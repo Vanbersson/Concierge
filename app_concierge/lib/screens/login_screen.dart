@@ -1,6 +1,9 @@
 import 'package:app_concierge/utils/components/myTextFormField.dart';
 import 'package:flutter/material.dart';
 
+import '../models/user.dart';
+import '../services/api/login_api.dart';
+
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
@@ -11,6 +14,22 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final loginKey = GlobalKey<FormFieldState>();
   final passwordKey = GlobalKey<FormFieldState>();
+
+  var loginController = TextEditingController();
+  var passwordController = TextEditingController();
+
+  ValueNotifier<bool>? isRememberPassword = ValueNotifier(false);
+
+ void login() async{
+    var user = User();
+    user.login = loginController.text;
+    user.password = passwordController.text;
+
+
+    var login = LoginApi();
+    login.login(user);
+
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,15 +48,12 @@ class _LoginScreenState extends State<LoginScreen> {
                   Text(
                     'AutoPoint',
                     style: TextStyle(
-                      
-                      fontSize: smallerSize * 0.14,
-                      fontWeight: FontWeight.w600,
-                      foreground: Paint()
-                      ..style = PaintingStyle.stroke
-                      ..strokeWidth = 4
-                      ..color = Colors.grey
-
-                    ),
+                        fontSize: smallerSize * 0.14,
+                        fontWeight: FontWeight.w600,
+                        foreground: Paint()
+                          ..style = PaintingStyle.stroke
+                          ..strokeWidth = 4
+                          ..color = Colors.grey),
                   ),
                   Text(
                     'Welcome',
@@ -88,40 +104,38 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ],
                       ),
+
                       SizedBox(
                         height: smallerSize * 0.04,
                       ),
                       //Login
                       MyTextFormField(
-                        myContext: context,
                         smallerSize: smallerSize,
                         myHintText: 'Login',
+                        myControler: loginController,
                         myKey: loginKey,
                         myBorderRadius: smallerSize * 0.02,
                         myPrefixIcon: const Icon(Icons.person),
                         myTextInputAction: TextInputAction.next,
                         mykeyboardType: TextInputType.emailAddress,
                         isPassword: false,
-                        response: (value) {},
-                        valid: (value) {},
                       ),
+
                       SizedBox(
                         height: smallerSize * 0.02,
                       ),
 
                       //Pasword
                       MyTextFormField(
-                        myContext: context,
                         smallerSize: smallerSize,
                         myHintText: 'Password',
+                        myControler: passwordController,
                         myKey: passwordKey,
                         myBorderRadius: smallerSize * 0.02,
                         myPrefixIcon: const Icon(Icons.person),
                         myTextInputAction: TextInputAction.done,
                         mykeyboardType: TextInputType.emailAddress,
                         isPassword: true,
-                        response: (value) {},
-                        valid: (value) {},
                       ),
 
                       SizedBox(
@@ -129,15 +143,45 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
 
                       Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
+                          //Remember password
+                          Row(
+                            children: [
+                              ValueListenableBuilder(
+                                valueListenable: isRememberPassword!,
+                                builder: (context, bool? isCheck, child) =>
+                                    Checkbox(
+                                  value: isCheck,
+                                  onChanged: (bool? value) {
+                                    if (value != null) {
+                                      isRememberPassword!.value = value;
+                                    }
+                                  },
+                                ),
+                              ),
+                              GestureDetector(
+                                onTap: () => isRememberPassword!.value =
+                                    !isRememberPassword!.value,
+                                child: Text(
+                                  'Remember',
+                                  style: TextStyle(
+                                      color: Colors.grey,
+                                      fontSize: smallerSize * 0.04,
+                                      fontWeight: FontWeight.w300),
+                                ),
+                              ),
+                            ],
+                          ),
+                          //Forgot Password
                           TextButton(
                             onPressed: () {},
                             child: Text(
-                              'Forget password?',
+                              'Forgot password?',
                               style: TextStyle(
                                   color: Colors.grey,
                                   fontSize: smallerSize * 0.04,
-                                  fontWeight: FontWeight.w400),
+                                  fontWeight: FontWeight.w300),
                             ),
                           ),
                         ],
@@ -150,7 +194,17 @@ class _LoginScreenState extends State<LoginScreen> {
                       SizedBox(
                         width: smallerSize,
                         child: ElevatedButton(
-                          onPressed: () {},
+                          onPressed: ()  {
+                            //Valid Fields
+                            if (loginKey.currentState!.validate() &&
+                                passwordKey.currentState!.validate()) {
+                              //Reset validation
+                              loginKey.currentState!.reset();
+                              passwordKey.currentState!.reset();
+
+                              login();
+                            } else {}
+                          },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.blue,
                             padding: EdgeInsets.symmetric(
@@ -169,7 +223,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                       SizedBox(
-                        height: smallerSize * 0.06,
+                        height: smallerSize * 0.08,
                       ),
                     ],
                   ),
