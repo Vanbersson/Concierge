@@ -7,8 +7,8 @@ import jakarta.validation.constraints.NotNull;
 
 public record CompanyDto(
         Integer id,
-        @NotNull StatusEnabledDisabledEnum status,
+        StatusEnabledDisabledEnum status,
         @NotBlank String name,
         @NotBlank String cnpj,
-        Address address) {
+         Integer addressId) {
 }

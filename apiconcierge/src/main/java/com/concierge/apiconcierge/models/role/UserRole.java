@@ -13,14 +13,16 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(of = "id")
+@SecondaryTable(name = "tb_resale",pkJoinColumns = @PrimaryKeyJoinColumn(name = "id"))
 @Entity
 @Table(name = "tb_user_role")
 public class UserRole implements Serializable {
     private static final long serialVersionUID = 4L;
 
-    private Company company;
 
-    private Resale resale;
+    @JoinColumn(referencedColumnName = "id")
+    @Column(name = "resale_id")
+    private Integer resaleId;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

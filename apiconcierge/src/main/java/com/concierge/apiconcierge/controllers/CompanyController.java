@@ -24,7 +24,7 @@ public class CompanyController {
     public ResponseEntity<Object> addCompany(@RequestBody @Valid CompanyDto data) {
         Company company0 = companyRepository.findByCnpj(data.cnpj());
 
-        if (company0 != null) return ResponseEntity.status(HttpStatus.CONFLICT).body("Company exists.");
+        if (company0 != null) return ResponseEntity.status(HttpStatus.CONFLICT).body("Company already exists.");
 
         Company company = new Company();
         BeanUtils.copyProperties(data, company);
@@ -58,7 +58,7 @@ public class CompanyController {
     }
 
     @GetMapping("/cnpj/{cnpj}")
-    public ResponseEntity<Object> getCnpjCompany(@PathVariable(value = "cnpj") String cnpj) {
+    public ResponseEntity<Object> cnpjCompany(@PathVariable(value = "cnpj") String cnpj) {
         Company company0 = companyRepository.findByCnpj(cnpj);
 
         if (company0 == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -68,7 +68,7 @@ public class CompanyController {
     }
 
     @GetMapping("/id/{id}")
-    public ResponseEntity<Object> getCnpjCompany(@PathVariable(value = "id") Integer id) {
+    public ResponseEntity<Object> idCompany(@PathVariable(value = "id") Integer id) {
         Optional<Company> company0 = companyRepository.findById(id);
 
         if (company0.isEmpty()) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();

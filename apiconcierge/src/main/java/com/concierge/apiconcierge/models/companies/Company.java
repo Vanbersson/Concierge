@@ -13,6 +13,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @EqualsAndHashCode(of = "id")
 @Entity
+@SecondaryTable(name = "tb_address", pkJoinColumns = @PrimaryKeyJoinColumn(name = "id"))
 @Table(name = "tb_company")
 public class Company implements Serializable {
 
@@ -28,5 +29,7 @@ public class Company implements Serializable {
 
     private String cnpj;
 
-    private Address address;
+    @JoinColumn(referencedColumnName = "id")
+    @Column(name = "address_id")
+    private Integer addressId;
 }

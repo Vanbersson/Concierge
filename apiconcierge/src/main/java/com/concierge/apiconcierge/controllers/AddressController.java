@@ -8,10 +8,10 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/address")
@@ -31,4 +31,52 @@ public class AddressController {
 
         return ResponseEntity.status(HttpStatus.CREATED).body(addressRepository.save(address));
     }
+
+    @PostMapping("/update")
+    public ResponseEntity<Address> updateAddress(@RequestBody @Valid AddressDto data) {
+        Optional<Address> address0 = addressRepository.findById(data.id());
+
+        if (address0.isEmpty()) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+
+        Address address = new Address();
+        BeanUtils.copyProperties(data, address);
+
+        return ResponseEntity.status(HttpStatus.OK).body(addressRepository.save(address));
+
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<List<Address>> allAddress() {
+
+        List<Address> addresses = addressRepository.findAll();
+
+        if (addresses.isEmpty()) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+
+        return ResponseEntity.ok(addresses);
+
+    }
+
+    @GetMapping("/cep/{cep}")
+    public ResponseEntity<Address> cepAddress(@PathVariable(value = "cep") String cep) {
+
+        Address address = addressRepository.findByCep(cep);
+
+        if (address == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+
+        return ResponseEntity.ok(address);
+
+    }
+
+    @GetMapping("/id/{id}")
+    public ResponseEntity<Object> cepAddress(@PathVariable(value = "id") Integer id) {
+
+        Optional<Address> address = addressRepository.findById(id);
+
+        if (address.isEmpty()) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+
+        return ResponseEntity.ok(address);
+
+    }
+
+
 }

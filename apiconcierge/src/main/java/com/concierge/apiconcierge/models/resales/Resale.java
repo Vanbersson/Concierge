@@ -14,13 +14,17 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(of = "id")
+@SecondaryTable(name = "tb_company",pkJoinColumns = @PrimaryKeyJoinColumn(name = "id"))
+@SecondaryTable(name = "tb_address",pkJoinColumns = @PrimaryKeyJoinColumn(name = "id"))
 @Entity
 @Table(name = "tb_resale")
 public class Resale implements Serializable {
 
     private static final long serialVersionUID = 3L;
 
-    private Company company;
+    @JoinColumn(referencedColumnName = "id")
+    @Column(name = "company_id")
+    private Integer companyId;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,5 +36,7 @@ public class Resale implements Serializable {
 
     private String cnpj;
 
-    private Address address;
+    @JoinColumn(referencedColumnName = "id")
+    @Column(name = "address_id")
+    private Integer addressId;
 }
