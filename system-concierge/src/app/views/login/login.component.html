@@ -1,0 +1,39 @@
+<div class="login-container">
+  <p-toast></p-toast>
+  <div class="card-login">
+    <div class="card-login-title">
+      <span>Conecte-se</span>
+    </div>
+    <P>Faça login em sua conta</P>
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+      <mat-form-field appearance="outline">
+        <mat-label>Digite seu email</mat-label>
+        <input matInput formControlName="login" placeholder="seuemail@email.com" type="email" />
+        <mat-icon matPrefix>person_outline</mat-icon>
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Digite sua senha</mat-label>
+        <input matInput formControlName="password" placeholder="Digite sua senha" [type]="hide ? 'password' : 'text'" />
+        <mat-icon matPrefix>fingerprint</mat-icon>
+        <button mat-icon-button matSuffix (click)="hide = !hide">
+          <mat-icon>{{ hide ? "visibility_off" : "visibility" }}</mat-icon>
+        </button>
+      </mat-form-field>
+      <div class="card-login-button">
+        <div class="card-login-button-submit">
+          <button mat-raised-button type="submit">Entrar</button>
+        </div>
+        <div class="card-login-button-esqueceu">
+          <button mat-button type="button" (click)="forgetPass()">Esqueceu sua senha?</button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div class="card-login-info">
+    <div class="info-tile">
+      <span>Bem vindo!</span>
+    </div>
+    <p>Sua oficina perto de você.</p>
+  </div>
+</div>

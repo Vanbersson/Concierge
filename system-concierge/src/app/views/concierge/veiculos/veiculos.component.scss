@@ -1,0 +1,30 @@
+
+:host{
+    .layout-card-title{
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 2rem;
+    
+        span{
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #673ab7;
+        }
+    }
+}
+
+:host ::ng-deep {
+    .p-progressbar {
+        height: .5rem;
+        background-color: #D8DADC;
+
+        .p-progressbar-value {
+            background-color: #607D8B;
+        }
+    }
+
+
+
+}
+
+

@@ -1,0 +1,107 @@
+<div class="layout-card">
+
+    <div class="layout-card-title">
+        <span>Lista veículos</span>
+        <p-button icon="pi pi-plus" label="Adicionar" [outlined]="true"></p-button>
+    </div>
+
+    <p-table #dt1 [value]="veiculos" [(selection)]="selectedItems" (selectionChange)="onSelectionChange($event)"
+        dataKey="id" [(selection)]="selectedVeiculo" [scrollable]="true" scrollHeight="700px"  [paginator]="true"
+        [rows]="10" [rowsPerPageOptions]="[10, 25, 50]">
+        <ng-template pTemplate="header">
+
+            <tr>
+                <th>Sel.</th>
+                <th pSortableColumn="id" style="width:10%">Código <p-sortIcon field="id"></p-sortIcon></th>
+                <th pSortableColumn="placa" style="width:15%">Placa <p-sortIcon field="placa"></p-sortIcon></th>
+                <th pSortableColumn="frota" style="width:15%">Frota <p-sortIcon field="frota"></p-sortIcon></th>
+                <th pSortableColumn="modelo" style="width:15%">Modelo <p-sortIcon field="modelo"></p-sortIcon></th>
+                <th pSortableColumn="dataEntrada" style="width:15%">Entrada <p-sortIcon
+                        field="dataEntrada"></p-sortIcon></th>
+                <th pSortableColumn="porteiro" style="width:15%">Porteiro <p-sortIcon field="porteiro"></p-sortIcon>
+                </th>
+                <th pSortableColumn="empresa" style="width:15%">Empresa <p-sortIcon field="empresa"></p-sortIcon></th>
+                <th pSortableColumn="orcamento" style="width:15%">Orçamento <p-sortIcon field="orcamento"></p-sortIcon>
+                </th>
+                <th style="width:15%"></th>
+
+            </tr>
+            <tr>
+                <th>
+                    <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+                </th>
+                <th>
+                    <p-columnFilter type="text" field="id"></p-columnFilter>
+                </th>
+                <th>
+                    <p-columnFilter type="text" field="placa"></p-columnFilter>
+                </th>
+                <th>
+                    <p-columnFilter type="text" field="frota"></p-columnFilter>
+                </th>
+                <th>
+                    <p-columnFilter type="text" field="modelo"></p-columnFilter>
+                </th>
+                <th>
+                    <p-columnFilter type="text" field="dataEntrada"></p-columnFilter>
+                </th>
+                <th>
+                    <p-columnFilter type="text" field="porteiro"></p-columnFilter>
+                </th>
+                <th>
+                    <p-columnFilter type="text" field="empresa"></p-columnFilter>
+                </th>
+                <th>
+                    <p-columnFilter field="orcamento" matchMode="equals" [showMenu]="false">
+                        <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                            <p-dropdown [ngModel]="value" [options]="statuses" (onChange)="filter($event.value)" [showClear]="true">
+                                <ng-template let-option pTemplate="item">
+                                    <p-tag [value]="option.value" [severity]="getSeverity(option.label)"></p-tag>
+                                </ng-template>
+                            </p-dropdown>
+                        </ng-template>
+                    </p-columnFilter>
+                </th>
+
+                <th>
+                    @if (selectedItems.length > 0) {
+                        <p-button icon="pi pi-check-circle" label="Liberar" [rounded]="true" [raised]="true" severity="success" size="small"></p-button>
+                    }
+                    
+                </th>
+
+            </tr>
+
+        </ng-template>
+        <ng-template pTemplate="body" let-veiculo>
+            <tr>
+                <td>
+                    <p-tableCheckbox [value]="veiculo"></p-tableCheckbox>
+                </td>
+                <td>{{ veiculo.id }}</td>
+                <td>{{ veiculo.placa }}</td>
+                <td>{{ veiculo.frota }}</td>
+                <td>{{ veiculo.modelo }}</td>
+                <td>{{ veiculo.dataEntrada }}</td>
+                <td>
+                    <img ngSrc="assets/layout/images/porteiro.png" alt="Porteiro" width="30" height="30" loading="lazy"
+                        style="vertical-align: middle">
+                    <span class="ml-1 vertical-align-middle">{{ veiculo.porteiro }}</span>
+                </td>
+                <td>{{ veiculo.empresa }}</td>
+                <td><p-tag [value]="veiculo.orcamento" [severity]="getSeverity(veiculo.orcamento)"></p-tag></td>
+
+                <td style="display: flex;">
+
+                    <button pButton pRipple icon="pi pi-pencil" size="small" class="p-button-rounded p-button-text"
+                        (click)="editVeiculo()"></button>
+
+                    <p-button label="Liberar" icon="pi pi-check-circle" [rounded]="true" [outlined]="true"  size="small" severity="success"></p-button>
+
+
+                </td>
+
+            </tr>
+        </ng-template>
+    </p-table>
+</div>

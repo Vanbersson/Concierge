@@ -1,0 +1,43 @@
+<div class="layout-sidebar-item">
+
+    <div class="layout-sidebar-item-title">
+        <span>{{item.title}}</span>
+    </div>
+
+    @if (item.itens == null) {
+    <div class="layout-title-item">
+
+        <mat-nav-list>
+            <a mat-list-item [routerLink]="item.routerlink" 
+            routerLinkActive="selected-link-active" #rla="routerLinkActive" [activated]="rla.isActive">
+                <i [class]="item.icon"></i>
+                <span>{{item.label}}</span>
+            </a>
+        </mat-nav-list>
+
+
+
+    </div>
+    }
+
+    @if (item.itens != null) {
+
+    <div class="layout-title-itens">
+
+        <mat-nav-list>
+
+            <a mat-list-item *ngFor="let menuitem of item.itens" [routerLink]="menuitem.routerlink"
+                routerLinkActive="item-link-active" #rla="routerLinkActive" [activated]="rla.isActive">
+                <i [class]="menuitem.icon"></i>
+                <span>{{menuitem.label}}</span>
+            </a>
+
+        </mat-nav-list>
+
+
+    </div>
+
+    }
+
+
+</div>

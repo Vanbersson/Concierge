@@ -1,0 +1,158 @@
+<div class="layout-card">
+
+    <div class="layout-modelo-title">
+        <span>Lista de modelos</span>
+        <p-button icon="pi pi-plus" (click)="showDialog()" label="Adicionar" [outlined]="true"></p-button>
+    </div>
+
+    <p-dialog header="Modelo veículo" [(visible)]="dialogVisible" [style]="{width: '450px'}" class="p-fluid">
+
+
+        <form [formGroup]="profileForm" (ngSubmit)="onSubmit()">
+
+            <div class="flex flex-column gap-2">
+
+                <div class="layout-dialog-img">
+                    <img [ngSrc]="pathFile" alt="Vehicle Model" height="100" width="100" loading="lazy">
+                </div>
+
+                <div class="field">
+                    <label for="username">Descrição</label>
+                    <input pInputText id="descricao" formControlName="description" />
+                </div>
+
+                <div class="layout-dialog-file">
+                    <label for="file">Selecionar imagem</label>
+                    <input type="file" id="file" (change)="onSelectFile($event)" accept="image/png" />
+                </div>
+
+                <div class="layout-card-modelo">
+                    <span>Situação</span>
+
+                    <div class="flex align-items-center">
+                        <p-radioButton inputId="ativo" value="ativo" formControlName="status"></p-radioButton>
+                        <label for="ativo" class="ml-2">Ativado</label>
+                    </div>
+
+                    <div class="flex align-items-center">
+                        <p-radioButton inputId="inativo" value="inativo" formControlName="status"></p-radioButton>
+                        <label for="inativo" class="ml-2">Desativado</label>
+                    </div>
+
+                </div>
+
+                <div class="layout-dialog-footer">
+                    <button pButton type="button" pRipple label="Cancelar" icon="pi pi-times" class="p-button-text"
+                        (click)=" hideDialog()"></button>
+                    <button pButton type="submit" pRipple label="Salvar" icon="pi pi-check"
+                        class="p-button-text"></button>
+                </div>
+            </div>
+
+
+        </form>
+
+    </p-dialog>
+
+    <p-table [value]="vehicleModels$ | async" [(selection)]="selectedItems" [tableStyle]="{'min-width': '50rem'}">
+        <ng-template pTemplate="header">
+            <tr>
+                <th>Sel.</th>
+                <th pSortableColumn="id" style="width:15%">Código <p-sortIcon field="id"></p-sortIcon></th>
+                <th pSortableColumn="status" style="width:15%">Status <p-sortIcon field="status"></p-sortIcon></th>
+                <th pSortableColumn="description" style="width:25%">Descrição <p-sortIcon
+                        field="description"></p-sortIcon></th>
+                <th pSortableColumn="image" style="width:20%">Imagem <p-sortIcon field="image"></p-sortIcon></th>
+                <th>
+
+                </th>
+            </tr>
+            <tr>
+                <th>
+                    <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+                </th>
+                <th>
+                    <p-columnFilter type="text" field="id"></p-columnFilter>
+                </th>
+                <th>
+                    <p-columnFilter field="status" matchMode="equals" [showMenu]="false">
+
+                        <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                            <p-dropdown [ngModel]="value" [options]="statuses" (onChange)="filter($event.value)"
+                                [showClear]="true">
+                                <ng-template let-option pTemplate="item">
+                                    <p-tag [value]="option.value" [severity]="getSeverity(option.label)"></p-tag>
+                                </ng-template>
+                            </p-dropdown>
+                        </ng-template>
+                    </p-columnFilter>
+
+                </th>
+                <th>
+                    <p-columnFilter type="text" field="description"></p-columnFilter>
+                </th>
+                <th></th>
+                <th>
+                    @if (selectedItems.length > 0 ) {
+
+                    @if(selectedItems[0].status == "ativo"){
+                    <p-button icon="pi pi-times" label="Desativar" [rounded]="true" [raised]="true" [outlined]="true"
+                        severity="warning" [style]="{width:'126.13px'}" size="small"
+                        (click)="updateStatusSelected()"></p-button>
+
+                    }
+                    @if(selectedItems[0].status == "inativo"){
+                    <p-button icon="pi pi-check" label="Ativar" [rounded]="true" [raised]="true" severity="success"
+                        [style]="{width:'126.13px'}" size="small" (click)="updateStatusSelected()"></p-button>
+
+                    }
+
+
+                    }
+
+
+                </th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-modelo>
+            <tr>
+                <td>
+                    <p-tableCheckbox [value]="modelo"></p-tableCheckbox>
+                </td>
+                <td>{{modelo.id}}</td>
+                <td> <p-tag [value]="modelo.status | titlecase" [severity]="getSeverity(modelo.status)"></p-tag> </td>
+                <td>{{modelo.description}}</td>
+                <td>
+                    @if (modelo.image) {
+                        <img src="data:image/png;base64,{{modelo.image}}" alt="Vehicle Model" width="50" height="50"
+                        loading="lazy">
+                    }@else {
+                    <img ngSrc="assets/layout/images/picture.png" alt="Vehicle Model" width="50" height="50"
+                        loading="lazy">
+                    }
+
+                </td>
+                <td>
+                    <div class="flex gap-2">
+
+                        <p-button icon="pi pi-pencil" [rounded]="true" [text]="true" severity="primary"
+                            (click)="showDialogEditar(modelo)"></p-button>
+
+                        @if (modelo.status =="ativo") {
+                        <p-button icon="pi pi-times" label="Desativar" [rounded]="true" [raised]="true"
+                            [outlined]="true" severity="warning" [style]="{width:'126.13px'}" size="small"
+                            (click)="updateStatus(modelo)"></p-button>
+                        }
+
+                        @if(modelo.status =="inativo") {
+                        <p-button icon="pi pi-check" label="Ativar" [rounded]="true" [raised]="true" severity="success"
+                            [style]="{width:'126.13px'}" size="small" (click)="updateStatus(modelo)"></p-button>
+                        }
+                    </div>
+
+
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
+</div>
