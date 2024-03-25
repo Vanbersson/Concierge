@@ -7,10 +7,15 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface UserRepository extends JpaRepository<User,Integer> {
+public interface UserRepository extends JpaRepository<User, Integer> {
+
+    User findByCompanyIdAndResaleIdAndId(Integer companyId,Integer resaleId,Integer id);
 
 
-    List<User> findByResaleId(Integer resaleId);
+  List<User> findByCompanyIdAndResaleId(Integer companyId,Integer resaleId);
+
+    User findByResaleIdAndId(Integer resaleId, Integer id);
+
     User findByLogin(String login);
 
     User findByEmail(String email);

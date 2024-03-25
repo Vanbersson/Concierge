@@ -1,15 +1,15 @@
-package com.concierge.apiconcierge.dtos;
+package com.concierge.apiconcierge.dtos.clientcompany;
 
-import com.concierge.apiconcierge.models.status.StatusEnabledDisabledEnum;
+import com.concierge.apiconcierge.models.status.StatusEnableDisable;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 public record ClientCompanyDto(
+       @NotNull Integer companyId,
         @NotNull Integer resaleId,
         Integer id,
-        @NotNull StatusEnabledDisabledEnum status,
-
-        @NotBlank String name,
+        StatusEnableDisable status,
+        String name,
         String cnpj,
         String cpf,
         String rg,
@@ -19,9 +19,7 @@ public record ClientCompanyDto(
 
         String cellphone,
 
-        @NotNull Integer typeId,
-
-        @NotNull Integer addressId
+        @NotNull Integer typeId
 
 ) {
 }

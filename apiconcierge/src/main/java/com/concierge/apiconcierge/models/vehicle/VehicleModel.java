@@ -1,23 +1,19 @@
-package com.concierge.apiconcierge.models.role;
+package com.concierge.apiconcierge.models.vehicle;
 
 import com.concierge.apiconcierge.models.status.StatusEnableDisable;
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.io.Serializable;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(of = "id")
-@SecondaryTable(name = "tb_company", pkJoinColumns = @PrimaryKeyJoinColumn(name = "id"))
-@SecondaryTable(name = "tb_resale", pkJoinColumns = @PrimaryKeyJoinColumn(name = "id"))
+@SecondaryTable(name = "tb_company",pkJoinColumns = @PrimaryKeyJoinColumn(name = "id"))
+@SecondaryTable(name = "tb_resale",pkJoinColumns = @PrimaryKeyJoinColumn(name = "id"))
 @Entity
-@Table(name = "tb_user_role")
-public class UserRole implements Serializable {
-    private static final long serialVersionUID = 4L;
-
+@Table(name = "tb_vehicle_model")
+public class VehicleModel {
 
     @JoinColumn(table = "tb_company", referencedColumnName = "id")
     @Column(name = "company_id")
@@ -35,4 +31,7 @@ public class UserRole implements Serializable {
 
     private String description;
 
+    @Lob
+    @Column(columnDefinition = "BLOB")
+    private byte[] image;
 }

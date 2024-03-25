@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/user/resale/{resaleId}")
+@RequestMapping("/user")
 public class UserController {
 
     @Autowired
@@ -30,19 +30,12 @@ public class UserController {
     ResaleRepository resaleRepository;
 
     @PostMapping("/add")
-    public ResponseEntity<Object> addUser(@PathVariable(value = "resaleId") Integer resaleId, @RequestBody @Valid UserDto data) {
-
-        //Validation
-        if (resaleId != data.resaleId()) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        
-        //Validation
-        if (!validResale(resaleId)) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    public ResponseEntity<Object> addUser(@RequestBody @Valid UserDto data) {
 
         User user0 = userRepository.findByLogin(data.login());
 
         //Validation
         if (user0 != null) return ResponseEntity.status(HttpStatus.CONFLICT).body("Login already exists.");
-
 
         User user = new User();
         BeanUtils.copyProperties(data, user);
@@ -52,17 +45,11 @@ public class UserController {
     }
 
     @PostMapping("/update")
-    public ResponseEntity<Object> updateUser(@PathVariable(value = "resaleId") Integer resaleId, @RequestBody @Valid UserDto data) {
+    public ResponseEntity<Object> updateUser(@RequestBody @Valid UserDto data) {
 
-        //Validation
-        if (resaleId != data.resaleId()) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        User user0 = userRepository.findByCompanyIdAndResaleIdAndId(data.companyId(), data.resaleId(), data.id());
 
-        //Validation
-        if (!validResale(resaleId)) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-
-        Optional<User> user0 = userRepository.findById(data.id());
-
-        if (user0.isEmpty()) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        if (user0 == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 
         User user = new User();
         BeanUtils.copyProperties(data, user);
@@ -70,19 +57,12 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(userRepository.save(user));
     }
 
-    @GetMapping("/all")
-    public ResponseEntity<List<User>> allUser(@PathVariable(value = "resaleId") Integer resaleId) {
-        List<User> users = userRepository.findByResaleId(resaleId);
-
-        if (users.isEmpty()) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    @GetMapping("/all/{companyid}/{resaleid}")
+    public ResponseEntity<List<User>> allUser(@PathVariable(value = "companyid") Integer companyId, @PathVariable(value = "resaleid") Integer resaleId) {
+        List<User> users = userRepository.findByCompanyIdAndResaleId(companyId, resaleId);
 
         return ResponseEntity.ok(users);
 
     }
 
-    private Boolean validResale(Integer resaleId) {
-        var resele = resaleRepository.findById(resaleId);
-
-        return resele.isPresent();
-    }
 }

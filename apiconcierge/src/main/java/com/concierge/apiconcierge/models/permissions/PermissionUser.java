@@ -12,28 +12,33 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@SecondaryTable(name = "tb_resale",pkJoinColumns = @PrimaryKeyJoinColumn(name = "id"))
-@SecondaryTable(name = "tb_user",pkJoinColumns = @PrimaryKeyJoinColumn(name = "id"))
-@SecondaryTable(name = "tb_permission",pkJoinColumns = @PrimaryKeyJoinColumn(name = "id"))
+@SecondaryTable(name = "tb_company", pkJoinColumns = @PrimaryKeyJoinColumn(name = "id"))
+@SecondaryTable(name = "tb_resale", pkJoinColumns = @PrimaryKeyJoinColumn(name = "id"))
+@SecondaryTable(name = "tb_user", pkJoinColumns = @PrimaryKeyJoinColumn(name = "id"))
+@SecondaryTable(name = "tb_permission", pkJoinColumns = @PrimaryKeyJoinColumn(name = "id"))
 @Entity
-@Table(name = "tb_permission_user")
+@Table(name = "tb_user_permission")
 public class PermissionUser implements Serializable {
 
     private static final long serialVersionUID = 7L;
+
+    @JoinColumn(table = "tb_company", referencedColumnName = "id")
+    @Column(name = "company_id")
+    private Integer companyId;
+
+    @JoinColumn(table = "tb_resale", referencedColumnName = "id")
+    @Column(name = "resale_id")
+    private Integer resaleId;
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @JoinColumn(referencedColumnName = "id")
-    @Column(name = "resale_id")
-    private Integer resaleId;
-
-    @JoinColumn(referencedColumnName = "id")
+    @JoinColumn(table = "tb_user", referencedColumnName = "id")
     @Column(name = "user_id")
     private Integer userId;
 
-    @JoinColumn(referencedColumnName = "id")
+    @JoinColumn(table = "tb_permission", referencedColumnName = "id")
     @Column(name = "permission_id")
     private Integer permissionId;
 }

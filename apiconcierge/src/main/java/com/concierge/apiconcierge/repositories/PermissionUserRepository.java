@@ -11,7 +11,7 @@ import java.util.UUID;
 @Repository
 public interface PermissionUserRepository extends JpaRepository<PermissionUser, UUID> {
 
-    List<PermissionUser> findByResaleIdAndUserId(Integer resaleId,Integer userId);
+    List<PermissionUser> findByResaleIdAndUserId(Integer resaleId, Integer userId);
 
-    PermissionUser findByResaleIdAndUserIdAndPermissionId(Integer resaleId,Integer userId,Integer permissionId);
+    PermissionUser findByResaleIdAndUserIdAndPermissionId(Integer resaleId, Integer userId, Integer permissionId);
 }

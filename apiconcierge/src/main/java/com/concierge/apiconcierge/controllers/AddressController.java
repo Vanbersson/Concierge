@@ -22,9 +22,9 @@ public class AddressController {
 
     @PostMapping("/add")
     public ResponseEntity<Object> addAddress(@RequestBody @Valid AddressDto data) {
-        Address address0 = addressRepository.findByCep(data.cep());
+        Address address0 = addressRepository.findByZipCode(data.zipCode());
 
-        if (address0 != null) return ResponseEntity.status(HttpStatus.CONFLICT).body("Address exists.");
+        if (address0 != null) return ResponseEntity.status(HttpStatus.CONFLICT).body("Address already exists.");
 
         Address address = new Address();
         BeanUtils.copyProperties(data, address);
@@ -50,16 +50,14 @@ public class AddressController {
 
         List<Address> addresses = addressRepository.findAll();
 
-        if (addresses.isEmpty()) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-
         return ResponseEntity.ok(addresses);
 
     }
 
-    @GetMapping("/cep/{cep}")
-    public ResponseEntity<Address> cepAddress(@PathVariable(value = "cep") String cep) {
+    @GetMapping("/zipcode/{zipcode}")
+    public ResponseEntity<Address> cepAddress(@PathVariable(value = "zipcode") String zipCode) {
 
-        Address address = addressRepository.findByCep(cep);
+        Address address = addressRepository.findByZipCode(zipCode);
 
         if (address == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 

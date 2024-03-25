@@ -1,20 +1,22 @@
 package com.concierge.apiconcierge.dtos;
 
-import com.concierge.apiconcierge.models.companies.Company;
-import com.concierge.apiconcierge.models.resales.Resale;
 import com.concierge.apiconcierge.models.role.UserRole;
-import com.concierge.apiconcierge.models.status.StatusEnabledDisabledEnum;
+import com.concierge.apiconcierge.models.status.StatusEnableDisable;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
+import java.util.UUID;
+
 public record UserDto(
+        @NotNull Integer companyId,
         @NotNull Integer resaleId,
         Integer id,
-        @NotNull StatusEnabledDisabledEnum status,
-        @NotBlank String name,
-        @NotBlank String login,
+        StatusEnableDisable status,
+        String name,
+        String login,
         String password,
         String email,
         String cellphone,
-        @NotNull Integer roleId) {
+        UUID imageId,
+        @NotNull Integer role) {
 }

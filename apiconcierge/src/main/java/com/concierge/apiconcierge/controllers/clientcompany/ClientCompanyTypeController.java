@@ -1,8 +1,8 @@
-package com.concierge.apiconcierge.controllers;
+package com.concierge.apiconcierge.controllers.clientcompany;
 
-import com.concierge.apiconcierge.dtos.ClientCompanyTypeDto;
+import com.concierge.apiconcierge.dtos.clientcompany.ClientCompanyTypeDto;
 import com.concierge.apiconcierge.models.clientcompany.ClientCompanyType;
-import com.concierge.apiconcierge.repositories.ClientCompanyTypeRepository;
+import com.concierge.apiconcierge.repositories.clientcompany.ClientCompanyTypeRepository;
 import jakarta.validation.Valid;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/ClientCompany/type")
+@RequestMapping("/clientcompany/type")
 public class ClientCompanyTypeController {
 
     @Autowired
@@ -45,20 +45,25 @@ public class ClientCompanyTypeController {
 
     }
 
-    @GetMapping("/all")
-    public ResponseEntity<List<ClientCompanyType>> allType() {
-        List<ClientCompanyType> types = typeRepository.findAll();
+    @GetMapping("/all/{companyid}/{resaleid}")
+    public ResponseEntity<List<ClientCompanyType>> allType(
+            @PathVariable(name = "companyid") Integer companyId,
+            @PathVariable(name = "resaleid") Integer resaleId) {
 
-        if (types.isEmpty()) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        List<ClientCompanyType> types = typeRepository.findByCompanyIdAndResaleId(companyId, resaleId);
 
         return ResponseEntity.ok(types);
     }
 
-    @GetMapping("/id/{id}")
-    public ResponseEntity<Object> idType(@PathVariable(name = "id") Integer id) {
-        Optional<ClientCompanyType> type0 = typeRepository.findById(id);
+    @GetMapping("/id/{id}/{companyid}/{resaleid}")
+    public ResponseEntity<Object> idType(
+            @PathVariable(name = "id") Integer id,
+            @PathVariable(name = "companyid") Integer companyId,
+            @PathVariable(name = "resaleid") Integer resaleId) {
 
-        if (type0.isEmpty()) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        ClientCompanyType type0 = typeRepository.findByCompanyIdAndResaleIdAndId(id, companyId, resaleId);
+
+        if (type0 == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 
         return ResponseEntity.ok(type0);
     }

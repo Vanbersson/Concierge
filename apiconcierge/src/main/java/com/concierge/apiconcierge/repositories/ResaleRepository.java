@@ -9,9 +9,11 @@ import java.util.List;
 @Repository
 public interface ResaleRepository extends JpaRepository<Resale, Integer> {
 
-    Resale findByCompanyIdAndCnpj(Integer companyId,String cnpj);
+    Resale findByCnpj(String cnpj);
 
-    Resale findByCompanyIdAndId(Integer companyId,Integer id);
+    Resale findByCompanyIdAndCnpj(Integer companyId, String cnpj);
+
+    Resale findByCompanyIdAndId(Integer companyId, Integer id);
 
     List<Resale> findByCompanyId(Integer companyId);
 }

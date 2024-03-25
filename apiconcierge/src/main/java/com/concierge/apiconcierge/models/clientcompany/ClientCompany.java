@@ -1,6 +1,6 @@
 package com.concierge.apiconcierge.models.clientcompany;
 
-import com.concierge.apiconcierge.models.status.StatusEnabledDisabledEnum;
+import com.concierge.apiconcierge.models.status.StatusEnableDisable;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -11,16 +11,20 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(of = "id")
+@SecondaryTable(name = "tb_company", pkJoinColumns = @PrimaryKeyJoinColumn(name = "id"))
 @SecondaryTable(name = "tb_resale", pkJoinColumns = @PrimaryKeyJoinColumn(name = "id"))
 @SecondaryTable(name = "tb_client_company_type", pkJoinColumns = @PrimaryKeyJoinColumn(name = "id"))
-@SecondaryTable(name = "tb_address", pkJoinColumns = @PrimaryKeyJoinColumn(name = "id"))
 @Entity
 @Table(name = "tb_client_company")
 public class ClientCompany implements Serializable {
 
     private static final long serialVersionUID = 9L;
 
-    @JoinColumn(referencedColumnName = "id")
+    @JoinColumn(table = "tb_company", referencedColumnName = "id")
+    @Column(name = "company_id")
+    private Integer companyId;
+
+    @JoinColumn(table = "tb_resale", referencedColumnName = "id")
     @Column(name = "resale_id")
     private Integer resaleId;
 
@@ -28,7 +32,7 @@ public class ClientCompany implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    private StatusEnabledDisabledEnum status;
+    private StatusEnableDisable status;
 
     private String name;
 
@@ -40,17 +44,13 @@ public class ClientCompany implements Serializable {
 
     private String email;
 
-    private String phone;
-
     private String cellphone;
 
-    @JoinColumn(referencedColumnName = "id")
+    private String phone;
+
+    @JoinColumn(table = "tb_client_company_type", referencedColumnName = "id")
     @Column(name = "type_id")
     private Integer typeId;
-
-    @JoinColumn(referencedColumnName = "id")
-    @Column(name = "address_id")
-    private Integer addressId;
 
 
 }

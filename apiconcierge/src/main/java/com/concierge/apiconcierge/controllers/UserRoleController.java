@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/role/user")
+@RequestMapping("/role")
 public class UserRoleController {
 
     @Autowired
@@ -25,12 +25,12 @@ public class UserRoleController {
 
     @PostMapping("/add")
     public ResponseEntity<Object> addRole(@RequestBody @Valid UserRoleDto data) {
-        Optional<UserRole> role0 = userRoleRepository.findById(data.id());
-
-        if (role0 != null) return ResponseEntity.status(HttpStatus.CONFLICT).body("Role exists.");
 
         UserRole role = new UserRole();
+
         BeanUtils.copyProperties(data, role);
+
+        role.setId(0);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(userRoleRepository.save(role));
 
@@ -38,9 +38,6 @@ public class UserRoleController {
 
     @PostMapping("/update")
     public ResponseEntity<Object> updateRole(@RequestBody @Valid UserRoleDto data) {
-        Optional<UserRole> role0 = userRoleRepository.findById(data.id());
-
-        if (role0.isEmpty()) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 
         UserRole role = new UserRole();
         BeanUtils.copyProperties(data, role);
@@ -48,24 +45,14 @@ public class UserRoleController {
         return ResponseEntity.status(HttpStatus.OK).body(userRoleRepository.save(role));
     }
 
-    @GetMapping("/all")
-    public ResponseEntity<List<UserRole>> allRole() {
+    @GetMapping("/all/{companyid}/{resaleid}")
+    public ResponseEntity<List<UserRole>> allRole(@PathVariable(value = "companyid") Integer companyId, @PathVariable(value = "resaleid") Integer resaleId) {
 
         List<UserRole> roles = userRoleRepository.findAll();
-        if (roles.isEmpty()) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 
         return ResponseEntity.ok(roles);
 
     }
 
-    @GetMapping("/id/{id}")
-    public ResponseEntity<Object> idRole(@PathVariable(value = "id") Integer id) {
-        Optional<UserRole> role0 = userRoleRepository.findById(id);
-
-        if (role0.isEmpty()) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-
-        return ResponseEntity.ok(role0);
-
-    }
 
 }

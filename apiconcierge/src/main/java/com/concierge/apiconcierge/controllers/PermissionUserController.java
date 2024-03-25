@@ -21,7 +21,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/permissionUser")
+@RequestMapping("/permission/user/resale/{resaleId}")
 public class PermissionUserController {
 
     @Autowired
@@ -34,25 +34,25 @@ public class PermissionUserController {
     PermissionRepository permissionRepository;
 
     @PostMapping("/add")
-    public ResponseEntity<Object> addPermissionUser(@RequestBody @Valid PermissionUserDto data) {
-
-        Optional<User> user = userRepository.findById(data.userId());
+    public ResponseEntity<Object> addPermissionUser(@PathVariable(value = "resaleId") Integer resaleId, @RequestBody @Valid PermissionUserDto data) {
 
         //Validation
-        if (user.isEmpty()) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-
-        //Validation
-        if (user.get().getResaleId() != data.resaleId()) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-
-        Optional<Permission> permission = permissionRepository.findById(data.permissionId());
-
-        //Validation
-        if (permission.isEmpty()) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        if (resaleId != data.resaleId()) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 
         PermissionUser permission0 = permissionUserRepository.findByResaleIdAndUserIdAndPermissionId(data.resaleId(), data.userId(), data.permissionId());
 
         //Validation
         if (permission0 != null) return ResponseEntity.status(HttpStatus.CONFLICT).body("Permission already exists.");
+
+        User user = userRepository.findByResaleIdAndId(data.resaleId(), data.userId());
+
+        //Validation
+        if (user == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+
+        Optional<Permission> permission = permissionRepository.findById(data.permissionId());
+
+        //Validation
+        if (permission.isEmpty()) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 
         PermissionUser permissionUser = new PermissionUser();
         BeanUtils.copyProperties(data, permissionUser);
@@ -61,8 +61,8 @@ public class PermissionUserController {
 
     }
 
-    @GetMapping("/resale/{resale}/user/{user}")
-    public ResponseEntity<List<PermissionUser>> idUser(@PathVariable(value = "resale") Integer resaleId, @PathVariable(value = "user") Integer userId) {
+    @GetMapping("/user/{userId}/all")
+    public ResponseEntity<List<PermissionUser>> idUser(@PathVariable(value = "resaleId") Integer resaleId, @PathVariable(value = "userId") Integer userId) {
         List<PermissionUser> users = permissionUserRepository.findByResaleIdAndUserId(resaleId, userId);
 
         if (users.isEmpty()) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -71,7 +71,7 @@ public class PermissionUserController {
 
     }
 
-    @PostMapping("/remove/permission")
+    @PostMapping("/dell")
     public ResponseEntity removeUser(@RequestBody @Valid PermissionUserDto data) {
 
         Optional<PermissionUser> permissionUser = permissionUserRepository.findById(data.id());

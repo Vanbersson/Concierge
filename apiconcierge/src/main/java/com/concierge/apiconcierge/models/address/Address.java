@@ -20,9 +20,13 @@ public class Address implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    private String cep;
+    private String state;
+
+    private String city;
+
+    @Column(name = "zip_code")
+    private String zipCode;
 
     private String address;
 
-    private String city;
 }
