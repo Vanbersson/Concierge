@@ -1,4 +1,4 @@
-package com.concierge.apiconcierge.controllers.clientcompany;
+package com.concierge.apiconcierge.controllers.version1.clientcompany;
 
 import com.concierge.apiconcierge.dtos.clientcompany.ClientCompanyTypeDto;
 import com.concierge.apiconcierge.models.clientcompany.ClientCompanyType;
@@ -14,14 +14,16 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/clientcompany/type")
+@RequestMapping("/v1/{companyid}/{resaleid}/clientCompany/type")
 public class ClientCompanyTypeController {
 
     @Autowired
     ClientCompanyTypeRepository typeRepository;
 
     @PostMapping("/add")
-    public ResponseEntity<Object> addType(@RequestBody @Valid ClientCompanyTypeDto data) {
+    public ResponseEntity<Object> addType(@PathVariable(name = "companyid") Integer companyId,
+                                          @PathVariable(name = "resaleid") Integer resaleId,
+                                          @RequestBody @Valid ClientCompanyTypeDto data) {
 
         ClientCompanyType type = new ClientCompanyType();
         BeanUtils.copyProperties(data, type);
@@ -31,7 +33,9 @@ public class ClientCompanyTypeController {
     }
 
     @PostMapping("/update")
-    public ResponseEntity<Object> updateType(@RequestBody @Valid ClientCompanyTypeDto data) {
+    public ResponseEntity<Object> updateType(@PathVariable(name = "companyid") Integer companyId,
+                                             @PathVariable(name = "resaleid") Integer resaleId,
+                                             @RequestBody @Valid ClientCompanyTypeDto data) {
 
         Optional<ClientCompanyType> type0 = typeRepository.findById(data.id());
 
@@ -45,7 +49,7 @@ public class ClientCompanyTypeController {
 
     }
 
-    @GetMapping("/all/{companyid}/{resaleid}")
+    @GetMapping("/all")
     public ResponseEntity<List<ClientCompanyType>> allType(
             @PathVariable(name = "companyid") Integer companyId,
             @PathVariable(name = "resaleid") Integer resaleId) {
@@ -55,7 +59,7 @@ public class ClientCompanyTypeController {
         return ResponseEntity.ok(types);
     }
 
-    @GetMapping("/id/{id}/{companyid}/{resaleid}")
+    @GetMapping("/filter/id/{id}")
     public ResponseEntity<Object> idType(
             @PathVariable(name = "id") Integer id,
             @PathVariable(name = "companyid") Integer companyId,

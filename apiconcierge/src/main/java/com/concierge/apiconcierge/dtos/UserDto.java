@@ -13,9 +13,8 @@ public record UserDto(
         Integer id,
         StatusEnableDisable status,
         String name,
-        String login,
-        String password,
         String email,
+        String password,
         String cellphone,
         UUID imageId,
         @NotNull Integer role) {

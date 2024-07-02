@@ -1,11 +1,12 @@
 package com.concierge.apiconcierge.models.vehicle;
 
+import com.concierge.apiconcierge.models.budget.enums.StatusBudgetEnum;
+import com.concierge.apiconcierge.models.vehicle.enums.*;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.UUID;
 
 @Getter
 @Setter
@@ -16,6 +17,7 @@ import java.util.UUID;
 @SecondaryTable(name = "tb_resale", pkJoinColumns = @PrimaryKeyJoinColumn(name = "id"))
 @SecondaryTable(name = "tb_user", pkJoinColumns = @PrimaryKeyJoinColumn(name = "id"))
 @SecondaryTable(name = "tb_client_company", pkJoinColumns = @PrimaryKeyJoinColumn(name = "id"))
+@SecondaryTable(name = "tb_vehicle_model", pkJoinColumns = @PrimaryKeyJoinColumn(name = "id"))
 @Entity
 @Table(name = "tb_vehicle_entry")
 public class VehicleEntry implements Serializable {
@@ -32,11 +34,16 @@ public class VehicleEntry implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    private String status;
+    private StatusVehicleEnum status;
 
     @Column(name = "step_entry")
-    private Integer stepEntry;
+    private StepVehicleEnum stepEntry;
 
+    @Column(name = "budget_id")
+    private Integer budgetId;
+
+    @Column(name = "budget_status")
+    private StatusBudgetEnum budgetStatus;
 
     @JoinColumn(table = "tb_user", referencedColumnName = "id")
     @Column(name = "id_user_entry")
@@ -47,6 +54,16 @@ public class VehicleEntry implements Serializable {
 
     @Column(name = "date_entry")
     private Date dateEntry;
+
+    @Column(name = "date_prevision_exit")
+    private Date datePrevisionExit;
+
+    @JoinColumn(table = "tb_user", referencedColumnName = "id")
+    @Column(name = "id_user_attendant")
+    private Integer idUserAttendant;
+
+    @Column(name = "name_user_attendant")
+    private String nameUserAttendant;
 
 
     @JoinColumn(table = "tb_user", referencedColumnName = "id")
@@ -60,8 +77,153 @@ public class VehicleEntry implements Serializable {
     private Date dateExitAuth1;
 
 
+    @JoinColumn(table = "tb_user", referencedColumnName = "id")
+    @Column(name = "id_user_exit_auth2")
+    private Integer idUserExitAuth2;
+
+    @Column(name = "name_user_exit_auth2")
+    private String nameUserExitAuth2;
+
+    @Column(name = "date_exit_auth2")
+    private Date dateExitAuth2;
+
+    @Column(name = "status_auth_exit")
+    private StatusAuthExitEnum statusAuthExit;
 
 
+    @JoinColumn(table = "tb_vehicle_model", referencedColumnName = "id")
+    @Column(name = "model_id")
+    private Integer modelId;
 
+    @Column(name = "model_description")
+    private String modelDescription;
+
+    //Empresa
+    @JoinColumn(table = "tb_client_company", referencedColumnName = "id")
+    @Column(name = "client_company_id")
+    private Integer clientCompanyId;
+
+    @Column(name = "client_company_name")
+    private String clientCompanyName;
+
+    @Column(name = "client_company_cnpj")
+    private String clientCompanyCnpj;
+
+    @Column(name = "client_company_cpf")
+    private String clientCompanyCpf;
+
+    @Column(name = "client_company_rg")
+    private String clientCompanyRg;
+
+    //Motorista entrada
+    @Column(name = "driver_entry_name")
+    private String driverEntryName;
+
+    @Column(name = "driver_entry_cpf")
+    private String driverEntryCpf;
+
+    @Column(name = "driver_entry_rg")
+    private String driverEntryRg;
+
+    @Lob
+    @Column(name = "driver_entry_photo")
+    private byte[] driverEntryPhoto;
+
+    @Lob
+    @Column(name = "driver_entry_signature")
+    private byte[] driverEntrySignature;
+
+    @Lob
+    @Column(name = "driver_entry_photo_doc1")
+    private byte[] driverEntryPhotoDoc1;
+
+    @Lob
+    @Column(name = "driver_entry_photo_doc2")
+    private byte[] driverEntryPhotoDoc2;
+
+    //Motorista saída
+    @Column(name = "driver_exit_name")
+    private String driverExitName;
+
+    @Column(name = "driver_exit_cpf")
+    private String driverExitCpf;
+
+    @Column(name = "driver_exit_rg")
+    private String driverExitRg;
+
+    @Lob
+    @Column(name = "driver_exit_photo")
+    private byte[] driverExitPhoto;
+
+    @Lob
+    @Column(name = "driver_exit_signature")
+    private byte[] driverExitSignature;
+
+    @Lob
+    @Column(name = "driver_exit_photo_doc1")
+    private byte[] driverExitPhotoDoc1;
+
+    @Lob
+    @Column(name = "driver_exit_photo_doc2")
+    private byte[] driverExitPhotoDoc2;
+
+    private ColorVehicleEnum color;
+
+    private String placa;
+
+    private String frota;
+
+    @Column(name = "vehicle_new")
+    private VehicleYesNotEnum vehicleNew;
+
+    @Column(name = "km_entry")
+    private String kmEntry;
+
+    @Column(name = "km_exit")
+    private String kmExit;
+
+    @Lob
+    private byte[] photo1;
+
+    @Lob
+    private byte[] photo2;
+
+    @Lob
+    private byte[] photo3;
+
+    @Lob
+    private byte[] photo4;
+
+    @Column(name = "quantity_extinguisher")
+    private Integer quantityExtinguisher;
+
+    @Column(name = "quantity_traffic_cone")
+    private Integer quantityTrafficCone;
+
+    @Column(name = "quantity_tire")
+    private Integer quantityTire;
+
+    @Column(name = "quantity_tire_complete")
+    private Integer quantityTireComplete;
+
+    @Column(name = "quantity_tool_box")
+    private Integer quantityToolBox;
+
+    @Column(name = "service_order")
+    private VehicleYesNotEnum serviceOrder;
+
+    @Column(name = "num_service_order")
+    private String numServiceOrder;
+
+    @Column(name = "num_nfe")
+    private String numNfe;
+
+    @Column(name = "num_nfse")
+    private String numNfse;
+
+    private String information;
+
+    @Column(name = "information_concierge")
+    private String informationConcierge;
 
 }

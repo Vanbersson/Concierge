@@ -52,5 +52,7 @@ public class ClientCompany implements Serializable {
     @Column(name = "type_id")
     private Integer typeId;
 
+    private ClientCompanyTypeEnum type;
+
 
 }

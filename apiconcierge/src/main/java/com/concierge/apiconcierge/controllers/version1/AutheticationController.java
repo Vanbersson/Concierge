@@ -1,4 +1,4 @@
-package com.concierge.apiconcierge.controllers;
+package com.concierge.apiconcierge.controllers.version1;
 
 import com.concierge.apiconcierge.dtos.AuthenticationDto;
 import com.concierge.apiconcierge.models.user.User;
@@ -24,7 +24,7 @@ public class AutheticationController {
     @PostMapping("/login")
     public ResponseEntity<User> login(@RequestBody @Valid AuthenticationDto data){
 
-        User user = userRepository.findByLogin(data.login());
+        User user = userRepository.findByEmail(data.email());
 
         //Valid
         if(user == null){

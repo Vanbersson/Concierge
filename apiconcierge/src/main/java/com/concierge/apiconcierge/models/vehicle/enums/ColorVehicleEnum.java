@@ -1,5 +1,5 @@
 package com.concierge.apiconcierge.models.vehicle.enums;
 
 public enum ColorVehicleEnum {
-    branco, preto, azul, verde, cinza, vermelho, amarelo, rosa, roxo;
+    Branco, Preto, Azul, Verde, Cinza, Vermelho, Amarelo, Rosa, Roxo, Outro;
 }
