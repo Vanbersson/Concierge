@@ -1,7 +1,5 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
-
-//Angular
 import { FormsModule, ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 
 //primeNG
@@ -17,18 +15,22 @@ import { InputTextModule } from 'primeng/inputtext';
 import { RadioButtonModule } from 'primeng/radiobutton';
 
 //Service
-import { VehicleModelService } from '../../../services/concierge/vehicle-model/vehicle-model.service';
-import { VehicleModel } from '../../../models/vehicle-model';
+import { VehicleModel } from '../../../models/vehicle/vehicleModel';
 import { InterfaceUpdateStatus } from '../../../interfaces/Interface-update-status';
+import { VehicleModelService } from '../../../services/concierge/vehicle-model/vehicle-model.service';
+import { LayoutService } from '../../../layouts/layout/layoutService';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-modelo-veiculo',
   standalone: true,
   imports: [CommonModule, FormsModule, ReactiveFormsModule, TableModule, NgOptimizedImage, TagModule, ButtonModule, CardModule, DialogModule, InputTextModule, RadioButtonModule, DropdownModule],
   templateUrl: './modelo-veiculo.component.html',
-  styleUrl: './modelo-veiculo.component.scss'
+  styleUrl: './modelo-veiculo.component.scss',
+  providers: []
 })
 export default class ModeloVeiculoComponent implements OnInit {
+
 
   dialogVisible: boolean = false;
 
@@ -45,17 +47,21 @@ export default class ModeloVeiculoComponent implements OnInit {
   vehicleStatus: InterfaceUpdateStatus = { companyId: 0, resaleId: 0, id: 0, status: '' };
 
   profileForm = this._fb.group({
-    companyId: ['2'],
-    resaleId: ['2'],
+    companyId: [''],
+    resaleId: [''],
     id: [''],
     description: ['', Validators.required],
     status: ['ativo', Validators.required],
     image: ['']
   });
 
-  constructor(private serviceModel: VehicleModelService, private _fb: FormBuilder) { }
+  constructor(private serviceModel: VehicleModelService, private _fb: FormBuilder,
+    private layoutService: LayoutService, private router: Router) { }
+
 
   ngOnInit(): void {
+
+    this.validLogin();
 
     this.statuses = [
       { label: 'ativo', value: 'ativo' },
@@ -65,7 +71,15 @@ export default class ModeloVeiculoComponent implements OnInit {
 
   }
 
-  getSeverity(status: string): string {
+  validLogin() {
+
+    if (!this.layoutService.isLogin()) {
+      this.router.navigateByUrl('/login');
+    }
+
+  }
+
+  getSeverity(status: string): any {
     switch (status) {
       case 'ativo':
         return 'success';
@@ -85,7 +99,7 @@ export default class ModeloVeiculoComponent implements OnInit {
       id: "",
       description: "",
       status: "ativo",
-      image:""
+      image: ""
 
     });
 
@@ -204,9 +218,12 @@ export default class ModeloVeiculoComponent implements OnInit {
 
   onSubmit() {
 
-    const { valid, value } = this.profileForm;
+    this.profileForm.patchValue({
+      companyId: sessionStorage.getItem('companyId'),
+      resaleId: sessionStorage.getItem('resaleId')
+    });
 
-    // debugger;
+    const { valid, value } = this.profileForm;
 
     if (valid) {
 

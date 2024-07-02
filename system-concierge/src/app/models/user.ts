@@ -10,8 +10,6 @@ export class User {
 
     private _name: string = "";
 
-    private _login: string = "";
-
     private _password: string = "";
 
     private _email: string = "";
@@ -44,12 +42,6 @@ export class User {
     }
     public set name(value: string) {
         this._name = value;
-    }
-    public get login(): string {
-        return this._login;
-    }
-    public set login(value: string) {
-        this._login = value;
     }
     public get password(): string {
         return this._password;

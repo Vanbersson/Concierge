@@ -1,1 +1,570 @@
-<p>atendimento works!</p>
+<div class="layout-card">
+    <!-- Info -->
+    <p-toast />
+
+    <!-- Dialog Veículos -->
+    <p-dialog header="Veículos" [(visible)]="dialogVehicleVisible"
+        [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }">
+
+        <p-table [value]="arrayFormAtendimento">
+
+            <ng-template pTemplate="header">
+                <tr>
+                    <th>Placa</th>
+                    <th>Frota</th>
+                    <th>Modelo</th>
+                    <th>Consultor</th>
+                    <th>Empresa</th>
+                    <th>Remover</th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-vehicle let-index="rowIndex">
+                <tr>
+                    <td>
+                        @if (vehicle.vehicleNew == "yes") {
+                        <p-tag [value]="'novo' | uppercase" severity="danger"></p-tag>
+                        }@else{
+                        <p-tag [value]="vehicle.placa | uppercase" severity="info"></p-tag>
+                        }
+
+                    </td>
+
+                    <td>{{vehicle.frota}}</td>
+                    <td>{{vehicle.modelDescription}}</td>
+
+                    @if(vehicle.nameUserAttendant == "falta"){
+                        <td><p-tag [value]="vehicle.nameUserAttendant | uppercase" severity="danger"></p-tag></td>
+                    }@else {
+                        <td>{{vehicle.nameUserAttendant}}</td>
+                    }
+                    
+                    <td>{{vehicle.clientCompanyName}}</td>
+                    <td>
+                        <button pButton [rounded]="true" icon="pi pi-trash" severity="danger"
+                            (click)="removerVehicle(index)"></button>
+                    </td>
+                </tr>
+
+            </ng-template>
+
+
+        </p-table>
+
+        <div class="flex justify-content-end mt-3">
+
+            <button pButton type="submit" pRipple label="Finalizar" icon="pi pi-check" class="p-button-text"
+                (click)="saveVehicle()"></button>
+        </div>
+    </p-dialog>
+
+    <div class="layout-card-title">
+        <span>Atendimento de veículos</span>
+
+        <div class="layout-button-alert">
+            @if (arrayFormAtendimento.length > 0) {
+            <p-badge [value]="arrayFormAtendimento.length" severity="info"></p-badge>
+            <p-button icon="pi pi-car" [rounded]="true" severity="secondary" [outlined]="true" [text]="true"
+                size="large" (onClick)="showDialogVehicle()" />
+            }@else {
+            <p-button icon="pi pi-car" [rounded]="true" severity="secondary" [outlined]="true" [text]="true"
+                size="large" />
+            }
+
+
+        </div>
+
+    </div>
+
+    <mat-stepper linear #stepper>
+
+        <mat-step [stepControl]="formClientCompany">
+            <ng-template matStepLabel>Empresa</ng-template>
+            <!-- Filter ClientCompany -->
+            <p-dialog [(visible)]="dialogVisible" header="Empresas" [style]="{ width: '60rem' }"
+                [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }">
+
+                <form [formGroup]="formClientCompanyFilter">
+                    <div class="p-fluid p-formgrid grid">
+
+                        <div class="field col-12 md:col-2">
+                            <label for="buscarClientCompanyId">Codígo</label>
+                            <p-inputNumber mode="decimal" inputId="buscarClientCompanyId" [useGrouping]="false"
+                                inputStyleClass="w-full md:w-7rem" formControlName="clientCompanyId" />
+                        </div>
+
+                        <div class="field col-12 md:col-10">
+                            <label for="buscarClientCompanyNome">Nome</label>
+                            <input pInputText id="buscarClientCompanyNome" type="text"
+                                formControlName="clientCompanyName" />
+                        </div>
+                        <div class="field col-12 md:col-3">
+                            <label for="clientCompanyCnpj">CNPJ</label>
+                            <p-inputMask id="clientCompanyCnpj" mask="99.999.999/9999-99" [unmask]="true"
+                                formControlName="clientCompanyCnpj" />
+                        </div>
+                        <div class="field col-12 md:col-3">
+                            <label for="clientCompanyCpf">CPF</label>
+                            <p-inputMask id="clientCompanyCpf" mask="999.999.999-99" [unmask]="true"
+                                formControlName="clientCompanyCpf" />
+                        </div>
+
+                        <div class="field col-12 md:col-3">
+                            <label for="clientCompanyRg">RG</label>
+                            <p-inputNumber id="clientCompanyRg" mode="decimal" [useGrouping]="false"
+                                formControlName="clientCompanyRg" />
+                        </div>
+
+
+                        <div class="field col-12 md:col-3 flex flex-column">
+                            <label>Filtrar</label>
+                            <button pButton type="button" class="p-button-warning" icon="pi pi-search"
+                                (click)="filterClientCompany()"></button>
+                        </div>
+
+                    </div>
+                </form>
+
+                <p-table [value]="dialogListClientCompany" selectionMode="single"
+                    [(selection)]="dialogSelectClientCompany" [paginator]="true" [rows]="5"
+                    [rowsPerPageOptions]="[5, 10, 20]" [globalFilterFields]="['id', 'name', 'cnpj', 'cpf']"
+                    [tableStyle]="{ 'min-width': '50rem','min-height': '20rem' }">
+
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th pSortableColumn="id">Código<p-sortIcon field="id" /></th>
+                            <th pSortableColumn="name">Nome<p-sortIcon field="name" /></th>
+                            <th pSortableColumn="cnpj">CNPJ<p-sortIcon field="cnpj" /></th>
+                            <th pSortableColumn="cpf">CPF<p-sortIcon field="cpf" /></th>
+                            <th pSortableColumn="rg">RG<p-sortIcon field="rg" /></th>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-clientcompany>
+                        <tr [pSelectableRow]="clientcompany">
+                            <td>{{clientcompany.id}}</td>
+                            <td>{{clientcompany.name}}</td>
+                            <td>{{clientcompany.cnpj}}</td>
+                            <td>{{clientcompany.cpf}}</td>
+                            <td>{{clientcompany.rg}}</td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+
+                <div class="flex justify-content-end gap-2 mt-3">
+                    <button pButton type="button" pRipple label="Cancelar" icon="pi pi-times" class="p-button-text"
+                        (click)="hideDialog()"></button>
+                    <button pButton type="submit" pRipple label="Confirmar" icon="pi pi-check" class="p-button-text"
+                        (click)="selectClientCompany()"></button>
+                </div>
+
+            </p-dialog>
+            <!-- ClientCompany -->
+            <form [formGroup]="formClientCompany" class="layout-form-step">
+
+                <p-scrollPanel [style]="{ width: '100%', height: '100%' }">
+                    <div class="layout-card-clientcompany">
+                        <span>Vamos fazer a entrada de um novo veículo</span>
+                        <p>
+                            Por favor selecione a empresa em que esse veículo pertence
+                        </p>
+
+                        <div class="p-fluid p-formgrid grid">
+
+                            <div class="field col-12 md:col-1">
+                                <label for="clientCompanyId">Codígo</label>
+                                <p-inputNumber inputId="clientCompanyId" [useGrouping]="false"
+                                    formControlName="clientCompanyId" />
+
+                            </div>
+
+                            <div class="md:col-11"></div>
+
+                            <div class="field col-12 md:col-6">
+                                <label for="clientCompanyName">Empresa</label>
+                                <p-inputGroup>
+                                    <input pInputText id="clientCompanyName" type="text"
+                                        formControlName="clientCompanyName" required />
+                                    <button pButton type="button" icon="pi pi-search" class="p-button-warning"
+                                        (click)="showDialog()"></button>
+                                </p-inputGroup>
+
+                            </div>
+                            <div class="md:col-6"></div>
+
+                            <div class="field col-12 md:col-2">
+                                <label for="clientCompanyCnpj">CNPJ</label>
+                                <p-inputMask id="clientCompanyCnpj" mask="99.999.999/9999-99"
+                                    formControlName="clientCompanyCnpj" />
+                            </div>
+
+                            <div class="field col-12 md:col-2">
+                                <label for="clientCompanyCpf">CPF</label>
+                                <p-inputMask id="clientCompanyCpf" mask="999.999.999-99"
+                                    formControlName="clientCompanyCpf" />
+                            </div>
+
+                            <div class="field col-12 md:col-2">
+                                <label for="clientCompanyRg">RG</label>
+                                <p-inputNumber inputId="clientCompanyRg" [useGrouping]="false"
+                                    formControlName="clientCompanyRg" />
+                            </div>
+                            <div class="md:col-6"></div>
+
+
+                        </div>
+
+                    </div>
+                    <div class="layout-button-action">
+                        <button pButton (click)="nextStepperClientCompany()" type="button" icon="pi pi-chevron-right"
+                            iconPos="right" label="Avançar"></button>
+                    </div>
+
+
+
+                </p-scrollPanel>
+
+            </form>
+
+        </mat-step>
+
+        <!-- Motorista -->
+        <mat-step [stepControl]="formDriver">
+            <form [formGroup]="formDriver" class="layout-form-step">
+                <ng-template matStepLabel>Motorista</ng-template>
+                <p-scrollPanel [style]="{ width: '100%', height: '100%' }">
+                    <div class="layout-card-driver">
+
+                        <span>Vamos informar os dados do motorista</span>
+
+                        <div class="p-fluid p-formgrid grid">
+
+
+                            <div class="field col-12 flex align-items-center">
+
+                                <div class="layout-photo-person">
+
+                                    @if(driverEntryPhoto){
+                                    <p-image [imageStyle]="{'border-radius':'100%','object-fit':'cover'}"
+                                        src="data:image/png;base64,{{driverEntryPhoto}}" alt="imagem motorista"
+                                        height="80" width="80" [preview]="true" />
+
+                                    <button pButton severity="danger" [text]="true" label="Remover"
+                                        (click)="deleteEntryPhotoDriver()"></button>
+                                    }@else{
+                                    <div class="layout-photo-person-label">
+                                        <label for="filedriverEntryPhoto">Foto</label>
+                                        <input type="file" id="filedriverEntryPhoto"
+                                            (change)="selectEntryPhotoDriver($event)" accept="image/png, image/jpeg" />
+                                    </div>
+                                    }
+
+                                </div>
+
+                            </div>
+
+                            <div class="field col-12 md:col-6">
+                                <label for="driverEntryName">Nome</label>
+                                <input pInputText id="driverEntryName" type="text" formControlName="driverEntryName"
+                                    [style]="{'text-transform':'capitalize'}">
+                            </div>
+                            <div class="md:col-6"></div>
+
+                            <div class="field col-12 md:col-2">
+                                <label for="driverEntryCpf">CPF</label>
+                                <p-inputMask id="driverEntryCpf" mask="999.999.999-99" unmask="true"
+                                    formControlName="driverEntryCpf" />
+                            </div>
+
+                            <div class="field col-12 md:col-2">
+                                <label for="driverEntryRg">RG</label>
+                                <p-inputNumber id="clientCompanyRg" mode="decimal" [useGrouping]="false"
+                                    formControlName="driverEntryRg" />
+                            </div>
+                            <div class="md:col-8"></div>
+
+                            <div class="field col-12 md:col-6 flex align-items-center gap-2">
+                                <div class="layout-file">
+                                    <div class="layout-file-img">
+                                        @if(driverEntryPhotoDoc1){
+                                        <p-image src="data:image/png;base64,{{driverEntryPhotoDoc1}}" alt="" height="80"
+                                            width="80" [preview]="true" />
+                                        }
+
+                                    </div>
+
+                                    @if(driverEntryPhotoDoc1){
+                                    <button pButton icon="pi pi-trash" severity="danger"
+                                        (click)="deleteEntryFileDriver1()"></button>
+                                    }@else {
+                                    <label for="filedriverEntryPhotoDoc1">Sel. Arquivo</label>
+                                    <input type="file" id="filedriverEntryPhotoDoc1"
+                                        (change)="selectEntryFileDriver1($event)" accept="image/png, image/jpeg" />
+                                    }
+
+
+                                </div>
+                                <div class="layout-file">
+                                    <div class="layout-file-img">
+                                        @if(driverEntryPhotoDoc2){
+                                        <p-image src="data:image/png;base64,{{driverEntryPhotoDoc2}}" alt="" height="80"
+                                            width="80" [preview]="true" />
+                                        }
+
+                                    </div>
+
+                                    @if(driverEntryPhotoDoc2){
+                                    <button pButton icon="pi pi-trash" severity="danger"
+                                        (click)="deleteEntryFileDriver2()"></button>
+                                    }@else {
+                                    <label for="filedriverEntryPhotoDoc2">Sel. Arquivo</label>
+                                    <input type="file" id="filedriverEntryPhotoDoc2"
+                                        (change)="selectEntryFileDriver2($event)" accept="image/png, image/jpeg" />
+                                    }
+
+
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="layout-button-action">
+                        <button type="button" pButton matStepperPrevious icon="pi pi-chevron-left"
+                            label="Voltar"></button>
+                        <button type="button" pButton (click)="nextSterpperDriver()" icon="pi pi-chevron-right"
+                            iconPos="right" label="Avançar"></button>
+
+                    </div>
+
+                </p-scrollPanel>
+            </form>
+
+        </mat-step>
+
+        <!-- Veículos -->
+        <mat-step [stepControl]="formVehicle">
+            <form [formGroup]="formVehicle" class="layout-form-step">
+                <ng-template matStepLabel>Veículos</ng-template>
+                <p-scrollPanel [style]="{ width: '100%', height: '100%' }">
+                    <div class="layout-card-vehicle">
+
+                        <span>Vamos informar agora os dados do veículo</span>
+                        <div class="flex p-fluid p-formgrid grid mt-3">
+
+                            <div class="field col-12 md:col-2">
+                                <label for="placa">Placa</label>
+                                <p-inputMask id="placa" mask="***-****" [unmask]="true"
+                                    [style]="{'text-transform':'uppercase'}" formControlName="placa" />
+                            </div>
+
+                            <div class="field col-12 md:col-2">
+                                <label for="frota">Frota</label>
+                                <input pInputText id="frota" type="text" [style]="{'text-transform':'uppercase'}"
+                                    formControlName="frota">
+                            </div>
+
+                            <div class="field col-12 md:col-2">
+                                <label for="vehiclemodelid">Modelos</label>
+                                <p-multiSelect id="vehiclemodelid" [options]="vehicleModels$ | async"
+                                    optionLabel="description" display="chip" [selectionLimit]="1"
+                                    placeholder="Selecione" formControlName="modelVehicle" />
+                            </div>
+
+                            <div class="field col-12 md:col-2 ">
+                                <label for="dateEntry">Data Entrada</label>
+                                <p-calendar [iconDisplay]="'input'" [showIcon]="true" [showTime]="true"
+                                    inputId="dateEntry" formControlName="dateEntry" />
+                            </div>
+
+                            <div class="field col-12 md:col-2 ">
+                                <label for="datePrevisionExit">Previsão saída</label>
+                                <p-calendar [iconDisplay]="'input'" [showIcon]="true" [showTime]="true"
+                                    inputId="datePrevisionExit" formControlName="datePrevisionExit" />
+                            </div>
+
+                            <div class="field col-12 md:col-2">
+                                <label for="kmatual">KM Atual</label>
+                                <p-inputNumber inputId="kmatual" [useGrouping]="false" formControlName="kmEntry" />
+                            </div>
+
+                            <div class="field col-12 md:col-2">
+                                <label for="coneid">Cone</label>
+                                <p-inputNumber inputId="coneid" [useGrouping]="false"
+                                    formControlName="quantityTrafficCone" />
+                            </div>
+                            <div class="field col-12 md:col-2">
+                                <label for="extintorid">Extintor</label>
+                                <p-inputNumber inputId="extintorid" [useGrouping]="false"
+                                    formControlName="quantityExtinguisher" />
+                            </div>
+                            <div class="field col-12 md:col-2">
+                                <label for="pneuid">Pneu</label>
+                                <p-inputNumber inputId="pneuid" [useGrouping]="false" formControlName="quantityTire" />
+                            </div>
+                            <div class="field col-12 md:col-2">
+                                <label for="pneurodaid">Pneu c/roda</label>
+                                <p-inputNumber inputId="pneurodaid" [useGrouping]="false"
+                                    formControlName="quantityTireComplete" />
+                            </div>
+                            <div class="field col-12 md:col-2">
+                                <label for="cxferramentaid">Cx ferramenta</label>
+                                <p-inputNumber inputId="cxferramentaid" [useGrouping]="false"
+                                    formControlName="quantityToolBox" />
+                            </div>
+
+                            <div class="field col-12 md:col-2">
+                                <label for="consultorid">Consultor</label>
+                                <p-multiSelect id="consultorid" [options]="consultores$ | async" [selectionLimit]="1"
+                                    optionLabel="name" display="chip" placeholder="Selecione"
+                                    formControlName="UserAttendant" />
+                            </div>
+
+                            <div class="field col-12 md:col-4 flex align-items-center gap-2">
+
+                                <div class="layout-file">
+                                    <div class="layout-file-img">
+                                        @if(photoVehicle1){
+                                        <p-image src="data:image/png;base64,{{photoVehicle1}}" alt="" height="80"
+                                            width="80" [preview]="true" />
+                                        }
+
+                                    </div>
+
+                                    @if(photoVehicle1){
+                                    <button pButton icon="pi pi-trash" severity="danger"
+                                        (click)="deleteFileVehicle1()"></button>
+                                    }@else {
+                                    <label for="fileVehicle1">Sel. Arquivo</label>
+                                    <input type="file" id="fileVehicle1" (change)="selectFileVehicle1($event)"
+                                        accept="image/png, image/jpeg" />
+                                    }
+
+                                </div>
+
+                                <div class="layout-file">
+                                    <div class="layout-file-img">
+                                        @if(photoVehicle2){
+                                        <p-image src="data:image/png;base64,{{photoVehicle2}}" alt="" height="80"
+                                            width="80" [preview]="true" />
+                                        }
+
+                                    </div>
+
+                                    @if(photoVehicle2){
+                                    <button pButton icon="pi pi-trash" severity="danger"
+                                        (click)="deleteFileVehicle2()"></button>
+                                    }@else {
+                                    <label for="fileVehicle2">Sel. Arquivo</label>
+                                    <input type="file" id="fileVehicle2" (change)="selectFileVehicle2($event)"
+                                        accept="image/png, image/jpeg" />
+                                    }
+
+                                </div>
+
+                                <div class="layout-file">
+                                    <div class="layout-file-img">
+                                        @if(photoVehicle3){
+                                        <p-image src="data:image/png;base64,{{photoVehicle3}}" alt="" height="80"
+                                            width="80" [preview]="true" />
+                                        }
+
+                                    </div>
+
+                                    @if(photoVehicle3){
+                                    <button pButton icon="pi pi-trash" severity="danger"
+                                        (click)="deleteFileVehicle3()"></button>
+                                    }@else {
+                                    <label for="fileVehicle3">Sel. Arquivo</label>
+                                    <input type="file" id="fileVehicle3" (change)="selectFileVehicle3($event)"
+                                        accept="image/png, image/jpeg" />
+                                    }
+
+                                </div>
+
+                                <div class="layout-file">
+                                    <div class="layout-file-img">
+                                        @if(photoVehicle4){
+                                        <p-image src="data:image/png;base64,{{photoVehicle4}}" alt="" height="80"
+                                            width="80" [preview]="true" />
+                                        }
+
+                                    </div>
+
+                                    @if(photoVehicle4){
+                                    <button pButton icon="pi pi-trash" severity="danger"
+                                        (click)="deleteFileVehicle4()"></button>
+                                    }@else {
+                                    <label for="fileVehicle4">Sel. Arquivo</label>
+                                    <input type="file" id="fileVehicle4" (change)="selectFileVehicle4($event)"
+                                        accept="image/png, image/jpeg" />
+                                    }
+
+                                </div>
+
+                            </div>
+
+                            <div class="field col-12 md:col-2">
+
+                                <div class="layout-card-option">
+                                    <div class="layout-card-option-title">Veículo novo</div>
+
+                                    <div class="flex align-items-center">
+                                        <p-radioButton inputId="newyes" value="yes" formControlName="vehicleNew"
+                                            (onClick)="placaRequiredRemove()"></p-radioButton>
+                                        <label for="newyes" class="ml-2">Sim</label>
+                                    </div>
+
+                                    <div class="flex align-items-center">
+                                        <p-radioButton inputId="newnot" value="not" formControlName="vehicleNew"
+                                            (onClick)="placaRequiredAdd()"></p-radioButton>
+                                        <label for="newnot" class="ml-2">Não</label>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <div class="field col-12 md:col-2">
+
+                                <div class="layout-card-option">
+
+                                    <div class="layout-card-option-title">Ordem serviço</div>
+
+                                    <div class="flex align-items-center">
+                                        <p-radioButton inputId="serviceyes" value="yes"
+                                            formControlName="serviceOrder"></p-radioButton>
+                                        <label for="serviceyes" class="ml-2">Sim</label>
+                                    </div>
+
+                                    <div class="flex align-items-center">
+                                        <p-radioButton inputId="serviceno" value="not"
+                                            formControlName="serviceOrder"></p-radioButton>
+                                        <label for="serviceno" class="ml-2">Não</label>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <div class="field col-12">
+                                <label for="informacao" class="ml-2">Informações</label>
+                                <textarea pInputTextarea id="informacao" rows="3" cols="30"
+                                    formControlName="informationConcierge"></textarea>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="layout-button-action">
+                        <button pButton matStepperPrevious icon="pi pi-chevron-left" label="Voltar"></button>
+                        <button pButton icon="pi pi-plus" label="Adcionar " [outlined]="true"
+                            (click)="addVehicle()"></button>
+                    </div>
+
+                </p-scrollPanel>
+
+            </form>
+
+        </mat-step>
+
+
+    </mat-stepper>
+
+</div>

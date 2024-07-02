@@ -1,0 +1,58 @@
+:host {
+    .layout-dialog-user{
+        width: 450px;
+        height: 100%;
+    }
+    .layout-avatar {
+        display: flex;
+        align-items: center;
+        
+
+        img {
+            object-fit: cover;
+            background-color: var(--color-grey-200);
+            border-radius: 100%;
+        }
+
+        .layout-file {
+
+            label {
+                padding: 18px 0px;
+                width: 100px;
+                color: #3B82F6;
+                text-align: center;
+                display: block;
+                cursor: pointer;
+            }
+
+            input[type="file"] {
+                display: none;
+            }
+        }
+
+    }
+
+    form {
+       
+       width: 800px;
+        padding: 2rem;
+
+
+    }
+
+    .layout-card-cargo {
+        display: flex;
+        flex-direction: column;
+        height: 8rem;
+        padding: 1rem;
+        border-radius: 8px;
+        border: 1px solid var(--color-grey-300);
+        gap: 8px;
+       
+        span {
+            font-weight: 400;
+
+        }
+    }
+
+}

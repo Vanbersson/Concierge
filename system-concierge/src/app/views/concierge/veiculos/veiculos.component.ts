@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule, NgOptimizedImage } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { CommonModule, NgOptimizedImage, UpperCasePipe } from '@angular/common';
+import { FormControl, FormGroup, FormsModule } from '@angular/forms';
+import { Router, RouterModule } from '@angular/router';
 
 //PrimeNG
 import { TableModule } from 'primeng/table';
@@ -12,75 +13,145 @@ import { MultiSelectModule } from 'primeng/multiselect';
 import { CardModule } from 'primeng/card';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
-import { RouterModule } from '@angular/router';
+import { MessageService } from 'primeng/api';
+import { ToastModule } from 'primeng/toast';
+
+//Service
+import { VehicleEntry } from '../../../models/vehicle/vehicleEntry';
+import { LayoutService } from '../../../layouts/layout/layoutService';
+import { VehicleService } from '../../../services/vehicle/vehicle.service';
+
+//Constants
+import { STATUS_VEHICLE_ENTRY_NOTAUTH, STATUS_VEHICLE_ENTRY_FIRSTAUTH, STATUS_VEHICLE_ENTRY_AUTHORIZED } from '../../../util/constants';
 
 
 @Component({
   selector: 'app-veiculos',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, NgOptimizedImage,TableModule, DropdownModule, TagModule, ProgressBarModule, SliderModule, MultiSelectModule, CardModule, ButtonModule, InputTextModule],
+  imports: [CommonModule, FormsModule, RouterModule, NgOptimizedImage, ToastModule, TableModule, DropdownModule, TagModule, ProgressBarModule, SliderModule, MultiSelectModule, CardModule, ButtonModule, InputTextModule],
   templateUrl: './veiculos.component.html',
-  styleUrl: './veiculos.component.scss'
+  styleUrl: './veiculos.component.scss',
+  providers: [MessageService]
 })
 export default class VeiculosComponent implements OnInit {
 
+  notAuth = STATUS_VEHICLE_ENTRY_NOTAUTH;
+  firstAuth = STATUS_VEHICLE_ENTRY_FIRSTAUTH;
+  authorized = STATUS_VEHICLE_ENTRY_AUTHORIZED;
+
   selectedVeiculo!: { id: number, placa: string, frota: string, modelo: string, dataEntrada: string, porteiro: string, empresa: string, orcamento: string };
 
-  statuses!: any[];
+  statusOrcamento!: any[];
 
-  veiculos: Array<{ id: number, placa: string, frota: string, modelo: string, dataEntrada: string, porteiro: string, empresa: string, orcamento: string }> = [];
 
-  selectedItems: Array<{ id: number, placa: string, frota: string, modelo: string, dataEntrada: string, porteiro: string, empresa: string, orcamento: string }> = [];
+  statusLiberacao!: any[];
 
-  constructor() { }
+  listVehicleEntry: VehicleEntry[] = [];
+
+  selectedItems: VehicleEntry[] = [];
+
+  formLiberar = new FormGroup({
+    companyId: new FormControl<Number>(0),
+    resaleId: new FormControl<Number>(0),
+    id: new FormControl<Number>(0),
+    idUserExitAuth: new FormControl<Number>(0),
+    nameUserExitAuth: new FormControl<string>(''),
+  });
+
+  constructor(private vehicleService: VehicleService, private layoutService: LayoutService, private router: Router, private messageService: MessageService,) { }
 
   ngOnInit(): void {
 
-    this.veiculos = [
-      { id: 100, placa: 'PBD-0102', frota: '1020', modelo: 'Graneleiro', dataEntrada: '23/02/2024 09:28', porteiro: 'Antonio', empresa: 'Polimix', orcamento: 'Sem Orçamento' },
-      { id: 101, placa: 'PBD-0102', frota: '1030', modelo: 'Graneleiro', dataEntrada: '24/02/2024 09:28', porteiro: 'Antonio', empresa: 'Polimix', orcamento: 'Sem Orçamento' },
-      { id: 102, placa: 'PBD-0102', frota: '1040', modelo: 'Graneleiro', dataEntrada: '24/02/2024 09:28', porteiro: 'Marcelo', empresa: 'BBM Transporte', orcamento: 'Enviado' },
-      { id: 103, placa: 'PBD-0102', frota: '1050', modelo: 'Graneleiro', dataEntrada: '23/02/2024 09:28', porteiro: 'Antonio', empresa: 'Polimix', orcamento: 'Não Enviado' },
-      { id: 104, placa: 'PBD-0102', frota: '1060', modelo: 'Graneleiro', dataEntrada: '23/02/2024 09:28', porteiro: 'Marcelo', empresa: 'BBM Transporte', orcamento: 'Aprovado' },
-      { id: 105, placa: 'PBD-0103', frota: '1070', modelo: 'Side', dataEntrada: '23/02/2024 09:28', porteiro: 'Antonio', empresa: 'Gafor', orcamento: 'Não Enviado' },
-      { id: 106, placa: 'PBD-0104', frota: '1080', modelo: 'Graneleiro', dataEntrada: '23/02/2024 09:28', porteiro: 'Marcelo', empresa: 'BBM Transporte', orcamento: 'Aprovado' },
-      { id: 107, placa: 'PBD-0105', frota: '1090', modelo: 'Graneleiro', dataEntrada: '23/02/2024 09:28', porteiro: 'Antonio', empresa: 'Gafor', orcamento: 'Não Enviado' },
-      { id: 108, placa: 'PBD-0106', frota: '1010', modelo: 'Graneleiro', dataEntrada: '23/02/2024 09:28', porteiro: 'Marcelo', empresa: 'BBM Transporte', orcamento: 'Aprovado' },
-      { id: 109, placa: 'PBD-0107', frota: '1011', modelo: 'Bau Aluminio', dataEntrada: '03/02/2024 09:28', porteiro: 'Antonio', empresa: 'Gafor', orcamento: 'Não Enviado' },
-      { id: 1010, placa: 'PBD-0108', frota: '1012', modelo: 'Graneleiro', dataEntrada: '23/02/2024 09:28', porteiro: 'Marcelo', empresa: 'BBM Transporte', orcamento: 'Aprovado' },
-      { id: 1011, placa: 'PBD-0109', frota: '1013', modelo: 'Graneleiro', dataEntrada: '29/02/2024 09:28', porteiro: 'Antonio', empresa: 'Gafor', orcamento: 'Não Enviado' },
-      { id: 1012, placa: 'PBD-0202', frota: '1014', modelo: 'Graneleiro', dataEntrada: '23/02/2024 09:28', porteiro: 'Marcelo', empresa: 'BBM Transporte', orcamento: 'Aprovado' },
-      { id: 1013, placa: 'PBD-0402', frota: '1015', modelo: 'Graneleiro', dataEntrada: '23/02/2024 09:28', porteiro: 'Antonio', empresa: 'Gafor', orcamento: 'Não Enviado' },
-      { id: 1014, placa: 'PBD-0302', frota: '1016', modelo: 'Graneleiro', dataEntrada: '15/02/2024 09:28', porteiro: 'Marcelo', empresa: 'BBM Transporte', orcamento: 'Aprovado' },
-      { id: 1015, placa: 'PBD-0002', frota: '1017', modelo: 'Graneleiro', dataEntrada: '01/02/2024 09:28', porteiro: 'Antonio', empresa: 'Gafor', orcamento: 'Não Enviado' },
-      { id: 1016, placa: 'PBD-7702', frota: '1018', modelo: 'Graneleiro', dataEntrada: '02/01/2024 09:28', porteiro: 'Marcelo', empresa: 'Bauminas', orcamento: 'Não Aprovado' }
-    ];
+    this.validLogin();
 
-    this.statuses = [
+    this.listVehicles();
+
+
+
+    this.statusOrcamento = [
       { label: 'Sem Orçamento', value: 'Sem Orçamento' },
       { label: 'Não Enviado', value: 'Não Enviado' },
-      { label: 'Enviado', value: 'Enviado' },
+      { label: 'Pendente Aprovação', value: 'Pendente Aprovação' },
       { label: 'Aprovado', value: 'Aprovado' },
       { label: 'Não Aprovado', value: 'Não Aprovado' }
     ];
 
-
+    this.statusLiberacao = [
+      { label: 'Não Liberado', value: this.notAuth },
+      { label: '1ª Liberação', value: this.firstAuth },
+      { label: 'Liberado', value: this.authorized }
+    ];
 
   }
 
-  onSelectionChange(event:any) {
-   
+  listVehicles() {
+    this.vehicleService.entryList$().subscribe((data) => {
+
+      for (let index = 0; index < data.length; index++) {
+
+        switch (data[index].budgetStatus) {
+          case 'pendenteAprovacao':
+            data[index].budgetStatus = 'Pendente Aprovação';
+            break;
+          case 'naoEnviado':
+            data[index].budgetStatus = 'Não Enviado';
+            break;
+          case 'semOrcamento':
+            data[index].budgetStatus = 'Sem Orçamento';
+            break;
+          case 'Aprovado':
+            break;
+          case 'naoAprovado':
+            data[index].budgetStatus = 'Não Aprovado';
+            break;
+        }
+
+        if (data[index].vehicleNew == "yes") {
+          data[index].placa = "novo";
+        } else {
+          var placa = data[index].placa;
+          data[index].placa = placa.substring(0, 3) + "-" + placa.substring(3, 7);
+        }
+
+
+
+        var nome = data[index].clientCompanyName.split(' ');
+        data[index].clientCompanyName = nome[0] + " " + nome[1];
+
+      }
+      this.listVehicleEntry = data;
+    });
+  }
+
+  novoAtendimento() {
+    this.router.navigateByUrl('v1/portaria/atendimento');
+  }
+
+  validLogin() {
+
+    if (!this.layoutService.isLogin()) {
+      this.router.navigateByUrl('/login');
+    }
+
+  }
+
+  onSelectionChange(event: any) {
+
     console.log('Itens selecionados:', this.selectedItems.length);
-  } 
+  }
 
-  getSeverity(status: string): string {
-    switch (status) {
+  getPlaca(placa: string) {
 
-      case 'Sem Orçamento':
-        return 'Primary';
+  }
+
+  getSeverity(value: string): any {
+
+    switch (value) {
+      case 'Pendente Aprovação':
+        return 'primary';
       case 'Não Enviado':
         return 'info';
-      case 'Enviado':
+      case 'Sem Orçamento':
         return 'warning';
       case 'Aprovado':
         return 'success';
@@ -88,11 +159,86 @@ export default class VeiculosComponent implements OnInit {
         return 'danger';
     }
 
-    return 'Primary';
+    return 'warning';
   }
 
-  editVeiculo() {
+  editVeiculo(id: number) {
+    this.router.navigateByUrl('v1/portaria/manutencao/' + id);
+  }
 
+  addAuthorizationAll() {
+    for (let index = 0; index < this.selectedItems.length; index++) {
+      const element = this.selectedItems[index];
+      this.addAuthorization(element);
+    }
+  }
+
+  addAuthorization(vehicle: VehicleEntry) {
+
+    if(vehicle.statusAuthExit != this.authorized){
+
+      this.formLiberar.patchValue({
+        companyId: vehicle.companyId,
+        resaleId: vehicle.resaleId,
+        id: vehicle.id,
+        idUserExitAuth: Number.parseInt(sessionStorage.getItem('id')!),
+        nameUserExitAuth: sessionStorage.getItem('name'),
+      });
+  
+      this.vehicleService.entryAddAuth(this.formLiberar.value).subscribe((data) => {
+        if (data.body == "Success.") {
+  
+          //Autorização de saída
+          if (vehicle.statusAuthExit == this.notAuth) {
+            this.showAuthSuccess(vehicle.placa);
+          }
+  
+          //Saída liberada
+          if (vehicle.statusAuthExit == this.firstAuth) {
+            this.showLiberadoSuccess(vehicle.placa);
+          }
+  
+  
+          this.listVehicles();
+        } else {
+          console.log(data.body);
+  
+          if (data.body == "UserAttendant") {
+            this.showUserAttendant();
+          }
+          if (data.body == "ClientCompany") {
+            this.showClientCompany();
+          }
+        }
+  
+      });
+
+    }else{
+      this.showInfo();
+    }
+
+  }
+
+  showUserAttendant() {
+    this.messageService.add({ severity: 'error', summary: 'Consultor', detail: "Consultor não informado", icon: 'pi pi-user', life: 10000 });
+  }
+
+  showClientCompany() {
+    this.messageService.add({ severity: 'error', summary: 'Empresa', detail: "Empresa não informada", icon: 'pi pi-building', life: 10000 });
+  }
+
+  showAuthSuccess(placa: string) {
+    const uppercase = new UpperCasePipe();
+    this.messageService.add({ severity: 'success', summary: 'Veículo Autorizado', detail: 'Placa ' + uppercase.transform(placa), icon: 'pi pi-car', life: 10000 });
+  }
+
+  showLiberadoSuccess(placa: string) {
+    const uppercase = new UpperCasePipe();
+    this.messageService.add({ severity: 'success', summary: 'Veículo Liberado', detail: 'Placa ' + uppercase.transform(placa), icon: 'pi pi-car', life: 10000 });
+  }
+
+  showInfo() {
+    this.messageService.add({ severity: 'info', summary: 'Informação', detail: "Veículo já liberado", icon: 'pi pi-car', life: 10000 });
   }
 
 

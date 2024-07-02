@@ -8,12 +8,12 @@
     <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
       <mat-form-field appearance="outline">
         <mat-label>Digite seu email</mat-label>
-        <input matInput formControlName="login" placeholder="seuemail@email.com" type="email" />
+        <input matInput placeholder="seuemail@email.com" type="email" formControlName="email" />
         <mat-icon matPrefix>person_outline</mat-icon>
       </mat-form-field>
       <mat-form-field appearance="outline">
         <mat-label>Digite sua senha</mat-label>
-        <input matInput formControlName="password" placeholder="Digite sua senha" [type]="hide ? 'password' : 'text'" />
+        <input matInput placeholder="Digite sua senha" [type]="hide ? 'password' : 'text'" formControlName="password" />
         <mat-icon matPrefix>fingerprint</mat-icon>
         <button mat-icon-button matSuffix (click)="hide = !hide">
           <mat-icon>{{ hide ? "visibility_off" : "visibility" }}</mat-icon>

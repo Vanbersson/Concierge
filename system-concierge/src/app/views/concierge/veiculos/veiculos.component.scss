@@ -6,25 +6,16 @@
         margin-bottom: 2rem;
     
         span{
+            display: flex;
+            align-items: center;
             font-size: 1.25rem;
-            font-weight: 600;
-            color: #673ab7;
+            font-weight: 400;
+            color: #64748b;
         }
+
+        
     }
 }
 
-:host ::ng-deep {
-    .p-progressbar {
-        height: .5rem;
-        background-color: #D8DADC;
-
-        .p-progressbar-value {
-            background-color: #607D8B;
-        }
-    }
-
-
-
-}
 
 

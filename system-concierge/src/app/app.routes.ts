@@ -9,10 +9,14 @@ export const routes: Routes = [
         path: 'login',
         title: 'Login',
         loadComponent: () => import('./views/login/login.component'),
-        //canActivate: [authLoginGuard]
+        canActivate: [authLoginGuard]
     },
     {
         path: '',
+        loadComponent: () => import('./components/valid-login/valid-login.component') 
+    },
+    {
+        path: 'v1',
         loadComponent: () => import('./layouts/layout/layout.component'),
         canMatch: [authRouterGuard],
         children: [
@@ -33,9 +37,9 @@ export const routes: Routes = [
                 loadComponent: () => import('./views/concierge/veiculos/veiculos.component')
             },
             {
-                path: 'portaria/saida-autorizada',
-                title: 'Saída Autorizada',
-                loadComponent: () => import('./views/concierge/saida-autorizada/saida-autorizada.component')
+                path: 'portaria/manutencao/:id',
+                title: 'Manutenção',
+                loadComponent: () => import('./views/concierge/manutencao/manutencao.component')
             },
             {
                 path: 'portaria/modelo-veiculo',
@@ -54,11 +58,6 @@ export const routes: Routes = [
             }
         ]
 
-    },
-    {
-        path: '',
-        redirectTo: 'login',
-        pathMatch: 'full'
     },
     {
         path: '**',

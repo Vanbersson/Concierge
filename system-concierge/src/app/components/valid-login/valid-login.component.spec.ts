@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { SaidaAutorizadaComponent } from './saida-autorizada.component';
+import { ValidLoginComponent } from './valid-login.component';
 
-describe('SaidaAutorizadaComponent', () => {
-  let component: SaidaAutorizadaComponent;
-  let fixture: ComponentFixture<SaidaAutorizadaComponent>;
+describe('ValidLoginComponent', () => {
+  let component: ValidLoginComponent;
+  let fixture: ComponentFixture<ValidLoginComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [SaidaAutorizadaComponent]
+      imports: [ValidLoginComponent]
     })
     .compileComponents();
     
-    fixture = TestBed.createComponent(SaidaAutorizadaComponent);
+    fixture = TestBed.createComponent(ValidLoginComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

@@ -1,0 +1,78 @@
+
+<form [formGroup]="userForm" (ngSubmit)="onSubmit()">
+
+  <p-scrollPanel>
+  <p-card header="Perfil usuário">
+
+    <div class="field col-12 layout-avatar">
+      <img [ngSrc]="imageUser" alt="Vehicle Model" height="100" width="100" loading="lazy">
+
+      <div class="layout-file">
+        <label for="file">Editar</label>
+        <input type="file" id="file" (change)="onSelectFile($event)" accept="image/png, image/jpeg" />
+      </div>
+    </div>
+    <div class="p-fluid p-formgrid grid">
+
+      <div class="field col-12 md:col-12">
+        <label for="nameid">Nome</label>
+        <input pInputText id="nameid" type="text" formControlName="name" />
+      </div>
+
+      <div class="field col-12 md:col-8">
+        <label for="emailid">Email</label>
+        <input pInputText id="emailid" type="text" formControlName="email" />
+      </div>
+
+      <div class="field col-12 md:col-4">
+        <label for="cellphoneid">Celular</label>
+        <p-inputMask id="cellphoneid" mask="(99) 9 9999-9999" formControlName="cellPhone" unmask="true" />
+      </div>
+
+      <div class="field col-12 md:col-4">
+        <label for="passwordid">Senha</label>
+        <p-password id="passwordid" formControlName="password" [feedback]="false" [toggleMask]="true" />
+      </div>
+
+
+      <div class="field col-12 md:col-4">
+        <label for="passwordvalidid">Repetir senha</label>
+        <p-password id="passwordvalidid" formControlName="passwordValid" [feedback]="false" [toggleMask]="true" />
+      </div>
+
+      <div class="field col-12 md:col-4">
+        <label for="role">Cargo</label>
+        <p-dropdown id="role" placeholder="Selecione" [options]="dropdownItems" optionLabel="name"
+          formControlName="roleId"></p-dropdown>
+      </div>
+
+      <div class="field col-12 md:col-12">
+        <div class="layout-card-cargo">
+          <span>Situação</span>
+          <div class="flex align-items-center">
+            <p-radioButton inputId="ativo" value="ativo" formControlName="status"></p-radioButton>
+            <label for="ativo" class="ml-2">Ativado</label>
+          </div>
+
+          <div class="flex align-items-center">
+            <p-radioButton inputId="inativo" value="inativo" formControlName="status"></p-radioButton>
+            <label for="inativo" class="ml-2">Desativado</label>
+          </div>
+
+        </div>
+      </div>
+
+
+
+    </div>
+
+  </p-card>
+
+
+  <div class="flex justify-content-end gap-2 mt-3">
+    <button pButton mat-dialog-close="" type="button" pRipple label="Cancelar" icon="pi pi-times"
+      class="p-button-text"></button>
+    <button pButton type="submit" pRipple label="Salvar" icon="pi pi-check" class="p-button-text"></button>
+  </div>
+</p-scrollPanel>
+</form>

@@ -4,7 +4,7 @@ import { RouterOutlet } from '@angular/router';
 
 import { SidebarComponent } from '../sidebar/sidebar/sidebar.component';
 import { TopbarComponent } from '../menu/topbar/topbar.component';
-
+import { LayoutService } from './layoutService';
 
 
 @Component({
@@ -17,7 +17,6 @@ import { TopbarComponent } from '../menu/topbar/topbar.component';
 export default class LayoutComponent implements OnInit {
 
 
-
   @ViewChild(SidebarComponent) appSidebar!: SidebarComponent;
 
   @ViewChild(TopbarComponent) appTopbar!: TopbarComponent;
@@ -28,7 +27,7 @@ export default class LayoutComponent implements OnInit {
 
   sideBarMarginLeft = computed(() => (this.visibleSidebar() ? '300px' : '-2rem'));
 
-  constructor() { }
+  constructor(private layoutService: LayoutService) { }
 
   ngOnInit(): void {
 

@@ -1,6 +1,11 @@
 <div class="layout-wrapper">
+
+    <div class="layout-loading-progress">
+        <!-- <app-progress-spinner/> -->
+    </div>
+
     <app-topbar (sideBar)="visibleSidebar.set($event)"></app-topbar>
-    
+
     <app-sidebar [collapsedSideBar]="visibleSidebar()"></app-sidebar>
 
     <div class="layout-main-container" [style.margin-left]="sideBarMarginLeft() ">

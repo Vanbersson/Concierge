@@ -1,32 +1,32 @@
 <div class="layout-card">
 
-    <div class="layout-modelo-title">
-        <span>Lista de modelos</span>
+    <div class="layout-card-title">
+        <span>Modelos de veículos</span>
         <p-button icon="pi pi-plus" (click)="showDialog()" label="Adicionar" [outlined]="true"></p-button>
     </div>
 
-    <p-dialog header="Modelo veículo" [(visible)]="dialogVisible" [style]="{width: '450px'}" class="p-fluid">
+    <p-dialog header="Modelo" [(visible)]="dialogVisible" [style]="{width: '450px'}" >
 
 
         <form [formGroup]="profileForm" (ngSubmit)="onSubmit()">
+            
+            <div class="p-fluid p-formgrid grid">
 
-            <div class="flex flex-column gap-2">
-
-                <div class="layout-dialog-img">
+                <div class="mt-5 layout-dialog-img">
                     <img [ngSrc]="pathFile" alt="Vehicle Model" height="100" width="100" loading="lazy">
                 </div>
 
-                <div class="field">
-                    <label for="username">Descrição</label>
+                <div class="field col-12">
+                    <label for="descricao">Descrição</label>
                     <input pInputText id="descricao" formControlName="description" />
                 </div>
 
-                <div class="layout-dialog-file">
+                <div class="field col-12 layout-dialog-file">
                     <label for="file">Selecionar imagem</label>
                     <input type="file" id="file" (change)="onSelectFile($event)" accept="image/png" />
                 </div>
 
-                <div class="layout-card-modelo">
+                <div class="field col-12 layout-card-status">
                     <span>Situação</span>
 
                     <div class="flex align-items-center">
@@ -41,14 +41,14 @@
 
                 </div>
 
-                <div class="layout-dialog-footer">
-                    <button pButton type="button" pRipple label="Cancelar" icon="pi pi-times" class="p-button-text"
-                        (click)=" hideDialog()"></button>
-                    <button pButton type="submit" pRipple label="Salvar" icon="pi pi-check"
-                        class="p-button-text"></button>
-                </div>
             </div>
-
+            
+            <div class="flex justify-content-end gap-2 mt-3">
+                <button pButton type="button" pRipple label="Cancelar" icon="pi pi-times" class="p-button-text"
+                    (click)=" hideDialog()"></button>
+                <button pButton type="submit" pRipple label="Salvar" icon="pi pi-check"
+                    class="p-button-text"></button>
+            </div>
 
         </form>
 
@@ -124,10 +124,10 @@
                 <td>{{modelo.description}}</td>
                 <td>
                     @if (modelo.image) {
-                        <img src="data:image/png;base64,{{modelo.image}}" alt="Vehicle Model" width="50" height="50"
+                        <img class="layout-tab-img" src="data:image/png;base64,{{modelo.image}}" alt="Vehicle Model" width="50" height="50"
                         loading="lazy">
                     }@else {
-                    <img ngSrc="assets/layout/images/picture.png" alt="Vehicle Model" width="50" height="50"
+                    <img class="layout-tab-img" ngSrc="assets/layout/images/picture.png" alt="Vehicle Model" width="50" height="50"
                         loading="lazy">
                     }
 

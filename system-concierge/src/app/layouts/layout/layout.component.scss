@@ -1,7 +1,11 @@
 .layout-wrapper{
     min-height: 100vh;
     margin: 0;
-
+    .layout-loading-progress{
+      position: absolute;
+      z-index: 9999;
+    }
+    
     .layout-main-container{
       display: flex;
       min-height: 100vh;
@@ -15,6 +19,8 @@
 
     .layout-main{
         flex: 1 1 auto;
+
+        
     }
 
    

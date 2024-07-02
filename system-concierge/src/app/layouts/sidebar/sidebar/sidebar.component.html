@@ -1,22 +1,12 @@
 <mat-drawer-container class="layout-sidebar-container">
     <mat-drawer class="layout-sidebar" [mode]="size ? 'over':'side'" [opened]="visibleSidebar()">
 
-        <cdk-virtual-scroll-viewport appendOnly [itemSize]="model.length" class="layout-scroll">
 
-            <ul>
-
-                @for (menuitem of model; track $index) {
-                <li>
-                    <app-sidebar-item [item]="menuitem" [index]="$index" />
-                </li>
-
-                }
-
-            </ul>
-        </cdk-virtual-scroll-viewport>
-
-
-
+        <div class="card flex justify-content-center mt-5 gap-2">
+            <!--   <p-button label="Toggle All" [text]="true" (onClick)="toggleAll()" /> -->
+            <p-panelMenu [model]="items" styleClass="w-full md:w-20rem" [multiple]="true">
+            </p-panelMenu>
+        </div>
 
     </mat-drawer>
 </mat-drawer-container>

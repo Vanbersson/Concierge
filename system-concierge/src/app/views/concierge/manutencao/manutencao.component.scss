@@ -1,0 +1,171 @@
+:host {
+    .layout-card-title {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 0.5rem;
+
+        span {
+            display: flex;
+            align-items: center;
+            font-size: 1.25rem;
+            font-weight: 400;
+            color: #64748b;
+        }
+
+        .layourt-button-back{
+            display: flex;
+            align-items: center;
+            height: 29px;
+        }
+
+    }
+
+    .layourt-tabview {
+        padding: 1rem 2rem 0 2rem;
+        border-radius: 8px;
+        border: 1px solid var(--color-grey-300);
+        height: 53.5rem;
+
+    }
+
+    .layout-card-abas {
+        padding: 2rem 1rem 0 1rem;
+        border-radius: 8px;
+        border: 1px solid var(--color-grey-300);
+        background-color: var(--color-grey-100);
+        height: 42rem;
+
+
+    }
+
+    .layourt-button-action {
+        display: flex;
+        justify-content: space-between;
+        width: 50rem;
+        height: 33px;
+        margin-left: 2rem;
+
+    }
+
+    .layout-photo-person {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 80px;
+        height: 80px;
+        background-color: var(--color-grey-300);
+        border-radius: 100%;
+
+        button {
+            width: 100px;
+            padding: 10px 0px;
+            border-radius: 0 0px 8px 8px;
+        }
+
+        .layout-photo-person-label {
+            display: flex;
+            align-items: center;
+            width: 80px;
+            height: 80px;
+
+            label {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                padding: 10px 0px;
+                width: 100%;
+                height: 100%;
+                color: #3B82F6;
+                cursor: pointer;
+            }
+
+            input[type="file"] {
+                display: none;
+            }
+        }
+
+
+    }
+
+    .layout-file {
+        display: flex;
+        flex-direction: column;
+        background-color: var(--color-grey-300);
+        justify-content: center;
+        align-items: center;
+        border-radius: 8px;
+
+        .layout-file-img {
+            width: 80px;
+            height: 80px;
+        }
+
+        label {
+            padding: 10px 0px;
+            width: 100px;
+            background-color: #64748b;
+            color: #FFF;
+            text-align: center;
+            display: block;
+            border-radius: 0 0px 8px 8px;
+            border: 1px solid var(--color-grey-300);
+            cursor: pointer;
+        }
+
+        button {
+            width: 100px;
+            padding: 10px 0px;
+            border-radius: 0 0px 8px 8px;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+    }
+
+    .layout-card-divid {
+        width: 100%;
+        height: 1px;
+        background-color: var(--color-grey-300);
+    }
+
+    .layout-card-option {
+        display: flex;
+        flex-direction: column;
+        height: 119px;
+        width: 100%;
+        padding: 0.5rem 2rem 2rem 2rem;
+        border-radius: 8px;
+        border: 1px solid var(--color-grey-300);
+        gap: 8px;
+
+        .layout-card-option-title {
+            font-weight: 400px;
+
+        }
+    }
+
+
+
+    @media(max-width: 600px) {
+        .layourt-tabview {
+            padding: 1rem 0 0 0;
+            border-radius: 8px;
+            border: 1px solid var(--color-grey-300);
+            height: 46rem;
+
+        }
+
+        .layout-card-abas {
+            padding: 0;
+            border: none;
+            height: 34.5rem;
+
+
+
+        }
+    }
+
+
+}

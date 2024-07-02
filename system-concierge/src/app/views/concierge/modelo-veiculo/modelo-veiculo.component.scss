@@ -1,15 +1,20 @@
 :host {
 
+    .layout-tab-img{
+        background-color:  var(--color-grey-200);
+        border-radius: 100%;
+        object-fit: cover;
+    }
 
-    .layout-modelo-title {
+    .layout-card-title {
         display: flex;
         justify-content: space-between;
         margin-bottom: 2rem;
 
         span {
             font-size: 1.25rem;
-            font-weight: 300;
-            color: #673ab7;
+            font-weight: 400;
+            color: #64748b;
         }
     }
 
@@ -52,17 +57,11 @@
 
     }
 
-    .layout-dialog-footer{
-        display: inline-flex;
-        margin: 1rem 0.5rem 0 10rem;
-    }
-
-    .layout-card-modelo {
+    .layout-card-status {
         display: flex;
         flex-direction: column;
         height: 7rem;
         padding: 1rem 0 1rem 1rem;
-        margin-top: 1rem;
         border-radius: 8px;
         border: 1px solid var(--color-grey-300);
         gap: 6px;

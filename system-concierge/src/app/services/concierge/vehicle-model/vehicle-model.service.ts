@@ -1,28 +1,34 @@
 import { Injectable } from '@angular/core';
-import { Observable, shareReplay } from 'rxjs';
+import { Observable } from 'rxjs';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { environment } from '../../../../environments/environment';
-import { VehicleModel } from '../../../models/vehicle-model';
+import { environment } from '../../../../environments/environment.development';
+
 import { InterfaceUpdateStatus } from '../../../interfaces/Interface-update-status';
+import { VehicleModel } from '../../../models/vehicle/vehicleModel';
+import { IVehicleModel } from '../../../interfaces/vehicle/iVehicleModel';
 
 @Injectable({
   providedIn: 'root'
 })
 export class VehicleModelService {
 
-  private apiGetAll = environment.Portaria_veiculo_modelo_All;
+  private urlBaseV1 = environment.URLBASE_V1;
 
-  private apiAdd = environment.portaria_veiculo_modelo_add;
+  companyId = sessionStorage.getItem('companyId');
+  resaleId = sessionStorage.getItem('resaleId');
 
-  private apiUpdate = environment.portaria_veiculo_modelo_update;
-
-  private apiUpdatestatus = environment.portaria_veiculo_modelo_updateStatus;
 
   constructor(private http: HttpClient) { }
 
   getAll$(): Observable<any> {
 
-    return this.http.get<VehicleModel>(this.apiGetAll + "/2/2");
+    return this.http.get<IVehicleModel>(this.urlBaseV1 + this.companyId + "/" + this.resaleId + "/vehicle/model/all");
+
+  }
+
+  getAllEnabled$(): Observable<any> {
+
+    return this.http.get<IVehicleModel>(this.urlBaseV1 + this.companyId + "/" + this.resaleId+"/vehicle/model/all");
 
   }
 
@@ -35,7 +41,7 @@ export class VehicleModelService {
       'Authorization': 'Bearer ' + token
     });
 
-    return this.http.post(this.apiAdd, model, { headers: httpOptions, observe: 'events' });
+    return this.http.post(this.urlBaseV1 + this.companyId + "/" + this.resaleId + "/vehicle/model/add", model, { headers: httpOptions, observe: 'events' });
 
   }
 
@@ -47,7 +53,7 @@ export class VehicleModelService {
       'Authorization': 'Bearer ' + token
     });
 
-    return this.http.post<VehicleModel>(this.apiUpdate, model, { headers: httpOptions, observe: 'events' });
+    return this.http.post<VehicleModel>(this.urlBaseV1 + this.companyId + "/" + this.resaleId + "/vehicle/model/update", model, { headers: httpOptions, observe: 'events' });
   }
 
   updateStatus$(model: InterfaceUpdateStatus): Observable<any> {
@@ -58,7 +64,7 @@ export class VehicleModelService {
       'Authorization': 'Bearer ' + token
     });
 
-    return this.http.post<InterfaceUpdateStatus>(this.apiUpdatestatus, model, { headers: httpOptions, observe: 'events' });
+    return this.http.post<InterfaceUpdateStatus>(this.urlBaseV1 + this.companyId + "/" + this.resaleId + "/vehicle/model/update/status", model, { headers: httpOptions, observe: 'events' });
   }
 
 

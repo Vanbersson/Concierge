@@ -3,37 +3,110 @@
         <img src="assets/layout/images/logotruck.png" alt="logo">
         <span>AUTOPOINT</span>
     </a>
-    <p-button #menuButton icon="pi pi-bars" [rounded]="true" [text]="true" severity="secondary" (click)="setSideBar(visibleSideBar())">
+    <p-button #menuButton icon="pi pi-bars" [rounded]="true" [text]="true" severity="secondary"
+        (click)="setSideBar(visibleSideBar())">
 
     </p-button>
 
     <p-button #topbarMenuButton class="layout-topbar-menu-button" icon="pi pi-ellipsis-v" [rounded]="true" [text]="true"
-        severity="secondary" >
+        severity="secondary">
     </p-button>
-
-    <span>Dashborad</span>
 
     <div #topbarmenu class="layout-topbar-menu">
 
-        <p-button icon="pi pi-bell" [rounded]="true" [text]="true" severity="secondary">
+        @if (qtdAlert() != '0') {
+        <div class="layout-button-alert">
+            <p-badge [value]="qtdAlert()" severity="info"></p-badge>
+            <p-button icon="pi pi-bell" [rounded]="true" [text]="true" severity="info"></p-button>
+        </div>
+        }@else {
+        <p-button icon="pi pi-bell" [rounded]="true" [text]="true" severity="secondary"></p-button>
+        }
 
+        <p-button icon="pi pi-user" [rounded]="true" [text]="true" severity="secondary" (click)="showSideBarRight()">
         </p-button>
-        <p-button icon="pi pi-calendar" (click)="showDialog()" [rounded]="true" [text]="true" severity="secondary">
 
-        </p-button>
-        <p-dialog [(visible)]="visible">
-            <p-calendar [(ngModel)]="date" [inline]="true" [showButtonBar]="false" inputId="buttonbar"></p-calendar>
-        </p-dialog>
-
-        <p-button icon="pi pi-user" [rounded]="true" [text]="true" severity="secondary">
-
-        </p-button>
-        <p-button icon="pi pi-cog" [rounded]="true" [text]="true" severity="secondary">
+        <p-button icon="pi pi-cog" [rounded]="true" [text]="true" severity="secondary" (click)="openDialog()">
 
         </p-button>
 
     </div>
 
+</div>
+
+<div>
+    <p-sidebar #sidebarRef [(visible)]="visibleSideBarRight" position="right" styleClass="w-30rem">
+
+        <ng-template pTemplate="headless">
+
+            <div class="layout-sidebar-header">
+                <div class="layout-sidebar-header-close">
+                    <p-button type="button" (click)="closeSideBarCallback($event)" icon="pi pi-times" [rounded]="true"
+                        [text]="true" size="large" severity="secondary"></p-button>
+                </div>
+
+                <div class="layout-sidebar-header-main">
+                    <div class="layout-side-header-photo">
+                        <p-avatar image="assets/layout/images/porteiro.png" size="xlarge" shape="circle"></p-avatar>
+                    </div>
+                    <div class="layout-sidebar-header-title">
+                        <span class="layout-sidebar-header-name">{{nameUser | titlecase}}</span>
+                        <span class="layout-sidebar-header-role">Vendedor</span>
+                    </div>
+                </div>
+
+            </div>
+            <div class="layout-sidebar-content">
+
+                <a class="layout-sidebar-content-card" (click)="openDialog()">
+                    <span class="pi pi-user"></span>
+                    <div class="layout-sidebar-content-card-item">
+                        <span class="sidebar-content-card-item-title">Perfil</span>
+                        <span>Dados do usuário</span>
+                    </div>
+                </a>
+
+                <a class="layout-sidebar-content-card">
+                    <span class="pi pi-cog"></span>
+                    <div class="layout-sidebar-content-card-item">
+                        <span class="sidebar-content-card-item-title">Configuração</span>
+                        <span>Informações do sistema</span>
+                    </div>
+                </a>
+
+                <a class="layout-sidebar-content-card">
+                    <span class="pi pi-power-off"></span>
+                    <div class="layout-sidebar-content-card-item">
+                        <span class="sidebar-content-card-item-title">Sair</span>
+                        <span>Encerrar a sessão</span>
+                    </div>
+                </a>
+
+                <div class="layout-notification">
+
+                    <span class="layout-notification-title">Notificações</span>
+
+                    @if ( qtdAlert() == '1' ) {
+                    <span class="layout-notification-message">Você tem {{qtdAlert()}} notificação</span>
+                    }
+                    @if ( qtdAlert() != '1' && qtdAlert() != '0' ) {
+                    <span class="layout-notification-message">Você tem {{qtdAlert()}} notificações</span>
+                    }
+                    @if ( qtdAlert() =='0' ) {
+                    <span class="layout-notification-message">Você não tem notificação</span>
+                    }
+
+                </div>
+                <a class="layout-sidebar-content-card">
+                    <span class="pi pi-bell"></span>
+                    <div class="layout-sidebar-content-card-item">
+                        <span class="sidebar-content-card-item-title">Notificações</span>
+                        <span>Acessar notificação</span>
+                    </div>
+                </a>
 
 
+            </div>
+        </ng-template>
+    </p-sidebar>
 </div>

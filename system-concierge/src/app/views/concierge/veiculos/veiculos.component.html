@@ -1,12 +1,20 @@
 <div class="layout-card">
 
+    <p-toast />
+
     <div class="layout-card-title">
-        <span>Lista veículos</span>
-        <p-button icon="pi pi-plus" label="Adicionar" [outlined]="true"></p-button>
+        <span>Veículos</span>
+
+        <div class="flex gap-2">
+            <p-button icon="pi pi-plus" label="Atendimento" [outlined]="true" (onClick)="novoAtendimento()"></p-button>
+            <p-button icon="pi pi-refresh" (onClick)="listVehicles()" />
+        </div>
+
+
     </div>
 
-    <p-table #dt1 [value]="veiculos" [(selection)]="selectedItems" (selectionChange)="onSelectionChange($event)"
-        dataKey="id" [(selection)]="selectedVeiculo" [scrollable]="true" scrollHeight="700px"  [paginator]="true"
+    <p-table #dt1 [value]="listVehicleEntry" [(selection)]="selectedItems" (selectionChange)="onSelectionChange($event)"
+        dataKey="id" [(selection)]="selectedVeiculo" [scrollable]="true" scrollHeight="650px" [paginator]="true"
         [rows]="10" [rowsPerPageOptions]="[10, 25, 50]">
         <ng-template pTemplate="header">
 
@@ -15,13 +23,21 @@
                 <th pSortableColumn="id" style="width:10%">Código <p-sortIcon field="id"></p-sortIcon></th>
                 <th pSortableColumn="placa" style="width:15%">Placa <p-sortIcon field="placa"></p-sortIcon></th>
                 <th pSortableColumn="frota" style="width:15%">Frota <p-sortIcon field="frota"></p-sortIcon></th>
-                <th pSortableColumn="modelo" style="width:15%">Modelo <p-sortIcon field="modelo"></p-sortIcon></th>
-                <th pSortableColumn="dataEntrada" style="width:15%">Entrada <p-sortIcon
-                        field="dataEntrada"></p-sortIcon></th>
-                <th pSortableColumn="porteiro" style="width:15%">Porteiro <p-sortIcon field="porteiro"></p-sortIcon>
+                <th pSortableColumn="modelDescription" style="width:15%">Modelo <p-sortIcon
+                        field="modelDescription"></p-sortIcon></th>
+                <th pSortableColumn="dateEntry" style="width:15%">Entrada <p-sortIcon field="dateEntry"></p-sortIcon>
                 </th>
-                <th pSortableColumn="empresa" style="width:15%">Empresa <p-sortIcon field="empresa"></p-sortIcon></th>
-                <th pSortableColumn="orcamento" style="width:15%">Orçamento <p-sortIcon field="orcamento"></p-sortIcon>
+                <th pSortableColumn="nameUserAttendant" style="width:15%">Consultor <p-sortIcon
+                        field="nameUserAttendant"></p-sortIcon>
+                </th>
+                <th pSortableColumn="clientCompanyName" style="width:15%">Empresa <p-sortIcon
+                        field="clientCompanyName"></p-sortIcon></th>
+                <th pSortableColumn="budgetStatus" style="width:15%">Orçamento <p-sortIcon
+                        field="budgetStatus"></p-sortIcon>
+                </th>
+                <th pSortableColumn="statusAuthExit" style="width:10%">Liberação<p-sortIcon
+                        field="statusAuthExit"></p-sortIcon>
+
                 </th>
                 <th style="width:15%"></th>
 
@@ -40,23 +56,47 @@
                     <p-columnFilter type="text" field="frota"></p-columnFilter>
                 </th>
                 <th>
-                    <p-columnFilter type="text" field="modelo"></p-columnFilter>
+                    <p-columnFilter type="text" field="modelDescription"></p-columnFilter>
                 </th>
                 <th>
-                    <p-columnFilter type="text" field="dataEntrada"></p-columnFilter>
+                    <p-columnFilter type="text" field="dateEntry"></p-columnFilter>
                 </th>
                 <th>
-                    <p-columnFilter type="text" field="porteiro"></p-columnFilter>
+                    <p-columnFilter type="text" field="nameUserAttendant"></p-columnFilter>
                 </th>
                 <th>
-                    <p-columnFilter type="text" field="empresa"></p-columnFilter>
+                    <p-columnFilter type="text" field="clientCompanyName"></p-columnFilter>
                 </th>
                 <th>
-                    <p-columnFilter field="orcamento" matchMode="equals" [showMenu]="false">
+                    <p-columnFilter field="budgetStatus" matchMode="equals" [showMenu]="false">
                         <ng-template pTemplate="filter" let-value let-filter="filterCallback">
-                            <p-dropdown [ngModel]="value" [options]="statuses" (onChange)="filter($event.value)" [showClear]="true">
+                            <p-dropdown [ngModel]="value" [options]="statusOrcamento" (onChange)="filter($event.value)"
+                                [showClear]="true">
                                 <ng-template let-option pTemplate="item">
                                     <p-tag [value]="option.value" [severity]="getSeverity(option.label)"></p-tag>
+                                </ng-template>
+                            </p-dropdown>
+                        </ng-template>
+                    </p-columnFilter>
+                </th>
+                <th>
+                    <p-columnFilter field="statusAuthExit" matchMode="equals" [showMenu]="false">
+                        <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                            <p-dropdown [ngModel]="value" [options]="statusLiberacao" (onChange)="filter($event.value)"
+                                [showClear]="true">
+                                <ng-template let-option pTemplate="item">
+
+                                    @if(option.value == notAuth){
+                                    <i class="pi pi-times-circle text-red-500"></i>
+                                    }
+                                    @if(option.value == firstAuth){
+                                    <i class="pi pi-check-circle text-green-500"></i>
+                                    }
+
+                                    @if(option.value == authorized){
+                                    <i class="pi pi-thumbs-up-fill text-green-500"></i>
+                                    }
+
                                 </ng-template>
                             </p-dropdown>
                         </ng-template>
@@ -65,41 +105,75 @@
 
                 <th>
                     @if (selectedItems.length > 0) {
-                        <p-button icon="pi pi-check-circle" label="Liberar" [rounded]="true" [raised]="true" severity="success" size="small"></p-button>
+                    <p-button icon="pi pi-check-circle" label="Liberar" [rounded]="true" [raised]="true"
+                        severity="success" size="small" (onClick)="addAuthorizationAll()"></p-button>
                     }
-                    
+
                 </th>
 
             </tr>
 
         </ng-template>
-        <ng-template pTemplate="body" let-veiculo>
+        <ng-template pTemplate="body" let-vehicle>
             <tr>
                 <td>
-                    <p-tableCheckbox [value]="veiculo"></p-tableCheckbox>
+                    <p-tableCheckbox [value]="vehicle"></p-tableCheckbox>
                 </td>
-                <td>{{ veiculo.id }}</td>
-                <td>{{ veiculo.placa }}</td>
-                <td>{{ veiculo.frota }}</td>
-                <td>{{ veiculo.modelo }}</td>
-                <td>{{ veiculo.dataEntrada }}</td>
+                <td>{{ vehicle.id }}</td>
                 <td>
-                    <img ngSrc="assets/layout/images/porteiro.png" alt="Porteiro" width="30" height="30" loading="lazy"
-                        style="vertical-align: middle">
-                    <span class="ml-1 vertical-align-middle">{{ veiculo.porteiro }}</span>
+                    @if(vehicle.placa == "novo"){
+                    <p-tag [value]="vehicle.placa | uppercase" severity="danger"></p-tag>
+                    }@else {
+                    <p-tag [value]="vehicle.placa | uppercase" severity="info"></p-tag>
+                    }
+
                 </td>
-                <td>{{ veiculo.empresa }}</td>
-                <td><p-tag [value]="veiculo.orcamento" [severity]="getSeverity(veiculo.orcamento)"></p-tag></td>
+                <td>{{ vehicle.frota }}</td>
+                <td>{{ vehicle.modelDescription }}</td>
+                <td>{{ vehicle.dateEntry | date: 'dd/MM/yyyy HH:mm' }}</td>
+
+                @if(vehicle.nameUserAttendant == 'falta'){
+                <td><p-tag [value]="vehicle.nameUserAttendant | uppercase" severity="danger"></p-tag></td>
+
+                }@else {
+                <td>{{ vehicle.nameUserAttendant }}</td>
+                }
+
+                @if(vehicle.clientCompanyName =="NÃO CADASTRADO"){
+                    <td> <p-tag [value]="vehicle.clientCompanyName | uppercase" severity="danger"></p-tag> </td>
+                }@else {
+                    <td>{{ vehicle.clientCompanyName }}</td>
+                }
+                
+
+
+                <td><p-tag [value]="vehicle.budgetStatus" [severity]="getSeverity(vehicle.budgetStatus)"></p-tag></td>
+
+                <td class="text-center">
+                    @if(vehicle.statusAuthExit == notAuth){
+                    <i class="pi pi-times-circle text-red-500"></i>
+                    }
+                    @if(vehicle.statusAuthExit ==firstAuth){
+                    <i class="pi pi-check-circle text-green-500"></i>
+                    }
+
+                    @if(vehicle.statusAuthExit== authorized){
+                    <i class="pi pi-thumbs-up-fill text-green-500"></i>
+                    }
+
+                </td>
 
                 <td style="display: flex;">
 
                     <button pButton pRipple icon="pi pi-pencil" size="small" class="p-button-rounded p-button-text"
-                        (click)="editVeiculo()"></button>
+                        (click)="editVeiculo(vehicle.id)"></button>
 
-                    <p-button label="Liberar" icon="pi pi-check-circle" [rounded]="true" [outlined]="true"  size="small" severity="success"></p-button>
+                    <p-button label="Liberar" icon="pi pi-check-circle" [rounded]="true" [outlined]="true" size="small"
+                        severity="success" (onClick)="addAuthorization(vehicle)"></p-button>
 
 
                 </td>
+
 
             </tr>
         </ng-template>

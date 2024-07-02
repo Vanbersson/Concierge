@@ -1,26 +1,32 @@
-import { ChangeDetectionStrategy, Component, ElementRef, Input, OnInit, signal } from '@angular/core';
+import { Component, Input, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { SidebarItemComponent } from '../sidebar-item/sidebar-item.component';
+
 
 
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { ScrollingModule } from '@angular/cdk/scrolling';
-import { SideBarMenuItem } from '../../../interfaces/sidebar-menu-item';
+
+
+//PrimeNg
+import { PanelMenuModule } from 'primeng/panelmenu';
+import { ButtonModule } from 'primeng/button';
+import { MenuItem } from 'primeng/api';
 
 
 
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [CommonModule, SidebarItemComponent, MatSidenavModule, ScrollingModule],
+  imports: [CommonModule, MatSidenavModule, ScrollingModule, PanelMenuModule, ButtonModule],
   templateUrl: './sidebar.component.html',
   styleUrl: './sidebar.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
   providers: []
 })
 export class SidebarComponent implements OnInit {
 
-  model: SideBarMenuItem[] = [];
+  items!: MenuItem[];
+
+
 
   visibleSidebar = signal(true);
 
@@ -30,43 +36,159 @@ export class SidebarComponent implements OnInit {
 
   constructor() { }
 
+
+
   ngOnInit(): void {
-    this.model = <SideBarMenuItem[]>([
 
+    this.items = [
       {
-        title: 'Home', label: 'Dashboard', icon: 'pi pi-home', routerlink: 'dashboard',
+        key: '0',
+        label: 'Dashboard',
+        icon: 'pi pi-home',
+        routerLink: 'dashboard',
+        visible: true
       },
       {
-        title: 'Portaria', itens: [
-          { label: 'Atendimento', icon: 'pi pi-book', routerlink: 'portaria/atendimento' },
-          { label: 'Veículos', icon: 'pi pi-car', routerlink: 'portaria/veiculos' },
-          { label: 'Saída autorizada', icon: 'pi pi-sign-out', routerlink: 'portaria/saida-autorizada' },
-          { label: 'Modelos veículo', icon: 'pi pi-sign-out', routerlink: 'portaria/modelo-veiculo' }
+        key: '1',
+        label: 'Portaria',
+        icon: 'pi pi-truck',
+        items: [
+          {
+            key: '1_1',
+            label: 'Atendimento',
+            routerLink: 'portaria/atendimento'
+          },
+          {
+            key: '1_2',
+            label: 'Veículos',
+            routerLink: 'portaria/veiculos'
+          },
+          {
+            key: '1_3',
+            label: 'Manutenção',
+            routerLink: 'portaria/manutencao',
+            visible: false
+          },
+          {
+            key: '1_4',
+            label: 'Cadastro',
+            items: [
+              {
+                key: '1_4_0',
+                label: 'Modelo',
+                routerLink: 'portaria/modelo-veiculo'
+              },
+              {
+                key: '1_4_1',
+                label: 'Veículo'
+              }
+            ]
+          },
 
         ]
       },
       {
-        title: 'Atendimento', itens: [
-          { label: 'Atendimento', icon: 'pi pi-id-card', routerlink: 'atendimento/atendimento' },
-          { label: 'Orçamento', icon: 'pi pi-verified', routerlink: '' }
+        key: '2',
+        label: 'Peças',
+        icon: 'pi pi-book',
+        items: [
+          {
+            key: '2_0',
+            label: 'Consulta peças',
+          },
+          {
+            key: '2_1',
+            label: 'Pedido de compra',
+            items: [
+              {
+                key: '2_1_0',
+                label: 'Novo',
+              },
+              {
+                key: '2_1_1',
+                label: 'Consulta',
+              },
+            ]
+          },
+          {
+            key: '2_2',
+            label: 'Controle de equipamentos',
+            items: [
+              {
+                key: '2_2_0',
+                label: 'Pegar',
+
+              },
+              {
+                key: '2_2_1',
+                label: 'Devolver',
+
+              },
+              {
+                key: '2_2_2',
+                label: 'Cadastro',
+                items: [
+                  {
+                    key: '2_2_2_0',
+                    label: 'Material',
+                  },
+                  {
+                    key: '2_2_2_1',
+                    label: 'Mecânico',
+                  }
+                ]
+              }
+            ]
+          }
+
         ]
       },
       {
-        title: 'Compras', itens: [
-          { label: 'Pedido de compra', icon: 'pi pi-id-card', routerlink: '' },
-          { label: 'Pedidos', icon: 'pi pi-verified', routerlink: '' }
-        ]
-      },
-      {
-        title: 'Ferramenta e EPI', itens: [
-          { label: 'Entrega Ferramenta', icon: 'pi pi-id-card', routerlink: '' },
-          { label: 'Estoque Ferramenta', icon: 'pi pi-verified', routerlink: '' },
-          { label: 'Entrega EPI', icon: 'pi pi-id-card', routerlink: '' },
-          { label: 'Estoque EPI', icon: 'pi pi-verified', routerlink: '' }
+        key: '3',
+        label: 'Oficina',
+        icon: 'pi pi-calendar',
+        items: [
+          {
+            key: '3_0',
+            label: 'Orçamento',
+            items: [
+              {
+                key: '3_0_0',
+                label: 'Novo',
+
+              },
+              {
+                key: '3_0_1',
+                label: 'Consulta',
+
+              },
+            ]
+          },
+
+
         ]
       }
-    ]);
+    ];
 
+  }
+
+  toggleAll() {
+    const expanded = !this.areAllItemsExpanded();
+    this.items = this.toggleAllRecursive(this.items, expanded);
+  }
+
+  private toggleAllRecursive(items: MenuItem[], expanded: boolean): MenuItem[] {
+    return items.map((menuItem) => {
+      menuItem.expanded = expanded;
+      if (menuItem.items) {
+        menuItem.items = this.toggleAllRecursive(menuItem.items, expanded);
+      }
+      return menuItem;
+    });
+  }
+
+  private areAllItemsExpanded(): boolean {
+    return this.items.every((menuItem) => menuItem.expanded);
   }
 
   get size() {
