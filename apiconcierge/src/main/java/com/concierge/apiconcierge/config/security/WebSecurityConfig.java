@@ -16,7 +16,8 @@ public class WebSecurityConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOrigins("http://localhost:4200","http://10.0.1.164:4200","http://10.0.1.183:4200")
+                        //.allowedOrigins("http://localhost:4200","http://10.0.1.164:4200","http://10.0.1.183:4200")
+                        .allowedOrigins("*")
                         .allowedMethods(HttpMethod.POST.name(), HttpMethod.GET.name())
                         .allowedHeaders(HttpHeaders.CONTENT_TYPE,HttpHeaders.AUTHORIZATION);
             }

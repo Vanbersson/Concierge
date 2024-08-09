@@ -16,6 +16,6 @@ public record UserDto(
         String email,
         String password,
         String cellphone,
-        UUID imageId,
+        byte[] photo,
         @NotNull Integer role) {
 }

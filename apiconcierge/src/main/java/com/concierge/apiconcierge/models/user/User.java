@@ -16,7 +16,6 @@ import java.util.UUID;
 @SecondaryTable(name = "tb_company", pkJoinColumns = @PrimaryKeyJoinColumn(name = "id"))
 @SecondaryTable(name = "tb_resale", pkJoinColumns = @PrimaryKeyJoinColumn(name = "id"))
 @SecondaryTable(name = "tb_user_role", pkJoinColumns = @PrimaryKeyJoinColumn(name = "id"))
-@SecondaryTable(name = "tb_user_image", pkJoinColumns = @PrimaryKeyJoinColumn(name = "id"))
 @Entity
 @Table(name = "tb_user")
 public class User implements Serializable {
@@ -45,9 +44,7 @@ public class User implements Serializable {
 
     private String cellphone;
 
-    @JoinColumn(table = "tb_user_image",referencedColumnName = "id")
-    @Column(name = "image_id")
-    private UUID imageId;
+    private byte[] photo;
 
     @JoinColumn(table = "tb_user_role", referencedColumnName = "id")
     @Column(name = "role_id")

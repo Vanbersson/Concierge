@@ -32,8 +32,8 @@ public class VehicleEntryController {
     @Autowired
     VehicleEntryRepository vehicleRepository;
 
-    @PostMapping("/add")
-    public ResponseEntity<Object> addVehicle(@RequestBody @Valid VehicleEntryDto data) {
+    @PostMapping("/save")
+    public ResponseEntity<Object> saveVehicle(@RequestBody @Valid VehicleEntryDto data) {
 
         VehicleEntry vehicleEntry = new VehicleEntry();
         BeanUtils.copyProperties(data, vehicleEntry);
@@ -42,17 +42,30 @@ public class VehicleEntryController {
             vehicleEntry.setPlaca("");
         }
 
-        if (!data.placa().equals("") && data.vehicleNew().equals(VehicleYesNotEnum.not)) {
+        if (data.vehicleNew().equals(VehicleYesNotEnum.not) && data.id() == null) {
             VehicleEntry vehicle = vehicleEntryIRepository.findByCompanyIdAndResaleIdAndPlaca(data.companyId(), data.resaleId(), data.placa());
 
-            if (vehicle != null) return ResponseEntity.status(HttpStatus.OK).body("Placa already exists.");
+            if (vehicle != null) return ResponseEntity.status(HttpStatus.CONFLICT).body("Placa already exists.");
         }
 
         return ResponseEntity.status(HttpStatus.CREATED).body(vehicleEntryIRepository.save(vehicleEntry));
     }
 
+    @PostMapping("/update")
+    public ResponseEntity<Object> updateVehicle(@RequestBody @Valid VehicleEntryDto data) {
+
+        VehicleEntry vehicleEntry = new VehicleEntry();
+        BeanUtils.copyProperties(data, vehicleEntry);
+
+        if (data.vehicleNew().equals(VehicleYesNotEnum.yes)) {
+            vehicleEntry.setPlaca("");
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(vehicleEntryIRepository.save(vehicleEntry));
+    }
+
     @GetMapping("/all")
-    public ResponseEntity<List<VehicleEntry>> getAll(
+    public ResponseEntity<List<VehicleEntry>> listAll(
             @PathVariable(name = "companyid") Integer companyId,
             @PathVariable(name = "resaleid") Integer resaleId) {
 
@@ -62,7 +75,7 @@ public class VehicleEntryController {
     }
 
     @GetMapping("/listEntry")
-    public ResponseEntity<List<VehicleEntry>> getListEntry(
+    public ResponseEntity<List<VehicleEntry>> listEntry(
             @PathVariable(name = "companyid") Integer companyId,
             @PathVariable(name = "resaleid") Integer resaleId) {
 
@@ -104,10 +117,9 @@ public class VehicleEntryController {
 
         String mensagem = validAuthorization(vehicle);
 
-        if(mensagem != "Authorized"){
+        if (mensagem != "Authorized") {
             return ResponseEntity.ok(mensagem);
         }
-
 
         mensagem = "Not authorized.";
 
@@ -201,6 +213,40 @@ public class VehicleEntryController {
         }
         if (vehicle.getIdUserAttendant() == null || vehicle.getNameUserAttendant().equals("falta")) {
             return "UserAttendant";
+        }
+
+        //Driver entry
+        if (vehicle.getDriverEntryName().isEmpty() && vehicle.getDriverEntryCpf().isEmpty() && vehicle.getDriverEntryRg().isEmpty()) {
+            return "Driver";
+        }
+        if (vehicle.getDriverEntryName().isEmpty() && !vehicle.getDriverEntryCpf().isEmpty() && !vehicle.getDriverEntryRg().isEmpty()) {
+            return "Driver";
+        }
+        if (!vehicle.getDriverEntryName().isEmpty() && vehicle.getDriverEntryCpf().isEmpty() && vehicle.getDriverEntryRg().isEmpty()) {
+            return "Driver";
+        }
+        if (vehicle.getDriverEntryName().isEmpty() && vehicle.getDriverEntryCpf().isEmpty() && !vehicle.getDriverEntryRg().isEmpty()) {
+            return "Driver";
+        }
+        if (vehicle.getDriverEntryName().isEmpty() && !vehicle.getDriverEntryCpf().isEmpty() && vehicle.getDriverEntryRg().isEmpty()) {
+            return "Driver";
+        }
+
+        //Driver Exit
+        if (vehicle.getDriverExitName().isEmpty() && vehicle.getDriverExitCpf().isEmpty() && vehicle.getDriverExitRg().isEmpty()) {
+            return "Driver";
+        }
+        if (vehicle.getDriverExitName().isEmpty() && !vehicle.getDriverExitCpf().isEmpty() && !vehicle.getDriverExitRg().isEmpty()) {
+            return "Driver";
+        }
+        if (!vehicle.getDriverExitName().isEmpty() && vehicle.getDriverExitCpf().isEmpty() && vehicle.getDriverExitRg().isEmpty()) {
+            return "Driver";
+        }
+        if (vehicle.getDriverExitName().isEmpty() && vehicle.getDriverExitCpf().isEmpty() && !vehicle.getDriverExitRg().isEmpty()) {
+            return "Driver";
+        }
+        if (vehicle.getDriverExitName().isEmpty() && !vehicle.getDriverExitCpf().isEmpty() && vehicle.getDriverExitRg().isEmpty()) {
+            return "Driver";
         }
 
         return "Authorized";

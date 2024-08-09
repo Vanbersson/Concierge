@@ -58,11 +58,6 @@
      FOREIGN KEY(resale_id) REFERENCES tb_resale(id)
  );
 
- CREATE TABLE tb_user_image(
-    id binary(16) unique,
-    image longblob not null
- );
-
  CREATE TABLE tb_user(
      company_id int not null,
      resale_id int not null,
@@ -73,11 +68,10 @@
      password varchar(8) not null,
      cellphone varchar(11),
      role_id int not null,
-     image_id binary(16),
-     FOREIGN KEY(role_id) REFERENCES tb_user_role(id),
+     photo longblob,
      FOREIGN KEY(company_id) REFERENCES tb_company(id),
      FOREIGN KEY(resale_id) REFERENCES tb_resale(id),
-     FOREIGN KEY(image_id) REFERENCES tb_user_image(id),
+     FOREIGN KEY(role_id) REFERENCES tb_user_role(id),
      PRIMARY KEY(id)
  );
 
@@ -150,6 +144,19 @@
       primary key(id)
   );
 
+   CREATE TABLE tb_budget_requisition(
+        company_id int not null,
+        resale_id int not null,
+        id binary(16) unique,
+        budget_id int not null,
+        ordem int not null,
+        description varchar(100) not null,
+        FOREIGN KEY(company_id) REFERENCES tb_company(id),
+        FOREIGN KEY(resale_id) REFERENCES tb_resale(id),
+        FOREIGN KEY(budget_id) REFERENCES tb_budget(id),
+        primary key(id)
+    );
+
  CREATE TABLE tb_budget_item(
       company_id int not null,
       resale_id int not null,
@@ -166,6 +173,22 @@
       FOREIGN KEY(budget_id) REFERENCES tb_budget(id),
       primary key(id)
   );
+
+   CREATE TABLE tb_budget_service(
+        company_id int not null,
+        resale_id int not null,
+        id int not null AUTO_INCREMENT,
+        budget_id int not null,
+        status tinyint not null,
+        description varchar(100) not null,
+        hour_service float not null,
+        price float not null,
+        discount float not null,
+        FOREIGN KEY(company_id) REFERENCES tb_company(id),
+        FOREIGN KEY(resale_id) REFERENCES tb_resale(id),
+        FOREIGN KEY(budget_id) REFERENCES tb_budget(id),
+        primary key(id)
+    );
 
  create table tb_vehicle(
      company_id int not null,
@@ -274,7 +297,6 @@
      FOREIGN KEY(id_user_exit_auth1) REFERENCES tb_user(id),
      FOREIGN KEY(id_user_exit_auth2) REFERENCES tb_user(id),
      FOREIGN KEY(model_id) REFERENCES tb_vehicle_model(id),
-     FOREIGN KEY(client_company_id) REFERENCES tb_client_company(id),
      PRIMARY KEY(id)
 
  );

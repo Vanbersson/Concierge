@@ -33,6 +33,7 @@ public class BudgetItem {
 
     private StatusBudgetItemEnum status;
 
+    @Column(name = "code_item")
     private String code;
 
     private String description;

@@ -1,22 +1,24 @@
 package com.concierge.apiconcierge.models.budget;
 
-import com.concierge.apiconcierge.models.budget.enums.StatusBudgetEnum;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import java.util.Date;
+import java.util.UUID;
+
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(of = "id")
 @SecondaryTable(name = "tb_company", pkJoinColumns = @PrimaryKeyJoinColumn(name = "id"))
 @SecondaryTable(name = "tb_resale", pkJoinColumns = @PrimaryKeyJoinColumn(name = "id"))
+@SecondaryTable(name = "tb_budget", pkJoinColumns = @PrimaryKeyJoinColumn(name = "id"))
 @Entity
-@Table(name = "tb_budget")
-public class Budget {
-
+@Table(name = "tb_budget_requisition")
+public class BudgetRequisition {
     @JoinColumn(table = "tb_company", referencedColumnName = "id")
     @Column(name = "company_id")
     private Integer companyId;
@@ -26,14 +28,14 @@ public class Budget {
     private Integer resaleId;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
-    private StatusBudgetEnum status;
+    @JoinColumn(table = "tb_budget", referencedColumnName = "id")
+    @Column(name = "budget_id")
+    private Integer budgetId;
 
-    @Column(name = "date_geration")
-    private Date dateGeration;
+    private Integer ordem;
 
-    @Column(name = "date_auth")
-    private Date dateAuth;
+    private String description;
 }

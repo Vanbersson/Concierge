@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/role")
+@RequestMapping("/v1/{companyid}/{resaleid}/user/role")
 public class UserRoleController {
 
     @Autowired
@@ -45,10 +45,24 @@ public class UserRoleController {
         return ResponseEntity.status(HttpStatus.OK).body(userRoleRepository.save(role));
     }
 
-    @GetMapping("/all/{companyid}/{resaleid}")
-    public ResponseEntity<List<UserRole>> allRole(@PathVariable(value = "companyid") Integer companyId, @PathVariable(value = "resaleid") Integer resaleId) {
+    @GetMapping("/all")
+    public ResponseEntity<List<UserRole>> allRole(
+            @PathVariable(value = "companyid") Integer companyId,
+            @PathVariable(value = "resaleid") Integer resaleId) {
 
-        List<UserRole> roles = userRoleRepository.findAll();
+        List<UserRole> roles = userRoleRepository.findByCompanyIdAndResaleId(companyId,resaleId);
+
+        return ResponseEntity.ok(roles);
+
+    }
+
+    @GetMapping("/filter/code/{code}")
+    public ResponseEntity<UserRole> getCode(
+            @PathVariable(value = "companyid") Integer companyId,
+            @PathVariable(value = "resaleid") Integer resaleId,
+            @PathVariable(value = "code") Integer code) {
+
+        UserRole roles = userRoleRepository.findByCompanyIdAndResaleIdAndId(companyId, resaleId, code);
 
         return ResponseEntity.ok(roles);
 
