@@ -5,7 +5,7 @@ import { FormsModule } from '@angular/forms';
 //PrimeNg
 import { ButtonModule } from 'primeng/button';
 import { CalendarModule } from 'primeng/calendar';
-import { LayoutService } from '../../layouts/layout/layoutService';
+import { LayoutService } from '../../layouts/layout/service/layout.service';
 import { Router } from '@angular/router';
 
 @Component({
@@ -19,19 +19,13 @@ import { Router } from '@angular/router';
 export default class DashboardComponent implements OnInit {
 
 
-  constructor(private layoutService: LayoutService, private router: Router) { }
+  constructor(public layoutService: LayoutService, private router: Router) {
+    this.layoutService.isLogin();
+  }
 
   ngOnInit(): void {
-    this.validLogin();
-
+    
   }
 
-  validLogin() {
-
-    if (!this.layoutService.isLogin()) {
-      this.router.navigateByUrl('/login');
-    }
-
-  }
 
 }

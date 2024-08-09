@@ -3,14 +3,14 @@
     .layout-card-title {
         display: flex;
         justify-content: space-between;
-        margin-bottom: 0.5rem;
+        padding-left: 1.5rem;
+        padding-right: 1.5rem;
 
         span {
             display: flex;
             align-items: center;
             font-size: 1.25rem;
-            font-weight: 400;
-            color: #64748b;
+            color: var(--color-grey-700);
         }
 
         .layout-button-alert {
@@ -22,48 +22,12 @@
         }
     }
 
-    .layout-card-clientcompany {
-        height: 36rem;
-        border-radius: 8px;
-        border: 1px solid var(--color-grey-300);
-        padding: 10px;
-        background-color: var(--color-grey-100);
-
+    .layout-card-step {     
+       
         span {
             font-size: 1.5rem;
             font-weight: 700;
-            color: #4B5563;
-        }
-
-    }
-
-    .layout-card-driver {
-        height: 36rem;
-        border-radius: 8px;
-        border: 1px solid var(--color-grey-300);
-        padding: 10px;
-        background-color: var(--color-grey-100);
-
-        span {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #4B5563;
-        }
-
-    }
-
-    .layout-card-vehicle {
-        height: 36rem;
-        border-radius: 8px;
-        border: 1px solid var(--color-grey-300);
-        padding: 10px;
-        background-color: var(--color-grey-100);
-
-        span {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #4B5563;
-
+            color: var(--color-grey-700);
         }
 
     }
@@ -71,14 +35,7 @@
     .layout-button-action {
         display: flex;
         width: 100%;
-        margin-top: 10px;
         gap: 8px;
-
-    }
-
-    .layout-form-step {
-        height: calc(100vh - 20rem);
-        margin-top: 0.5rem;
     }
 
     .layout-photo-person {
@@ -121,7 +78,7 @@
 
     }
 
-    .layout-file-foto-driver{
+    .layout-file-foto-driver {
         display: flex;
         justify-content: center;
 
@@ -133,7 +90,7 @@
             display: block;
             cursor: pointer;
         }
-             
+
         input[type="file"] {
             display: none;
         }
@@ -176,7 +133,6 @@
 
     }
 
-
     .layout-card-option {
         display: flex;
         flex-direction: column;
@@ -193,23 +149,37 @@
         }
     }
 
+    .layout-card-option-type {
+        display: flex;
+        height: 100px;
+        width: 100%;
+        padding: 0.5rem 2rem 2rem 0rem;
+        gap: 8px;
 
-    @media(max-width: 600px) {
+        .layout-card-option-title {
+            font-weight: 400px;
 
-
-        .layout-card-clientcompany {
-            height: 42rem;  
         }
-
-        .layout-card-driver{
-            height: 43rem;
-        }
-
-        .layout-card-vehicle{
-            height: 128rem;
-        }
-
     }
+
+    /* Small devices (portrait tablets and large phones, 600px and up) */
+    @media only screen and (min-width: 375px) and (max-width: 667px) and (orientation: portrait) {
+
+        .layout-card-option-type {
+            height: 22px;
+        }
+
+        .layout-card-driver {
+            height: 42rem;
+        }
+
+        .layout-card-vehicle {
+            height: 124rem;
+        }
+    }
+
+
+
 
 
 

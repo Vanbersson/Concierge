@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule, DatePipe } from '@angular/common';
+import { CommonModule, UpperCasePipe } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Validators, FormsModule, ReactiveFormsModule, FormGroup, FormControl } from '@angular/forms';
 
@@ -19,11 +19,19 @@ import { InputGroupModule } from 'primeng/inputgroup';
 import { ImageModule } from 'primeng/image';
 import { DialogModule } from 'primeng/dialog';
 import { TableModule } from 'primeng/table';
+import { ConfirmationService, MenuItem, MessageService } from 'primeng/api';
+import { ToastModule } from 'primeng/toast';
+import { IconFieldModule } from 'primeng/iconfield';
+import { InputIconModule } from 'primeng/inputicon';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { TooltipModule } from 'primeng/tooltip';
+import { SpeedDialModule } from 'primeng/speeddial';
+
 
 
 //Service
 import { VehicleService } from '../../../services/vehicle/vehicle.service';
-import { UserService } from '../../../services/users/user.service';
+import { UserService } from '../../../services/user/user.service';
 import { VehicleModelService } from '../../../services/concierge/vehicle-model/vehicle-model.service';
 import { ClientecompanyService } from '../../../services/clientecompany/clientecompany.service';
 
@@ -35,17 +43,33 @@ import { IColor } from '../../../interfaces/icolor';
 
 //Constants
 import { STATUS_VEHICLE_ENTRY_NOTAUTH, STATUS_VEHICLE_ENTRY_FIRSTAUTH, STATUS_VEHICLE_ENTRY_AUTHORIZED } from '../../../util/constants';
+import { Nullable } from 'primeng/ts-helpers';
+import { BudgetService } from '../../../services/budget/budget.service';
+import { LayoutService } from '../../../layouts/layout/service/layout.service';
+import { IBudgetRequisition } from '../../../interfaces/budget/ibudget-requisition';
+
+export interface IBudgetService {
+  ordem: number;
+  description: string;
+  tempService: number;
+  valueHour: number;
+}
 
 @Component({
   selector: 'app-manutencao',
   standalone: true,
-  imports: [CommonModule, TabViewModule, FormsModule, ImageModule, DialogModule, TableModule, ReactiveFormsModule, InputTextareaModule, InputNumberModule, InputTextModule, ButtonModule, InputMaskModule, MultiSelectModule, InputGroupModule, ScrollPanelModule, RadioButtonModule, CalendarModule],
+  imports: [CommonModule, TabViewModule, FormsModule, IconFieldModule, TooltipModule, SpeedDialModule, ConfirmDialogModule, InputIconModule, ImageModule, DialogModule, ToastModule, TableModule, ReactiveFormsModule, InputTextareaModule, InputNumberModule, InputTextModule, ButtonModule, InputMaskModule, MultiSelectModule, InputGroupModule, ScrollPanelModule, RadioButtonModule, CalendarModule],
   templateUrl: './manutencao.component.html',
-  styleUrl: './manutencao.component.scss'
+  styleUrl: './manutencao.component.scss',
+  providers: [ConfirmationService, MessageService]
 })
 export default class ManutencaoComponent implements OnInit {
 
-  private id: number = 0;
+  id: number = 0;
+
+  proteiroId: number = 0;
+  porteiroName: string = '';
+  porteiroInfo: String = '';
 
   cores: IColor[] = []
 
@@ -68,22 +92,31 @@ export default class ManutencaoComponent implements OnInit {
   dialogListClientCompany!: IClientCompany[];
   dialogSelectClientCompany!: IClientCompany;
   dialogVisibleClientCompany: boolean = false;
+  dialogloadingClientCompany: boolean = false;
 
+  nameUserExitAuth1!: string;
   dateExitAuth1!: string;
+  nameUserExitAuth2!: string;
   dateExitAuth2!: string;
+
+  dialogVisibleOrcamento: boolean = false;
+  dialogNomeClientCompany!: string;
+  dialogIdClientCompany!: number;
+
+  itemsButtonMenu: MenuItem[] = [];
 
   formAtendimento = new FormGroup({
 
-    companyId: new FormControl<Number>(0, Validators.required),
-    resaleId: new FormControl<Number>(0, Validators.required),
+    companyId: new FormControl<number>(0, Validators.required),
+    resaleId: new FormControl<number>(0, Validators.required),
 
     id: new FormControl(),
 
-    status: new FormControl<String>('entradaAutorizada'),
-    stepEntry: new FormControl<String>('atendimento'),
+    status: new FormControl<String>(''),
+    stepEntry: new FormControl<String>(''),
 
-    budgetId: new FormControl(null),
-    budgetStatus: new FormControl<String>('semOrcamento'),
+    budgetId: new FormControl<number | null>(null),
+    budgetStatus: new FormControl<String>(''),
 
     idUserEntry: new FormControl<Number>(0, Validators.required),
     nameUserEntry: new FormControl<String>('', Validators.required),
@@ -112,24 +145,24 @@ export default class ManutencaoComponent implements OnInit {
     clientCompanyCpf: new FormControl<String>(''),
     clientCompanyRg: new FormControl<String>(''),
 
-    driverEntryName: new FormControl<String>(''),
-    driverEntryCpf: new FormControl<String>(''),
-    driverEntryRg: new FormControl<String>(''),
+    driverEntryName: new FormControl<string>(''),
+    driverEntryCpf: new FormControl<string>(''),
+    driverEntryRg: new FormControl<string>(''),
     driverEntryPhoto: new FormControl<String | null>(null),
     driverEntrySignature: new FormControl<String | null>(null),
     driverEntryPhotoDoc1: new FormControl<String | null>(null),
     driverEntryPhotoDoc2: new FormControl<String | null>(null),
 
-    driverExitName: new FormControl<String>(''),
-    driverExitCpf: new FormControl<String>(''),
-    driverExitRg: new FormControl<String>(''),
+    driverExitName: new FormControl<string>(''),
+    driverExitCpf: new FormControl<string>(''),
+    driverExitRg: new FormControl<string>(''),
     driverExitPhoto: new FormControl<String | null>(null),
     driverExitSignature: new FormControl<String | null>(null),
     driverExitPhotoDoc1: new FormControl<String | null>(null),
     driverExitPhotoDoc2: new FormControl<String | null>(null),
 
     color: new FormControl<String>('', Validators.required),
-    placa: new FormControl<String>(''),
+    placa: new FormControl<string>(''),
     frota: new FormControl<String>(''),
 
     vehicleNew: new FormControl<String>(''),
@@ -160,16 +193,14 @@ export default class ManutencaoComponent implements OnInit {
   });
 
   formVehicle = new FormGroup({
-    companyId: new FormControl<Number>(0, Validators.required),
-    resaleId: new FormControl<Number>(0, Validators.required),
 
-    id: new FormControl<Number>({ value: 0, disabled: true }, Validators.required),
+    id: new FormControl<number>(0, Validators.required),
 
-    placa: new FormControl<String>('', Validators.required),
+    placa: new FormControl<string>('', Validators.required),
     frota: new FormControl<String>(''),
 
     color: new FormControl<IColor[]>([], Validators.required),
-    kmEntry: new FormControl<string>(''),
+    kmEntry: new FormControl<String>(''),
     kmExit: new FormControl<String>(''),
 
     modelVehicle: new FormControl<IVehicleModel[]>([], Validators.required),
@@ -179,11 +210,11 @@ export default class ManutencaoComponent implements OnInit {
     datePrevisionExit: new FormControl<Date | null>(null),
 
     idUserExitAuth1: new FormControl<Number>(0),
-    nameUserExitAuth1: new FormControl<String>({ value: '', disabled: true }),
+    nameUserExitAuth1: new FormControl<String>(''),
     dateExitAuth1: new FormControl<Date | null>(null),
 
     idUserExitAuth2: new FormControl<Number>(0),
-    nameUserExitAuth2: new FormControl<String>({ value: '', disabled: true }),
+    nameUserExitAuth2: new FormControl<String>(''),
     dateExitAuth2: new FormControl<Date | null>(null),
 
     statusAuthExit: new FormControl<String>(''),
@@ -212,40 +243,36 @@ export default class ManutencaoComponent implements OnInit {
 
   });
 
-  formPorteiro = new FormGroup({
-    idUserEntry: new FormControl<Number>({ value: 0, disabled: true }),
-    nameUserEntry: new FormControl<String>({ value: '', disabled: true }),
-    informationConcierge: new FormControl<String>({ value: '', disabled: true }),
-  });
-
   formClientCompany = new FormGroup({
-    clientCompanyId: new FormControl<Number>({ value: 0, disabled: true }, Validators.required),
-    clientCompanyName: new FormControl<String>({ value: '', disabled: true }, Validators.required),
-    clientCompanyCnpj: new FormControl<String>({ value: '', disabled: true }),
-    clientCompanyCpf: new FormControl<String>({ value: '', disabled: true }),
-    clientCompanyRg: new FormControl<String>({ value: '', disabled: true }),
+    clientCompanyId: new FormControl<number>(0, Validators.required),
+    clientCompanyName: new FormControl<string>('', Validators.required),
+    clientCompanyCnpj: new FormControl<string>(''),
+    clientCompanyCpf: new FormControl<string>(''),
+    clientCompanyRg: new FormControl<string>(''),
   });
 
-  formFilterClientCompany = new FormGroup({
+  formClientCompanyFilter = new FormGroup({
     clientCompanyId: new FormControl<Number>(0),
+    clientCompanyFantasia: new FormControl<string>(''),
     clientCompanyName: new FormControl<string>(''),
     clientCompanyCnpj: new FormControl<string>(''),
     clientCompanyCpf: new FormControl<string>(''),
-    clientCompanyRg: new FormControl<string>('')
+    clientCompanyRg: new FormControl<string>(''),
+    clientCompanyTipo: new FormControl<string>('j'),
   });
 
   formMotorista = new FormGroup({
-    driverEntryName: new FormControl('', Validators.required),
-    driverEntryCpf: new FormControl(''),
-    driverEntryRg: new FormControl(''),
+    driverEntryName: new FormControl<string>('', Validators.required),
+    driverEntryCpf: new FormControl<string>(''),
+    driverEntryRg: new FormControl<string>(''),
     driverEntryPhoto: new FormControl<string | null>(null),
     driverEntrySignature: new FormControl<string | null>(null),
     driverEntryPhotoDoc1: new FormControl<string | null>(null),
     driverEntryPhotoDoc2: new FormControl<string | null>(null),
 
-    driverExitName: new FormControl(''),
-    driverExitCpf: new FormControl(''),
-    driverExitRg: new FormControl(''),
+    driverExitName: new FormControl<string>(''),
+    driverExitCpf: new FormControl<string>(''),
+    driverExitRg: new FormControl<string>(''),
     driverExitPhoto: new FormControl<string | null>(null),
     driverExitSignature: new FormControl<string | null>(null),
     driverExitPhotoDoc1: new FormControl<string | null>(null),
@@ -260,12 +287,48 @@ export default class ManutencaoComponent implements OnInit {
     nameUserExitAuth: new FormControl<string>(''),
   });
 
+
+  //Orçamento
+
+  formNewBudget = new FormGroup({
+    companyId: new FormControl<number>(0, Validators.required),
+    resaleId: new FormControl<number>(0, Validators.required),
+    vehicleEntryId: new FormControl<number>(0, Validators.required),
+  });
+
+  listBudgetRequisition: IBudgetRequisition[] = [];
+  listBudgetService: IBudgetService[] = [];
+  totalService: number = 0;
+
+  formBudgetRequisition = new FormGroup({
+    companyId: new FormControl<number>(0),
+    resaleId: new FormControl<number>(0),
+    id: new FormControl<string>(''),
+    budgetId: new FormControl<number>(0),
+    ordem: new FormControl<number>(0),
+    description: new FormControl<string>('', Validators.required),
+  });
+
+  formBudgetService = new FormGroup({
+    ordem: new FormControl<number>(0),
+    description: new FormControl<string>('', Validators.required),
+    tempService: new FormControl<number>(0, Validators.required),
+    valueHour: new FormControl<number>(0, Validators.required),
+  });
+
+
   constructor(private vehicleService: VehicleService,
     private activatedRoute: ActivatedRoute,
+    private layoutService: LayoutService,
     private userService: UserService,
     private vehicleModelService: VehicleModelService,
+    private budgetService: BudgetService,
     private serviceClienteCompany: ClientecompanyService,
-    private router: Router) { }
+    private confirmationService: ConfirmationService,
+    private messageService: MessageService,
+    ) { 
+      this.layoutService.isLogin();
+    }
 
   ngOnInit(): void {
 
@@ -305,8 +368,7 @@ export default class ManutencaoComponent implements OnInit {
 
       //Form Veículo
       this.formVehicle.patchValue({
-        companyId: data.companyId,
-        resaleId: data.resaleId,
+
         id: data.id,
 
         dateEntry: new Date(data.dateEntry),
@@ -354,10 +416,12 @@ export default class ManutencaoComponent implements OnInit {
       });
 
       if (data.dateExitAuth1) {
+        this.nameUserExitAuth1 = data.nameUserExitAuth1!;
         this.dateExitAuth1 = data.dateExitAuth1!.toString();
       }
 
       if (data.dateExitAuth2) {
+        this.nameUserExitAuth2 = data.nameUserExitAuth2!;
         this.dateExitAuth2 = data.dateExitAuth2!.toString();
       }
 
@@ -370,12 +434,29 @@ export default class ManutencaoComponent implements OnInit {
       this.photoVehicle3 = data.photo3!;
       this.photoVehicle4 = data.photo4!;
 
-      //Form Porteiro
-      this.formPorteiro.patchValue({
+      this.formAtendimento.patchValue({
+        companyId: data.companyId,
+        resaleId: data.resaleId,
+
+        status: data.status,
+        stepEntry: data.stepEntry,
+
+
+        budgetId: data.budgetId,
+        budgetStatus: data.budgetStatus,
+
         idUserEntry: data.idUserEntry,
         nameUserEntry: data.nameUserEntry,
-        informationConcierge: data.informationConcierge,
+
+        informationConcierge: data.informationConcierge
+
+
       });
+
+      //Form Porteiro
+      this.proteiroId = data.idUserEntry;
+      this.porteiroName = data.nameUserEntry;
+      this.porteiroInfo = data.informationConcierge!;
 
       //Form Proprietario
       this.formClientCompany.patchValue({
@@ -385,6 +466,9 @@ export default class ManutencaoComponent implements OnInit {
         clientCompanyCpf: data.clientCompanyCpf,
         clientCompanyRg: data.clientCompanyRg,
       });
+
+      this.dialogNomeClientCompany = this.formClientCompany.value.clientCompanyName!;
+      this.dialogIdClientCompany = this.formClientCompany.value.clientCompanyId!;
 
       //Form Motorista
       this.formMotorista.patchValue({
@@ -409,9 +493,34 @@ export default class ManutencaoComponent implements OnInit {
       this.driverEntryPhotoDoc1 = data.driverEntryPhotoDoc1!;
       this.driverEntryPhotoDoc2 = data.driverEntryPhotoDoc2!;
 
+      //Orçamento
+
+
     }, (error) => {
 
-    })
+    });
+
+    this.itemsButtonMenu = [
+      {
+        icon: 'pi pi-print',
+        command: () => {
+          this.messageService.add({ severity: 'info', summary: 'Print', detail: 'Data Print' });
+        }
+      },
+      {
+        icon: 'pi pi-file',
+        command: () => {
+          this.confirmGerarOrcamento();
+        }
+      },
+      {
+        icon: 'pi pi-cloud-upload',
+        command: () => {
+          this.saveVehicle();
+        }
+      }
+    ];
+
 
   }
 
@@ -423,67 +532,147 @@ export default class ManutencaoComponent implements OnInit {
     this.dialogVisibleClientCompany = false;
   }
 
-  selectDialogClientCompany() {
+  selectClientCompany() {
 
     if (this.dialogSelectClientCompany) {
       this.dialogVisibleClientCompany = false;
     }
 
+    if (this.dialogSelectClientCompany.fisjur == "j") {
+
+      if (this.dialogSelectClientCompany.cnpj) {
+        if (this.dialogSelectClientCompany.cnpj.length == 13) {
+          this.dialogSelectClientCompany.cnpj = "0" + this.dialogSelectClientCompany.cnpj;
+        }
+        if (this.dialogSelectClientCompany.cnpj.length == 12) {
+          this.dialogSelectClientCompany.cnpj = "00" + this.dialogSelectClientCompany.cnpj;
+        }
+        if (this.dialogSelectClientCompany.cnpj.length == 11) {
+          this.dialogSelectClientCompany.cnpj = "000" + this.dialogSelectClientCompany.cnpj;
+        }
+      }
+    } else {
+
+      if (this.dialogSelectClientCompany.cpf) {
+        if (this.dialogSelectClientCompany.cpf.length == 10) {
+          this.dialogSelectClientCompany.cpf = "0" + this.dialogSelectClientCompany.cpf;
+        }
+        if (this.dialogSelectClientCompany.cpf.length == 9) {
+          this.dialogSelectClientCompany.cpf = "00" + this.dialogSelectClientCompany.cpf;
+        }
+        if (this.dialogSelectClientCompany.cpf.length == 8) {
+          this.dialogSelectClientCompany.cpf = "000" + this.dialogSelectClientCompany.cpf;
+        }
+        if (this.dialogSelectClientCompany.cpf.length == 7) {
+          this.dialogSelectClientCompany.cpf = "0000" + this.dialogSelectClientCompany.cpf;
+        }
+        if (this.dialogSelectClientCompany.cpf.length == 6) {
+          this.dialogSelectClientCompany.cpf = "00000" + this.dialogSelectClientCompany.cpf;
+        }
+        if (this.dialogSelectClientCompany.cpf.length == 5) {
+          this.dialogSelectClientCompany.cpf = "000000" + this.dialogSelectClientCompany.cpf;
+        }
+      }
+
+    }
+
     this.formClientCompany.patchValue({
-      clientCompanyId: this.dialogSelectClientCompany.id,
-      clientCompanyName: this.dialogSelectClientCompany.name,
+      clientCompanyId: this.dialogSelectClientCompany.cliente,
+      clientCompanyName: this.dialogSelectClientCompany.nome,
       clientCompanyCnpj: this.dialogSelectClientCompany.cnpj,
       clientCompanyCpf: this.dialogSelectClientCompany.cpf,
-      clientCompanyRg: this.dialogSelectClientCompany.rg
+      clientCompanyRg: this.dialogSelectClientCompany.identidade
     });
 
-    //this.validFormClientCompany();
-
+    this.validFormClientCompany();
 
   }
 
   filterClientCompany() {
 
-    const { value } = this.formFilterClientCompany;
+    this.dialogloadingClientCompany = true;
 
-    if (value.clientCompanyId) {
-      this.serviceClienteCompany.getId$(value.clientCompanyId).subscribe((data) => {
-        this.dialogListClientCompany = data;
-      });
-    } else if (value.clientCompanyName) {
-      this.serviceClienteCompany.getName$(value.clientCompanyName).subscribe((data) => {
-        this.dialogListClientCompany = data;
-      });
-    } else if (value.clientCompanyCnpj) {
-      this.serviceClienteCompany.getCnpj$(value.clientCompanyCnpj).subscribe((data) => {
-        this.dialogListClientCompany = data;
-      });
-    }
-    else if (value.clientCompanyCpf) {
-      this.serviceClienteCompany.getCpf$(value.clientCompanyCpf).subscribe((data) => {
-        this.dialogListClientCompany = data;
-      });
-    }
-    else if (value.clientCompanyRg) {
-      this.serviceClienteCompany.getRg$(value.clientCompanyRg).subscribe((data) => {
-        this.dialogListClientCompany = data;
-      });
+    const { value } = this.formClientCompanyFilter;
+
+    if (value.clientCompanyTipo == "j") {
+
+      if (value.clientCompanyId) {
+        this.serviceClienteCompany.getId$(value.clientCompanyId).subscribe((data) => {
+          this.dialogListClientCompany = data;
+          this.dialogloadingClientCompany = false;
+        });
+      } else if (value.clientCompanyFantasia) {
+        this.serviceClienteCompany.getFantasiaJ$(value.clientCompanyFantasia).subscribe((data) => {
+          this.dialogListClientCompany = data;
+          this.dialogloadingClientCompany = false;
+        });
+      } else if (value.clientCompanyName) {
+        this.serviceClienteCompany.getNameJ$(value.clientCompanyName).subscribe((data) => {
+          this.dialogListClientCompany = data;
+          this.dialogloadingClientCompany = false;
+        });
+      } else if (value.clientCompanyCnpj) {
+        this.serviceClienteCompany.getCnpj$(value.clientCompanyCnpj).subscribe((data) => {
+          this.dialogListClientCompany = data;
+          this.dialogloadingClientCompany = false;
+        });
+      }
+      else if (value.clientCompanyCpf || value.clientCompanyRg) {
+        this.dialogloadingClientCompany = false;
+      } else if (value.clientCompanyTipo) {
+        this.serviceClienteCompany.getTipo$(value.clientCompanyTipo).subscribe((data) => {
+          this.dialogListClientCompany = data;
+          this.dialogloadingClientCompany = false;
+        });
+      }
+
+
     } else {
-      this.serviceClienteCompany.getAll$().subscribe((data) => {
-        this.dialogListClientCompany = data;
-      });
+      // P/Física
+
+      if (value.clientCompanyId) {
+        this.serviceClienteCompany.getId$(value.clientCompanyId).subscribe((data) => {
+          this.dialogListClientCompany = data;
+          this.dialogloadingClientCompany = false;
+        });
+      } else if (value.clientCompanyName) {
+        this.serviceClienteCompany.getNameF$(value.clientCompanyName).subscribe((data) => {
+          this.dialogListClientCompany = data;
+          this.dialogloadingClientCompany = false;
+        });
+      } else if (value.clientCompanyCnpj) {
+        this.dialogloadingClientCompany = false;
+      } else if (value.clientCompanyCpf) {
+        this.serviceClienteCompany.getCpf$(value.clientCompanyCpf).subscribe((data) => {
+          this.dialogListClientCompany = data;
+          this.dialogloadingClientCompany = false;
+        });
+      } else if (value.clientCompanyRg) {
+        this.serviceClienteCompany.getRg$(value.clientCompanyRg).subscribe((data) => {
+          this.dialogListClientCompany = data;
+          this.dialogloadingClientCompany = false;
+        });
+      } else if (value.clientCompanyTipo) {
+        this.serviceClienteCompany.getTipo$(value.clientCompanyTipo).subscribe((data) => {
+          this.dialogListClientCompany = data;
+          this.dialogloadingClientCompany = false;
+        });
+      }
+
     }
+
+
+
+
+
 
   }
 
   validFormClientCompany() {
 
-    if (this.dialogSelectClientCompany.type == "PJ") {
+    if (this.dialogSelectClientCompany.fisjur == "J") {
       this.formClientCompany.controls['clientCompanyCpf'].removeValidators(Validators.required);
       this.formClientCompany.controls['clientCompanyCpf'].updateValueAndValidity();
-
-      this.formClientCompany.controls['clientCompanyRg'].removeValidators(Validators.required);
-      this.formClientCompany.controls['clientCompanyRg'].updateValueAndValidity();
 
       this.formClientCompany.controls['clientCompanyCnpj'].addValidators(Validators.required);
       this.formClientCompany.controls['clientCompanyCnpj'].updateValueAndValidity();
@@ -495,9 +684,6 @@ export default class ManutencaoComponent implements OnInit {
 
       this.formClientCompany.controls['clientCompanyCpf'].addValidators(Validators.required);
       this.formClientCompany.controls['clientCompanyCpf'].updateValueAndValidity();
-
-      this.formClientCompany.controls['clientCompanyRg'].addValidators(Validators.required);
-      this.formClientCompany.controls['clientCompanyRg'].updateValueAndValidity();
 
     }
 
@@ -693,25 +879,21 @@ export default class ManutencaoComponent implements OnInit {
 
   dataVehicle() {
 
-
     this.formAtendimento.patchValue({
-      companyId: this.formVehicle.value.companyId,
-      resaleId: this.formVehicle.value.resaleId,
+
       id: this.formVehicle.value.id,
 
-      idUserEntry: this.formPorteiro.value.idUserEntry,
-      nameUserEntry: this.formPorteiro.value.nameUserEntry,
       dateEntry: this.formVehicle.value.dateEntry,
 
       idUserAttendant: this.formVehicle.value.userAttendant?.at(0)?.id,
       nameUserAttendant: this.formVehicle.value.userAttendant?.at(0)?.name,
 
       idUserExitAuth1: this.formVehicle.value.idUserExitAuth1,
-      nameUserExitAuth1: this.formVehicle.value.nameUserExitAuth1,
+      nameUserExitAuth1: this.nameUserExitAuth1,
       dateExitAuth1: this.formVehicle.value.dateExitAuth1,
 
       idUserExitAuth2: this.formVehicle.value.idUserExitAuth2,
-      nameUserExitAuth2: this.formVehicle.value.nameUserExitAuth2,
+      nameUserExitAuth2: this.nameUserExitAuth2,
       dateExitAuth2: this.formVehicle.value.dateExitAuth2,
 
       statusAuthExit: this.formVehicle.value.statusAuthExit,
@@ -727,7 +909,7 @@ export default class ManutencaoComponent implements OnInit {
 
       driverEntryName: this.formMotorista.value.driverEntryName,
       driverEntryCpf: this.formMotorista.value.driverEntryCpf,
-      driverEntryRg: this.formMotorista.value.driverEntryRg,
+      driverEntryRg: this.formMotorista.value.driverEntryRg ?? "",
       driverEntryPhoto: this.formMotorista.value.driverEntryPhoto,
       driverEntrySignature: this.formMotorista.value.driverEntrySignature,
       driverEntryPhotoDoc1: this.formMotorista.value.driverEntryPhotoDoc1,
@@ -735,7 +917,7 @@ export default class ManutencaoComponent implements OnInit {
 
       driverExitName: this.formMotorista.value.driverExitName,
       driverExitCpf: this.formMotorista.value.driverExitCpf,
-      driverExitRg: this.formMotorista.value.driverExitRg,
+      driverExitRg: this.formMotorista.value.driverExitRg ?? "",
       driverExitPhoto: this.formMotorista.value.driverExitPhoto,
       driverExitSignature: this.formMotorista.value.driverExitSignature,
       driverExitPhotoDoc1: this.formMotorista.value.driverExitPhotoDoc1,
@@ -746,8 +928,8 @@ export default class ManutencaoComponent implements OnInit {
       frota: this.formVehicle.value.frota,
 
       vehicleNew: this.formVehicle.value.vehicleNew,
-      kmEntry: this.formVehicle.value.kmEntry,
-      kmExit: this.formVehicle.value.kmExit,
+      kmEntry: this.formVehicle.value.kmEntry ?? "",
+      kmExit: this.formVehicle.value.kmExit ?? "",
 
       photo1: this.formVehicle.value.photo1,
       photo2: this.formVehicle.value.photo2,
@@ -761,42 +943,43 @@ export default class ManutencaoComponent implements OnInit {
       quantityToolBox: this.formVehicle.value.quantityToolBox,
 
       serviceOrder: this.formVehicle.value.serviceOrder,
-      numServiceOrder: this.formVehicle.value.numServiceOrder,
-      numNfe: this.formVehicle.value.numNfe,
-      numNfse: this.formVehicle.value.numNfse,
+      numServiceOrder: this.formVehicle.value.numServiceOrder ?? "",
+      numNfe: this.formVehicle.value.numNfe ?? "",
+      numNfse: this.formVehicle.value.numNfse ?? "",
 
       information: this.formVehicle.value.information,
-      informationConcierge: this.formPorteiro.value.informationConcierge,
 
     });
 
-
     console.log(this.formAtendimento.value);
-  }
 
-  validCampos(): Boolean {
-
-
-
-    return true;
   }
 
   saveVehicle() {
 
-
     this.dataVehicle();
 
-    /* this.vehicleService.entryAdd$(this.formAtendimento.value).subscribe((data) => {
+    const { value, valid } = this.formAtendimento;
 
-      if (data.status == 201) {
+    if (valid) {
 
-      }
+      this.vehicleService.entryUpdate$(value).subscribe((data) => {
 
-    }, (error) => {
+        if (data.status == 200) {
+          this.showSaveSuccess();
+        }
 
-      console.log(error);
+      }, (error) => {
 
-    }); */
+        if (error.status == 409) {
+          this.showPlacaExist(value.placa!);
+        }
+
+      });
+
+    }
+
+
   }
 
   deleteFileVehicle1() {
@@ -847,10 +1030,6 @@ export default class ManutencaoComponent implements OnInit {
   deleteExitFileDriver2() {
     this.driverExitPhotoDoc2 = "";
     this.formMotorista.patchValue({ driverExitPhotoDoc2: null });
-  }
-
-  btnBack() {
-    this.router.navigateByUrl('v1/portaria/veiculos');
   }
 
   deleteAuth1() {
@@ -937,6 +1116,343 @@ export default class ManutencaoComponent implements OnInit {
 
 
 
+  }
+
+  showSaveSuccess() {
+    this.messageService.add({ severity: 'success', summary: 'Veículo atualizado', detail: 'Veículo atualizado com sucesso', icon: 'pi pi-car' });
+  }
+  showPlacaExist(placa: string) {
+    const uppercase = new UpperCasePipe();
+    this.messageService.add({ severity: 'error', summary: 'Placa ' + uppercase.transform(placa), detail: "Vaículo já se encontra na empresa", icon: 'pi pi-car', life: 10000 });
+  }
+
+  //Orçamento
+
+  confirmGerarOrcamento() {
+
+    if (this.formAtendimento.value.budgetId != null) {
+      this.showDialogOrcamento();
+    } else {
+      this.confirmationService.confirm({
+        header: 'Confirmar',
+        message: 'Gerar um orçamento.',
+        acceptIcon: 'pi pi-check mr-2',
+        rejectIcon: 'pi pi-times mr-2',
+        rejectButtonStyleClass: 'p-button-sm',
+        rejectLabel: 'Não',
+        acceptButtonStyleClass: 'p-button-outlined p-button-sm',
+        acceptLabel: 'Sim',
+        accept: () => {
+
+          this.formNewBudget.patchValue({
+            companyId: this.formAtendimento.value.companyId,
+            resaleId: this.formAtendimento.value.resaleId,
+            vehicleEntryId: this.formVehicle.value.id
+          });
+
+          this.budgetService.addBudget$(this.formNewBudget.value).subscribe((data) => {
+
+            if (data.status == 201) {
+
+              this.formAtendimento.patchValue({
+                budgetId: data.body.id,
+                budgetStatus: data.body.status
+              });
+
+              this.messageService.add({ severity: 'info', summary: 'Gerado', detail: 'Orçamento gerado com sucesso', life: 3000 });
+              this.showDialogOrcamento();
+            }
+
+          });
+
+        }/* ,
+        reject: () => {
+          this.messageService.add({ severity: 'error', summary: 'Rejected', detail: 'You have rejected', life: 3000 });
+        } */
+      });
+    }
+
+
+
+
+
+
+  }
+
+  showDialogOrcamento() {
+    this.dialogVisibleOrcamento = true;
+
+    this.getListBudgetRequisition();
+
+  }
+
+  getListBudgetRequisition() {
+    var code = this.formAtendimento.value.budgetId;
+    this.budgetService.listBudgetRequisition$(code!).subscribe((data) => {
+
+      this.listBudgetRequisition = data;
+
+    });
+  }
+
+  getSizeListBudgetRequisition(): number {
+    return this.listBudgetRequisition.length;
+  }
+
+  addBudgetRequisition() {
+
+    if (this.formBudgetRequisition.valid && this.formBudgetRequisition.value.description!.toString().trim() != "") {
+
+      this.formBudgetRequisition.patchValue({
+        companyId: this.formAtendimento.value.companyId,
+        resaleId: this.formAtendimento.value.resaleId,
+        budgetId: this.formAtendimento.value.budgetId,
+        ordem: this.getSizeListBudgetRequisition() + 1,
+      });
+
+      this.budgetService.addBudgetRequisition$(this.formBudgetRequisition.value).subscribe((data) => {
+
+        if (data.status == 201) {
+
+          this.getListBudgetRequisition();
+
+          this.alertShowAddRequisition();
+        }
+
+      });
+
+    } else {
+      this.showErrorRequisition();
+    }
+
+    this.cleanBudgetRequisition();
+
+  }
+
+  updateBudgetRequisition() {
+
+    for (let index = 0; index < this.listBudgetRequisition.length; index++) {
+      const item = this.listBudgetRequisition[index];
+
+      if (this.formBudgetRequisition.value.ordem == item.ordem) {
+        this.listBudgetRequisition[index].description = this.formBudgetRequisition.value.description!;
+      }
+
+    }
+
+    this.cleanBudgetRequisition();
+
+  }
+
+  cleanBudgetRequisition() {
+    this.formBudgetRequisition.patchValue({
+      companyId: 0,
+      resaleId: 0,
+      id: '',
+      budgetId: 0,
+      ordem: 0,
+      description: ''
+    });
+  }
+
+  editarBudgetRequisition(ordem: number) {
+
+    for (let index = 0; index < this.listBudgetRequisition.length; index++) {
+      const item = this.listBudgetRequisition[index];
+
+      if (ordem == item.ordem) {
+        this.formBudgetRequisition.patchValue({
+          ordem: item.ordem,
+          description: item.description
+        });
+      }
+
+    }
+
+  }
+
+  removerBudgetRequisition(ordem: number) {
+
+
+    var listTemp: IBudgetRequisition[] = [];
+
+
+    for (let index = 0; index < this.listBudgetRequisition.length; index++) {
+
+      const item = this.listBudgetRequisition[index];
+
+      if (ordem == item.ordem) {
+
+        this.formBudgetRequisition.patchValue({
+          companyId: item.companyId,
+          resaleId: item.resaleId,
+          id: item.id,
+          budgetId: item.budgetId,
+          ordem: item.ordem,
+          description: item.description,
+        });
+
+        this.budgetService.deleteBudgetRequisition$(this.formBudgetRequisition.value).subscribe();
+
+        this.cleanBudgetRequisition();
+
+      } else {
+        listTemp.push(item);
+      }
+
+    }
+    this.listBudgetRequisition = [];
+
+    for (let index = 0; index < listTemp.length; index++) {
+      const item = listTemp[index];
+
+      item.ordem = index + 1;
+
+      this.budgetService.addBudgetRequisition$(item).subscribe((data) => {
+
+        if (data.status == 201) {
+
+          this.getListBudgetRequisition();
+
+        }
+
+      });
+
+
+    }
+  }
+
+  getSizeListBudgetService(): number {
+    return this.listBudgetService.length;
+  }
+
+  addBudgetService() {
+
+    this.formBudgetService.patchValue({
+      ordem: this.getSizeListBudgetService() + 1
+    });
+
+    const { value, valid } = this.formBudgetService;
+
+    if (this.listBudgetRequisition.length == 0) {
+      this.showErrorRequisition();
+    } else if (!valid) {
+      this.showServiceError();
+    } else if (value.tempService! <= 0 || value.valueHour! <= 0) {
+      this.showServiceError();
+    } else {
+
+      this.listBudgetService.push({ ordem: value.ordem!, description: value.description!, tempService: value.tempService!, valueHour: value.valueHour! });
+      this.showServiceAdd();
+
+      this.somaService();
+    }
+
+    this.cleanBudgetService();
+
+  }
+
+  saveBudgetService() {
+
+    const { value } = this.formBudgetService;
+
+    for (let index = 0; index < this.listBudgetService.length; index++) {
+      const item = this.listBudgetService[index];
+
+      if (value.ordem == item.ordem) {
+
+        this.listBudgetService[index].description = value.description!;
+        this.listBudgetService[index].tempService = value.tempService!
+        this.listBudgetService[index].valueHour = value.valueHour!;
+
+      }
+
+    }
+
+    this.cleanBudgetService();
+
+    this.somaService();
+
+  }
+
+  somaService() {
+    this.totalService = 0;
+
+    for (let index = 0; index < this.listBudgetService.length; index++) {
+      const element = this.listBudgetService[index];
+
+      this.totalService += (element.tempService! * element.valueHour!);
+    }
+
+  }
+
+  cleanBudgetService() {
+    this.formBudgetService.patchValue({
+      ordem: 0,
+      description: "",
+      tempService: 0,
+      valueHour: 0
+    });
+  }
+
+  editarBudgetService(ordem: number) {
+
+    for (let index = 0; index < this.listBudgetService.length; index++) {
+      const item = this.listBudgetService[index];
+
+      if (ordem == item.ordem) {
+        this.formBudgetService.patchValue({
+          ordem: item.ordem,
+          description: item.description,
+          tempService: item.tempService,
+          valueHour: item.valueHour
+
+        });
+      }
+
+    }
+  }
+
+  removerBudgetService(ordem: number) {
+
+    var listTemp: IBudgetService[] = [];
+
+    for (let index = 0; index < this.listBudgetService.length; index++) {
+
+      const item = this.listBudgetService.at(index);
+
+      if (ordem != this.listBudgetService.at(index)!.ordem) {
+        listTemp.push({ ordem: item!.ordem, description: item!.description, tempService: item!.tempService, valueHour: item!.valueHour });
+      }
+
+    }
+    this.listBudgetService = [];
+    this.totalService = 0;
+
+    for (let index = 0; index < listTemp.length; index++) {
+      const item = listTemp.at(index);
+
+      this.listBudgetService.push({ ordem: index + 1, description: item!.description, tempService: item!.tempService, valueHour: item!.valueHour });
+
+      this.totalService += (item!.tempService * item!.valueHour);
+
+    }
+  }
+
+  alertShowAddRequisition() {
+    this.messageService.add({ severity: 'success', summary: 'Adicionado', detail: 'Solicitação adicionada com sucesso', icon: 'pi pi-plus' });
+  }
+
+  showErrorRequisition() {
+    this.messageService.add({ severity: 'error', summary: 'Atenção', detail: 'Não a solicitação', icon: 'pi pi-exclamation-triangle' });
+  }
+
+  showServiceAdd() {
+    this.messageService.add({ severity: 'success', summary: 'Adicionado', detail: 'Serviço adicionado com sucesso', icon: 'pi pi-plus' });
+  }
+
+  showServiceError() {
+    this.messageService.add({ severity: 'error', summary: 'Atenção', detail: 'Não foi possivel adicionar', icon: 'pi pi-exclamation-triangle' });
   }
 
 

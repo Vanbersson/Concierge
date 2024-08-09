@@ -1,14 +1,12 @@
-<div class="layout-wrapper">
+<div class="layout-wrapper" [ngClass]="containerClass">
 
-    <div class="layout-loading-progress">
-        <!-- <app-progress-spinner/> -->
+    <app-topbar></app-topbar>
+
+    <div class="layout-sidebar">
+        <app-sidebar></app-sidebar>
     </div>
 
-    <app-topbar (sideBar)="visibleSidebar.set($event)"></app-topbar>
-
-    <app-sidebar [collapsedSideBar]="visibleSidebar()"></app-sidebar>
-
-    <div class="layout-main-container" [style.margin-left]="sideBarMarginLeft() ">
+    <div class="layout-main-container">
         <div class="layout-main">
             <router-outlet></router-outlet>
         </div>

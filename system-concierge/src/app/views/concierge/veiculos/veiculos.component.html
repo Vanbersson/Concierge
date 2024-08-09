@@ -132,8 +132,8 @@
                 <td>{{ vehicle.modelDescription }}</td>
                 <td>{{ vehicle.dateEntry | date: 'dd/MM/yyyy HH:mm' }}</td>
 
-                @if(vehicle.nameUserAttendant == 'falta'){
-                <td><p-tag [value]="vehicle.nameUserAttendant | uppercase" severity="danger"></p-tag></td>
+                @if(vehicle.nameUserAttendant == null){
+                <td><p-tag value="FALTA" severity="danger"></p-tag></td>
 
                 }@else {
                 <td>{{ vehicle.nameUserAttendant }}</td>

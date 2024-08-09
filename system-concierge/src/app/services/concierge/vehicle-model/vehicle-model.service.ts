@@ -6,19 +6,26 @@ import { environment } from '../../../../environments/environment.development';
 import { InterfaceUpdateStatus } from '../../../interfaces/Interface-update-status';
 import { VehicleModel } from '../../../models/vehicle/vehicleModel';
 import { IVehicleModel } from '../../../interfaces/vehicle/iVehicleModel';
+import { LayoutService } from '../../../layouts/layout/service/layout.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class VehicleModelService {
 
+  private companyId = this.layoutService.loginUser.companyId;
+  private resaleId = this.layoutService.loginUser.resaleId;
+  private token = localStorage.getItem('token');
+
   private urlBaseV1 = environment.URLBASE_V1;
 
-  companyId = sessionStorage.getItem('companyId');
-  resaleId = sessionStorage.getItem('resaleId');
 
+  private httpOptions = new HttpHeaders({
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer ' + this.token
+  });
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private layoutService: LayoutService) { }
 
   getAll$(): Observable<any> {
 

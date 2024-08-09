@@ -9,35 +9,41 @@ import { IClientCompany } from '../../interfaces/iclient-company';
 })
 export class ClientecompanyService {
 
-  companyId = sessionStorage.getItem('companyId');
-  resaleId = sessionStorage.getItem('resaleId');
-
-  private urlBaseV1 = environment.URLBASE_V1;
-
+  private urlBaseV1 = "http://10.0.0.20:9000/api/v1/fatclient/filter";
 
   constructor(private http: HttpClient) { }
 
-  getAll$(): Observable<any> {
-    return this.http.get<IClientCompany>(this.urlBaseV1 + this.companyId + "/" + this.resaleId + "/clientCompany/all");
-  }
-
   getId$(id: Number): Observable<any> {
-    return this.http.get<IClientCompany>(this.urlBaseV1 + this.companyId + "/" + this.resaleId + "/clientCompany/filter/id/" + id);
+    return this.http.get<IClientCompany>(this.urlBaseV1 + "/code/" + id);
   }
 
-  getName$(name: string): Observable<any> {
-    return this.http.get<IClientCompany>(this.urlBaseV1 + this.companyId + "/" + this.resaleId + "/clientCompany/filter/name/" + name);
+  getFantasiaJ$(name: string): Observable<any> {
+    return this.http.get<IClientCompany>(this.urlBaseV1 + "/j/fantasia/" + name);
+  }
+
+  getFantasiaF$(name: string): Observable<any> {
+    return this.http.get<IClientCompany>(this.urlBaseV1 + "/f/fantasia/" + name);
+  }
+
+  getNameJ$(name: string): Observable<any> {
+    return this.http.get<IClientCompany>(this.urlBaseV1 + "/j/name/" + name);
+  }
+  getNameF$(name: string): Observable<any> {
+    return this.http.get<IClientCompany>(this.urlBaseV1 + "/f/name/" + name);
   }
 
   getCnpj$(cnpj: string): Observable<any> {
-    return this.http.get<IClientCompany>(this.urlBaseV1 + this.companyId + "/" + this.resaleId + "/clientCompany/filter/cnpj/" + cnpj);
+    return this.http.get<IClientCompany>(this.urlBaseV1 + "/cnpj/" + cnpj);
   }
 
   getCpf$(cpf: string): Observable<any> {
-    return this.http.get<IClientCompany>(this.urlBaseV1 + this.companyId + "/" + this.resaleId + "/clientCompany/filter/cpf/" + cpf);
+    return this.http.get<IClientCompany>(this.urlBaseV1 + "/cpf/" + cpf);
   }
 
   getRg$(rg: string): Observable<any> {
-    return this.http.get<IClientCompany>(this.urlBaseV1 + this.companyId + "/" + this.resaleId + "/clientCompany/filter/rg/" + rg);
+    return this.http.get<IClientCompany>(this.urlBaseV1 + "/rg/" + rg);
+  }
+  getTipo$(tipo: string): Observable<any> {
+    return this.http.get<IClientCompany>(this.urlBaseV1 + "/tipo/" + tipo);
   }
 }

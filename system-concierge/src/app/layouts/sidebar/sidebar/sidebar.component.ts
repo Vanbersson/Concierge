@@ -1,23 +1,18 @@
-import { Component, Input, OnInit, signal } from '@angular/core';
+import { Component, ElementRef, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-
-
-
-import { MatSidenavModule } from '@angular/material/sidenav';
-import { ScrollingModule } from '@angular/cdk/scrolling';
-
 
 //PrimeNg
 import { PanelMenuModule } from 'primeng/panelmenu';
 import { ButtonModule } from 'primeng/button';
 import { MenuItem } from 'primeng/api';
+import { LayoutService } from '../../layout/service/layout.service';
 
 
 
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [CommonModule, MatSidenavModule, ScrollingModule, PanelMenuModule, ButtonModule],
+  imports: [CommonModule, PanelMenuModule, ButtonModule],
   templateUrl: './sidebar.component.html',
   styleUrl: './sidebar.component.scss',
   providers: []
@@ -26,17 +21,7 @@ export class SidebarComponent implements OnInit {
 
   items!: MenuItem[];
 
-
-
-  visibleSidebar = signal(true);
-
-  @Input() set collapsedSideBar(val: boolean) {
-    this.visibleSidebar.set(val);
-  }
-
-  constructor() { }
-
-
+  constructor(public layoutService: LayoutService, public el: ElementRef) { }
 
   ngOnInit(): void {
 
@@ -45,13 +30,14 @@ export class SidebarComponent implements OnInit {
         key: '0',
         label: 'Dashboard',
         icon: 'pi pi-home',
-        routerLink: 'dashboard',
+        routerLink: '/',
         visible: true
       },
       {
         key: '1',
         label: 'Portaria',
         icon: 'pi pi-truck',
+        expanded: true,
         items: [
           {
             key: '1_1',
@@ -172,28 +158,8 @@ export class SidebarComponent implements OnInit {
 
   }
 
-  toggleAll() {
-    const expanded = !this.areAllItemsExpanded();
-    this.items = this.toggleAllRecursive(this.items, expanded);
-  }
 
-  private toggleAllRecursive(items: MenuItem[], expanded: boolean): MenuItem[] {
-    return items.map((menuItem) => {
-      menuItem.expanded = expanded;
-      if (menuItem.items) {
-        menuItem.items = this.toggleAllRecursive(menuItem.items, expanded);
-      }
-      return menuItem;
-    });
-  }
 
-  private areAllItemsExpanded(): boolean {
-    return this.items.every((menuItem) => menuItem.expanded);
-  }
-
-  get size() {
-    return true;
-  }
 
 
 

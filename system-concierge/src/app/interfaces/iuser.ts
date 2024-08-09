@@ -8,8 +8,9 @@ export interface IUser {
     password?: string;
     email?: string;
     cellphone?: string;
-    imageId?: number;
+    photo?: string;
     role?: number;
+    token?: string;
 
 
 

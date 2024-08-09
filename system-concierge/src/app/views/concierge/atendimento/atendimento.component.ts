@@ -1,6 +1,7 @@
-import { Component, OnInit, ViewChild, signal } from '@angular/core';
-import { CommonModule, DatePipe, NgOptimizedImage, UpperCasePipe } from '@angular/common';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { CommonModule, NgOptimizedImage, UpperCasePipe } from '@angular/common';
 import { Validators, FormsModule, ReactiveFormsModule, FormGroup, FormControl } from '@angular/forms';
+import { Router } from '@angular/router';
 
 //Angular Material
 import { MatStepper, MatStepperModule } from '@angular/material/stepper';
@@ -29,16 +30,19 @@ import { TagModule } from 'primeng/tag';
 import { ImageModule } from 'primeng/image';
 
 
+
 //Service
 import { VehicleModelService } from '../../../services/concierge/vehicle-model/vehicle-model.service';
 import { ClientecompanyService } from '../../../services/clientecompany/clientecompany.service';
-import { UserService } from '../../../services/users/user.service';
+import { UserService } from '../../../services/user/user.service';
 import { VehicleService } from '../../../services/vehicle/vehicle.service';
 
 //Interface
 import { IClientCompany } from '../../../interfaces/iclient-company';
 import { IVehicleModel } from '../../../interfaces/vehicle/iVehicleModel';
 import { IUser } from '../../../interfaces/iuser';
+import { LayoutService } from '../../../layouts/layout/service/layout.service';
+
 
 
 @Component({
@@ -55,10 +59,10 @@ export default class AtendimentoComponent implements OnInit {
 
   dialogVehicleVisible: boolean = false;
 
-
   dialogListClientCompany!: IClientCompany[];
   dialogSelectClientCompany!: IClientCompany;
   dialogVisible: boolean = false;
+  dialogloadingClientCompany: boolean = false;
 
   driverEntryPhoto!: string;
   driverEntryPhotoDoc1!: string;
@@ -160,10 +164,12 @@ export default class AtendimentoComponent implements OnInit {
 
   formClientCompanyFilter = new FormGroup({
     clientCompanyId: new FormControl<Number>(0),
+    clientCompanyFantasia: new FormControl<string>(''),
     clientCompanyName: new FormControl<string>(''),
     clientCompanyCnpj: new FormControl<string>(''),
     clientCompanyCpf: new FormControl<string>(''),
-    clientCompanyRg: new FormControl<string>('')
+    clientCompanyRg: new FormControl<string>(''),
+    clientCompanyTipo: new FormControl<string>('j'),
   });
 
   formClientCompany = new FormGroup({
@@ -217,14 +223,17 @@ export default class AtendimentoComponent implements OnInit {
   });
 
   constructor(
+    private layoutService: LayoutService,
     private vehicleModelService: VehicleModelService,
     private vehicleService: VehicleService,
     private userService: UserService,
     private messageService: MessageService,
-    private serviceClienteCompany: ClientecompanyService) { }
+    private serviceClienteCompany: ClientecompanyService) { 
+      this.layoutService.isLogin();
+    }
 
   ngOnInit(): void {
-
+    
   }
 
   showDialog() {
@@ -241,50 +250,133 @@ export default class AtendimentoComponent implements OnInit {
       this.dialogVisible = false;
     }
 
+    if (this.dialogSelectClientCompany.fisjur == "j") {
+
+      if (this.dialogSelectClientCompany.cnpj) {
+        if (this.dialogSelectClientCompany.cnpj.length == 13) {
+          this.dialogSelectClientCompany.cnpj = "0" + this.dialogSelectClientCompany.cnpj;
+        }
+        if (this.dialogSelectClientCompany.cnpj.length == 12) {
+          this.dialogSelectClientCompany.cnpj = "00" + this.dialogSelectClientCompany.cnpj;
+        }
+        if (this.dialogSelectClientCompany.cnpj.length == 11) {
+          this.dialogSelectClientCompany.cnpj = "000" + this.dialogSelectClientCompany.cnpj;
+        }
+      }
+    } else {
+
+      if (this.dialogSelectClientCompany.cpf) {
+        if (this.dialogSelectClientCompany.cpf.length == 10) {
+          this.dialogSelectClientCompany.cpf = "0" + this.dialogSelectClientCompany.cpf;
+        }
+        if (this.dialogSelectClientCompany.cpf.length == 9) {
+          this.dialogSelectClientCompany.cpf = "00" + this.dialogSelectClientCompany.cpf;
+        }
+        if (this.dialogSelectClientCompany.cpf.length == 8) {
+          this.dialogSelectClientCompany.cpf = "000" + this.dialogSelectClientCompany.cpf;
+        }
+        if (this.dialogSelectClientCompany.cpf.length == 7) {
+          this.dialogSelectClientCompany.cpf = "0000" + this.dialogSelectClientCompany.cpf;
+        }
+        if (this.dialogSelectClientCompany.cpf.length == 6) {
+          this.dialogSelectClientCompany.cpf = "00000" + this.dialogSelectClientCompany.cpf;
+        }
+        if (this.dialogSelectClientCompany.cpf.length == 5) {
+          this.dialogSelectClientCompany.cpf = "000000" + this.dialogSelectClientCompany.cpf;
+        }
+      }
+
+    }
+
     this.formClientCompany.patchValue({
-      clientCompanyId: this.dialogSelectClientCompany.id,
-      clientCompanyName: this.dialogSelectClientCompany.name,
+      clientCompanyId: this.dialogSelectClientCompany.cliente,
+      clientCompanyName: this.dialogSelectClientCompany.nome,
       clientCompanyCnpj: this.dialogSelectClientCompany.cnpj,
       clientCompanyCpf: this.dialogSelectClientCompany.cpf,
-      clientCompanyRg: this.dialogSelectClientCompany.rg
+      clientCompanyRg: this.dialogSelectClientCompany.identidade
     });
 
     this.validFormClientCompany();
-
 
   }
 
   filterClientCompany() {
 
+    this.dialogloadingClientCompany = true;
+
     const { value } = this.formClientCompanyFilter;
 
-    if (value.clientCompanyId) {
-      this.serviceClienteCompany.getId$(value.clientCompanyId).subscribe((data) => {
-        this.dialogListClientCompany = data;
-      });
-    } else if (value.clientCompanyName) {
-      this.serviceClienteCompany.getName$(value.clientCompanyName).subscribe((data) => {
-        this.dialogListClientCompany = data;
-      });
-    } else if (value.clientCompanyCnpj) {
-      this.serviceClienteCompany.getCnpj$(value.clientCompanyCnpj).subscribe((data) => {
-        this.dialogListClientCompany = data;
-      });
-    }
-    else if (value.clientCompanyCpf) {
-      this.serviceClienteCompany.getCpf$(value.clientCompanyCpf).subscribe((data) => {
-        this.dialogListClientCompany = data;
-      });
-    }
-    else if (value.clientCompanyRg) {
-      this.serviceClienteCompany.getRg$(value.clientCompanyRg).subscribe((data) => {
-        this.dialogListClientCompany = data;
-      });
+    if (value.clientCompanyTipo == "j") {
+
+      if (value.clientCompanyId) {
+        this.serviceClienteCompany.getId$(value.clientCompanyId).subscribe((data) => {
+          this.dialogListClientCompany = data;
+          this.dialogloadingClientCompany = false;
+        });
+      } else if (value.clientCompanyFantasia) {
+        this.serviceClienteCompany.getFantasiaJ$(value.clientCompanyFantasia).subscribe((data) => {
+          this.dialogListClientCompany = data;
+          this.dialogloadingClientCompany = false;
+        });
+      } else if (value.clientCompanyName) {
+        this.serviceClienteCompany.getNameJ$(value.clientCompanyName).subscribe((data) => {
+          this.dialogListClientCompany = data;
+          this.dialogloadingClientCompany = false;
+        });
+      } else if (value.clientCompanyCnpj) {
+        this.serviceClienteCompany.getCnpj$(value.clientCompanyCnpj).subscribe((data) => {
+          this.dialogListClientCompany = data;
+          this.dialogloadingClientCompany = false;
+        });
+      }
+      else if (value.clientCompanyCpf || value.clientCompanyRg) {
+        this.dialogloadingClientCompany = false;
+      } else if (value.clientCompanyTipo) {
+        this.serviceClienteCompany.getTipo$(value.clientCompanyTipo).subscribe((data) => {
+          this.dialogListClientCompany = data;
+          this.dialogloadingClientCompany = false;
+        });
+      }
+
+
     } else {
-      this.serviceClienteCompany.getAll$().subscribe((data) => {
-        this.dialogListClientCompany = data;
-      });
+      // P/Física
+
+      if (value.clientCompanyId) {
+        this.serviceClienteCompany.getId$(value.clientCompanyId).subscribe((data) => {
+          this.dialogListClientCompany = data;
+          this.dialogloadingClientCompany = false;
+        });
+      } else if (value.clientCompanyName) {
+        this.serviceClienteCompany.getNameF$(value.clientCompanyName).subscribe((data) => {
+          this.dialogListClientCompany = data;
+          this.dialogloadingClientCompany = false;
+        });
+      } else if (value.clientCompanyCnpj) {
+        this.dialogloadingClientCompany = false;
+      } else if (value.clientCompanyCpf) {
+        this.serviceClienteCompany.getCpf$(value.clientCompanyCpf).subscribe((data) => {
+          this.dialogListClientCompany = data;
+          this.dialogloadingClientCompany = false;
+        });
+      } else if (value.clientCompanyRg) {
+        this.serviceClienteCompany.getRg$(value.clientCompanyRg).subscribe((data) => {
+          this.dialogListClientCompany = data;
+          this.dialogloadingClientCompany = false;
+        });
+      } else if (value.clientCompanyTipo) {
+        this.serviceClienteCompany.getTipo$(value.clientCompanyTipo).subscribe((data) => {
+          this.dialogListClientCompany = data;
+          this.dialogloadingClientCompany = false;
+        });
+      }
+
     }
+
+
+
+
+
 
   }
 
@@ -427,12 +519,9 @@ export default class AtendimentoComponent implements OnInit {
 
   validFormClientCompany() {
 
-    if (this.dialogSelectClientCompany.type == "PJ") {
+    if (this.dialogSelectClientCompany.fisjur == "J") {
       this.formClientCompany.controls['clientCompanyCpf'].removeValidators(Validators.required);
       this.formClientCompany.controls['clientCompanyCpf'].updateValueAndValidity();
-
-      this.formClientCompany.controls['clientCompanyRg'].removeValidators(Validators.required);
-      this.formClientCompany.controls['clientCompanyRg'].updateValueAndValidity();
 
       this.formClientCompany.controls['clientCompanyCnpj'].addValidators(Validators.required);
       this.formClientCompany.controls['clientCompanyCnpj'].updateValueAndValidity();
@@ -444,9 +533,6 @@ export default class AtendimentoComponent implements OnInit {
 
       this.formClientCompany.controls['clientCompanyCpf'].addValidators(Validators.required);
       this.formClientCompany.controls['clientCompanyCpf'].updateValueAndValidity();
-
-      this.formClientCompany.controls['clientCompanyRg'].addValidators(Validators.required);
-      this.formClientCompany.controls['clientCompanyRg'].updateValueAndValidity();
 
     }
 
@@ -507,72 +593,6 @@ export default class AtendimentoComponent implements OnInit {
 
   }
 
-  addVehicle() {
-
-    const { valid } = this.formVehicle;
-
-    if (valid) {
-      this.formAtendimento.patchValue({
-        companyId: Number.parseInt(sessionStorage.getItem('companyId')!),
-        resaleId: Number.parseInt(sessionStorage.getItem('resaleId')!),
-
-        idUserEntry: Number.parseInt(sessionStorage.getItem('id')!),
-        nameUserEntry: sessionStorage.getItem('name'),
-        dateEntry: this.formVehicle.value.dateEntry,
-        datePrevisionExit: this.formVehicle.value.datePrevisionExit,
-       
-        clientCompanyId: this.formClientCompany.value.clientCompanyId,
-        clientCompanyName: this.formClientCompany.value.clientCompanyName,
-        clientCompanyCnpj: this.formClientCompany.value.clientCompanyCnpj,
-        clientCompanyCpf: this.formClientCompany.value.clientCompanyCpf,
-        clientCompanyRg: this.formClientCompany.value.clientCompanyRg,
-
-        driverEntryName: this.formDriver.value.driverEntryName,
-        driverEntryCpf: this.formDriver.value.driverEntryCpf,
-        driverEntryRg: this.formDriver.value.driverEntryRg,
-        driverEntryPhoto: this.formDriver.value.driverEntryPhoto,
-        driverEntryPhotoDoc1: this.formDriver.value.driverEntryPhotoDoc1,
-        driverEntryPhotoDoc2: this.formDriver.value.driverEntryPhotoDoc2,
-
-        placa: this.formVehicle.value.vehicleNew == "not" ? this.formVehicle.value.placa : '',
-        frota: this.formVehicle.value.frota?.toString(),
-        kmEntry: this.formVehicle.value.kmEntry?.toString(),
-
-        photo1: this.formVehicle.value.photo1,
-        photo2: this.formVehicle.value.photo2,
-        photo3: this.formVehicle.value.photo3,
-        photo4: this.formVehicle.value.photo4,
-
-        modelId: this.formVehicle.value.modelVehicle?.at(0)?.id,
-        modelDescription: this.formVehicle.value.modelVehicle?.at(0)?.description,
-
-        idUserAttendant: this.formVehicle.value.UserAttendant?.at(0)?.id,
-        nameUserAttendant: this.formVehicle.value.UserAttendant?.at(0)?.name == null ? 'falta' : this.formVehicle.value.UserAttendant?.at(0)?.name,
-
-        quantityTrafficCone: this.formVehicle.value.quantityTrafficCone,
-        quantityExtinguisher: this.formVehicle.value.quantityExtinguisher,
-        quantityTire: this.formVehicle.value.quantityTire,
-        quantityTireComplete: this.formVehicle.value.quantityTireComplete,
-        quantityToolBox: this.formVehicle.value.quantityToolBox,
-
-        serviceOrder: this.formVehicle.value.serviceOrder,
-        vehicleNew: this.formVehicle.value.vehicleNew,
-
-        informationConcierge: this.formVehicle.value.informationConcierge,
-
-      });
-
-      this.arrayFormAtendimento.push(this.formAtendimento.value);
-
-      //Toast Info
-      this.showAddSuccess();
-
-      //Reset Form
-      this.resetFormVehicle();
-
-    }
-
-  }
 
   removerVehiclePlaca(placa: string) {
 
@@ -678,6 +698,74 @@ export default class AtendimentoComponent implements OnInit {
 
   }
 
+  addVehicle() {
+
+    const { valid } = this.formVehicle;
+
+    if (valid) {
+      this.formAtendimento.patchValue({
+        companyId: this.layoutService.loginUser.companyId,
+        resaleId: this.layoutService.loginUser.resaleId,
+
+        idUserEntry: this.layoutService.loginUser.id,
+        nameUserEntry: this.layoutService.loginUser.name,
+        dateEntry: this.formVehicle.value.dateEntry,
+        datePrevisionExit: this.formVehicle.value.datePrevisionExit,
+
+        clientCompanyId: this.formClientCompany.value.clientCompanyId,
+        clientCompanyName: this.formClientCompany.value.clientCompanyName,
+        clientCompanyCnpj: this.formClientCompany.value.clientCompanyCnpj,
+        clientCompanyCpf: this.formClientCompany.value.clientCompanyCpf,
+        clientCompanyRg: this.formClientCompany.value.clientCompanyRg ?? "",
+
+        driverEntryName: this.formDriver.value.driverEntryName,
+        driverEntryCpf: this.formDriver.value.driverEntryCpf,
+        driverEntryRg: this.formDriver.value.driverEntryRg ?? "",
+        driverEntryPhoto: this.formDriver.value.driverEntryPhoto,
+        driverEntryPhotoDoc1: this.formDriver.value.driverEntryPhotoDoc1,
+        driverEntryPhotoDoc2: this.formDriver.value.driverEntryPhotoDoc2,
+
+        placa: this.formVehicle.value.vehicleNew == "not" ? this.formVehicle.value.placa : '',
+        frota: this.formVehicle.value.frota,
+        kmEntry: this.formVehicle.value.kmEntry ?? "",
+
+        photo1: this.formVehicle.value.photo1,
+        photo2: this.formVehicle.value.photo2,
+        photo3: this.formVehicle.value.photo3,
+        photo4: this.formVehicle.value.photo4,
+
+        modelId: this.formVehicle.value.modelVehicle?.at(0)?.id,
+        modelDescription: this.formVehicle.value.modelVehicle?.at(0)?.description,
+
+        idUserAttendant: this.formVehicle.value.UserAttendant?.at(0)?.id,
+        nameUserAttendant: this.formVehicle.value.UserAttendant?.at(0)?.name,
+
+        quantityTrafficCone: this.formVehicle.value.quantityTrafficCone,
+        quantityExtinguisher: this.formVehicle.value.quantityExtinguisher,
+        quantityTire: this.formVehicle.value.quantityTire,
+        quantityTireComplete: this.formVehicle.value.quantityTireComplete,
+        quantityToolBox: this.formVehicle.value.quantityToolBox,
+
+        serviceOrder: this.formVehicle.value.serviceOrder,
+        vehicleNew: this.formVehicle.value.vehicleNew,
+
+        informationConcierge: this.formVehicle.value.informationConcierge,
+
+      });
+
+      this.arrayFormAtendimento.push(this.formAtendimento.value);
+
+      //Toast Info
+      this.showAddSuccess();
+
+      //Reset Form
+      this.resetFormVehicle();
+
+    }
+
+  }
+
+
   saveVehicle() {
 
     const vehicles = this.arrayFormAtendimento;
@@ -685,7 +773,7 @@ export default class AtendimentoComponent implements OnInit {
     for (let index = 0; index < vehicles.length; index++) {
       const element = vehicles.at(index);
 
-      this.vehicleService.entryAdd$(element).subscribe((data) => {
+      this.vehicleService.entrySave$(element).subscribe((data) => {
 
         if (data.status == 201) {
 
@@ -715,13 +803,10 @@ export default class AtendimentoComponent implements OnInit {
 
         }
 
-        if (data.status == 200 && data.body == "Placa already exists.") {
+      }, (error) => {
+        if (error.status == 409) {
           this.showPlacaExist(index);
         }
-      }, (error) => {
-
-        console.log(error);
-
 
       });
 

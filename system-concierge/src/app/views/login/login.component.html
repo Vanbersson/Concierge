@@ -4,27 +4,30 @@
     <div class="card-login-title">
       <span>Conecte-se</span>
     </div>
-    <P>Faça login em sua conta</P>
+    <P class="mt-2 mb-4">Faça login em sua conta</P>
     <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-      <mat-form-field appearance="outline">
-        <mat-label>Digite seu email</mat-label>
-        <input matInput placeholder="seuemail@email.com" type="email" formControlName="email" />
-        <mat-icon matPrefix>person_outline</mat-icon>
-      </mat-form-field>
-      <mat-form-field appearance="outline">
-        <mat-label>Digite sua senha</mat-label>
-        <input matInput placeholder="Digite sua senha" [type]="hide ? 'password' : 'text'" formControlName="password" />
-        <mat-icon matPrefix>fingerprint</mat-icon>
-        <button mat-icon-button matSuffix (click)="hide = !hide">
-          <mat-icon>{{ hide ? "visibility_off" : "visibility" }}</mat-icon>
-        </button>
-      </mat-form-field>
+
+      <div class="grid p-fluid p-formgrid">
+        <div class="field col-12">
+          <p-floatLabel>
+            <input id="emailid" type="text" pInputText formControlName="email" />
+            <label for="emailid">Digite seu email</label>
+          </p-floatLabel>
+        </div>
+        <div class="field col-12">
+          <p-floatLabel>
+            <p-password id="idsenha" [toggleMask]="true" [feedback]="false" formControlName="password" />
+            <label for="idsenha">Digite sua senha</label>
+          </p-floatLabel>
+        </div>
+
+      </div>
       <div class="card-login-button">
         <div class="card-login-button-submit">
-          <button mat-raised-button type="submit">Entrar</button>
+          <button pButton type="submit" label="Entrar"></button>
         </div>
         <div class="card-login-button-esqueceu">
-          <button mat-button type="button" (click)="forgetPass()">Esqueceu sua senha?</button>
+          <button pButton type="button" label="Esqueceu sua senha?" [text]="true" (click)="forgetPass()"></button>
         </div>
       </div>
     </form>

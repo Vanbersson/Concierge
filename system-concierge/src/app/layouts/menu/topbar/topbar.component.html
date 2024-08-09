@@ -1,41 +1,37 @@
 <div class="layout-topbar">
-    <a class="layout-topbar-logo" routerLink="">
+    <a class="layout-topbar-logo" routerLink="/">
         <img src="assets/layout/images/logotruck.png" alt="logo">
         <span>AUTOPOINT</span>
     </a>
-    <p-button #menuButton icon="pi pi-bars" [rounded]="true" [text]="true" severity="secondary"
-        (click)="setSideBar(visibleSideBar())">
 
-    </p-button>
+    <button #menubutton class="p-link layout-menu-button layout-topbar-button" (click)="layoutService.onMenuToggle()">
+        <i class="pi pi-bars"></i>
+    </button>
 
-    <p-button #topbarMenuButton class="layout-topbar-menu-button" icon="pi pi-ellipsis-v" [rounded]="true" [text]="true"
-        severity="secondary">
-    </p-button>
+    <button #topbarmenubutton class="p-link layout-topbar-menu-button layout-topbar-button"
+        (click)="layoutService.showProfileSidebar()">
+        <i class="pi pi-ellipsis-v"></i>
+    </button>
 
-    <div #topbarmenu class="layout-topbar-menu">
+    <div #topbarmenu class="layout-topbar-menu"
+        [ngClass]="{'layout-topbar-menu-mobile-active':layoutService.state.profileSidebarVisible}">
 
-        @if (qtdAlert() != '0') {
-        <div class="layout-button-alert">
-            <p-badge [value]="qtdAlert()" severity="info"></p-badge>
-            <p-button icon="pi pi-bell" [rounded]="true" [text]="true" severity="info"></p-button>
-        </div>
-        }@else {
-        <p-button icon="pi pi-bell" [rounded]="true" [text]="true" severity="secondary"></p-button>
-        }
+        <button class="p-link layout-topbar-button">
+            <i class="pi pi-bell"></i>
+            <span>Notificação</span>
+        </button>
 
-        <p-button icon="pi pi-user" [rounded]="true" [text]="true" severity="secondary" (click)="showSideBarRight()">
-        </p-button>
-
-        <p-button icon="pi pi-cog" [rounded]="true" [text]="true" severity="secondary" (click)="openDialog()">
-
-        </p-button>
+        <button class="p-link layout-topbar-button" (click)="showSideBarRight()">
+            <i class="pi pi-user"></i>
+            <span>Configuração</span>
+        </button>
 
     </div>
 
 </div>
 
 <div>
-    <p-sidebar #sidebarRef [(visible)]="visibleSideBarRight" position="right" styleClass="w-30rem">
+    <p-sidebar #sidebarRef [(visible)]="visibleSideBarRight" position="right" styleClass="w-20rem">
 
         <ng-template pTemplate="headless">
 
@@ -47,19 +43,27 @@
 
                 <div class="layout-sidebar-header-main">
                     <div class="layout-side-header-photo">
-                        <p-avatar image="assets/layout/images/porteiro.png" size="xlarge" shape="circle"></p-avatar>
+
+                        @if(userPhoto){
+                        <p-image [imageStyle]="{'border-radius':'100%','object-fit':'cover'}"
+                            src="data:image/png;base64,{{userPhoto}}" alt="imagem motorista" height="56" width="56" />
+                        }@else {
+                        <p-avatar [label]="nametest" size="xlarge" shape="circle"></p-avatar>
+                        }
+
+
                     </div>
                     <div class="layout-sidebar-header-title">
-                        <span class="layout-sidebar-header-name">{{nameUser | titlecase}}</span>
-                        <span class="layout-sidebar-header-role">Vendedor</span>
+                        <span class="layout-sidebar-header-name">{{userName | titlecase}}</span>
+                        <span class="layout-sidebar-header-role">{{userRoleDescription | uppercase}}</span>
                     </div>
                 </div>
 
             </div>
             <div class="layout-sidebar-content">
 
-                <a class="layout-sidebar-content-card" (click)="openDialog()">
-                    <span class="pi pi-user"></span>
+                <a class="layout-sidebar-content-card" (click)="showDialogUser()">
+                    <i class="pi pi-user"></i>
                     <div class="layout-sidebar-content-card-item">
                         <span class="sidebar-content-card-item-title">Perfil</span>
                         <span>Dados do usuário</span>
@@ -67,15 +71,15 @@
                 </a>
 
                 <a class="layout-sidebar-content-card">
-                    <span class="pi pi-cog"></span>
+                    <i class="pi pi-cog"></i>
                     <div class="layout-sidebar-content-card-item">
                         <span class="sidebar-content-card-item-title">Configuração</span>
                         <span>Informações do sistema</span>
                     </div>
                 </a>
 
-                <a class="layout-sidebar-content-card">
-                    <span class="pi pi-power-off"></span>
+                <a class="layout-sidebar-content-card" (click)="closeSession()">
+                    <i class="pi pi-power-off" style="color: red;"></i>
                     <div class="layout-sidebar-content-card-item">
                         <span class="sidebar-content-card-item-title">Sair</span>
                         <span>Encerrar a sessão</span>
@@ -86,21 +90,25 @@
 
                     <span class="layout-notification-title">Notificações</span>
 
-                    @if ( qtdAlert() == '1' ) {
-                    <span class="layout-notification-message">Você tem {{qtdAlert()}} notificação</span>
-                    }
-                    @if ( qtdAlert() != '1' && qtdAlert() != '0' ) {
-                    <span class="layout-notification-message">Você tem {{qtdAlert()}} notificações</span>
-                    }
-                    @if ( qtdAlert() =='0' ) {
-                    <span class="layout-notification-message">Você não tem notificação</span>
+                    @if ( qtdAlert() == 0 ) {
+                        <span class="layout-notification-message">Você não tem notificação</span>
+                    }@else{
+                        @if ( qtdAlert() > 1 ) {
+                        <span class="layout-notification-message">Você tem {{qtdAlert()}} notificações</span>
+                        }@else {
+                            @if ( qtdAlert() > 0 ) {
+                                <span class="layout-notification-message">Você tem {{qtdAlert()}} notificação</span>
+                            }
+                        }
+
+                        
                     }
 
                 </div>
                 <a class="layout-sidebar-content-card">
-                    <span class="pi pi-bell"></span>
+                    <i class="pi pi-bell"></i>
                     <div class="layout-sidebar-content-card-item">
-                        <span class="sidebar-content-card-item-title">Notificações</span>
+                        <span class="sidebar-content-card-item-title">Notificação</span>
                         <span>Acessar notificação</span>
                     </div>
                 </a>
@@ -109,4 +117,113 @@
             </div>
         </ng-template>
     </p-sidebar>
+</div>
+
+<div>
+    <p-toast />
+    <p-dialog [(visible)]="visibleDialogUser" [modal]="true" [style]="{ width: '50rem' }"
+        [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }">
+        <form [formGroup]="userFormView" (ngSubmit)="updateUser()">
+            <div class="p-fluid p-formgrid grid">
+
+                <div class="field col-12 flex align-items-center justify-content-center ">
+
+                    <div class="layout-photo-person mb-5">
+
+                        @if(userPhoto){
+                        <p-image [imageStyle]="{'border-radius':'100%','object-fit':'cover'}"
+                            src="data:image/png;base64,{{userPhoto}}" alt="imagem motorista" height="80" width="80"
+                            [preview]="true" />
+
+                        <button pButton severity="danger" [text]="true" label="Remover"
+                            (click)="deleteEntryPhotoDriver()"></button>
+                        }@else{
+                        <div class="layout-photo-person-label">
+                            <label for="userPhoto">Foto</label>
+                            <input type="file" id="userPhoto" (change)="selectEntryPhotoDriver($event)"
+                                accept="image/png, image/jpeg" />
+                        </div>
+                        }
+
+                    </div>
+
+                </div>
+
+                <div class="field col-12 md:col-12">
+                    <label for="nameid">Nome</label>
+                    <input pInputText id="nameid" type="text" formControlName="name" />
+                    <small class="p-error block"
+                        *ngIf="userFormView.get('name')?.invalid && userFormView.get('name')?.dirty">
+                        Campo obrigatório</small>
+                </div>
+
+                <div class="field col-12 md:col-8">
+                    <label for="emailid">Email</label>
+                    <div class="layout-input-disabled">
+                        <span>{{userEmail}}</span>
+                    </div>
+                </div>
+
+                <div class="field col-12 md:col-4">
+                    <label for="cellphoneid">Celular</label>
+                    <p-inputMask id="cellphoneid" mask="(99) 9 9999-9999" formControlName="cellphone" unmask="true" />
+                </div>
+
+                <div class="field col-12 md:col-4">
+                    <label for="passwordid">Senha</label>
+                    <p-password id="passwordid" formControlName="password" [feedback]="false" [toggleMask]="true" />
+                    <small class="p-error block"
+                        *ngIf="userFormView.get('password')?.invalid && userFormView.get('password')?.dirty">
+                        Campo obrigatório</small>
+                </div>
+
+
+                <div class="field col-12 md:col-4">
+                    <label for="passwordvalidid">Repetir senha</label>
+                    <p-password id="passwordvalidid" formControlName="passwordValid" [feedback]="false"
+                        [toggleMask]="true" />
+                    <small class="p-error block"
+                        *ngIf="userFormView.get('passwordValid')?.invalid && userFormView.get('passwordValid')?.dirty">
+                        Campo Obrigatório</small>
+                </div>
+
+                <div class="field col-12 md:col-4">
+                    <label for="userrole">Cargo</label>
+
+                    <div class="layout-input-disabled">
+                        <span>{{userRoleDescription | uppercase}}</span>
+                    </div>
+                </div>
+
+                <div class="field col-12">
+
+                    <div class="layout-card-option">
+
+                        <div class="layout-card-option-title">Situação</div>
+
+                        <div class="flex align-items-center">
+                            <p-radioButton inputId="ativo" value="ativo" formControlName="status"></p-radioButton>
+                            <label for="ativo" class="ml-2">Ativado</label>
+                        </div>
+
+                        <div class="flex align-items-center">
+                            <p-radioButton inputId="inativo" value="inativo" formControlName="status"></p-radioButton>
+                            <label for="inativo" class="ml-2">Desativado</label>
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+            </div>
+            <div class="flex justify-content-end gap-2 mt-3">
+                <button pButton type="button" pRipple label="Cancelar" icon="pi pi-times" class="p-button-text"
+                    (click)="hideDialogUser()"></button>
+                <button pButton type="submit" pRipple label="Salvar" icon="pi pi-check" class="p-button-text"></button>
+            </div>
+
+        </form>
+    </p-dialog>
+
 </div>

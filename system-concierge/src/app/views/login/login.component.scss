@@ -1,12 +1,15 @@
-.login-container {
-    height: 100%;
-    width: 100%;
-    background-color: #d8dbe0;
+:host {
+
+  .login-container {
     display: flex;
     justify-content: center;
     align-items: center;
+    height: 100vh;
+    width: 100vw;
+    background-color: #d8dbe0;
+    
   }
-  
+
   .card-login {
     display: flex;
     flex-direction: column;
@@ -16,49 +19,46 @@
     width: 28rem;
     height: 22rem;
     padding: 24px;
-  
+
     border-top-left-radius: 8px;
     border-bottom-left-radius: 8px;
-  
+
     .card-login-title {
       width: 100%;
       font-weight: 600;
       font-size: 40px;
       color: var(--color-text-secondary);
     }
-    > P {
+
+    >P {
       width: 100%;
-      margin-top: 8px;
-  
       color: var(--color-text-secondary);
     }
-    > form mat-form-field {
+
+    >form mat-form-field {
       width: 100%;
     }
+
     .card-login-button {
       width: 100%;
       height: 41px;
       display: flex;
       justify-content: space-between;
-  
-      .card-login-button-submit > button {
+
+      .card-login-button-submit>button {
         width: 200px;
         height: 41px;
         background-color: var(--color-primary);
         color: #fff;
       }
-  
-      .card-login-button-esqueceu > button {
+
+      .card-login-button-esqueceu>button {
         color: var(--color-text-secondary);
         height: 41px;
       }
     }
   }
-  
-  mat-icon {
-    color: var(--color-primary);
-  }
-  
+
   .card-login-info {
     display: flex;
     justify-content: center;
@@ -71,21 +71,24 @@
     padding: 24px;
     border-top-right-radius: 8px;
     border-bottom-right-radius: 8px;
-  
+
     .info-tile {
       font-size: 30px;
       font-weight: 500;
     }
-    > p {
+
+    >p {
       font-size: 18px;
       font-weight: 300;
     }
   }
-  
-  @media (max-width: 700px) {
+
+
+  @media only screen and (min-width: 375px) and (max-width: 667px) {
     .card-login-info {
       display: none;
     }
+
     .card-login {
       border-top-right-radius: 8px;
       border-bottom-right-radius: 8px;
@@ -93,4 +96,6 @@
       padding-right: 16px;
     }
   }
-  
+
+
+}

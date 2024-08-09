@@ -18,7 +18,7 @@ import { RadioButtonModule } from 'primeng/radiobutton';
 import { VehicleModel } from '../../../models/vehicle/vehicleModel';
 import { InterfaceUpdateStatus } from '../../../interfaces/Interface-update-status';
 import { VehicleModelService } from '../../../services/concierge/vehicle-model/vehicle-model.service';
-import { LayoutService } from '../../../layouts/layout/layoutService';
+import { LayoutService } from '../../../layouts/layout/service/layout.service';
 import { Router } from '@angular/router';
 
 @Component({
@@ -56,26 +56,16 @@ export default class ModeloVeiculoComponent implements OnInit {
   });
 
   constructor(private serviceModel: VehicleModelService, private _fb: FormBuilder,
-    private layoutService: LayoutService, private router: Router) { }
+    public layoutService: LayoutService, private router: Router) {this.layoutService.isLogin(); }
 
 
   ngOnInit(): void {
-
-    this.validLogin();
 
     this.statuses = [
       { label: 'ativo', value: 'ativo' },
       { label: 'inativo', value: 'inativo' }
 
     ];
-
-  }
-
-  validLogin() {
-
-    if (!this.layoutService.isLogin()) {
-      this.router.navigateByUrl('/login');
-    }
 
   }
 

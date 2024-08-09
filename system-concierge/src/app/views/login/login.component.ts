@@ -1,60 +1,47 @@
-import { Component, OnChanges, OnInit, SimpleChanges } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
+import { ReactiveFormsModule, Validators, FormGroup, FormControl } from '@angular/forms';
 import { Router } from '@angular/router';
 
-import { MatCardModule } from '@angular/material/card';
-import { MatButtonModule } from '@angular/material/button';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatIconModule } from '@angular/material/icon';
-import { MatInputModule } from '@angular/material/input';
+
 import { ToastModule } from 'primeng/toast';
+import { FloatLabelModule } from 'primeng/floatlabel';
+import { InputTextModule } from 'primeng/inputtext';
+import { PasswordModule } from 'primeng/password';
+import { ButtonModule } from 'primeng/button';
 
 import { MessageService } from 'primeng/api';
 import { AuthService } from '../../services/login/auth.service';
-import { LayoutService } from '../../layouts/layout/layoutService';
+import { LayoutService } from '../../layouts/layout/service/layout.service';
+import { IUser } from '../../interfaces/iuser';
 
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, MatCardModule, MatButtonModule, MatFormFieldModule, MatIconModule, MatInputModule, ToastModule, ReactiveFormsModule],
+  imports: [CommonModule, FloatLabelModule, ButtonModule, PasswordModule, InputTextModule, ToastModule, ReactiveFormsModule],
   providers: [MessageService],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss'
 })
-export default class LoginComponent implements OnInit {
+export default class LoginComponent {
 
-  hide = true;
+  user: IUser = null;
 
-
-  loginForm = this.builder.group({
-    email: ['vambersson@gmail.com', [Validators.email, Validators.required]],
-    password: ['12345', [Validators.required, Validators.maxLength(8)]],
+  loginForm = new FormGroup({
+    email: new FormControl('vambersson@gmail.com', [Validators.required, Validators.email]),
+    password: new FormControl('12345', [Validators.required, Validators.maxLength(8)]),
   });
 
   constructor(
     private auth: AuthService,
-    private builder: FormBuilder,
     private messageService: MessageService,
     private router: Router,
-    private layoutService: LayoutService) {
+    public layoutService: LayoutService) {
 
   }
 
-  ngOnInit(): void {
-    this.validLogin();
-  }
-
-  validLogin() {
-
-    if (this.layoutService.isLogin()) {
-      this.router.navigateByUrl('dashboard');
-    }
-
-  }
-
-   onSubmit() {
+  onSubmit() {
 
     const { valid, value } = this.loginForm;
 
@@ -65,21 +52,15 @@ export default class LoginComponent implements OnInit {
         if (data.status == 200) {
           this.showSuccess(data.body.name);
 
-          sessionStorage.setItem('companyId', data.body.companyId);
-          sessionStorage.setItem('resaleId', data.body.resaleId);
-          sessionStorage.setItem('id', data.body.id);
-          sessionStorage.setItem('name', data.body.name);
-          sessionStorage.setItem('email', data.body.email);
-          sessionStorage.setItem('cellPhone', data.body.cellphone);
+          this.user = data.body;
 
-          sessionStorage.setItem('token', 'abc12345');
+          this.layoutService.login(this.user);
 
           setTimeout(() => {
-            this.router.navigateByUrl('v1/dashboard');
-          }, 2500);
+            this.router.navigateByUrl('/dashboard');
+          }, 2000);
 
         }
-
 
       }, (error) => {
 

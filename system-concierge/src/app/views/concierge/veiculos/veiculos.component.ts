@@ -18,7 +18,7 @@ import { ToastModule } from 'primeng/toast';
 
 //Service
 import { VehicleEntry } from '../../../models/vehicle/vehicleEntry';
-import { LayoutService } from '../../../layouts/layout/layoutService';
+import { LayoutService } from '../../../layouts/layout/service/layout.service';
 import { VehicleService } from '../../../services/vehicle/vehicle.service';
 
 //Constants
@@ -58,15 +58,13 @@ export default class VeiculosComponent implements OnInit {
     nameUserExitAuth: new FormControl<string>(''),
   });
 
-  constructor(private vehicleService: VehicleService, private layoutService: LayoutService, private router: Router, private messageService: MessageService,) { }
+  constructor(private vehicleService: VehicleService, public layoutService: LayoutService, private router: Router, private messageService: MessageService) {
+    this.layoutService.isLogin();
+  }
 
   ngOnInit(): void {
 
-    this.validLogin();
-
     this.listVehicles();
-
-
 
     this.statusOrcamento = [
       { label: 'Sem Orçamento', value: 'Sem Orçamento' },
@@ -124,15 +122,7 @@ export default class VeiculosComponent implements OnInit {
   }
 
   novoAtendimento() {
-    this.router.navigateByUrl('v1/portaria/atendimento');
-  }
-
-  validLogin() {
-
-    if (!this.layoutService.isLogin()) {
-      this.router.navigateByUrl('/login');
-    }
-
+    this.router.navigateByUrl('portaria/atendimento');
   }
 
   onSelectionChange(event: any) {
@@ -163,7 +153,7 @@ export default class VeiculosComponent implements OnInit {
   }
 
   editVeiculo(id: number) {
-    this.router.navigateByUrl('v1/portaria/manutencao/' + id);
+    this.router.navigateByUrl('portaria/manutencao/' + id);
   }
 
   addAuthorizationAll() {
@@ -175,7 +165,7 @@ export default class VeiculosComponent implements OnInit {
 
   addAuthorization(vehicle: VehicleEntry) {
 
-    if(vehicle.statusAuthExit != this.authorized){
+    if (vehicle.statusAuthExit != this.authorized) {
 
       this.formLiberar.patchValue({
         companyId: vehicle.companyId,
@@ -184,36 +174,37 @@ export default class VeiculosComponent implements OnInit {
         idUserExitAuth: Number.parseInt(sessionStorage.getItem('id')!),
         nameUserExitAuth: sessionStorage.getItem('name'),
       });
-  
+
       this.vehicleService.entryAddAuth(this.formLiberar.value).subscribe((data) => {
         if (data.body == "Success.") {
-  
+
           //Autorização de saída
           if (vehicle.statusAuthExit == this.notAuth) {
             this.showAuthSuccess(vehicle.placa);
           }
-  
+
           //Saída liberada
           if (vehicle.statusAuthExit == this.firstAuth) {
             this.showLiberadoSuccess(vehicle.placa);
           }
-  
-  
+
           this.listVehicles();
         } else {
-          console.log(data.body);
-  
+
           if (data.body == "UserAttendant") {
             this.showUserAttendant();
           }
           if (data.body == "ClientCompany") {
             this.showClientCompany();
           }
+          if (data.body == "Driver") {
+            this.showDriver();
+          }
         }
-  
+
       });
 
-    }else{
+    } else {
       this.showInfo();
     }
 
@@ -225,6 +216,10 @@ export default class VeiculosComponent implements OnInit {
 
   showClientCompany() {
     this.messageService.add({ severity: 'error', summary: 'Empresa', detail: "Empresa não informada", icon: 'pi pi-building', life: 10000 });
+  }
+
+  showDriver() {
+    this.messageService.add({ severity: 'error', summary: 'Motorista', detail: "Motorista não informado", icon: 'pi pi-user', life: 10000 });
   }
 
   showAuthSuccess(placa: string) {
