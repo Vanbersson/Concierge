@@ -1,6 +1,5 @@
 import { Injectable, effect, signal } from '@angular/core';
 import { Subject } from 'rxjs';
-import { IUser } from '../../../interfaces/iuser';
 import { Router } from '@angular/router';
 
 export interface AppConfig {
@@ -26,7 +25,6 @@ interface LayoutState {
 })
 export class LayoutService {
 
-    private user = signal<IUser>(null);
 
     _config: AppConfig = {
         ripple: false,
@@ -161,87 +159,5 @@ export class LayoutService {
 
     changeScale(value: number) {
         document.documentElement.style.fontSize = `${value}px`;
-    }
-
-    isLogin() {
-
-        if (!this.user()) {
-
-            const result = this.loadingLogin();
-
-            if (result == null) {
-                this.navigateLogin();
-            } else {
-                this.user.set(result);
-            }
-
-        }
-
-    }
-
-    get loginUser() {
-        return this.user();
-    }
-
-    login(us: IUser) {
-
-        this.user.set(us);
-
-        localStorage.setItem('companyId', us.companyId.toString());
-        localStorage.setItem('resaleId', us.resaleId.toString());
-        localStorage.setItem('status', us.status);
-        localStorage.setItem('id', us.id.toString());
-        localStorage.setItem('name', us.name);
-        localStorage.setItem('email', us.email);
-        localStorage.setItem('cellPhone', us.cellphone);
-        localStorage.setItem('role', us.role.toString());
-        localStorage.setItem('photo', us.photo);
-        localStorage.setItem('token', us.token ?? "");
-
-    }
-
-    closeLogin() {
-
-        localStorage.removeItem('companyId');
-        localStorage.removeItem('resaleId');
-        localStorage.removeItem('status');
-        localStorage.removeItem('id');
-        localStorage.removeItem('name');
-        localStorage.removeItem('email');
-        localStorage.removeItem('cellPhone');
-        localStorage.removeItem('role');
-        localStorage.removeItem('photo');
-        localStorage.removeItem('token');
-
-        this.user.set(null);
-
-        this.navigateLogin();
-    }
-
-    loadingLogin(): IUser {
-
-        var us: IUser = null;
-
-        if (localStorage.getItem('companyId') == null || localStorage.getItem('resaleId') == null) {
-            return us;
-        }
-
-        us = {
-            companyId: Number.parseInt(localStorage.getItem('companyId')),
-            resaleId: Number.parseInt(localStorage.getItem('resaleId')),
-            status: localStorage.getItem('status'),
-            id: Number.parseInt(localStorage.getItem('id')),
-            name: localStorage.getItem('name'),
-            email: localStorage.getItem('email'),
-            cellphone: localStorage.getItem('cellPhone'),
-            photo: localStorage.getItem('photo'),
-            role: Number.parseInt(localStorage.getItem('role')),
-        }
-
-        return us;
-    }
-
-    private navigateLogin() {
-        this.router.navigateByUrl('/login');
     }
 }

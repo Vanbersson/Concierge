@@ -33,5 +33,5 @@ public class VehicleModel {
 
     @Lob
     @Column(columnDefinition = "BLOB")
-    private byte[] image;
+    private byte[] photo;
 }

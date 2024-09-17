@@ -2,6 +2,8 @@ package com.concierge.apiconcierge.controllers.version1.vehicle;
 
 import com.concierge.apiconcierge.dtos.vehicle.AuthExit;
 import com.concierge.apiconcierge.dtos.vehicle.VehicleEntryDto;
+import com.concierge.apiconcierge.dtos.vehicle.VehicleEntryListDto;
+import com.concierge.apiconcierge.dtos.vehicle.VehicleEntryUpdateDto;
 import com.concierge.apiconcierge.models.vehicle.Vehicle;
 import com.concierge.apiconcierge.models.vehicle.VehicleEntry;
 import com.concierge.apiconcierge.models.vehicle.enums.StatusAuthExitEnum;
@@ -19,18 +21,20 @@ import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
-@RequestMapping("/v1/{companyid}/{resaleid}/vehicleEntry")
+@RequestMapping("/vehicle/entry")
 public class VehicleEntryController {
 
     @Autowired
     VehicleEntryIRepository vehicleEntryIRepository;
 
     @Autowired
-    VehicleEntryRepository vehicleRepository;
+    VehicleEntryRepository vehicleEntryRepository;
 
     @PostMapping("/save")
     public ResponseEntity<Object> saveVehicle(@RequestBody @Valid VehicleEntryDto data) {
@@ -38,81 +42,97 @@ public class VehicleEntryController {
         VehicleEntry vehicleEntry = new VehicleEntry();
         BeanUtils.copyProperties(data, vehicleEntry);
 
-        if (data.vehicleNew().equals(VehicleYesNotEnum.yes)) {
+        if (vehicleEntry.getVehicleNew().equals(VehicleYesNotEnum.yes)) {
             vehicleEntry.setPlaca("");
+            this.vehicleEntryIRepository.save(vehicleEntry);
+            return ResponseEntity.status(HttpStatus.CREATED).build();
+        } else {
+
+            if (vehicleEntry.getPlaca().trim() != "") {
+                VehicleEntry vehicle = vehicleEntryIRepository.findByPlaca(vehicleEntry.getPlaca());
+                if (vehicle != null) return ResponseEntity.status(HttpStatus.CONFLICT).body("Placa already exists.");
+
+                this.vehicleEntryIRepository.save(vehicleEntry);
+                return ResponseEntity.status(HttpStatus.CREATED).build();
+            }
         }
 
-        if (data.vehicleNew().equals(VehicleYesNotEnum.not) && data.id() == null) {
-            VehicleEntry vehicle = vehicleEntryIRepository.findByCompanyIdAndResaleIdAndPlaca(data.companyId(), data.resaleId(), data.placa());
-
-            if (vehicle != null) return ResponseEntity.status(HttpStatus.CONFLICT).body("Placa already exists.");
-        }
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(vehicleEntryIRepository.save(vehicleEntry));
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
     @PostMapping("/update")
-    public ResponseEntity<Object> updateVehicle(@RequestBody @Valid VehicleEntryDto data) {
+    public ResponseEntity<Object> updateVehicle(@RequestBody @Valid VehicleEntryUpdateDto data) {
 
         VehicleEntry vehicleEntry = new VehicleEntry();
         BeanUtils.copyProperties(data, vehicleEntry);
 
-        if (data.vehicleNew().equals(VehicleYesNotEnum.yes)) {
+        if (vehicleEntry.getVehicleNew().equals(VehicleYesNotEnum.yes)) {
             vehicleEntry.setPlaca("");
+            this.vehicleEntryIRepository.save(vehicleEntry);
+            return ResponseEntity.status(HttpStatus.OK).build();
+        } else {
+
+            if (vehicleEntry.getPlaca().trim() != "") {
+                this.vehicleEntryIRepository.save(vehicleEntry);
+                return ResponseEntity.status(HttpStatus.OK).build();
+            }
         }
 
-        return ResponseEntity.status(HttpStatus.OK).body(vehicleEntryIRepository.save(vehicleEntry));
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+
     }
 
     @GetMapping("/all")
-    public ResponseEntity<List<VehicleEntry>> listAll(
-            @PathVariable(name = "companyid") Integer companyId,
-            @PathVariable(name = "resaleid") Integer resaleId) {
+    public ResponseEntity<List<Object>> getAllEntry() {
 
-        List<VehicleEntry> list = vehicleEntryIRepository.findByCompanyIdAndResaleId(companyId, resaleId);
+        List<VehicleEntry> list = this.vehicleEntryIRepository.findAll();
+        List<Object> vehicles = new ArrayList<>();
+        for (VehicleEntry item : list) {
 
-        return ResponseEntity.ok(list);
+            var t = new VehicleEntryListDto(
+                    item.getCompanyId(),
+                    item.getResaleId(),
+                    item.getId(),
+                    item.getPlaca(),
+                    item.getVehicleNew(),
+                    item.getFrota(),
+                    item.getModelDescription(),
+                    item.getDateEntry(),
+                    item.getNameUserAttendant(),
+                    item.getClientCompanyName(),
+                    item.getBudgetStatus(),
+                    item.getIdUserExitAuth1(),
+                    item.getIdUserExitAuth2(),
+                    item.getStatusAuthExit());
+            vehicles.add(t);
+        }
+        return ResponseEntity.ok(vehicles);
     }
 
-    @GetMapping("/listEntry")
-    public ResponseEntity<List<VehicleEntry>> listEntry(
-            @PathVariable(name = "companyid") Integer companyId,
-            @PathVariable(name = "resaleid") Integer resaleId) {
+    @GetMapping("/filter/id/{id}")
+    public ResponseEntity<Object> getId(@PathVariable(name = "id") Integer id) {
 
-        List<VehicleEntry> list = vehicleRepository.getListEntry(companyId, resaleId);
+        Optional<VehicleEntry> vehicle = vehicleEntryIRepository.findById(id);
 
-        return ResponseEntity.ok(list);
+        if (vehicle.isEmpty()) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+
+        return ResponseEntity.ok(vehicle);
     }
 
-    @GetMapping("filter/id/{id}")
-    public ResponseEntity<VehicleEntry> getId(
-            @PathVariable(name = "companyid") Integer companyId,
-            @PathVariable(name = "resaleid") Integer resaleId,
-            @PathVariable(name = "id") Integer id) {
+    @GetMapping("/filter/placa/{placa}")
+    public ResponseEntity<VehicleEntry> getPlaca(@PathVariable(name = "placa") String placa) {
 
-        VehicleEntry vehicle = vehicleEntryIRepository.findByCompanyIdAndResaleIdAndId(companyId, resaleId, id);
+        VehicleEntry vehicle = vehicleEntryIRepository.findByPlaca(placa);
 
         if (vehicle == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 
         return ResponseEntity.ok(vehicle);
     }
 
-    @GetMapping("filter/placa/{placa}")
-    public ResponseEntity<VehicleEntry> getPlaca(
-            @PathVariable(name = "companyid") Integer companyId,
-            @PathVariable(name = "resaleid") Integer resaleId,
-            @PathVariable(name = "placa") String placa) {
-
-        VehicleEntry vehicle = vehicleEntryIRepository.findByCompanyIdAndResaleIdAndPlaca(companyId, resaleId, placa);
-
-        if (vehicle == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-
-        return ResponseEntity.ok(vehicle);
-    }
-
-    @PostMapping("add/authorization")
+    /*
+    @PostMapping("/add/authorization")
     public ResponseEntity<String> addAuthorizationExit(@RequestBody @Valid AuthExit data) {
-        VehicleEntry vehicle = vehicleEntryIRepository.findByCompanyIdAndResaleIdAndId(data.companyId(), data.resaleId(), data.id());
+        Optional<VehicleEntry> vehicle = vehicleEntryIRepository.findById(data.id());
 
 
         String mensagem = validAuthorization(vehicle);
@@ -145,7 +165,7 @@ public class VehicleEntryController {
         return ResponseEntity.ok(mensagem);
     }
 
-    @PostMapping("delete/authorization1")
+    @PostMapping("/delete/authorization1")
     public ResponseEntity<String> deleteAuthorizationExit1(@RequestBody @Valid AuthExit data) {
 
         VehicleEntry vehicle = vehicleEntryIRepository.findByCompanyIdAndResaleIdAndId(data.companyId(), data.resaleId(), data.id());
@@ -165,7 +185,7 @@ public class VehicleEntryController {
         return ResponseEntity.ok("Not delete.");
     }
 
-    @PostMapping("delete/authorization2")
+    @PostMapping("/delete/authorization2")
     public ResponseEntity<String> deleteAuthorizationExit2(@RequestBody @Valid AuthExit data) {
 
         VehicleEntry vehicle = vehicleEntryIRepository.findByCompanyIdAndResaleIdAndId(data.companyId(), data.resaleId(), data.id());
@@ -251,5 +271,5 @@ public class VehicleEntryController {
 
         return "Authorized";
 
-    }
+    }*/
 }

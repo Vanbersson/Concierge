@@ -2,9 +2,11 @@ package com.concierge.apiconcierge.dtos;
 
 public record AddressDto(
         Integer id,
+        String zipCode,
         String state,
         String city,
-        String zipCode,
-        String address
-        ) {
+        String neighborhood,
+        String address,
+        String addressComplement
+) {
 }

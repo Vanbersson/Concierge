@@ -33,15 +33,22 @@ public class Company implements Serializable {
 
     private String phone;
 
+    @Column(name = "zip_code")
+    private String zipCode;
+
     private String state;
 
     private String city;
 
-    @Column(name = "zip_code")
-    private String zipCode;
+    private String neighborhood;
 
     private String address;
 
     @Column(name = "address_number")
     private String addressNumber;
+
+    @Column(name = "address_complement")
+    private String addressComplement;
+
+
 }

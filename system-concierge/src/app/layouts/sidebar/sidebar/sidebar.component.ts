@@ -150,8 +150,30 @@ export class SidebarComponent implements OnInit {
               },
             ]
           },
+          {
+           key:'3_1',
+           label:'Manutenção Clientes' 
+          }
 
 
+        ]
+      },
+      {
+        key:'99',
+        label:'Configuração',
+        icon:'pi pi-corg',
+        items:[
+          {
+            key:'99_0',
+            label:'Empresa',
+            icon:'pi pi-building'
+          },
+          {
+            key:'99_1',
+            label:'Cadastro Usuários',
+            icon:'pi pi-users',
+            routerLink:'configuracao/usuario'
+          }
         ]
       }
     ];

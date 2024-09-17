@@ -1,12 +1,17 @@
 import { Routes } from '@angular/router';
+import { authGuardGuard } from './services/login/auth-guard.guard';
 
 export const routes: Routes = [
-
+    {
+        path: 'login',
+        title: 'Login',
+        loadComponent: () => import('./views/login/login.component'),
+    },
     {
         path: '',
         loadComponent: () => import('./layouts/layout/layout.component'),
+        canActivateChild: [authGuardGuard],
         children: [
-
             {
                 path: '',
                 title: 'Dashboard',
@@ -42,17 +47,35 @@ export const routes: Routes = [
                         loadComponent: () => import('./views/concierge/modelo-veiculo/modelo-veiculo.component')
                     },
                 ]
+            },
+            {
+                path: 'oficina',
+                children: [
+                    {
+                        path: 'orcamento/:id',
+                        title: 'Orçamento',
+                        loadComponent: () => import('./views/oficina/budget/budget.component')
+                    },
+                ]
+
+            },
+            {
+                path: 'configuracao',
+                children: [
+                    {
+                        path: 'usuario',
+                        title: 'Usuário',
+                        loadComponent: () => import('./views/settings/user/user.component')
+
+                    }
+                ]
+
+            },
+            {
+                path: '**',
+                loadComponent: () => import('./views/not-found/not-found.component')
             }
         ]
 
-    },
-    {
-        path: 'login',
-        title: 'Login',
-        loadComponent: () => import('./views/login/login.component'),
-    },
-    {
-        path: '**',
-        loadComponent: () => import('./views/not-found/not-found.component')
     }
 ];

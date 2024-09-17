@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
-import { FormsModule, ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule, Validators, FormGroup, FormControl } from '@angular/forms';
 
 //primeNG
 import { TableModule } from 'primeng/table';
@@ -15,11 +15,20 @@ import { InputTextModule } from 'primeng/inputtext';
 import { RadioButtonModule } from 'primeng/radiobutton';
 
 //Service
-import { VehicleModel } from '../../../models/vehicle/vehicleModel';
-import { InterfaceUpdateStatus } from '../../../interfaces/Interface-update-status';
-import { VehicleModelService } from '../../../services/concierge/vehicle-model/vehicle-model.service';
+import { VehicleModelService } from '../../../services/vehicle-model/vehicle-model.service';
 import { LayoutService } from '../../../layouts/layout/service/layout.service';
+import { StorageService } from '../../../services/storage/storage.service';
 import { Router } from '@angular/router';
+
+
+import { UserService } from '../../../services/user/user.service';
+
+//Interface
+import { IModelStatus } from '../../../interfaces/vehicle-model/imodel-status';
+//Class
+
+import { ModelVehicle } from '../../../models/vehicle-model/model-vehicle';
+import { User } from '../../../models/user/user';
 
 @Component({
   selector: 'app-modelo-veiculo',
@@ -30,7 +39,9 @@ import { Router } from '@angular/router';
   providers: []
 })
 export default class ModeloVeiculoComponent implements OnInit {
-
+  private user: User;
+  private modelVehicle: ModelVehicle;
+  private modelVehicleStatus: IModelStatus = null;
 
   dialogVisible: boolean = false;
 
@@ -40,33 +51,43 @@ export default class ModeloVeiculoComponent implements OnInit {
 
   pathFile: string = "assets/layout/images/picture.png";
 
-  vehicleModels$ = this.serviceModel.getAll$();
+  modelVehicles: ModelVehicle[] = [];
 
-  selectedItems: VehicleModel[] = [];
+  selectedItems: ModelVehicle[] = [];
 
-  vehicleStatus: InterfaceUpdateStatus = { companyId: 0, resaleId: 0, id: 0, status: '' };
-
-  profileForm = this._fb.group({
-    companyId: [''],
-    resaleId: [''],
-    id: [''],
-    description: ['', Validators.required],
-    status: ['ativo', Validators.required],
-    image: ['']
+  formModel = new FormGroup({
+    id: new FormControl<number>(0),
+    description: new FormControl<string>('', Validators.required),
+    status: new FormControl<string>('', Validators.required),
+    photo: new FormControl<string | null>(null),
   });
 
-  constructor(private serviceModel: VehicleModelService, private _fb: FormBuilder,
-    public layoutService: LayoutService, private router: Router) {this.layoutService.isLogin(); }
-
+  constructor(
+    private serviceModel: VehicleModelService,
+    public layoutService: LayoutService,
+    private storageService: StorageService,
+    private router: Router,
+    private userService: UserService) {
+    this.userService.getUser$().subscribe(data => {
+      this.user = data;
+    });
+    this.modelVehicle = new ModelVehicle();
+  }
 
   ngOnInit(): void {
+    this.listaModel();
 
     this.statuses = [
       { label: 'ativo', value: 'ativo' },
       { label: 'inativo', value: 'inativo' }
-
     ];
 
+  }
+
+  private listaModel() {
+    this.serviceModel.getAll$().subscribe((data) => {
+      this.modelVehicles = data;
+    });
   }
 
   getSeverity(status: string): any {
@@ -85,30 +106,27 @@ export default class ModeloVeiculoComponent implements OnInit {
 
   showDialog() {
 
-    this.profileForm.patchValue({
-      id: "",
-      description: "",
-      status: "ativo",
-      image: ""
-
-    });
-
     this.pathFile = "assets/layout/images/picture.png";
-
     this.dialogVisible = true;
+    this.formModel.patchValue({
+      id: null,
+      description: '',
+      status: 'ativo',
+      photo: null
+    });
   }
 
-  showDialogEditar(modelo: VehicleModel) {
+  showDialogEditar(modelo: ModelVehicle) {
 
-    this.profileForm.patchValue({
-      id: modelo.id!.toString(),
+    this.formModel.patchValue({
+      id: modelo.id,
       description: modelo.description,
       status: modelo.status,
-      image: modelo.image
+      photo: modelo.photo
     });
 
-    if (modelo.image) {
-      this.pathFile = "data:image/png;base64," + modelo.image;
+    if (modelo.photo) {
+      this.pathFile = "data:image/png;base64," + modelo.photo;
     } else {
       this.pathFile = "assets/layout/images/picture.png";
     }
@@ -117,7 +135,6 @@ export default class ModeloVeiculoComponent implements OnInit {
   }
 
   onSelectFile(event: any) {
-
     const file = event.target.files[0];
 
     if (file) {
@@ -132,7 +149,7 @@ export default class ModeloVeiculoComponent implements OnInit {
         //image byte
         const byteImg = event.target.result.split('base64,')[1];
 
-        this.profileForm.patchValue({ image: byteImg });
+        this.formModel.patchValue({ photo: byteImg });
       };
 
       this.selectedFile = file;
@@ -141,63 +158,33 @@ export default class ModeloVeiculoComponent implements OnInit {
 
   }
 
-  updateStatus(model: VehicleModel) {
+  deleteFile() {
+    this.pathFile = "assets/layout/images/picture.png";
+    this.formModel.patchValue({ photo: null });
+  }
 
-    if (model.status == 'ativo') {
-      model.status = 'inativo';
-    } else {
-      model.status = 'ativo';
-    }
+  public updateStatus(model: ModelVehicle) {
 
-    this.vehicleStatus.companyId = model.companyId;
-    this.vehicleStatus.resaleId = model.resaleId;
-    this.vehicleStatus.id = model.id!;
-    this.vehicleStatus.status = model.status;
+    this.modelVehicleStatus = { id: model.id };
 
-    this.serviceModel.updateStatus$(this.vehicleStatus).subscribe((data) => {
-
+    this.serviceModel.updateStatus$(this.modelVehicleStatus).subscribe((data) => {
       if (data.status == 200) {
-
-        this.vehicleModels$ = this.serviceModel.getAll$();
-
+        this.listaModel();
       }
-
     });
-
 
   }
 
-  async updateStatusSelected() {
+  public updateStatusSelected() {
 
-    if (this.selectedItems[0].status == "ativo") {
+    for (let index = 0; index < this.selectedItems.length; index++) {
 
-      for (let index = 0; index < this.selectedItems.length; index++) {
-
-        this.selectedItems[index].status = "inativo";
-
-        this.vehicleStatus.companyId = this.selectedItems[index].companyId;
-        this.vehicleStatus.resaleId = this.selectedItems[index].resaleId;
-        this.vehicleStatus.id = this.selectedItems[index].id!;
-        this.vehicleStatus.status = this.selectedItems[index].status;
-
-        this.serviceModel.updateStatus$(this.vehicleStatus).subscribe();
-
-      }
-
-    } else {
-
-      for (let index = 0; index < this.selectedItems.length; index++) {
-
-        this.selectedItems[index].status = "ativo";
-
-        this.vehicleStatus.companyId = this.selectedItems[index].companyId;
-        this.vehicleStatus.resaleId = this.selectedItems[index].resaleId;
-        this.vehicleStatus.id = this.selectedItems[index].id!;
-        this.vehicleStatus.status = this.selectedItems[index].status;
-
-        this.serviceModel.updateStatus$(this.vehicleStatus).subscribe();
-
-      }
+      this.modelVehicleStatus = { id: this.selectedItems[index].id! };
+      this.serviceModel.updateStatus$(this.modelVehicleStatus).subscribe((data) => {
+        if (data.status == 200) {
+          this.listaModel();
+        }
+      });
 
     }
 
@@ -207,42 +194,44 @@ export default class ModeloVeiculoComponent implements OnInit {
   }
 
   onSubmit() {
-
-    this.profileForm.patchValue({
-      companyId: sessionStorage.getItem('companyId'),
-      resaleId: sessionStorage.getItem('resaleId')
-    });
-
-    const { valid, value } = this.profileForm;
-
+    const { valid, value } = this.formModel;
     if (valid) {
 
-      if (value.id == '') {
+      if (value.id == null) {
         //Save
 
-        this.serviceModel.addModel$(value).subscribe((data) => {
-
+        this.modelVehicle.companyId = this.user.companyId;
+        this.modelVehicle.resaleId = this.user.resaleId;
+        this.modelVehicle.status = value.status;
+        this.modelVehicle.description = value.description;
+        this.modelVehicle.photo = value.photo;
+        
+        this.serviceModel.addModel$(this.modelVehicle).subscribe((data) => {
           if (data.status == 201) {
-
             this.hideDialog();
-
-            this.vehicleModels$ = this.serviceModel.getAll$();
-
+            this.formModel.reset;
+            this.listaModel();
           }
+
+        }, (error) => {
 
         });
 
       } else {
         //Update
 
-        this.serviceModel.updateModel$(value).subscribe((data) => {
+        this.modelVehicle.companyId = this.user.companyId;
+        this.modelVehicle.resaleId = this.user.resaleId;
+        this.modelVehicle.id = value.id;
+        this.modelVehicle.status = value.status;
+        this.modelVehicle.description = value.description;
+        this.modelVehicle.photo = value.photo;
 
+        this.serviceModel.updateModel$(this.modelVehicle).subscribe((data) => {
           if (data.status == 200) {
-
             this.hideDialog();
-
-            this.vehicleModels$ = this.serviceModel.getAll$();
-
+            this.formModel.reset;
+            this.listaModel();
           }
 
         });

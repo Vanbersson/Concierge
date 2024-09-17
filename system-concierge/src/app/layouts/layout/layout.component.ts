@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, Renderer2, ViewChild } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit, Renderer2, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 
@@ -6,18 +6,20 @@ import { SidebarComponent } from '../sidebar/sidebar/sidebar.component';
 import { TopbarComponent } from '../menu/topbar/topbar.component';
 import { LayoutService } from './service/layout.service';
 import { filter, Subscription } from 'rxjs';
-import LoginComponent from '../../views/login/login.component';
+import { IUser } from '../../interfaces/user/iuser';
 
 
 @Component({
   selector: 'app-layout',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, TopbarComponent, SidebarComponent, LoginComponent],
+  imports: [CommonModule, RouterOutlet, TopbarComponent, SidebarComponent],
   templateUrl: './layout.component.html',
-  styleUrl: './layout.component.scss'
+  styleUrl: './layout.component.scss',
+  providers: []
 })
 export default class LayoutComponent implements OnDestroy {
 
+  user: IUser = null;
 
   overlayMenuOpenSubscription: Subscription;
 
@@ -29,11 +31,7 @@ export default class LayoutComponent implements OnDestroy {
 
   @ViewChild(SidebarComponent) appSidebar!: SidebarComponent;
 
-
   constructor(public layoutService: LayoutService, public renderer: Renderer2, public router: Router) {
-
-    layoutService.isLogin();
-
 
     this.overlayMenuOpenSubscription = this.layoutService.overlayOpen$.subscribe(() => {
 
@@ -75,6 +73,8 @@ export default class LayoutComponent implements OnDestroy {
     })
 
   }
+
+  
 
   hideMenu() {
     this.layoutService.state.overlayMenuActive = false;

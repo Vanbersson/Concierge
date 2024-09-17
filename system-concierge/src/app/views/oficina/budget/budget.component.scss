@@ -1,0 +1,31 @@
+:host{
+    .layout-card-title {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 0.5rem;
+
+        span {
+            display: flex;
+            align-items: center;
+            font-size: 1.25rem;
+            font-weight: 400;
+            color: #64748b;
+            padding-left: 1.5rem;
+        }
+
+        .layourt-button-back {
+            display: flex;
+            align-items: center;
+            height: 29px;
+        }
+
+    }
+
+    /* Small devices (portrait tablets and large phones, 600px and up) */
+    @media only screen and (min-width: 375px) and (max-width: 667px){
+        .mobile-disabled {
+            display: none;
+
+        }
+    }
+}

@@ -1,0 +1,198 @@
+<div class="layout-card">
+
+    <!-- Info -->
+    <p-toast />
+    <div class="layout-card-title">
+        <span>Usuários</span>
+
+        <div class="flex gap-2">
+            <p-button icon="pi pi-plus" label="Usuário" [outlined]="true" (onClick)="showDialogUser()"></p-button>
+            <p-button icon="pi pi-refresh" (onClick)="getUsers()" />
+        </div>
+    </div>
+    <p-table [value]="users">
+        <ng-template pTemplate="header">
+            <tr>
+                <th>Nome</th>
+                <th>Email</th>
+                <th>Cargo</th>
+                <th>Ativo</th>
+                <th>Editar</th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-user>
+            <tr>
+                <td>
+                    @if(user.photo){
+                    <img class="layout-tab-img" [alt]="user.name" src="data:image/png;base64,{{user.photo}}"
+                        style="vertical-align: middle" width="56" height="56" />
+                    }@else {
+                    <p-avatar [label]="firstLetter(user)" size="xlarge" shape="circle"></p-avatar>
+                    }
+                    {{user.name}}
+                </td>
+                <td>{{user.email}}</td>
+                <td>{{user.roleDesc}}</td>
+                <td>
+                    @if(user.status== 'ativo'){
+                    <i class="pi text-green-500 pi-check-circle"></i>
+                    }@else {
+                    <i class="pi text-red-500 pi-times-circle"></i>
+                    }
+                </td>
+                <td>
+                    <button pButton type="button" icon="pi pi-pencil" [text]="true" (click)="editUser(user)"></button>
+                </td>
+
+            </tr>
+        </ng-template>
+    </p-table>
+
+</div>
+
+<p-dialog [(visible)]="visibleDialogUser" [modal]="true" [style]="{ width: '50rem' }"
+    [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }">
+    <form [formGroup]="formUser" (ngSubmit)="save()">
+        <div class="p-fluid p-formgrid grid">
+
+            <div class="field col-12 flex align-items-center justify-content-center ">
+
+                <div class="layout-photo-person mb-5">
+
+                    @if(userPhoto){
+                    <p-image [imageStyle]="{'border-radius':'100%','object-fit':'cover'}"
+                        src="data:image/png;base64,{{userPhoto}}" alt="imagem motorista" height="80" width="80"
+                        [preview]="true" />
+
+                    <button pButton severity="danger" [text]="true" label="Remover" (click)="deletePhoto()"></button>
+                    }@else{
+                    <div class="layout-photo-person-label">
+                        <label for="userPhoto">Foto</label>
+                        <input type="file" id="userPhoto" (change)="selectPhoto($event)"
+                            accept="image/png, image/jpeg" />
+                    </div>
+                    }
+
+                </div>
+
+            </div>
+
+            <div class="field col-12 md:col-2">
+                <label for="nameid">Código</label>
+                <p-inputNumber formControlName="id"></p-inputNumber>
+            </div>
+            <div class="field col-12 md:col-10">
+                <label for="nameid">Nome</label>
+                <input pInputText id="nameid" type="text" formControlName="name" />
+                <small class="p-error block" *ngIf="formUser.get('name')?.invalid && formUser.get('name')?.dirty">
+                    Campo obrigatório</small>
+            </div>
+
+            <div class="field col-12 md:col-6">
+                <label for="emailid">Email</label>
+                <input pInputText id="emailid" type="email" formControlName="email" />
+            </div>
+
+            <div class="field col-12 md:col-4">
+                <label for="cellphoneid">Celular</label>
+                <p-inputMask id="cellphoneid" mask="(99) 9 9999-9999" formControlName="cellphone" unmask="true" />
+            </div>
+            <div class="field col-12 md:col-2">
+                <label for="discountid">Desconto</label>
+                <p-inputNumber suffix="%" formControlName="limitDiscount" />
+            </div>
+
+            <div class="field col-12 md:col-4">
+                <label for="passwordid">Senha</label>
+                <p-password id="passwordid" formControlName="password" [feedback]="false" [toggleMask]="true" />
+                <small class="p-error block"
+                    *ngIf="formUser.get('password')?.invalid && formUser.get('password')?.dirty">
+                    Campo obrigatório</small>
+            </div>
+
+            <div class="field col-12 md:col-4">
+                <label for="passwordvalidid">Repetir senha</label>
+                <p-password id="passwordvalidid" formControlName="passwordValid" [feedback]="false"
+                    [toggleMask]="true" />
+                <small class="p-error block"
+                    *ngIf="formUser.get('passwordValid')?.invalid && formUser.get('passwordValid')?.dirty">
+                    Campo Obrigatório</small>
+            </div>
+
+            <div class="field col-12 md:col-4">
+                <label for="userrole">Cargo</label>
+                <p-multiSelect id="userrole" [options]="roles" optionLabel="description" display="chip"
+                    [selectionLimit]="1" placeholder="Selecione" formControlName="roleDesc" />
+            </div>
+
+            <div class="field col-12 md:col-5 ">
+                <div class="layout-card-status">
+                    <span>Perfil</span>
+                    <div class="flex align-items-center">
+                        <p-radioButton inputId="ADMIN" value="ADMIN" formControlName="roleFunc"></p-radioButton>
+                        <label for="ADMIN" class="ml-2">Administrador</label>
+                    </div>
+
+                    <div class="flex align-items-center">
+                        <p-radioButton inputId="USER" value="USER" formControlName="roleFunc"></p-radioButton>
+                        <label for="USER" class="ml-2">Usuário</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="field col-12 md:col-5">
+                <div class="layout-card-status">
+                    <span>Situação</span>
+                    <div class="flex align-items-center">
+                        <p-radioButton inputId="ativo" value="ativo" formControlName="status"></p-radioButton>
+                        <label for="ativo" class="ml-2">Ativado</label>
+                    </div>
+
+                    <div class="flex align-items-center">
+                        <p-radioButton inputId="inativo" value="inativo" formControlName="status"></p-radioButton>
+                        <label for="inativo" class="ml-2">Desativado</label>
+                    </div>
+                </div>
+            </div>
+            <div class="field col-12 md:col-4">
+                <button pButton type="button" label="Funções" (click)="showDialogFunc()"></button>
+            </div>
+
+
+        </div>
+        <div class="flex justify-content-end gap-2 mt-3">
+            <button pButton type="button" pRipple label="Cancelar" icon="pi pi-times" class="p-button-text"
+                (click)="hideDialogUser()"></button>
+            <button pButton type="submit" pRipple label="Salvar" icon="pi pi-check" class="p-button-text"></button>
+        </div>
+
+    </form>
+</p-dialog>
+
+<p-dialog [(visible)]="visibleDialogFunc" [modal]="true" [style]="{ width: '40rem' }"
+    [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }">
+    <p-table [value]="permissions" [(selection)]="permissionsSelect" dataKey="id" styleClass="p-datatable-sm">
+        <ng-template pTemplate="header">
+            <tr>
+                <th style="width: 4rem"><p-tableHeaderCheckbox /></th>
+                <th>Código</th>
+                <th>Descrição</th>
+            </tr>
+
+        </ng-template>
+        <ng-template pTemplate="body" let-permission>
+            <tr [pSelectableRow]="permission">
+                <td>
+                    <p-tableCheckbox [value]="permission" />
+                </td>
+                <td>{{permission.id}}</td>
+                <td>{{permission.description | uppercase}}</td>
+            </tr>
+        </ng-template>
+
+    </p-table>
+    <div class="flex justify-content-end gap-2 mt-3">
+        <button pButton type="button" pRipple label="Cancelar" icon="pi pi-times" class="p-button-text" (click)="hideDialogFunc()"></button>
+        <button pButton type="button" pRipple label="Salvar" icon="pi pi-check" class="p-button-text" (click)="savePermission()"></button>
+    </div>
+</p-dialog>

@@ -17,13 +17,13 @@ import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 
 //Service
-import { VehicleEntry } from '../../../models/vehicle/vehicleEntry';
+import { VehicleEntry } from '../../../models/vehicle/vehicle-entry';
 import { LayoutService } from '../../../layouts/layout/service/layout.service';
 import { VehicleService } from '../../../services/vehicle/vehicle.service';
 
 //Constants
 import { STATUS_VEHICLE_ENTRY_NOTAUTH, STATUS_VEHICLE_ENTRY_FIRSTAUTH, STATUS_VEHICLE_ENTRY_AUTHORIZED } from '../../../util/constants';
-
+import { StorageService } from '../../../services/storage/storage.service';
 
 @Component({
   selector: 'app-veiculos',
@@ -34,6 +34,7 @@ import { STATUS_VEHICLE_ENTRY_NOTAUTH, STATUS_VEHICLE_ENTRY_FIRSTAUTH, STATUS_VE
   providers: [MessageService]
 })
 export default class VeiculosComponent implements OnInit {
+
 
   notAuth = STATUS_VEHICLE_ENTRY_NOTAUTH;
   firstAuth = STATUS_VEHICLE_ENTRY_FIRSTAUTH;
@@ -58,8 +59,13 @@ export default class VeiculosComponent implements OnInit {
     nameUserExitAuth: new FormControl<string>(''),
   });
 
-  constructor(private vehicleService: VehicleService, public layoutService: LayoutService, private router: Router, private messageService: MessageService) {
-    this.layoutService.isLogin();
+  constructor(
+    private vehicleService: VehicleService,
+    public layoutService: LayoutService,
+    private storageService: StorageService,
+    private router: Router,
+    private messageService: MessageService) {
+    
   }
 
   ngOnInit(): void {
@@ -110,9 +116,6 @@ export default class VeiculosComponent implements OnInit {
           var placa = data[index].placa;
           data[index].placa = placa.substring(0, 3) + "-" + placa.substring(3, 7);
         }
-
-
-
         var nome = data[index].clientCompanyName.split(' ');
         data[index].clientCompanyName = nome[0] + " " + nome[1];
 

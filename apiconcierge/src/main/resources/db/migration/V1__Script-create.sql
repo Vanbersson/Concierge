@@ -1,9 +1,11 @@
  CREATE TABLE tb_address(
  id int not null auto_increment,
+ zip_code varchar(8) not null,
  state varchar(2) not null,
  city varchar(100) not null,
- zip_code varchar(20) not null,
+ neighborhood varchar(100) not null,
  address varchar(100) not null,
+ address_complement varchar(100),
  primary key(id)
  );
 
@@ -21,15 +23,18 @@
     email varchar(100),
     cellphone varchar(11),
     phone varchar(10),
+    zip_code varchar(8) not null,
     state varchar(2) not null,
     city varchar(100) not null,
-    zip_code varchar(20) not null,
+    neighborhood varchar(100) not null,
     address varchar(100) not null,
     address_number varchar(10) not null,
+    address_complement varchar(100),
     PRIMARY KEY(id)
  );
 
  CREATE TABLE tb_resale(
+    company_id int not null,
     id int not null AUTO_INCREMENT,
     status tinyint not null,
     name varchar(255) not null,
@@ -37,12 +42,13 @@
     email varchar(100),
     cellphone varchar(11),
     phone varchar(10),
+    zip_code varchar(8) not null,
     state varchar(2) not null,
     city varchar(100) not null,
-    zip_code varchar(20) not null,
+    neighborhood varchar(100) not null,
     address varchar(100) not null,
     address_number varchar(10) not null,
-    company_id int not null,
+    address_complement varchar(100),
     FOREIGN KEY(company_id) REFERENCES tb_company(id),
     PRIMARY KEY(id)
  );
@@ -64,11 +70,15 @@
      id int not null AUTO_INCREMENT,
      status tinyint not null,
      name varchar(100) not null,
-     email varchar(100) not null,
-     password varchar(8) not null,
+     email varchar(100) not null unique,
+     password varchar(255) not null,
      cellphone varchar(11),
+     limit_discount int,
      role_id int not null,
+     role_desc varchar(100) not null,
+     role_func tinyint not null,
      photo longblob,
+     last_session datetime,
      FOREIGN KEY(company_id) REFERENCES tb_company(id),
      FOREIGN KEY(resale_id) REFERENCES tb_resale(id),
      FOREIGN KEY(role_id) REFERENCES tb_user_role(id),
@@ -93,7 +103,6 @@
      resale_id int not null,
      id int not null AUTO_INCREMENT,
      status tinyint not null,
-     type tinyint not null,
      description varchar(50) not null,
      FOREIGN KEY(company_id) REFERENCES tb_company(id),
      FOREIGN KEY(resale_id) REFERENCES tb_resale(id),
@@ -106,17 +115,27 @@
      id int not null AUTO_INCREMENT,
      status tinyint not null,
      name varchar(255) not null,
+     fantasia varchar(255),
+     clifor tinyint not null,
+     fisjur tinyint not null,
      cnpj varchar(14),
      cpf varchar(11),
      rg varchar(11),
-     email varchar(100),
+     email_home varchar(100),
+     email_work varchar(100),
+     ddd_cellphone varchar(2),
      cellphone varchar(11),
+     ddd_phone varchar(2),
      phone varchar(10),
-     type_id int not null,
-     type tinyint not null,
+     zip_code varchar(8) not null,
+     state varchar(2) not null,
+     city varchar(100) not null,
+     neighborhood varchar(100) not null,
+     address varchar(100) not null,
+     address_number varchar(10) not null,
+     address_complement varchar(100),
      FOREIGN KEY(company_id) REFERENCES tb_company(id),
      FOREIGN KEY(resale_id) REFERENCES tb_resale(id),
-     FOREIGN KEY(type_id) REFERENCES tb_client_company_type(id),
      primary KEY(id)
  );
 
@@ -126,7 +145,7 @@
      id int not null AUTO_INCREMENT,
      status tinyint not null,
      description varchar(100) not null,
-     image longblob,
+     photo longblob,
      PRIMARY KEY(id),
      FOREIGN KEY(company_id) REFERENCES tb_company(id),
      FOREIGN KEY(resale_id) REFERENCES tb_resale(id)
@@ -144,25 +163,26 @@
       primary key(id)
   );
 
-   CREATE TABLE tb_budget_requisition(
-        company_id int not null,
-        resale_id int not null,
-        id binary(16) unique,
-        budget_id int not null,
-        ordem int not null,
-        description varchar(100) not null,
-        FOREIGN KEY(company_id) REFERENCES tb_company(id),
-        FOREIGN KEY(resale_id) REFERENCES tb_resale(id),
-        FOREIGN KEY(budget_id) REFERENCES tb_budget(id),
-        primary key(id)
-    );
+  CREATE TABLE tb_budget_requisition(
+    company_id int not null,
+    resale_id int not null,
+    id binary(16) unique,
+    budget_id int not null,
+    ordem int not null,
+    description varchar(100) not null,
+    FOREIGN KEY(company_id) REFERENCES tb_company(id),
+    FOREIGN KEY(resale_id) REFERENCES tb_resale(id),
+    FOREIGN KEY(budget_id) REFERENCES tb_budget(id),
+    primary key(id)
+  );
 
  CREATE TABLE tb_budget_item(
       company_id int not null,
       resale_id int not null,
-      id int not null AUTO_INCREMENT,
+      id binary(16) unique,
       budget_id int not null,
       status tinyint not null,
+      ordem int not null,
       code_item varchar(20) not null,
       description varchar(100) not null,
       quantity int not null,
@@ -177,9 +197,10 @@
    CREATE TABLE tb_budget_service(
         company_id int not null,
         resale_id int not null,
-        id int not null AUTO_INCREMENT,
+        id binary(16) unique,
         budget_id int not null,
         status tinyint not null,
+        ordem int not null,
         description varchar(100) not null,
         hour_service float not null,
         price float not null,

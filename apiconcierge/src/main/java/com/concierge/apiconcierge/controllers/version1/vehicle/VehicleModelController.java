@@ -5,7 +5,6 @@ import com.concierge.apiconcierge.dtos.vehicle.VehicleModelDto;
 import com.concierge.apiconcierge.models.status.StatusEnableDisable;
 import com.concierge.apiconcierge.models.vehicle.VehicleModel;
 import com.concierge.apiconcierge.repositories.vehicle.VehicleModelIRepository;
-import com.concierge.apiconcierge.repositories.vehicle.VehicleModelRepository;
 import jakarta.validation.Valid;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,75 +13,73 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
-@RequestMapping("/v1/{companyid}/{resaleid}/vehicle/model")
+@RequestMapping("/vehicle/model")
 public class VehicleModelController {
 
     @Autowired
     VehicleModelIRepository vehicleModelIRepository;
 
-    @Autowired
-    VehicleModelRepository modelRepository;
-
-
-    @PostMapping("/add")
-    public ResponseEntity<Object> addModel(@PathVariable(name = "companyid") Integer companyId,
-                                           @PathVariable(name = "resaleid") Integer resaleId,
-                                           @RequestBody @Valid VehicleModelDto data) {
+    @PostMapping("/save")
+    public ResponseEntity<Object> saveModel(@RequestBody @Valid VehicleModelDto data) {
 
         VehicleModel model = new VehicleModel();
         BeanUtils.copyProperties(data, model);
 
-        model.setId(0);
+        this.vehicleModelIRepository.save(model);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(vehicleModelIRepository.save(model));
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @PostMapping("/update")
-    public ResponseEntity updateModel(@RequestBody @Valid VehicleModelDto data) {
+    public ResponseEntity<Object> updateModel(@RequestBody @Valid VehicleModelDto data) {
 
-        VehicleModel model = vehicleModelIRepository.findByCompanyIdAndResaleIdAndId(data.companyId(), data.resaleId(), data.id());
+        Optional<VehicleModel> model0 = this.vehicleModelIRepository.findById(data.id());
 
-        if (model == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        if (model0.isEmpty()) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 
+        VehicleModel model = new VehicleModel();
         BeanUtils.copyProperties(data, model);
 
-        return ResponseEntity.ok(vehicleModelIRepository.save(model));
+        this.vehicleModelIRepository.save(model);
+
+        return ResponseEntity.ok().build();
 
     }
 
     @PostMapping("/update/status")
-    public ResponseEntity updateStatus(@PathVariable(name = "companyid") Integer companyId,
-                                       @PathVariable(name = "resaleid") Integer resaleId,
-                                       @RequestBody @Valid UpdateStatusDto data) {
+    public ResponseEntity<Object> updateStatus(@RequestBody @Valid UpdateStatusDto data) {
 
-        VehicleModel model = vehicleModelIRepository.findByCompanyIdAndResaleIdAndId(data.companyId(), data.resaleId(), data.id());
+        Optional<VehicleModel> model0 = vehicleModelIRepository.findById(data.id());
+        if (model0.isEmpty()) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 
-        if (model == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        VehicleModel model = model0.get();
 
-        model.setStatus(data.status());
+        if(model.getStatus() == StatusEnableDisable.ativo){
+            model.setStatus(StatusEnableDisable.inativo);
+        }else{
+            model.setStatus(StatusEnableDisable.ativo);
+        }
 
-        return ResponseEntity.ok(vehicleModelIRepository.save(model));
+        this.vehicleModelIRepository.save(model);
+
+        return ResponseEntity.ok().build();
 
     }
 
     @GetMapping("/all")
-    public ResponseEntity<List<VehicleModel>> getAll(
-            @PathVariable(name = "companyid") Integer companyId,
-            @PathVariable(name = "resaleid") Integer resaleId) {
-
-        return ResponseEntity.ok(vehicleModelIRepository.findByCompanyIdAndResaleId(companyId, resaleId));
-
+    public ResponseEntity<List<VehicleModel>> getAll() {
+        List<VehicleModel> list = this.vehicleModelIRepository.findAll();
+        return ResponseEntity.ok(list);
     }
 
     @GetMapping("/all/enabled")
-    public ResponseEntity<List<VehicleModel>> allModelsEnabled(
-            @PathVariable(name = "companyid") Integer companyId,
-            @PathVariable(name = "resaleid") Integer resaleId) {
+    public ResponseEntity<List<VehicleModel>> getAllEnabled() {
 
-        // List<VehicleModel> list = modelRepository.listAllEnabled(companyId, resaleId);
-        List<VehicleModel> list = vehicleModelIRepository.findByCompanyIdAndResaleIdAndStatus(companyId, resaleId, StatusEnableDisable.ativo);
+        List<VehicleModel> list = this.vehicleModelIRepository.listAllEnabled();
+
         return ResponseEntity.ok(list);
 
     }

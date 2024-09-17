@@ -36,23 +36,54 @@ public class ClientCompany implements Serializable {
 
     private String name;
 
+    private String fantasia;
+
+    private CliForEnum clifor;
+
+    private FisJurEnum fisjur;
+
     private String cnpj;
 
     private String cpf;
 
     private String rg;
 
-    private String email;
+    @Column(name = "email_home")
+    private String emailHome;
+
+    @Column(name = "email_work")
+    private String emailWork;
+
+    @Column(name = "ddd_cellphone")
+    private String dddCellphone;
 
     private String cellphone;
 
+    @Column(name = "ddd_phone")
+    private String dddPhone;
+
     private String phone;
 
-    @JoinColumn(table = "tb_client_company_type", referencedColumnName = "id")
-    @Column(name = "type_id")
-    private Integer typeId;
+    @Column(name = "zip_code")
+    private String zipCode;
 
-    private ClientCompanyTypeEnum type;
+    private String state;
+
+    private String city;
+
+    private String neighborhood;
+
+    private String address;
+
+    @Column(name = "address_number")
+    private String addressNumber;
+
+    @Column(name = "address_complement")
+    private String addressComplement;
+
+
+
+
 
 
 }

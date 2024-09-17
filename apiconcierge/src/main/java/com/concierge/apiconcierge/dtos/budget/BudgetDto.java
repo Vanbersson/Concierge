@@ -6,12 +6,10 @@ import jakarta.validation.constraints.NotNull;
 import java.util.Date;
 
 public record BudgetDto(
-        @NotNull Integer companyId,
-        @NotNull Integer resaleId,
-        @NotNull Integer vehicleEntryId,
+        Integer companyId,
+        Integer resaleId,
         Integer id,
         StatusBudgetEnum status,
-
         Date dateGeration,
         Date dateAuth) {
 }

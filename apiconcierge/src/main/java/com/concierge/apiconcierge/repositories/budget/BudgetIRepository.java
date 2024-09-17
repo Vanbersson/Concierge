@@ -8,8 +8,4 @@ import java.util.List;
 
 @Repository
 public interface BudgetIRepository extends JpaRepository<Budget, Integer> {
-
-    List<Budget> findByCompanyIdAndResaleId(Integer companyId, Integer resaleId);
-
-    Budget findByCompanyIdAndResaleIdAndId(Integer companyId, Integer resaleId, Integer id);
 }

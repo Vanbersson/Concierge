@@ -1,11 +1,9 @@
 package com.concierge.apiconcierge.controllers.version1;
 
 
-import com.concierge.apiconcierge.dtos.ResaleDto;
 import com.concierge.apiconcierge.dtos.UserRoleDto;
-import com.concierge.apiconcierge.models.resales.Resale;
 import com.concierge.apiconcierge.models.role.UserRole;
-import com.concierge.apiconcierge.repositories.UserRoleRepository;
+import com.concierge.apiconcierge.repositories.UserRoleIRepository;
 import jakarta.validation.Valid;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,14 +15,14 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/v1/{companyid}/{resaleid}/user/role")
+@RequestMapping("/user/role")
 public class UserRoleController {
 
     @Autowired
-    UserRoleRepository userRoleRepository;
+    UserRoleIRepository repository;
 
-    @PostMapping("/add")
-    public ResponseEntity<Object> addRole(@RequestBody @Valid UserRoleDto data) {
+    @PostMapping("/save")
+    public ResponseEntity<Object> saveRole(@RequestBody @Valid UserRoleDto data) {
 
         UserRole role = new UserRole();
 
@@ -32,7 +30,7 @@ public class UserRoleController {
 
         role.setId(0);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(userRoleRepository.save(role));
+        return ResponseEntity.status(HttpStatus.CREATED).body(repository.save(role));
 
     }
 
@@ -42,29 +40,28 @@ public class UserRoleController {
         UserRole role = new UserRole();
         BeanUtils.copyProperties(data, role);
 
-        return ResponseEntity.status(HttpStatus.OK).body(userRoleRepository.save(role));
+        return ResponseEntity.status(HttpStatus.OK).body(repository.save(role));
     }
 
     @GetMapping("/all")
-    public ResponseEntity<List<UserRole>> allRole(
-            @PathVariable(value = "companyid") Integer companyId,
-            @PathVariable(value = "resaleid") Integer resaleId) {
-
-        List<UserRole> roles = userRoleRepository.findByCompanyIdAndResaleId(companyId,resaleId);
-
+    public ResponseEntity<List<UserRole>> allRole() {
+        List<UserRole> roles = repository.findAll();
         return ResponseEntity.ok(roles);
-
     }
 
-    @GetMapping("/filter/code/{code}")
-    public ResponseEntity<UserRole> getCode(
-            @PathVariable(value = "companyid") Integer companyId,
-            @PathVariable(value = "resaleid") Integer resaleId,
-            @PathVariable(value = "code") Integer code) {
-
-        UserRole roles = userRoleRepository.findByCompanyIdAndResaleIdAndId(companyId, resaleId, code);
-
+    @GetMapping("/all/enabled")
+    public ResponseEntity<List<UserRole>> allRoleEnabled() {
+        List<UserRole> roles = repository.listEnabled();
         return ResponseEntity.ok(roles);
+    }
+
+    @GetMapping("/filter/id/{id}")
+    public ResponseEntity<UserRole> getId(@PathVariable(value = "id") Integer id) {
+        Optional<UserRole> userRole = repository.findById(id);
+        if (userRole.isEmpty()) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+
+        UserRole role = userRole.get();
+        return ResponseEntity.status(HttpStatus.OK).body(role);
 
     }
 

@@ -1,11 +1,5 @@
 :host {
 
-    
-    .layout-scrollpanel{
-        width: 100%;
-        height: 600px;
-    }
-
     .layout-input-disabled {
         display: flex;
         font-size: 1rem;
@@ -49,7 +43,7 @@
             height: 29px;
         }
 
-    }    
+    }
 
     .layourt-button-action {
         display: flex;
@@ -57,7 +51,6 @@
         height: 33px;
         padding-left: 2rem;
     }
-
 
     .layout-photo-person {
         display: flex;
@@ -67,12 +60,6 @@
         height: 80px;
         background-color: var(--color-grey-300);
         border-radius: 100%;
-
-        button {
-            width: 100px;
-            padding: 10px 0px;
-            border-radius: 0 0px 8px 8px;
-        }
 
         .layout-photo-person-label {
             display: flex;
@@ -95,15 +82,12 @@
                 display: none;
             }
         }
-
-
     }
 
     ::ng-deep .p-image-preview-container>img {
         width: 80px;
         height: 80px;
     }
-
 
     .layout-file {
         display: flex;
@@ -118,28 +102,11 @@
             height: 80px;
         }
 
-        label {
-            padding: 10px 0px;
-            width: 100px;
-            background-color: #64748b;
-            color: #FFF;
-            text-align: center;
-            display: block;
-            border-radius: 0 0px 8px 8px;
-            border: 1px solid var(--color-grey-300);
-            cursor: pointer;
-        }
-
         button {
             width: 100px;
             padding: 10px 0px;
             border-radius: 0 0px 8px 8px;
         }
-
-        input[type="file"] {
-            display: none;
-        }
-
     }
 
     .layout-card-divid {
@@ -183,17 +150,13 @@
         border: solid 1px var(--color-grey-300);
     }
 
-    .layout-card-border-service {
-        height: 29rem;
-        padding: 1rem;
-        margin-top: 0.5rem;
-        border-radius: 8px;
-        border: solid 1px var(--color-grey-300);
-    }
-
     /* Small devices (portrait tablets and large phones, 600px and up) */
-    @media only screen and (min-width: 375px) and (max-width: 667px) and (orientation: portrait) {
-        
+    @media only screen and (min-width: 375px) and (max-width: 667px) {
+
+        .mobile-disabled {
+            display: none;
+
+        }
 
         .layourt-button-action {
             display: none;
@@ -203,11 +166,11 @@
             display: flex;
             position: absolute !important;
             top: 40vh;
-            left: 90vw;
+            right: 16vw;
         }
 
         ::ng-deep {
-            
+
             .p-image-preview-container>img {
                 width: 68px;
                 height: 68px;

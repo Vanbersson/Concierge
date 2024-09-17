@@ -1,9 +1,11 @@
 package com.concierge.apiconcierge.controllers.version1.clientcompany;
 
 import com.concierge.apiconcierge.dtos.clientcompany.ClientCompanyDto;
+import com.concierge.apiconcierge.dtos.clientcompany.ClientCompanyUpdateDto;
 import com.concierge.apiconcierge.models.clientcompany.ClientCompany;
 import com.concierge.apiconcierge.models.clientcompany.ClientCompanyType;
-import com.concierge.apiconcierge.models.clientcompany.ClientCompanyTypeEnum;
+import com.concierge.apiconcierge.models.clientcompany.CliForEnum;
+import com.concierge.apiconcierge.models.clientcompany.FisJurEnum;
 import com.concierge.apiconcierge.repositories.clientcompany.ClientCompanyIRepository;
 import com.concierge.apiconcierge.repositories.clientcompany.ClientCompanyRepository;
 import com.concierge.apiconcierge.repositories.clientcompany.ClientCompanyTypeRepository;
@@ -15,35 +17,23 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
-@RequestMapping("/v1/{companyid}/{resaleid}/clientCompany")
+@RequestMapping("/clientcompany")
 public class ClientCompanyController {
 
     @Autowired
-    ClientCompanyIRepository clientIRepository;
+    private ClientCompanyIRepository clientIRepository;
 
-    @Autowired
-    ClientCompanyTypeRepository typeRepository;
+    @PostMapping("/save")
+    public ResponseEntity<Object> saveClientCompany(@RequestBody @Valid ClientCompanyDto data) {
 
-    @Autowired
-    ClientCompanyRepository companyRepository;
+        if (data.fisjur() == FisJurEnum.Juridica) {
 
-    @PostMapping("/add")
-    public ResponseEntity<Object> addClientCompany(@PathVariable(name = "companyid") Integer companyId,
-                                                   @PathVariable(name = "resaleid") Integer resaleId,
-                                                   @RequestBody @Valid ClientCompanyDto data) {
+            ClientCompany client0 = this.clientIRepository.findByCnpj(data.cnpj());
 
-        ClientCompanyType type0 = typeRepository.findByCompanyIdAndResaleIdAndId(data.companyId(), data.resaleId(), data.typeId());
-
-        if (type0 == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-
-        if (type0.getType() == ClientCompanyTypeEnum.PJ) {
-
-            ClientCompany client0 = clientIRepository.findByCompanyIdAndResaleIdAndCnpj(data.companyId(), data.resaleId(), data.cnpj());
-
-            if (client0 != null)
-                return ResponseEntity.status(HttpStatus.CONFLICT).body("CNPJ already exists.");
+            if (client0 != null) return ResponseEntity.status(HttpStatus.CONFLICT).body("CNPJ already exists.");
 
             ClientCompany clientCompany = new ClientCompany();
             BeanUtils.copyProperties(data, clientCompany);
@@ -51,28 +41,30 @@ public class ClientCompanyController {
             clientCompany.setCpf("");
             clientCompany.setRg("");
 
-            return ResponseEntity.status(HttpStatus.CREATED).body(clientIRepository.save(clientCompany));
+            this.clientIRepository.save(clientCompany);
+
+            return ResponseEntity.status(HttpStatus.CREATED).build();
 
         }
 
-        if (type0.getType() == ClientCompanyTypeEnum.PF) {
+        if (data.fisjur() == FisJurEnum.Fisica) {
 
-            ClientCompany client0 = clientIRepository.findByCompanyIdAndResaleIdAndCpf(data.companyId(), data.resaleId(), data.cpf());
+            ClientCompany client0 = this.clientIRepository.findByCpf(data.cpf());
 
-            if (client0 != null)
-                return ResponseEntity.status(HttpStatus.CONFLICT).body("CPF already exists.");
+            if (client0 != null) return ResponseEntity.status(HttpStatus.CONFLICT).body("CPF already exists.");
 
-            ClientCompany client1 = clientIRepository.findByCompanyIdAndResaleIdAndRg(data.companyId(), data.resaleId(), data.rg());
+            ClientCompany client1 = clientIRepository.findByRg(data.rg());
 
-            if (client1 != null)
-                return ResponseEntity.status(HttpStatus.CONFLICT).body("RG already exists.");
+            if (client1 != null) return ResponseEntity.status(HttpStatus.CONFLICT).body("RG already exists.");
 
             ClientCompany clientCompany = new ClientCompany();
             BeanUtils.copyProperties(data, clientCompany);
 
             clientCompany.setCnpj("");
 
-            return ResponseEntity.status(HttpStatus.CREATED).body(clientIRepository.save(clientCompany));
+            this.clientIRepository.save(clientCompany);
+
+            return ResponseEntity.status(HttpStatus.CREATED).build();
 
         }
 
@@ -80,79 +72,72 @@ public class ClientCompanyController {
     }
 
     @PostMapping("/update")
-    public ResponseEntity<Object> updateClientCompany(@RequestBody @Valid ClientCompanyDto data) {
-        ClientCompany client = clientIRepository.findByCompanyIdAndResaleIdAndId(data.companyId(), data.resaleId(), data.id());
+    public ResponseEntity<Object> updateClientCompany(@RequestBody @Valid ClientCompanyUpdateDto data) {
+        Optional<ClientCompany> client0 = this.clientIRepository.findById(data.id());
 
-        if (client == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        if (client0.isEmpty()) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 
+        ClientCompany client = client0.get();
         BeanUtils.copyProperties(data, client);
 
-        return ResponseEntity.ok(clientIRepository.save(client));
+        this.clientIRepository.save(client);
+
+        return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/all")
-    public ResponseEntity<List<ClientCompany>> allClientCompany(
-            @PathVariable(name = "companyid") Integer companyId,
-            @PathVariable(name = "resaleid") Integer resaleId) {
+    @GetMapping("/filter/id/{id}")
+    public ResponseEntity<Object> getIdClientCompany(@PathVariable(name = "id") Integer id) {
+        Optional<ClientCompany> company = clientIRepository.findById(id);
+        if (company.isEmpty()) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        return ResponseEntity.ok().body(company);
+    }
 
-        List<ClientCompany> companies = clientIRepository.findByCompanyIdAndResaleId(companyId, resaleId);
 
+    //Juridica
+    @GetMapping("/filter/j/fantasia/{fantasia}")
+    public ResponseEntity<List<ClientCompany>> getJFantasia(@PathVariable(name = "fantasia") String fantasia) {
+        List<ClientCompany> companies = this.clientIRepository.findFantasia(1, fantasia);
         return ResponseEntity.ok(companies);
     }
 
-    @GetMapping("/filter/name/{companyname}")
-    public ResponseEntity<List<ClientCompany>> getListName(
-            @PathVariable(name = "companyname") String name,
-            @PathVariable(name = "companyid") Integer companyId,
-            @PathVariable(name = "resaleid") Integer resaleId) {
-
-        List<ClientCompany> companies = companyRepository.getListName(companyId, resaleId, name);
-
-        return ResponseEntity.ok(companies);
-    }
-
-    @GetMapping("/filter/id/{code}")
-    public ResponseEntity<List<ClientCompany>> getListId(
-            @PathVariable(name = "code") Integer id,
-            @PathVariable(name = "companyid") Integer companyId,
-            @PathVariable(name = "resaleid") Integer resaleId) {
-
-        List<ClientCompany> companies = companyRepository.getListId(companyId, resaleId, id);
-
+    @GetMapping("/filter/j/name/{name}")
+    public ResponseEntity<List<ClientCompany>> getJName(@PathVariable(name = "name") String name) {
+        List<ClientCompany> companies = this.clientIRepository.findName(1, name);
         return ResponseEntity.ok(companies);
     }
 
     @GetMapping("/filter/cnpj/{cnpj}")
-    public ResponseEntity<List<ClientCompany>> getListCnpj(
-            @PathVariable(name = "cnpj") String cnpj,
-            @PathVariable(name = "companyid") Integer companyId,
-            @PathVariable(name = "resaleid") Integer resaleId) {
+    public ResponseEntity<ClientCompany> getCnpj(@PathVariable(name = "cnpj") String cnpj) {
+        ClientCompany company = this.clientIRepository.findByCnpj(cnpj);
+        if (company == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        return ResponseEntity.ok().body(company);
+    }
 
-        List<ClientCompany> companies = companyRepository.getListCnpj(companyId, resaleId, cnpj);
+    //Física
+    @GetMapping("/filter/f/fantasia/{fantasia}")
+    public ResponseEntity<List<ClientCompany>> getFFantasia(@PathVariable(name = "fantasia") String fantasia) {
+        List<ClientCompany> companies = this.clientIRepository.findFantasia(0, fantasia);
+        return ResponseEntity.ok(companies);
+    }
 
+    @GetMapping("/filter/f/name/{name}")
+    public ResponseEntity<List<ClientCompany>> getFName(@PathVariable(name = "name") String name) {
+        List<ClientCompany> companies = this.clientIRepository.findName(0, name);
         return ResponseEntity.ok(companies);
     }
 
     @GetMapping("/filter/cpf/{cpf}")
-    public ResponseEntity<List<ClientCompany>> getListCpf(
-            @PathVariable(name = "cpf") String cpf,
-            @PathVariable(name = "companyid") Integer companyId,
-            @PathVariable(name = "resaleid") Integer resaleId) {
-
-        List<ClientCompany> companies = companyRepository.getListCpf(companyId, resaleId, cpf);
-
-        return ResponseEntity.ok(companies);
+    public ResponseEntity<ClientCompany> getCpf(@PathVariable(name = "cpf") String cpf) {
+        ClientCompany company = this.clientIRepository.findByCpf(cpf);
+        if (company == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        return ResponseEntity.ok().body(company);
     }
 
     @GetMapping("/filter/rg/{rg}")
-    public ResponseEntity<List<ClientCompany>> getListRg(
-            @PathVariable(name = "rg") String rg,
-            @PathVariable(name = "companyid") Integer companyId,
-            @PathVariable(name = "resaleid") Integer resaleId) {
-
-        List<ClientCompany> companies = companyRepository.getListRg(companyId, resaleId, rg);
-
-        return ResponseEntity.ok(companies);
+    public ResponseEntity<ClientCompany> getRg(@PathVariable(name = "cnpj") String cnpj) {
+        ClientCompany company = this.clientIRepository.findByCnpj(cnpj);
+        if (company == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        return ResponseEntity.ok().body(company);
     }
 
 }

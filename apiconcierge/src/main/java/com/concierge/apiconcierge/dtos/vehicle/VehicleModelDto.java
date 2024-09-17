@@ -9,5 +9,5 @@ public record VehicleModelDto(
         Integer id,
         StatusEnableDisable status,
         String description,
-        byte[] image) {
+        byte[] photo) {
 }

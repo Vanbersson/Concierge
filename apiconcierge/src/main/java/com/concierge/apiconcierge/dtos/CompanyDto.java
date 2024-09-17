@@ -8,21 +8,15 @@ public record CompanyDto(
         StatusEnableDisable status,
         String name,
         String cnpj,
-
         String email,
-
         String cellphone,
-
         String phone,
-
-        String state,
-
-        String city,
-
         String zipCode,
-
+        String state,
+        String city,
+        String neighborhood,
         String address,
-
-        String addressNumber
+        String addressNumber,
+        String addressComplement
 ) {
 }

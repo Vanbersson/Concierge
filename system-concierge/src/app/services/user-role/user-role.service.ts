@@ -1,33 +1,34 @@
 import { Injectable } from '@angular/core';
-import { environment } from '../../../environments/environment.development';
+import { environment } from '../../../environments/environment';
 import { Observable } from 'rxjs';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { IUserRole } from '../../interfaces/iuser-role';
-import { LayoutService } from '../../layouts/layout/service/layout.service';
+import { HttpClient, HttpHeaders, HttpResponse } from '@angular/common/http';
+import { StorageService } from '../storage/storage.service';
+import { UserRole } from '../../models/user-role/user-role';
+
+
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserRoleService {
-  private companyId = this.layoutService.loginUser.companyId;
-  private resaleId = this.layoutService.loginUser.resaleId;
-  private token = localStorage.getItem('token');
 
-  private urlBaseV1 = environment.URLBASE_V1;
+  constructor(private http: HttpClient, private storage: StorageService) { }
 
-
-  private httpOptions = new HttpHeaders({
-    'Content-Type': 'application/json',
-    'Authorization': 'Bearer ' + this.token
-  });
-
-  constructor(private http: HttpClient, private layoutService: LayoutService) { }
-
-  getAll$(): Observable<any> {
-    return this.http.get<IUserRole>(this.urlBaseV1 + this.companyId + "/" + this.resaleId + "/user/role/all");
+  getAll$(): Observable<UserRole[]> {
+    return this.http.get<UserRole[]>(environment.apiuUrl + "/user/role/all", { headers: this.myHeaders() });
+  }
+  getAllEnabled$(): Observable<UserRole[]> {
+    return this.http.get<UserRole[]>(environment.apiuUrl + "/user/role/all/enabled", { headers: this.myHeaders() });
+  }
+  getFilterId$(id: number): Observable<HttpResponse<UserRole>> {
+    return this.http.get<UserRole>(environment.apiuUrl + "/user/role/filter/code/" + id, { headers: this.myHeaders(), observe: 'response' });
   }
 
-  getfilterId$(id: number): Observable<any> {
-    return this.http.get<IUserRole>(this.urlBaseV1 + this.companyId + "/" + this.resaleId + "/user/role/filter/code/" + id, { headers: this.httpOptions, observe: 'response' });
+  private myHeaders(): HttpHeaders {
+    const httpOptions = new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + this.storage.token,
+    });
+    return httpOptions;
   }
 }

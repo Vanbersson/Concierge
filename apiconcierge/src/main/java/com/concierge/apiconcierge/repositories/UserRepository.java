@@ -9,14 +9,8 @@ import java.util.List;
 @Repository
 public interface UserRepository extends JpaRepository<User, Integer> {
 
-    User findByCompanyIdAndResaleIdAndId(Integer companyId,Integer resaleId,Integer id);
 
-
-  List<User> findByCompanyIdAndResaleId(Integer companyId,Integer resaleId);
-
-    List<User> findByCompanyIdAndResaleIdAndRole(Integer companyId,Integer resaleId,Integer role);
-
-    User findByResaleIdAndId(Integer resaleId, Integer id);
+    List<User> findByRoleId(Integer roleId);
 
     User findByEmail(String email);
 

@@ -1,37 +1,54 @@
 import { Injectable } from '@angular/core';
-import { environment } from '../../../environments/environment.development';
+import { environment } from '../../../environments/environment';
 import { Observable } from 'rxjs';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { IUser } from '../../interfaces/iuser';
-import { LayoutService } from '../../layouts/layout/service/layout.service';
+import { HttpClient, HttpHeaders, HttpResponse } from '@angular/common/http';
+import { StorageService } from '../storage/storage.service';
+import { User } from '../../models/user/user';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
-  private companyId = this.layoutService.loginUser.companyId;
-  private resaleId = this.layoutService.loginUser.resaleId;
-  private token = localStorage.getItem('token');
 
-  private urlBaseV1 = environment.URLBASE_V1;
+  constructor(private http: HttpClient, private storage: StorageService) { }
 
-
-  private httpOptions = new HttpHeaders({
-    'Content-Type': 'application/json',
-    'Authorization': 'Bearer ' + this.token
-  });
-
-  constructor(private http: HttpClient, private layoutService: LayoutService) { }
-
-  getAll$(): Observable<any> {
-    return this.http.get<IUser>(this.urlBaseV1 + this.companyId + "/" + this.resaleId + "/user/all");
+  saveUser(user: User): Observable<HttpResponse<User>> {
+    return this.http.post<User>(environment.apiuUrl + "/user/add", user, { headers: this.myHeaders(), observe: 'response' });
   }
 
-  getConsultores$(): Observable<any> {
-    return this.http.get<IUser>(this.urlBaseV1 + this.companyId + "/" + this.resaleId + "/user/role/2");
+  updateUser(user: User): Observable<HttpResponse<User>> {
+    return this.http.post<User>(environment.apiuUrl + "/user/update", user, { headers: this.myHeaders(), observe: 'response' });
   }
 
-  updateUser(data: any): Observable<any> {
-    return this.http.post<IUser>(this.urlBaseV1 + this.companyId + "/" + this.resaleId + "/user/update", data, { headers: this.httpOptions, observe: 'response', });
+  getAll$(): Observable<User[]> {
+    return this.http.get<User[]>(environment.apiuUrl + "/user/all", { headers: this.myHeaders() });
   }
+
+  getUser$(): Observable<User> {
+    return this.http.get<User>(environment.apiuUrl + "/user/filter/token", { headers: this.myHeaders(), responseType: "json" });
+  }
+
+  getUserFilterId(id: number): Observable<HttpResponse<User>> {
+    return this.http.get<User>(environment.apiuUrl + "/user/filter/id/" + id, { headers: this.myHeaders(), observe: 'response', responseType: "json" });
+  }
+
+  getUserFilterEmail$(email: string): Observable<HttpResponse<User>> {
+    return this.http.get<User>(environment.apiuUrl + "/user/filter/email/" + email, { headers: this.myHeaders(), observe: 'response', responseType: "json" });
+  }
+
+  getUserFilterRoleId$(roleId: number): Observable<User[]> {
+    return this.http.get<User[]>(environment.apiuUrl + "/user/filter/roleid/" + roleId, { headers: this.myHeaders() });
+  }
+
+
+
+  private myHeaders(): HttpHeaders {
+    const httpOptions = new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + this.storage.token,
+    });
+    return httpOptions;
+  }
+
+
 }

@@ -4,6 +4,8 @@ import com.concierge.apiconcierge.models.budget.enums.StatusBudgetItemEnum;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.UUID;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -24,14 +26,16 @@ public class BudgetItem {
     private Integer resaleId;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     @JoinColumn(table = "tb_budget", referencedColumnName = "id")
     @Column(name = "budget_id")
     private Integer budgetId;
 
     private StatusBudgetItemEnum status;
+
+    private Integer ordem;
 
     @Column(name = "code_item")
     private String code;

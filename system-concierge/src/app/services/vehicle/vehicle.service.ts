@@ -1,54 +1,60 @@
 import { Injectable } from '@angular/core';
-import { environment } from '../../../environments/environment.development';
+import { environment } from '../../../environments/environment';
 import { Observable } from 'rxjs';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { IVehicleEntry } from '../../interfaces/vehicle/iVehicleEntry';
-import { LayoutService } from '../../layouts/layout/service/layout.service';
+import { HttpClient, HttpHeaders, HttpResponse } from '@angular/common/http';
+import { StorageService } from '../storage/storage.service';
+
+//class
+import { VehicleEntry } from '../../models/vehicle/vehicle-entry';
 
 @Injectable({
   providedIn: 'root'
 })
 export class VehicleService {
 
-  private companyId = this.layoutService.loginUser.companyId;
-  private resaleId = this.layoutService.loginUser.resaleId;
-  private token = localStorage.getItem('token');
-  private httpOptions = new HttpHeaders({
-    'Content-Type': 'application/json',
-    'Authorization': 'Bearer ' + this.token
-  });
+  constructor(private http: HttpClient, private storage: StorageService) { }
 
-  private urlBaseV1 = environment.URLBASE_V1;
-
-
-  constructor(private http: HttpClient, private layoutService: LayoutService,) { }
-
-  entrySave$(vehicle: any): Observable<any> {
-    return this.http.post(this.urlBaseV1 + this.companyId + "/" + this.resaleId + "/vehicleEntry/save", vehicle, { headers: this.httpOptions, observe: 'response', responseType: 'text' });
+  entrySave$(vehicle: VehicleEntry): Observable<HttpResponse<VehicleEntry>> {
+    return this.http.post<VehicleEntry>(environment.apiuUrl + "/vehicle/entry/save", vehicle, { headers: this.myHeaders(), observe: 'response' });
   }
 
-  entryUpdate$(vehicle: any): Observable<any> {
-    return this.http.post(this.urlBaseV1 + this.companyId + "/" + this.resaleId + "/vehicleEntry/update", vehicle, { headers: this.httpOptions, observe: 'response', responseType: 'json' });
+  entryUpdate$(vehicle: VehicleEntry): Observable<HttpResponse<VehicleEntry>> {
+    return this.http.post<VehicleEntry>(environment.apiuUrl + "/vehicle/entry/update", vehicle, { headers: this.myHeaders(), observe: 'response' });
   }
 
-  entryList$(): Observable<any> {
-    return this.http.get<IVehicleEntry>(this.urlBaseV1 + this.companyId + "/" + this.resaleId + "/vehicleEntry/listEntry", { headers: this.httpOptions });
+  entryList$(): Observable<VehicleEntry[]> {
+    return this.http.get<VehicleEntry[]>(environment.apiuUrl + "/vehicle/entry/all", { headers: this.myHeaders() });
   }
 
-  entryFilterId(id: number) {
-    return this.http.get<IVehicleEntry>(this.urlBaseV1 + this.companyId + "/" + this.resaleId + "/vehicleEntry/filter/id/" + id, { headers: this.httpOptions });
+  entryFilterId$(id: number): Observable<HttpResponse<VehicleEntry>> {
+    return this.http.get<VehicleEntry>(environment.apiuUrl + "/vehicle/entry/filter/id/" + id, { headers: this.myHeaders(), observe: 'response' });
   }
 
+  entryFilterPlaca$(placa: string): Observable<HttpResponse<VehicleEntry>> {
+    return this.http.get<VehicleEntry>(environment.apiuUrl + "/vehicle/entry/filter/placa/" + placa, { headers: this.myHeaders(), observe: 'response' });
+  }
+
+
+
+  /* Falta */
   entryAddAuth(auth: any) {
-    return this.http.post(this.urlBaseV1 + this.companyId + "/" + this.resaleId + "/vehicleEntry/add/authorization", auth, { headers: this.httpOptions, observe: 'response', responseType: 'text' });
+    return this.http.post(environment.apiuUrl + "/vehicleEntry/add/authorization", auth, { headers: this.myHeaders(), observe: 'response', responseType: 'text' });
   }
 
   entryDeleteAuth1(auth: any) {
-    return this.http.post(this.urlBaseV1 + this.companyId + "/" + this.resaleId + "/vehicleEntry/delete/authorization1", auth, { headers: this.httpOptions, observe: 'response', responseType: 'text' });
+    return this.http.post(environment.apiuUrl + "/vehicleEntry/delete/authorization1", auth, { headers: this.myHeaders(), observe: 'response', responseType: 'text' });
   }
 
   entryDeleteAuth2(auth: any) {
-    return this.http.post(this.urlBaseV1 + this.companyId + "/" + this.resaleId + "/vehicleEntry/delete/authorization2", auth, { headers: this.httpOptions, observe: 'response', responseType: 'text' });
+    return this.http.post(environment.apiuUrl + "/vehicleEntry/delete/authorization2", auth, { headers: this.myHeaders(), observe: 'response', responseType: 'text' });
+  }
+
+  private myHeaders(): HttpHeaders {
+    const httpOptions = new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + this.storage.token,
+    });
+    return httpOptions;
   }
 
 

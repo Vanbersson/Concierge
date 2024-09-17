@@ -2,6 +2,7 @@ package com.concierge.apiconcierge.controllers.version1.budget;
 
 
 import com.concierge.apiconcierge.dtos.budget.BudgetDto;
+import com.concierge.apiconcierge.dtos.budget.BudgetNewDto;
 import com.concierge.apiconcierge.models.budget.Budget;
 import com.concierge.apiconcierge.models.budget.enums.StatusBudgetEnum;
 import com.concierge.apiconcierge.models.vehicle.VehicleEntry;
@@ -19,49 +20,40 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Date;
+import java.util.Optional;
 
 @RestController
-@RequestMapping("/v1/{companyid}/{resaleid}/budget")
+@RequestMapping("/vehicle/entry/budget")
 public class BudgetController {
-
 
     @Autowired
     private BudgetIRepository budgetIRepository;
-
     @Autowired
-    VehicleEntryIRepository vehicleEntryIRepository;
+    private VehicleEntryIRepository vehicleEntryIRepository;
 
-    @PostMapping("/add")
-    public ResponseEntity<Budget> addBudget(@RequestBody @Valid BudgetDto data) {
+    @PostMapping("/save")
+    public ResponseEntity<Object> saveBudget(@RequestBody @Valid BudgetNewDto data) {
 
-        VehicleEntry vehicle = vehicleEntryIRepository.findByCompanyIdAndResaleIdAndId(data.companyId(), data.resaleId(), data.vehicleEntryId());
+        Optional<VehicleEntry> vehicle = this.vehicleEntryIRepository.findById(data.vehicleEntryId());
 
-        if(vehicle.getBudgetId() != null){
+        VehicleEntry vehicleEntry = vehicle.get();
+        if (vehicleEntry.getBudgetId() != null) {
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
 
         Budget budget = new Budget();
-        BeanUtils.copyProperties(data, budget);
-
+        budget.setCompanyId(vehicleEntry.getCompanyId());
+        budget.setResaleId(vehicleEntry.getResaleId());
         budget.setStatus(StatusBudgetEnum.naoEnviado);
         budget.setDateGeration(new Date());
+        Budget resultBudget = this.budgetIRepository.save(budget);
 
-        Budget result = budgetIRepository.save(budget);
+        //alterar o status do orçamento na entrada de veículo
+        vehicleEntry.setBudgetId(resultBudget.getId());
+        vehicleEntry.setBudgetStatus(budget.getStatus());
+        this.vehicleEntryIRepository.save(vehicleEntry);
 
-        //alterar o statu do orçamento na entrada de veículo
-        saveBudgetVehicleEntry(result, data.vehicleEntryId());
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(result);
+        return ResponseEntity.status(HttpStatus.CREATED).body(resultBudget);
     }
 
-    private void saveBudgetVehicleEntry(Budget budget, Integer id) {
-
-        VehicleEntry v = vehicleEntryIRepository.findByCompanyIdAndResaleIdAndId(budget.getCompanyId(), budget.getResaleId(), id);
-
-        v.setBudgetId(budget.getId());
-        v.setBudgetStatus(budget.getStatus());
-
-        vehicleEntryIRepository.save(v);
-
-    }
 }

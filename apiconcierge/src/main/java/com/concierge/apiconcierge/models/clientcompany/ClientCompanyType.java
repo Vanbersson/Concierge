@@ -33,8 +33,6 @@ public class ClientCompanyType implements Serializable {
 
     private StatusEnableDisable status;
 
-    private ClientCompanyTypeEnum type;
-
     private String description;
 
 }

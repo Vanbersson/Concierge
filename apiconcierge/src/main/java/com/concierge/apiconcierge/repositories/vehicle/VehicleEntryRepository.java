@@ -21,7 +21,7 @@ public class VehicleEntryRepository {
     @PersistenceContext
     private EntityManager entityManager;
 
-    public List<VehicleEntry> getListEntry(Integer companyId, Integer resaleId) {
+    public List<VehicleEntry> listEntry() {
 
         String query = "select " +
                 "v.companyId, " +
@@ -65,8 +65,8 @@ public class VehicleEntryRepository {
 
         TypedQuery<Object[]> typedQuery = entityManager.createQuery(query, Object[].class);
 
-        typedQuery.setParameter("companyId", companyId);
-        typedQuery.setParameter("resaleId", resaleId);
+        typedQuery.setParameter("companyId", 1);
+        typedQuery.setParameter("resaleId", 1);
 
         List<VehicleEntry> list = new ArrayList<>();
 

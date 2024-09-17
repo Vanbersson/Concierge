@@ -5,11 +5,9 @@
         <p-button icon="pi pi-plus" (click)="showDialog()" label="Adicionar" [outlined]="true"></p-button>
     </div>
 
-    <p-dialog header="Modelo" [(visible)]="dialogVisible" [style]="{width: '450px'}" >
+    <p-dialog header="Modelo" [(visible)]="dialogVisible" [style]="{width: '450px'}">
+        <form [formGroup]="formModel" (ngSubmit)="onSubmit()">
 
-
-        <form [formGroup]="profileForm" (ngSubmit)="onSubmit()">
-            
             <div class="p-fluid p-formgrid grid">
 
                 <div class="mt-5 layout-dialog-img">
@@ -21,9 +19,12 @@
                     <input pInputText id="descricao" formControlName="description" />
                 </div>
 
-                <div class="field col-12 layout-dialog-file">
+                <div class="field col-10 layout-dialog-file">
                     <label for="file">Selecionar imagem</label>
                     <input type="file" id="file" (change)="onSelectFile($event)" accept="image/png" />
+                </div>
+                <div class="field col-2 flex align-items-center">
+                    <button type="button" pButton icon="pi pi-trash" severity="danger" (click)="deleteFile()"></button>
                 </div>
 
                 <div class="field col-12 layout-card-status">
@@ -42,19 +43,17 @@
                 </div>
 
             </div>
-            
+
             <div class="flex justify-content-end gap-2 mt-3">
                 <button pButton type="button" pRipple label="Cancelar" icon="pi pi-times" class="p-button-text"
                     (click)=" hideDialog()"></button>
-                <button pButton type="submit" pRipple label="Salvar" icon="pi pi-check"
-                    class="p-button-text"></button>
+                <button pButton type="submit" pRipple label="Salvar" icon="pi pi-check" class="p-button-text"></button>
             </div>
 
         </form>
-
     </p-dialog>
 
-    <p-table [value]="vehicleModels$ | async" [(selection)]="selectedItems" [tableStyle]="{'min-width': '50rem'}">
+    <p-table [value]="modelVehicles" [(selection)]="selectedItems" [tableStyle]="{'min-width': '50rem'}">
         <ng-template pTemplate="header">
             <tr>
                 <th>Sel.</th>
@@ -123,12 +122,12 @@
                 <td> <p-tag [value]="modelo.status | titlecase" [severity]="getSeverity(modelo.status)"></p-tag> </td>
                 <td>{{modelo.description}}</td>
                 <td>
-                    @if (modelo.image) {
-                        <img class="layout-tab-img" src="data:image/png;base64,{{modelo.image}}" alt="Vehicle Model" width="50" height="50"
-                        loading="lazy">
+                    @if (modelo.photo) {
+                    <img class="layout-tab-img" src="data:image/png;base64,{{modelo.photo}}" alt="Vehicle Model"
+                        width="50" height="50" loading="lazy">
                     }@else {
-                    <img class="layout-tab-img" ngSrc="assets/layout/images/picture.png" alt="Vehicle Model" width="50" height="50"
-                        loading="lazy">
+                    <img class="layout-tab-img" ngSrc="assets/layout/images/picture.png" alt="Vehicle Model" width="50"
+                        height="50" loading="lazy">
                     }
 
                 </td>

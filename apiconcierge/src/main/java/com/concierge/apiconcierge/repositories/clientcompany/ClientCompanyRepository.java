@@ -1,12 +1,11 @@
 package com.concierge.apiconcierge.repositories.clientcompany;
 
 import com.concierge.apiconcierge.models.clientcompany.ClientCompany;
-import com.concierge.apiconcierge.models.clientcompany.ClientCompanyTypeEnum;
+import com.concierge.apiconcierge.models.clientcompany.CliForEnum;
 import com.concierge.apiconcierge.models.status.StatusEnableDisable;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
@@ -18,7 +17,7 @@ public class ClientCompanyRepository {
     @PersistenceContext
     private EntityManager entityManager;
 
-
+/*
 
     public List<ClientCompany> getListId(Integer companyId, Integer resaleId, Integer id) {
 
@@ -60,11 +59,10 @@ public class ClientCompanyRepository {
             clientCompany.setCnpj((String) row[5]);
             clientCompany.setCpf((String) row[6]);
             clientCompany.setRg((String) row[7]);
-            clientCompany.setEmail((String) row[8]);
+
             clientCompany.setCellphone((String) row[9]);
             clientCompany.setPhone((String) row[10]);
-            clientCompany.setTypeId((Integer) row[11]);
-            clientCompany.setType((ClientCompanyTypeEnum) row[12]);
+
 
             list.add(clientCompany);
 
@@ -117,7 +115,7 @@ public class ClientCompanyRepository {
             clientCompany.setCellphone((String) row[9]);
             clientCompany.setPhone((String) row[10]);
             clientCompany.setTypeId((Integer) row[11]);
-            clientCompany.setType((ClientCompanyTypeEnum) row[12]);
+            clientCompany.setType((CliForEnum) row[12]);
 
             list.add(clientCompany);
 
@@ -170,7 +168,7 @@ public class ClientCompanyRepository {
             clientCompany.setCellphone((String) row[9]);
             clientCompany.setPhone((String) row[10]);
             clientCompany.setTypeId((Integer) row[11]);
-            clientCompany.setType((ClientCompanyTypeEnum) row[12]);
+            clientCompany.setType((CliForEnum) row[12]);
 
             list.add(clientCompany);
 
@@ -223,7 +221,7 @@ public class ClientCompanyRepository {
             clientCompany.setCellphone((String) row[9]);
             clientCompany.setPhone((String) row[10]);
             clientCompany.setTypeId((Integer) row[11]);
-            clientCompany.setType((ClientCompanyTypeEnum) row[12]);
+            clientCompany.setType((CliForEnum) row[12]);
 
             list.add(clientCompany);
 
@@ -276,13 +274,13 @@ public class ClientCompanyRepository {
             clientCompany.setCellphone((String) row[9]);
             clientCompany.setPhone((String) row[10]);
             clientCompany.setTypeId((Integer) row[11]);
-            clientCompany.setType((ClientCompanyTypeEnum) row[12]);
+            clientCompany.setType((CliForEnum) row[12]);
 
             list.add(clientCompany);
 
         }
 
         return list;
-    }
+    }*/
 
 }

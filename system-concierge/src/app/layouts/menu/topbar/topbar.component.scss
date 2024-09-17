@@ -1,5 +1,14 @@
 :host {
 
+    .layout-input-disabled {
+        display: flex;
+        font-size: 1rem;
+        padding: 0.75rem;
+        border-radius: 6px;
+        border: 1px solid var(--color-grey-300);
+
+    }
+
     .layout-sidebar-header {
         display: flex;
         flex-direction: column;
@@ -162,8 +171,5 @@
 
         }
     }
-
-    /* Small devices (portrait tablets and large phones, 600px and up) */
-    @media only screen and (min-width: 375px) and (max-width: 667px) and (orientation: portrait) {}
 
 }

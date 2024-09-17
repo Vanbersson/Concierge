@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, Validators, FormGroup, FormControl } from '@angular/forms';
+import { ReactiveFormsModule, Validators, FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
 
 
@@ -13,7 +13,12 @@ import { ButtonModule } from 'primeng/button';
 import { MessageService } from 'primeng/api';
 import { AuthService } from '../../services/login/auth.service';
 import { LayoutService } from '../../layouts/layout/service/layout.service';
-import { IUser } from '../../interfaces/iuser';
+import { IUser } from '../../interfaces/user/iuser';
+import { StorageService } from '../../services/storage/storage.service';
+
+
+//Interface
+import { IAuth } from '../../interfaces/auth/iauth';
 
 
 @Component({
@@ -24,57 +29,73 @@ import { IUser } from '../../interfaces/iuser';
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss'
 })
-export default class LoginComponent {
+export default class LoginComponent implements OnInit {
 
   user: IUser = null;
+  login: IAuth;
+  token: string = "";
 
-  loginForm = new FormGroup({
-    email: new FormControl('vambersson@gmail.com', [Validators.required, Validators.email]),
-    password: new FormControl('12345', [Validators.required, Validators.maxLength(8)]),
+
+  loginForm = this._fb.group<IAuth>({
+    email: 'vambersson@gmail.com',
+    password: 'VjslM@1236!',
   });
 
   constructor(
     private auth: AuthService,
     private messageService: MessageService,
+    private _fb: FormBuilder,
     private router: Router,
-    public layoutService: LayoutService) {
+    public layoutService: LayoutService, private storageService: StorageService) {
 
+
+  }
+  ngOnInit(): void {
+    this.addValidation();
+  }
+
+  addValidation() {
+    this.loginForm.controls["email"].addValidators([Validators.email, Validators.required]);
+    this.loginForm.controls["email"].updateValueAndValidity();
+
+    this.loginForm.controls["password"].addValidators([Validators.minLength(8)]);
+    this.loginForm.controls["password"].updateValueAndValidity();
   }
 
   onSubmit() {
 
+    //Senha Administrador
+    //VjslM@1236!
     const { valid, value } = this.loginForm;
 
     if (valid) {
+      this.login = { email: value.email, password: value.password };
 
-      this.auth.login(value).subscribe((data) => {
+      this.auth.login(this.login).subscribe(
+        (data) => {
+          
+          this.storageService.photo = data.body.photo;
+          this.storageService.name = data.body.name;
+          this.storageService.roleDesc = data.body.roleDesc;
+          this.storageService.token = data.body.token;
 
-        if (data.status == 200) {
           this.showSuccess(data.body.name);
-
-          this.user = data.body;
-
-          this.layoutService.login(this.user);
 
           setTimeout(() => {
             this.router.navigateByUrl('/dashboard');
           }, 2000);
 
+        }, (error) => {
+          this.showError();
         }
-
-      }, (error) => {
-
-        this.showError();
-
-      });
-
+      );
 
     }
 
   }
 
   showSuccess(nome: string) {
-    this.messageService.add({ severity: 'success', summary: 'Bem-vindo', detail: nome, icon: 'pi pi-lock-open' });
+    this.messageService.add({ severity: 'success', summary: 'Bem-vindo', detail: nome, icon: 'pi pi-lock-open', life: 3000 });
   }
 
   showError() {

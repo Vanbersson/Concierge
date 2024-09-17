@@ -1,49 +1,68 @@
 import { Injectable } from '@angular/core';
-import { environment } from '../../../environments/environment.development';
-import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../environments/environment';
+import { HttpClient, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { IClientCompany } from '../../interfaces/iclient-company';
+import { StorageService } from '../storage/storage.service';
+import { ClientCompany } from '../../models/clientcompany/client-company';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ClientecompanyService {
 
-  private urlBaseV1 = "http://10.0.0.20:9000/api/v1/fatclient/filter";
+  //private urlBaseV1 = "http://10.0.0.20:9000/api/v1/fatclient/filter";
 
-  constructor(private http: HttpClient) { }
 
-  getId$(id: Number): Observable<any> {
-    return this.http.get<IClientCompany>(this.urlBaseV1 + "/code/" + id);
+
+  constructor(private http: HttpClient, private storage: StorageService) { }
+
+  save(id: Number): Observable<HttpResponse<ClientCompany>> {
+    return this.http.get<ClientCompany>(environment.apiuUrl + "/clientcompany/save/" + id, { headers: this.myHeaders(), observe: 'response' });
+  }
+  update(id: Number): Observable<HttpResponse<ClientCompany>> {
+    return this.http.get<ClientCompany>(environment.apiuUrl + "/clientcompany/update/" + id, { headers: this.myHeaders(), observe: 'response' });
   }
 
-  getFantasiaJ$(name: string): Observable<any> {
-    return this.http.get<IClientCompany>(this.urlBaseV1 + "/j/fantasia/" + name);
+  getId$(id: Number): Observable<HttpResponse<ClientCompany>> {
+    return this.http.get<ClientCompany>(environment.apiuUrl + "/clientcompany/filter/id/" + id, { headers: this.myHeaders(), observe: 'response',responseType: 'json' });
   }
 
-  getFantasiaF$(name: string): Observable<any> {
-    return this.http.get<IClientCompany>(this.urlBaseV1 + "/f/fantasia/" + name);
+  getFantasiaJ$(name: string): Observable<ClientCompany[]> {
+    return this.http.get<ClientCompany[]>(environment.apiuUrl + "/clientcompany/filter/j/fantasia/" + name, { headers: this.myHeaders(), responseType: 'json' });
   }
 
-  getNameJ$(name: string): Observable<any> {
-    return this.http.get<IClientCompany>(this.urlBaseV1 + "/j/name/" + name);
-  }
-  getNameF$(name: string): Observable<any> {
-    return this.http.get<IClientCompany>(this.urlBaseV1 + "/f/name/" + name);
+  getFantasiaF$(name: string): Observable<ClientCompany[]> {
+    return this.http.get<ClientCompany[]>(environment.apiuUrl + "/clientcompany/filter/f/fantasia/" + name, { headers: this.myHeaders(), responseType: 'json' });
   }
 
-  getCnpj$(cnpj: string): Observable<any> {
-    return this.http.get<IClientCompany>(this.urlBaseV1 + "/cnpj/" + cnpj);
+  getNameJ$(name: string): Observable<ClientCompany[]> {
+    return this.http.get<ClientCompany[]>(environment.apiuUrl + "/clientcompany/filter/j/name/" + name, { headers: this.myHeaders(), responseType: 'json' });
+  }
+  getNameF$(name: string): Observable<ClientCompany[]> {
+    return this.http.get<ClientCompany[]>(environment.apiuUrl + "/clientcompany/filter/f/name/" + name, { headers: this.myHeaders(), responseType: 'json' });
   }
 
-  getCpf$(cpf: string): Observable<any> {
-    return this.http.get<IClientCompany>(this.urlBaseV1 + "/cpf/" + cpf);
+  getCnpj$(cnpj: string): Observable<HttpResponse<ClientCompany>> {
+    return this.http.get<ClientCompany>(environment.apiuUrl + "/clientcompany/filter/cnpj/" + cnpj, { headers: this.myHeaders(),observe: 'response', responseType: 'json' });
   }
 
-  getRg$(rg: string): Observable<any> {
-    return this.http.get<IClientCompany>(this.urlBaseV1 + "/rg/" + rg);
+  getCpf$(cpf: string): Observable<HttpResponse<ClientCompany>> {
+    return this.http.get<ClientCompany>(environment.apiuUrl + "/clientcompany/filter/cpf/" + cpf, { headers: this.myHeaders(),observe: 'response', responseType: 'json' });
   }
-  getTipo$(tipo: string): Observable<any> {
-    return this.http.get<IClientCompany>(this.urlBaseV1 + "/tipo/" + tipo);
+
+  getRg$(rg: string): Observable<HttpResponse<ClientCompany>> {
+    return this.http.get<ClientCompany>(environment.apiuUrl + "/clientcompany/filter/rg/" + rg, { headers: this.myHeaders(),observe: 'response', responseType: 'json' });
+  }
+  getTipo$(tipo: string): Observable<ClientCompany[]> {
+    return this.http.get<ClientCompany[]>(environment.apiuUrl + "/clientcompany/filter/tipo/" + tipo, { headers: this.myHeaders(), responseType: 'json' });
+  }
+
+
+  private myHeaders(): HttpHeaders {
+    const httpOptions = new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + this.storage.token,
+    });
+    return httpOptions;
   }
 }

@@ -1,7 +1,5 @@
 <div class="layout-card">
-
     <p-toast />
-
     <div class="layout-card-title">
         <span>Veículos</span>
 
@@ -9,8 +7,6 @@
             <p-button icon="pi pi-plus" label="Atendimento" [outlined]="true" (onClick)="novoAtendimento()"></p-button>
             <p-button icon="pi pi-refresh" (onClick)="listVehicles()" />
         </div>
-
-
     </div>
 
     <p-table #dt1 [value]="listVehicleEntry" [(selection)]="selectedItems" (selectionChange)="onSelectionChange($event)"
@@ -129,24 +125,22 @@
 
                 </td>
                 <td>{{ vehicle.frota }}</td>
-                <td>{{ vehicle.modelDescription }}</td>
+                <td>{{ vehicle.modelDescription | uppercase }}</td>
                 <td>{{ vehicle.dateEntry | date: 'dd/MM/yyyy HH:mm' }}</td>
 
                 @if(vehicle.nameUserAttendant == null){
                 <td><p-tag value="FALTA" severity="danger"></p-tag></td>
 
                 }@else {
-                <td>{{ vehicle.nameUserAttendant }}</td>
+                <td>{{ vehicle.nameUserAttendant | uppercase }}</td>
                 }
 
                 @if(vehicle.clientCompanyName =="NÃO CADASTRADO"){
                     <td> <p-tag [value]="vehicle.clientCompanyName | uppercase" severity="danger"></p-tag> </td>
                 }@else {
-                    <td>{{ vehicle.clientCompanyName }}</td>
+                    <td>{{ vehicle.clientCompanyName | uppercase }}</td>
                 }
                 
-
-
                 <td><p-tag [value]="vehicle.budgetStatus" [severity]="getSeverity(vehicle.budgetStatus)"></p-tag></td>
 
                 <td class="text-center">

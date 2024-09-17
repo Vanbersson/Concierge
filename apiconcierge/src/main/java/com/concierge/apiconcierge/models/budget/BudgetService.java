@@ -1,10 +1,13 @@
 package com.concierge.apiconcierge.models.budget;
 
+import com.concierge.apiconcierge.models.budget.enums.StatusBudgetItemEnum;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.UUID;
 
 
 @Getter
@@ -26,12 +29,16 @@ public class BudgetService {
     private Integer resaleId;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     @JoinColumn(table = "tb_budget", referencedColumnName = "id")
     @Column(name = "budget_id")
     private Integer budgetId;
+
+    private StatusBudgetItemEnum status;
+
+    private Integer ordem;
 
     private String description;
 

@@ -7,6 +7,9 @@ import { ButtonModule } from 'primeng/button';
 import { CalendarModule } from 'primeng/calendar';
 import { LayoutService } from '../../layouts/layout/service/layout.service';
 import { Router } from '@angular/router';
+import { StorageService } from '../../services/storage/storage.service';
+import { ValidToken } from '../../services/login/validtoken';
+
 
 @Component({
   selector: 'app-dashboard',
@@ -16,16 +19,12 @@ import { Router } from '@angular/router';
   styleUrl: './dashboard.component.scss',
   providers: []
 })
-export default class DashboardComponent implements OnInit {
+export default class DashboardComponent {
 
 
-  constructor(public layoutService: LayoutService, private router: Router) {
-    this.layoutService.isLogin();
+  constructor(public layoutService: LayoutService, private router: Router, private storageService: StorageService, private valid: ValidToken) {
   }
 
-  ngOnInit(): void {
-    
-  }
 
 
 }
