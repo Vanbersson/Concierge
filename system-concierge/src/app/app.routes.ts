@@ -63,6 +63,12 @@ export const routes: Routes = [
                 path: 'configuracao',
                 children: [
                     {
+                        path: 'empresa',
+                        title: 'Empresa',
+                        loadComponent: () => import('./views/settings/company/company.component')
+
+                    },
+                    {
                         path: 'usuario',
                         title: 'Usuário',
                         loadComponent: () => import('./views/settings/user/user.component')

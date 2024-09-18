@@ -166,7 +166,8 @@ export class SidebarComponent implements OnInit {
           {
             key:'99_0',
             label:'Empresa',
-            icon:'pi pi-building'
+            icon:'pi pi-building',
+            routerLink:'configuracao/empresa'
           },
           {
             key:'99_1',

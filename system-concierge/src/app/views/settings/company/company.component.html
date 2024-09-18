@@ -1,1 +1,105 @@
-<p>company works!</p>
+<div class="layout-card">
+    <!-- Info -->
+    <p-toast />
+    <div class="layout-card-title">
+        <span>Empresa/Revenda</span>
+    </div>
+
+    <p-tabView>
+        <p-tabPanel header="Empresa">
+            <div class="card">
+                <form [formGroup]="formCompany">
+                    <div class="p-fluid p-formgrid grid">
+                        <div class="col-12 md:col-6">
+                            <div class="p-fluid p-formgrid grid">
+                                <div class="field col-12 md:col-2">
+                                    <label for="companyId">Código</label>
+                                    <p-inputNumber id="companyId" formControlName="id"></p-inputNumber>
+                                </div>
+                                <div class="field col-12 md:col-10">
+                                    <label for="companyName">Razão Social</label>
+                                    <input pInputText id="companyName" type="text" formControlName="name"/>
+                                </div>
+                                <div class="field col-12 md:col-6">
+                                    <label for="companyCnpj">CNPJ</label>
+                                    <p-inputMask id="companyCnpj" mask="99.999.999/9999-99" [unmask]="true" formControlName="cnpj"></p-inputMask>
+                                </div>
+    
+                                <div class="field col-12 md:col-6">
+                                    <label for="companyEmail">Email</label>
+                                    <input pInputText id="companyEmail" type="email" formControlName="email"/>
+                                </div>
+                                <div class="field col-12 md:col-4">
+                                    <label for="companyPhone">Telefone</label>
+                                    <p-inputMask id="companyPhone" mask="(99) 9999-9999" [unmask]="true" formControlName="phone"></p-inputMask>
+                                </div>
+    
+                                <div class="field col-12 md:col-4">
+                                    <label for="companyCellphone">Celular</label>
+                                    <p-inputMask id="companyCellphone" mask="(99) 9 9999-9999"
+                                        [unmask]="true" formControlName="cellphone"></p-inputMask>
+                                </div>
+                                <div class="md:col-4">
+    
+                                </div>
+    
+                                <div class="field col-12 md:col-3">
+                                    <label for="companyZipCode">CEP</label>
+                                    <p-inputMask id="companyZipCode" mask="99999-999" [unmask]="true" formControlName="zipCode"></p-inputMask>
+                                </div>
+    
+                                <div class="field col-12 md:col-7">
+                                    <label for="companyName">Endereço</label>
+                                    <input pInputText id="companyName" type="text" formControlName="address"/>
+                                </div>
+                                <div class="field col-12 md:col-2">
+                                    <label for="companyName">Nº</label>
+                                    <input pInputText id="companyName" type="text" formControlName="addressNumber" />
+                                </div>
+                                <div class="field col-12 md:col-2">
+                                    <label for="companyUf">UF</label>
+                                    <input pInputText id="companyUf" type="text" formControlName="state"/>
+                                </div>
+                                <div class="field col-12 md:col-10">
+                                    <label for="companyName">Cidade</label>
+                                    <input pInputText id="companyName" type="text" formControlName="city"/>
+                                </div>
+                                <div class="field col-12 md:col-6">
+                                    <label for="companyName">Bairro</label>
+                                    <input pInputText id="companyName" type="text" formControlName="neighborhood"/>
+                                </div>
+                                <div class="field col-12 md:col-6">
+                                    <label for="companyName">Complemento</label>
+                                    <input pInputText id="companyName" type="text" formControlName="addressComplement"/>
+                                </div>
+    
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                
+            </div>
+        </p-tabPanel>
+        <p-tabPanel header="Revendas">
+            <div class="m-2">
+                <button pButton label="Revenda" [outlined]="true" icon="pi pi-plus"></button>
+            </div>
+            <p-table>
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th>Código</th>
+                        <th>CNPJ</th>
+                        <th>Razão Social</th>
+                        <th>Ativo</th>
+                        <th>Editar</th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-resale></ng-template>
+            </p-table>
+
+        </p-tabPanel>
+    </p-tabView>
+
+
+
+</div>
