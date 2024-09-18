@@ -17,6 +17,8 @@ import { CompanyService } from '../../../services/company/company.service';
 
 //Class
 import { Company } from '../../../models/company/Company';
+import { Resale } from '../../../models/resale/resale';
+import { ResaleService } from '../../../services/resale/resale.service';
 
 
 @Component({
@@ -30,6 +32,8 @@ import { Company } from '../../../models/company/Company';
 export default class CompanyComponent {
 
   private company: Company;
+
+  resales: Resale[] = [];
 
   formCompany = new FormGroup({
     id: new FormControl<number | null>(null),
@@ -48,11 +52,10 @@ export default class CompanyComponent {
     addressComplement: new FormControl<string>(''),
   });
 
-
-  constructor(private companyService: CompanyService, private messageService: MessageService) {
+  constructor(private companyService: CompanyService, private resaleService: ResaleService, private messageService: MessageService) {
     this.getCompanies();
+    this.getResales();
   }
-
 
   private getCompanies() {
     this.companyService.getCompanyFilterId$(1).subscribe(data => {
@@ -61,8 +64,13 @@ export default class CompanyComponent {
     });
   }
 
-  private loadingForm() {
+  private getResales() {
+    this.resaleService.getFilterCompany(1).subscribe(data => {
+      this.resales = data;
+    });
+  }
 
+  private loadingForm() {
     this.formCompany.patchValue({
       id: this.company.id,
       name: this.company.name,

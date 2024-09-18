@@ -23,7 +23,9 @@ VALUES
 INSERT INTO `tb_resale`
 (`company_id`,`status`, `name`, `cnpj`, `email`, `cellphone`, `phone`,  `zip_code`, `state`, `city`, `neighborhood`, `address`, `address_number`)
 VALUES
-(1,0,'Nativa Máquinas e Implementos Ltda','08274520000102','ti@nativarossi.com.br','','8135211030','54590000', 'PE','Cabo de Santo Agostinho','Distrito DIPER','Via pedro rossi','382');
+(1,0,'Nativa Máquinas e Implementos Ltda','08274520000102','ti@nativarossi.com.br','','8135211030','54590000', 'PE','Cabo de Santo Agostinho','Distrito DIPER','Via pedro rossi','382'),
+(1,1,'Nativa Máquinas Peças','06274520000202','ti@nativarossi.com.br','','8135211030','54590000', 'PB','Cabo de Santo Agostinho','Distrito DIPER','Via pedro rossi','382'),
+(1,1,'Nativa Máquinas Serviços','04274520000303','ti@nativarossi.com.br','','8135211030','54590000', 'AL','Cabo de Santo Agostinho','Distrito DIPER','Via pedro rossi','382');
 
 INSERT INTO `tb_user_role`
 (`company_id`, `resale_id`, `status`, `description`)

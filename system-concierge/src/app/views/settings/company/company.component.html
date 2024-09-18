@@ -18,39 +18,42 @@
                                 </div>
                                 <div class="field col-12 md:col-10">
                                     <label for="companyName">Razão Social</label>
-                                    <input pInputText id="companyName" type="text" formControlName="name"/>
+                                    <input pInputText id="companyName" type="text" formControlName="name" />
                                 </div>
                                 <div class="field col-12 md:col-6">
                                     <label for="companyCnpj">CNPJ</label>
-                                    <p-inputMask id="companyCnpj" mask="99.999.999/9999-99" [unmask]="true" formControlName="cnpj"></p-inputMask>
+                                    <p-inputMask id="companyCnpj" mask="99.999.999/9999-99" [unmask]="true"
+                                        formControlName="cnpj"></p-inputMask>
                                 </div>
-    
+
                                 <div class="field col-12 md:col-6">
                                     <label for="companyEmail">Email</label>
-                                    <input pInputText id="companyEmail" type="email" formControlName="email"/>
+                                    <input pInputText id="companyEmail" type="email" formControlName="email" />
                                 </div>
                                 <div class="field col-12 md:col-4">
                                     <label for="companyPhone">Telefone</label>
-                                    <p-inputMask id="companyPhone" mask="(99) 9999-9999" [unmask]="true" formControlName="phone"></p-inputMask>
+                                    <p-inputMask id="companyPhone" mask="(99) 9999-9999" [unmask]="true"
+                                        formControlName="phone"></p-inputMask>
                                 </div>
-    
+
                                 <div class="field col-12 md:col-4">
                                     <label for="companyCellphone">Celular</label>
-                                    <p-inputMask id="companyCellphone" mask="(99) 9 9999-9999"
-                                        [unmask]="true" formControlName="cellphone"></p-inputMask>
+                                    <p-inputMask id="companyCellphone" mask="(99) 9 9999-9999" [unmask]="true"
+                                        formControlName="cellphone"></p-inputMask>
                                 </div>
                                 <div class="md:col-4">
-    
+
                                 </div>
-    
+
                                 <div class="field col-12 md:col-3">
                                     <label for="companyZipCode">CEP</label>
-                                    <p-inputMask id="companyZipCode" mask="99999-999" [unmask]="true" formControlName="zipCode"></p-inputMask>
+                                    <p-inputMask id="companyZipCode" mask="99999-999" [unmask]="true"
+                                        formControlName="zipCode"></p-inputMask>
                                 </div>
-    
+
                                 <div class="field col-12 md:col-7">
                                     <label for="companyName">Endereço</label>
-                                    <input pInputText id="companyName" type="text" formControlName="address"/>
+                                    <input pInputText id="companyName" type="text" formControlName="address" />
                                 </div>
                                 <div class="field col-12 md:col-2">
                                     <label for="companyName">Nº</label>
@@ -58,43 +61,60 @@
                                 </div>
                                 <div class="field col-12 md:col-2">
                                     <label for="companyUf">UF</label>
-                                    <input pInputText id="companyUf" type="text" formControlName="state"/>
+                                    <input pInputText id="companyUf" type="text" formControlName="state" />
                                 </div>
                                 <div class="field col-12 md:col-10">
                                     <label for="companyName">Cidade</label>
-                                    <input pInputText id="companyName" type="text" formControlName="city"/>
+                                    <input pInputText id="companyName" type="text" formControlName="city" />
                                 </div>
                                 <div class="field col-12 md:col-6">
                                     <label for="companyName">Bairro</label>
-                                    <input pInputText id="companyName" type="text" formControlName="neighborhood"/>
+                                    <input pInputText id="companyName" type="text" formControlName="neighborhood" />
                                 </div>
                                 <div class="field col-12 md:col-6">
                                     <label for="companyName">Complemento</label>
-                                    <input pInputText id="companyName" type="text" formControlName="addressComplement"/>
+                                    <input pInputText id="companyName" type="text"
+                                        formControlName="addressComplement" />
                                 </div>
-    
+
                             </div>
                         </div>
                     </div>
                 </form>
-                
+
             </div>
         </p-tabPanel>
         <p-tabPanel header="Revendas">
             <div class="m-2">
                 <button pButton label="Revenda" [outlined]="true" icon="pi pi-plus"></button>
             </div>
-            <p-table>
+            <p-table [value]="resales">
                 <ng-template pTemplate="header">
                     <tr>
+                        <th>Ativo</th>
                         <th>Código</th>
+                        <th>Estado</th>
                         <th>CNPJ</th>
                         <th>Razão Social</th>
-                        <th>Ativo</th>
                         <th>Editar</th>
                     </tr>
                 </ng-template>
-                <ng-template pTemplate="body" let-resale></ng-template>
+                <ng-template pTemplate="body" let-resale>
+                    <tr>
+                        <td>
+                            <i class="pi pi-circle-fill"
+                                [ngClass]="{ 'text-green-500': resale.status == 'ativo', 'text-red-500': resale.status == 'inativo' }"></i>
+                        </td>
+                        <td>{{resale.id}}</td>
+                        <td>{{resale.state | uppercase}}</td>
+                        <td>{{resale.cnpj}}</td>
+                        <td>{{resale.name | uppercase}}</td>
+                        
+                        <td>
+                            <button pButton [text]="true" icon="pi pi-pencil"></button>
+                        </td>
+                    </tr>
+                </ng-template>
             </p-table>
 
         </p-tabPanel>

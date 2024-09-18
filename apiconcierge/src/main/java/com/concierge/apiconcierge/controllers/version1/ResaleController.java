@@ -21,19 +21,13 @@ import java.util.Optional;
 public class ResaleController {
 
     @Autowired
-    ResaleRepository resaleRepository;
+    private ResaleRepository resaleRepository;
 
-    @Autowired
-    CompanyRepository companyRepository;
-
-    @PostMapping("/add")
-    public ResponseEntity<Object> addResale(@RequestBody @Valid ResaleDto data) {
+    @PostMapping("/save")
+    public ResponseEntity<Object> saveResale(@RequestBody @Valid ResaleDto data) {
 
         //Validation
         if (data.cnpj().length() != 14) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-
-        //Validation
-        if (!validCompany(data.companyId())) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 
         Resale resale0 = resaleRepository.findByCompanyIdAndCnpj(data.companyId(), data.cnpj());
         //Validation
@@ -49,9 +43,6 @@ public class ResaleController {
     @PostMapping("/update")
     public ResponseEntity<Object> updateResale(@PathVariable(value = "companyId") Integer companyId, @RequestBody @Valid ResaleDto data) {
 
-        //Validation
-        if (!validCompany(companyId)) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-
         Resale resale = resaleRepository.findByCompanyIdAndId(companyId, data.id());
         //Validation
         if (companyId != data.companyId()) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
@@ -63,29 +54,22 @@ public class ResaleController {
         return ResponseEntity.status(HttpStatus.OK).body(resaleRepository.save(resale));
     }
 
-    @GetMapping("/all/company/{id}")
-    public ResponseEntity<List<Resale>> allResale(@PathVariable(value = "id") Integer companyId) {
-
+    @GetMapping("/filter/company/{company}")
+    public ResponseEntity<List<Resale>> getFilterCompany(@PathVariable(value = "company") Integer companyId) {
         List<Resale> resales = resaleRepository.findByCompanyId(companyId);
-
-        if (resales.isEmpty()) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-
         return ResponseEntity.ok(resales);
-
     }
 
-    @GetMapping("/cnpj/{cnpj}")
+    @GetMapping("/filter/cnpj/{cnpj}")
     public ResponseEntity<Object> cnpjResale(@PathVariable(value = "cnpj") String cnpj) {
 
         Resale resale0 = resaleRepository.findByCnpj(cnpj);
-
         if (resale0 == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-
         return ResponseEntity.ok(resale0);
 
     }
 
-    @GetMapping("/id/{id}")
+    @GetMapping("/filter/id/{id}")
     public ResponseEntity<Object> idResale(@PathVariable(value = "id") Integer id) {
         Optional<Resale> resale0 = resaleRepository.findById(id);
 
@@ -93,12 +77,6 @@ public class ResaleController {
 
         return ResponseEntity.ok(resale0);
 
-    }
-
-    private Boolean validCompany(Integer companyId) {
-        var company = companyRepository.findById(companyId);
-
-        return company.isPresent();
     }
 
 

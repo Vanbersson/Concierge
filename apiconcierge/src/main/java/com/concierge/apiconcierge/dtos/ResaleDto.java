@@ -5,20 +5,20 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 public record ResaleDto(
-        @NotBlank Integer companyId,
+        @NotNull Integer companyId,
         Integer id,
-        StatusEnableDisable status,
-        String name,
-        String cnpj,
+        @NotNull StatusEnableDisable status,
+        @NotBlank String name,
+        @NotBlank String cnpj,
         String email,
         String cellphone,
         String phone,
-        String zipCode,
-        String state,
-        String city,
-        String neighborhood,
-        String address,
-        String addressNumber,
+        @NotBlank String zipCode,
+        @NotBlank String state,
+        @NotBlank String city,
+        @NotBlank String neighborhood,
+        @NotBlank String address,
+        @NotBlank String addressNumber,
         String addressComplement
 ) {
 }
