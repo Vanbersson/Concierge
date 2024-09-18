@@ -18,18 +18,19 @@ import java.util.Optional;
 public class CompanyController {
 
     @Autowired
-    CompanyRepository companyRepository;
+    private CompanyRepository companyRepository;
 
-    @PostMapping("/add")
-    public ResponseEntity<Object> addCompany(@RequestBody @Valid CompanyDto data) {
+    @PostMapping("/save")
+    public ResponseEntity<Object> saveCompany(@RequestBody @Valid CompanyDto data) {
         Company company0 = companyRepository.findByCnpj(data.cnpj());
 
         if (company0 != null) return ResponseEntity.status(HttpStatus.CONFLICT).body("Company already exists.");
 
         Company company = new Company();
         BeanUtils.copyProperties(data, company);
+        this.companyRepository.save(company);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(companyRepository.save(company));
+        return ResponseEntity.status(HttpStatus.CREATED).build();
 
     }
 
@@ -42,39 +43,30 @@ public class CompanyController {
         Company company = new Company();
         BeanUtils.copyProperties(data, company);
 
-        return ResponseEntity.status(HttpStatus.OK).body(companyRepository.save(company));
+        this.companyRepository.save(company);
+
+        return ResponseEntity.status(HttpStatus.OK).build();
 
     }
 
     @GetMapping("/all")
     public ResponseEntity<List<Company>> allCompany() {
-
-        List<Company> companies = companyRepository.findAll();
-
-        if (companies.isEmpty()) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-
+        List<Company> companies = this.companyRepository.findAll();
         return ResponseEntity.ok(companies);
-
     }
 
-    @GetMapping("/cnpj/{cnpj}")
+    @GetMapping("/filter/cnpj/{cnpj}")
     public ResponseEntity<Object> cnpjCompany(@PathVariable(value = "cnpj") String cnpj) {
         Company company0 = companyRepository.findByCnpj(cnpj);
-
         if (company0 == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-
         return ResponseEntity.ok(company0);
-
     }
 
-    @GetMapping("/id/{id}")
+    @GetMapping("/filter/id/{id}")
     public ResponseEntity<Object> idCompany(@PathVariable(value = "id") Integer id) {
         Optional<Company> company0 = companyRepository.findById(id);
-
         if (company0.isEmpty()) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-
         return ResponseEntity.ok(company0);
-
     }
 
 
