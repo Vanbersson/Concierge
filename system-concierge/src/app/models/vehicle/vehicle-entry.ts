@@ -18,11 +18,11 @@ export class VehicleEntry implements IVehicleEntry {
     idUserAttendant: number | null = null;
     nameUserAttendant: string = '';
 
-    idUserExitAuth1: number = 0;
+    idUserExitAuth1: number | null = null;
     nameUserExitAuth1: string = '';
     dateExitAuth1: Date | null = null;
 
-    idUserExitAuth2: number = 0;
+    idUserExitAuth2: number | null = null;
     nameUserExitAuth2: string = '';
     dateExitAuth2: Date | null = null;
 

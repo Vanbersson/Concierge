@@ -4,9 +4,9 @@
     <div class="layout-card-title">
         <span>Atendimento de veículos</span>
         <div class="layout-button-alert">
-            @if (arrayFormAtendimento.length > 0) {
-            <p-badge [value]="arrayFormAtendimento.length" severity="warning"></p-badge>
-            <p-button icon="pi pi-truck" [rounded]="true" severity="secondary" [outlined]="true" [text]="true"
+            @if (listVehicleEntry.length > 0) {
+             <p-badge [value]="listVehicleEntry.length" severity="warning"></p-badge> 
+            <p-button icon="pi pi-truck" [rounded]="true" severity="warning" [outlined]="true" [text]="true"
                 size="large" (onClick)="showDialogVehicle()" />
             }
         </div>
@@ -31,42 +31,34 @@
                         <p>
                             Por favor selecione a empresa em que esse veículo pertence
                         </p>
-
                         <div class="p-fluid p-formgrid grid">
-
                             <div class="field col-12 md:col-1">
                                 <label for="clientCompanyId">Codígo</label>
                                 <p-inputNumber inputId="clientCompanyId" [useGrouping]="false"
                                     formControlName="clientCompanyId" />
-
                             </div>
-
                             <div class="md:col-11"></div>
-
                             <div class="field col-12 md:col-6">
                                 <label for="clientCompanyName">Empresa</label>
                                 <p-inputGroup>
                                     <input pInputText id="clientCompanyName" type="text"
-                                        formControlName="clientCompanyName" required />
+                                        formControlName="clientCompanyName" [style]="{'text-transform':'uppercase'}" />
                                     <button pButton type="button" icon="pi pi-search" class="p-button-warning"
                                         (click)="showDialogFilterClientCompany()"></button>
                                 </p-inputGroup>
 
                             </div>
                             <div class="md:col-6"></div>
-
                             <div class="field col-12 md:col-2">
                                 <label for="clientCompanyCnpj">CNPJ</label>
                                 <p-inputMask id="clientCompanyCnpj" mask="99.999.999/9999-99"
                                     formControlName="clientCompanyCnpj" />
                             </div>
-
                             <div class="field col-12 md:col-2">
                                 <label for="clientCompanyCpf">CPF</label>
                                 <p-inputMask id="clientCompanyCpf" mask="999.999.999-99"
                                     formControlName="clientCompanyCpf" />
                             </div>
-
                             <div class="field col-12 md:col-2">
                                 <label for="clientCompanyRg">RG</label>
                                 <p-inputNumber inputId="clientCompanyRg" [useGrouping]="false"
@@ -120,8 +112,8 @@
                                         (click)="deleteEntryPhotoDriver()"></button>
                                     }@else{
                                     <div class="layout-photo-person-label">
-                                        <button pButton type="button" label="Foto" [rounded]="true" [text]="true" size="small"
-                                            (click)="photoPersonDriver()"></button>
+                                        <button pButton type="button" label="Foto" [rounded]="true" [text]="true"
+                                            size="small" (click)="photoPersonDriver()"></button>
                                     </div>
                                     }
 
@@ -221,13 +213,13 @@
                         <span>Vamos informar agora os dados do veículo</span>
                         <div class="p-fluid p-formgrid grid">
 
-                            <div class="field col-12 md:col-2">
+                            <div class="field col-12 md:col-1">
                                 <label for="placa">Placa</label>
                                 <p-inputMask id="placa" mask="***-****" [unmask]="true"
                                     [style]="{'text-transform':'uppercase'}" formControlName="placa" />
                             </div>
 
-                            <div class="field col-12 md:col-2">
+                            <div class="field col-12 md:col-1">
                                 <label for="frota">Frota</label>
                                 <input pInputText id="frota" type="text" [style]="{'text-transform':'uppercase'}"
                                     formControlName="frota">
@@ -251,6 +243,11 @@
                                 <p-calendar [iconDisplay]="'input'" [showIcon]="true" [showTime]="true"
                                     dateFormat="dd/mm/yy" inputId="datePrevisionExit"
                                     formControlName="datePrevisionExit" />
+                            </div>
+                            <div class="field col-12 md:col-2">
+                                <label for="vehiclecolorid">Cor</label>
+                                <p-multiSelect id="vehiclecolorid" [options]="cores" optionLabel="color" display="chip"
+                                    [selectionLimit]="1" placeholder="Selecione" formControlName="color" />
                             </div>
 
                             <div class="field col-12 md:col-2">
@@ -305,7 +302,7 @@
                                     <button pButton icon="pi pi-trash" severity="danger"
                                         (click)="deleteFileVehicle1()"></button>
                                     }@else {
-                                        <button pButton type="button" label="Foto Arquivo" severity="secondary"
+                                    <button pButton type="button" label="Foto Arquivo" severity="secondary"
                                         (click)="photoFile1Vehicle()"></button>
                                     }
 
@@ -324,7 +321,7 @@
                                     <button pButton icon="pi pi-trash" severity="danger"
                                         (click)="deleteFileVehicle2()"></button>
                                     }@else {
-                                        <button pButton type="button" label="Foto Arquivo" severity="secondary"
+                                    <button pButton type="button" label="Foto Arquivo" severity="secondary"
                                         (click)="photoFile2Vehicle()"></button>
                                     }
 
@@ -343,7 +340,7 @@
                                     <button pButton icon="pi pi-trash" severity="danger"
                                         (click)="deleteFileVehicle3()"></button>
                                     }@else {
-                                        <button pButton type="button" label="Foto Arquivo" severity="secondary"
+                                    <button pButton type="button" label="Foto Arquivo" severity="secondary"
                                         (click)="photoFile3Vehicle()"></button>
                                     }
 
@@ -362,7 +359,7 @@
                                     <button pButton icon="pi pi-trash" severity="danger"
                                         (click)="deleteFileVehicle4()"></button>
                                     }@else {
-                                        <button pButton type="button" label="Foto Arquivo" severity="secondary"
+                                    <button pButton type="button" label="Foto Arquivo" severity="secondary"
                                         (click)="photoFile4Vehicle()"></button>
                                     }
 
@@ -425,7 +422,7 @@
                     <button pButton (click)="prevCallback.emit()" label="Voltar" severity="secondary"
                         icon="pi pi-arrow-left"></button>
                     <button pButton icon="pi pi-plus" label="Adcionar " [outlined]="true"
-                        (click)="addVehicle()"></button>
+                        (click)="addVehicleEntry()"></button>
                 </div>
             </ng-template>
 
@@ -435,8 +432,7 @@
 
 <!-- Dialog Veículos -->
 <p-dialog header="Veículos" [(visible)]="dialogVehicleVisible" [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }">
-
-    <p-table [value]="arrayFormAtendimento">
+    <p-table [value]="listVehicleEntry">
 
         <ng-template pTemplate="header">
             <tr>
@@ -452,26 +448,24 @@
             <tr>
                 <td>
                     @if (vehicle.vehicleNew == "yes") {
-                    <p-tag [value]="'novo' | uppercase" severity="danger"></p-tag>
+                    <p-tag value="NOVO" severity="danger"></p-tag>
                     }@else{
                     <p-tag [value]="vehicle.placa | uppercase" severity="info"></p-tag>
                     }
-
                 </td>
-
-                <td>{{vehicle.frota}}</td>
-                <td>{{vehicle.modelDescription}}</td>
+                <td>{{vehicle.frota | uppercase}}</td>
+                <td>{{vehicle.modelDescription | uppercase}}</td>
 
                 @if(vehicle.nameUserAttendant == null){
                 <td><p-tag value="FALTA" severity="danger"></p-tag></td>
                 }@else {
-                <td>{{vehicle.nameUserAttendant}}</td>
+                <td>{{vehicle.nameUserAttendant | uppercase}}</td>
                 }
 
-                <td>{{vehicle.clientCompanyName}}</td>
+                <td>{{vehicle.clientCompanyName | uppercase}}</td>
                 <td>
                     <button pButton [rounded]="true" icon="pi pi-trash" severity="danger"
-                        (click)="removerVehicle(index)"></button>
+                        (click)="deleteVehicleEntry(index)"></button>
                 </td>
             </tr>
 
@@ -479,11 +473,10 @@
 
 
     </p-table>
-
     <div class="flex justify-content-end mt-3">
 
         <button pButton type="submit" pRipple label="Finalizar" icon="pi pi-check" class="p-button-text"
-            (click)="saveVehicle()"></button>
+            (click)="saveVehicleEntry()"></button>
     </div>
 </p-dialog>
 

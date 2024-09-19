@@ -42,6 +42,10 @@ import { IModelVehicle } from '../../../interfaces/vehicle-model/imodel-vehicle'
 import { User } from '../../../models/user/user';
 import { ClientCompany } from '../../../models/clientcompany/client-company';
 import { error } from 'console';
+import { VehicleEntry } from '../../../models/vehicle/vehicle-entry';
+import { IColor } from '../../../interfaces/icolor';
+import { HttpResponse } from '@angular/common/http';
+import { Observable } from 'rxjs';
 
 
 @Component({
@@ -54,6 +58,7 @@ import { error } from 'console';
 })
 export default class AtendimentoComponent {
   private user: User = null;
+  private vehicleEntry: VehicleEntry;
 
   activeStepper: number | undefined = 0;
 
@@ -66,32 +71,41 @@ export default class AtendimentoComponent {
   dialogloadingClientCompany: boolean = false;
 
   formClientCompanyFilter = new FormGroup({
-    clientCompanyId: new FormControl<Number>(0),
+    clientCompanyId: new FormControl<Number | null>(null),
     clientCompanyFantasia: new FormControl<string>(''),
     clientCompanyName: new FormControl<string>(''),
     clientCompanyCnpj: new FormControl<string>(''),
     clientCompanyCpf: new FormControl<string>(''),
-    clientCompanyRg: new FormControl<string>(''),
+    clientCompanyRg: new FormControl<string | null>(null),
     clientCompanyTipo: new FormControl<string>('j'),
   });
 
   formClientCompany = new FormGroup({
-    clientCompanyId: new FormControl<Number>(0, Validators.required),
+    clientCompanyId: new FormControl<number | null>(null, Validators.required),
     clientCompanyName: new FormControl<string>('', Validators.required),
     clientCompanyCnpj: new FormControl<string>(''),
     clientCompanyCpf: new FormControl<string>(''),
-    clientCompanyRg: new FormControl<string>(''),
+    clientCompanyRg: new FormControl<string | null>(null),
   });
 
-
-
   //Driver
-
-  dialogVehicleVisible: boolean = false;
 
   driverEntryPhoto!: string;
   driverEntryPhotoDoc1!: string;
   driverEntryPhotoDoc2!: string;
+
+  formDriver = new FormGroup({
+    driverEntryName: new FormControl<string>('', Validators.required),
+    driverEntryCpf: new FormControl<string>(''),
+    driverEntryRg: new FormControl<string | null>(null),
+    driverEntryPhoto: new FormControl(null),
+    driverEntrySignature: new FormControl(null),
+    driverEntryPhotoDoc1: new FormControl(null),
+    driverEntryPhotoDoc2: new FormControl(null),
+  });
+
+  //Vehicle
+  cores: IColor[] = []
 
   photoVehicle1!: string;
   photoVehicle2!: string;
@@ -100,134 +114,40 @@ export default class AtendimentoComponent {
 
   vehicleModels$ = this.vehicleModelService.getAllEnabled$();
 
+  formVehicle = new FormGroup({
+    placa: new FormControl<string>('', Validators.required),
+    frota: new FormControl<string>(''),
+    kmEntry: new FormControl<string | null>(null),
+    modelVehicle: new FormControl<IModelVehicle[]>([], Validators.required),
+    dateEntry: new FormControl<Date | null>(null, Validators.required),
+    datePrevisionExit: new FormControl<Date | null>(null),
+    color: new FormControl<IColor[]>([], Validators.required),
+    quantityExtinguisher: new FormControl<number | null>(null, Validators.required),
+    quantityTrafficCone: new FormControl<number | null>(null, Validators.required),
+    quantityTire: new FormControl<number | null>(null, Validators.required),
+    quantityTireComplete: new FormControl<number | null>(null, Validators.required),
+    quantityToolBox: new FormControl<number | null>(null, Validators.required),
+    UserAttendant: new FormControl<User[]>([]),
+    vehicleNew: new FormControl<string>('not', Validators.required),
+    serviceOrder: new FormControl<string>('yes', Validators.required),
+    photo1: new FormControl<string | null>(null),
+    photo2: new FormControl<string | null>(null),
+    photo3: new FormControl<string | null>(null),
+    photo4: new FormControl<string | null>(null),
+
+    informationConcierge: new FormControl<string>(''),
+  });
+
+
+
   consultores$ = this.userService.getUserFilterRoleId$(2);
 
   formCompanyIsEditable = false;
 
-  arrayFormAtendimento: any[] = [];
-
-  formAtendimento = new FormGroup({
-
-    companyId: new FormControl<Number>(0, Validators.required),
-    resaleId: new FormControl<Number>(0, Validators.required),
-
-    status: new FormControl<string>('entradaAutorizada'),
-    stepEntry: new FormControl<string>('atendimento'),
-
-    budgetId: new FormControl<Number | null>(null),
-    budgetStatus: new FormControl<string>('semOrcamento'),
-
-    idUserEntry: new FormControl<Number>(0, Validators.required),
-    nameUserEntry: new FormControl('', Validators.required),
-    dateEntry: new FormControl<Date | null>(null),
-    datePrevisionExit: new FormControl<Date | null>(null),
-
-    idUserAttendant: new FormControl<Number>(0),
-    nameUserAttendant: new FormControl<string>(''),
-
-    idUserExitAuth1: new FormControl<Number | null>(null),
-    nameUserExitAuth1: new FormControl<string>(''),
-    dateExitAuth1: new FormControl<Date | null>(null),
-
-    idUserExitAuth2: new FormControl<Number | null>(null),
-    nameUserExitAuth2: new FormControl<string>(''),
-    dateExitAuth2: new FormControl<Date | null>(null),
-
-    statusAuthExit: new FormControl('NotAuth', Validators.required),
-
-    modelId: new FormControl<Number>(0),
-    modelDescription: new FormControl<string>(''),
-
-    clientCompanyId: new FormControl<Number>(0),
-    clientCompanyName: new FormControl<string>(''),
-    clientCompanyCnpj: new FormControl<string>(''),
-    clientCompanyCpf: new FormControl<string>(''),
-    clientCompanyRg: new FormControl<string>(''),
-
-    driverEntryName: new FormControl<string>(''),
-    driverEntryCpf: new FormControl<string>(''),
-    driverEntryRg: new FormControl<string>(''),
-    driverEntryPhoto: new FormControl(null),
-    driverEntrySignature: new FormControl(null),
-    driverEntryPhotoDoc1: new FormControl(null),
-    driverEntryPhotoDoc2: new FormControl(null),
-
-    driverExitName: new FormControl<string>(''),
-    driverExitCpf: new FormControl<string>(''),
-    driverExitRg: new FormControl<string>(''),
-    driverExitPhoto: new FormControl(null),
-    driverExitSignature: new FormControl(null),
-    driverExitPhotoDoc1: new FormControl(null),
-    driverExitPhotoDoc2: new FormControl(null),
-
-    color: new FormControl<string>('Branco'),
-    placa: new FormControl<string>(''),
-    frota: new FormControl<string>(''),
-
-    vehicleNew: new FormControl<string>(''),
-
-    kmEntry: new FormControl<string>(''),
-    kmExit: new FormControl<string>(''),
-
-    photo1: new FormControl(null),
-    photo2: new FormControl(null),
-    photo3: new FormControl(null),
-    photo4: new FormControl(null),
-
-    quantityExtinguisher: new FormControl<Number>(0),
-    quantityTrafficCone: new FormControl<Number>(0),
-    quantityTire: new FormControl<Number>(0),
-    quantityTireComplete: new FormControl<Number>(0),
-    quantityToolBox: new FormControl<Number>(0),
-
-    serviceOrder: new FormControl<string>(''),
-
-    information: new FormControl<string>(''),
-    informationConcierge: new FormControl<string>(''),
-
-  });
-
-  formDriver = new FormGroup({
-    driverEntryName: new FormControl<string>('', Validators.required),
-    driverEntryCpf: new FormControl<string>(''),
-    driverEntryRg: new FormControl<string>(''),
-    driverEntryPhoto: new FormControl(null),
-    driverEntrySignature: new FormControl(null),
-    driverEntryPhotoDoc1: new FormControl(null),
-    driverEntryPhotoDoc2: new FormControl(null),
-  });
-
-  formVehicle = new FormGroup({
-
-    placa: new FormControl<string>('', Validators.required),
-    frota: new FormControl<string>(''),
-
-    kmEntry: new FormControl<string>(''),
-
-    modelVehicle: new FormControl<IModelVehicle[]>([], Validators.required),
-
-    dateEntry: new FormControl<Date | null>(null, Validators.required),
-
-    datePrevisionExit: new FormControl<Date | null>(null),
-
-    quantityExtinguisher: new FormControl<Number>(0, Validators.required),
-    quantityTrafficCone: new FormControl<Number>(0, Validators.required),
-    quantityTire: new FormControl<Number>(0, Validators.required),
-    quantityTireComplete: new FormControl<Number>(0, Validators.required),
-    quantityToolBox: new FormControl<Number>(0, Validators.required),
-
-    UserAttendant: new FormControl<User[]>([]),
-
-    vehicleNew: new FormControl<string>('not', Validators.required),
-    serviceOrder: new FormControl<string>('yes', Validators.required),
-
-    photo1: new FormControl(null),
-    photo2: new FormControl(null),
-    photo3: new FormControl(null),
-    photo4: new FormControl(null),
-
-    informationConcierge: new FormControl<string>(''),
-  });
+  //Dialog Vehicle entry
+  dialogVehicleVisible: boolean = false;
+  // arrayFormAtendimento: VehicleEntry[] = [];
+  listVehicleEntry: VehicleEntry[] = [];
 
   constructor(
     private router: Router,
@@ -241,9 +161,22 @@ export default class AtendimentoComponent {
     this.userService.getUser$().subscribe(data => {
       this.user = data;
     });
+
+    this.cores = [
+      { color: 'Branco' },
+      { color: 'Preto' },
+      { color: 'Azul' },
+      { color: 'Verde' },
+      { color: 'Cinza' },
+      { color: 'Vermelho' },
+      { color: 'Amarelo' },
+      { color: 'Rosa' },
+      { color: 'Roxo' },
+      { color: 'Outro' }
+    ];
   }
 
-  async openCamera(): Promise<Photo> {
+  private async openCamera(): Promise<Photo> {
 
     const image = await Camera.getPhoto({
       quality: 80,
@@ -254,15 +187,13 @@ export default class AtendimentoComponent {
   }
 
   //ClientCompany
-  showDialogFilterClientCompany() {
+  public showDialogFilterClientCompany() {
     this.dialogVisibleClientCompany = true;
   }
-
-  hideDialogFilterClientCompany() {
+  public hideDialogFilterClientCompany() {
     this.dialogVisibleClientCompany = false;
   }
-
-  selectClientCompany() {
+  public selectClientCompany() {
 
     if (this.dialogSelectClientCompany) {
       this.dialogVisibleClientCompany = false;
@@ -281,47 +212,8 @@ export default class AtendimentoComponent {
       this.addFormValidatorsClientCompany();
     }
 
-    /* if (this.dialogSelectClientCompany.fisjur == "j") {
-
-      if (this.dialogSelectClientCompany.cnpj) {
-        if (this.dialogSelectClientCompany.cnpj.length == 13) {
-          this.dialogSelectClientCompany.cnpj = "0" + this.dialogSelectClientCompany.cnpj;
-        }
-        if (this.dialogSelectClientCompany.cnpj.length == 12) {
-          this.dialogSelectClientCompany.cnpj = "00" + this.dialogSelectClientCompany.cnpj;
-        }
-        if (this.dialogSelectClientCompany.cnpj.length == 11) {
-          this.dialogSelectClientCompany.cnpj = "000" + this.dialogSelectClientCompany.cnpj;
-        }
-      }
-    } else {
-
-      if (this.dialogSelectClientCompany.cpf) {
-        if (this.dialogSelectClientCompany.cpf.length == 10) {
-          this.dialogSelectClientCompany.cpf = "0" + this.dialogSelectClientCompany.cpf;
-        }
-        if (this.dialogSelectClientCompany.cpf.length == 9) {
-          this.dialogSelectClientCompany.cpf = "00" + this.dialogSelectClientCompany.cpf;
-        }
-        if (this.dialogSelectClientCompany.cpf.length == 8) {
-          this.dialogSelectClientCompany.cpf = "000" + this.dialogSelectClientCompany.cpf;
-        }
-        if (this.dialogSelectClientCompany.cpf.length == 7) {
-          this.dialogSelectClientCompany.cpf = "0000" + this.dialogSelectClientCompany.cpf;
-        }
-        if (this.dialogSelectClientCompany.cpf.length == 6) {
-          this.dialogSelectClientCompany.cpf = "00000" + this.dialogSelectClientCompany.cpf;
-        }
-        if (this.dialogSelectClientCompany.cpf.length == 5) {
-          this.dialogSelectClientCompany.cpf = "000000" + this.dialogSelectClientCompany.cpf;
-        }
-      }
-
-    } */
-
   }
-
-  filterClientCompany() {
+  public filterClientCompany() {
 
     this.dialogloadingClientCompany = true;
 
@@ -420,7 +312,6 @@ export default class AtendimentoComponent {
     }
 
   }
-
   private addFormValidatorsClientCompany() {
 
     if (this.clientCompany.fisjur == "Juridica") {
@@ -441,39 +332,48 @@ export default class AtendimentoComponent {
     }
 
   }
-
-  nextStepperClientCompany() {
+  public nextStepperClientCompany() {
     if (this.formClientCompany.valid) {
       this.activeStepper = 1;
     } else {
       this.messageService.add({ severity: 'info', summary: 'Atenção', detail: 'Empresa não selecionada', icon: 'pi pi-exclamation-triangle' });
     }
   }
-
-  stepperClientCompany() {
+  public stepperClientCompany() {
     this.activeStepper = 0;
+  }
+  private cleanFormClientCompany() {
+    this.formClientCompany.reset();
   }
 
   //Driver
-
-  async photoPersonDriver() {
+  public async photoPersonDriver() {
     const image = this.openCamera();
     this.driverEntryPhoto = (await image).base64String;
     this.formDriver.patchValue({ driverEntryPhoto: this.driverEntryPhoto });
   }
-
-  async photoFile1Driver() {
+  public async photoFile1Driver() {
     const image = this.openCamera();
     this.driverEntryPhotoDoc1 = (await image).base64String;
     this.formDriver.patchValue({ driverEntryPhotoDoc1: this.driverEntryPhotoDoc1 });
   }
-
-  async photoFile2Driver() {
+  public async photoFile2Driver() {
     const image = this.openCamera();
     this.driverEntryPhotoDoc2 = (await image).base64String;
     this.formDriver.patchValue({ driverEntryPhotoDoc2: this.driverEntryPhotoDoc2 });
   }
-
+  public deleteEntryPhotoDriver() {
+    this.driverEntryPhoto = "";
+    this.formDriver.patchValue({ driverEntryPhoto: null });
+  }
+  public deleteEntryFileDriver1() {
+    this.driverEntryPhotoDoc1 = "";
+    this.formDriver.patchValue({ driverEntryPhotoDoc1: null });
+  }
+  public deleteEntryFileDriver2() {
+    this.driverEntryPhotoDoc2 = "";
+    this.formDriver.patchValue({ driverEntryPhotoDoc2: null });
+  }
   private addFormValidatorsDriver() {
 
     if (this.formDriver.value.driverEntryCpf == '' && this.formDriver.value.driverEntryRg == '' ||
@@ -497,8 +397,7 @@ export default class AtendimentoComponent {
       this.formDriver.controls['driverEntryCpf'].updateValueAndValidity();
     }
   }
-
-  nextSterpperDriver() {
+  public nextSterpperDriver() {
 
     this.addFormValidatorsDriver();
 
@@ -509,18 +408,22 @@ export default class AtendimentoComponent {
     }
 
   }
-
-  stepperDriver() {
+  public stepperDriver() {
     if (this.formClientCompany.valid) {
       this.activeStepper = 1;
     } else {
       this.messageService.add({ severity: 'info', summary: 'Atenção', detail: 'Empresa não selecionada', icon: 'pi pi-exclamation-triangle' });
     }
   }
+  private cleanFormDriver() {
+    this.formDriver.reset();
+    this.driverEntryPhoto = '';
+    this.driverEntryPhotoDoc1 = '';
+    this.driverEntryPhotoDoc2 = '';
 
+  }
   //Vehicle
-
-  stepperVehicle() {
+  public stepperVehicle() {
     this.addFormValidatorsDriver();
 
     if (this.formClientCompany.valid) {
@@ -535,329 +438,237 @@ export default class AtendimentoComponent {
       this.messageService.add({ severity: 'info', summary: 'Atenção', detail: 'Empresa não selecionada', icon: 'pi pi-exclamation-triangle' });
     }
   }
-
-  async photoFile1Vehicle() {
+  public async photoFile1Vehicle() {
     const image = this.openCamera();
     this.photoVehicle1 = (await image).base64String;
     this.formVehicle.patchValue({ photo1: this.photoVehicle1 });
   }
-
-  async photoFile2Vehicle() {
+  public async photoFile2Vehicle() {
     const image = this.openCamera();
     this.photoVehicle2 = (await image).base64String;
     this.formVehicle.patchValue({ photo2: this.photoVehicle2 });
   }
-
-  async photoFile3Vehicle() {
+  public async photoFile3Vehicle() {
     const image = this.openCamera();
     this.photoVehicle3 = (await image).base64String;
     this.formVehicle.patchValue({ photo3: this.photoVehicle3 });
   }
-
-  async photoFile4Vehicle() {
+  public async photoFile4Vehicle() {
     const image = this.openCamera();
     this.photoVehicle4 = (await image).base64String;
     this.formVehicle.patchValue({ photo4: this.photoVehicle4 });
   }
-  placaRequiredAdd() {
+  public deleteFileVehicle1() {
+    this.photoVehicle1 = "";
+    this.formVehicle.patchValue({ photo1: null });
+  }
+  public deleteFileVehicle2() {
+    this.photoVehicle2 = "";
+    this.formVehicle.patchValue({ photo2: null });
+  }
+  public deleteFileVehicle3() {
+    this.photoVehicle3 = "";
+    this.formVehicle.patchValue({ photo3: null });
+  }
+  public deleteFileVehicle4() {
+    this.photoVehicle4 = "";
+    this.formVehicle.patchValue({ photo4: null });
+  }
+  public placaRequiredAdd() {
     this.formVehicle.controls['placa'].addValidators(Validators.required);
     this.formVehicle.controls['placa'].updateValueAndValidity();
   }
-  placaRequiredRemove() {
+  public placaRequiredRemove() {
     this.formVehicle.controls['placa'].removeValidators(Validators.required);
     this.formVehicle.controls['placa'].updateValueAndValidity();
     this.cleanPlaca();
   }
   private cleanPlaca() {
     this.formVehicle.patchValue({ placa: '' });
-    //this.vehicleEntry.placa = '';
   }
-
-
-
-
-
-
-   removerVehiclePlaca(placa: string) {
-
-    var myArray: any[] = [];
-
-    for (let i = 0; i < this.arrayFormAtendimento.length; i++) {
-      const element = this.arrayFormAtendimento[i];
-
-      if (placa != element.placa) {
-        myArray.push(element);
-      }
-
-    }
-
-    this.arrayFormAtendimento = [];
-
-    for (let i = 0; i < myArray.length; i++) {
-      const element = myArray[i];
-
-      this.arrayFormAtendimento.push(element);
-
-    }
-
-    if (this.arrayFormAtendimento.length == 0) {
-      this.dialogVehicleVisible = false;
-    }
-
-  }
-
-  removerVehicle(index: number) {
-
-    var myArray: any[] = [];
-
-
-    for (let i = 0; i < this.arrayFormAtendimento.length; i++) {
-      const element = this.arrayFormAtendimento[i];
-
-      if (i != index) {
-        myArray.push(element);
-      }
-
-    }
-
-    this.arrayFormAtendimento = [];
-
-    for (let i = 0; i < myArray.length; i++) {
-      const element = myArray[i];
-
-      this.arrayFormAtendimento.push(element);
-
-    }
-
-    if (this.arrayFormAtendimento.length == 0) {
-      this.dialogVehicleVisible = false;
-    }
-
-  }
-
-  resetFormAtendimento() {
-
-    this.formAtendimento.reset();
-
-    this.formAtendimento.patchValue({
-
-      status: 'entradaAutorizada',
-      stepEntry: 'atendimento',
-      budgetStatus: 'semOrcamento',
-      statusAuthExit: 'FirstAuth',
-    });
-  }
-
-  resetFormVehicle() {
-
-    //Limpa o form
+  private cleanFormVehicle() {
     this.formVehicle.reset();
 
     this.formVehicle.patchValue({
-
       modelVehicle: [],
-
-      quantityExtinguisher: 0,
-      quantityTrafficCone: 0,
-      quantityTire: 0,
-      quantityTireComplete: 0,
-      quantityToolBox: 0,
+      color: [],
       vehicleNew: 'not',
       serviceOrder: 'yes',
-
       photo1: null,
       photo2: null,
       photo3: null,
       photo4: null,
-
-      UserAttendant: [],
-
+      UserAttendant: []
     });
-
-
     this.photoVehicle1 = '';
     this.photoVehicle2 = '';
     this.photoVehicle3 = '';
     this.photoVehicle4 = '';
 
   }
-
-  addVehicle() {
-
-    this.vehicleService.entryFilterPlaca$(this.formVehicle.value.placa).subscribe(data => {
-      if (data.status == 200) {
-        const uppercase = new UpperCasePipe();
-        this.messageService.add({ severity: 'error', summary: 'Placa ' + uppercase.transform(this.formVehicle.value.placa), detail: "Veículo já se encontra na empresa", icon: 'pi pi-car', life: 10000 });
-      }
-    }, error => {
-      const { valid } = this.formVehicle;
-
-      if (valid) {
-        this.formAtendimento.patchValue({
-          companyId: this.user.companyId,
-          resaleId: this.user.resaleId,
-
-          idUserEntry: this.user.id,
-          nameUserEntry: this.user.name,
-          dateEntry: this.formVehicle.value.dateEntry,
-          datePrevisionExit: this.formVehicle.value.datePrevisionExit,
-
-          clientCompanyId: this.formClientCompany.value.clientCompanyId,
-          clientCompanyName: this.formClientCompany.value.clientCompanyName,
-          clientCompanyCnpj: this.formClientCompany.value.clientCompanyCnpj,
-          clientCompanyCpf: this.formClientCompany.value.clientCompanyCpf,
-          clientCompanyRg: this.formClientCompany.value.clientCompanyRg ?? "",
-
-          driverEntryName: this.formDriver.value.driverEntryName,
-          driverEntryCpf: this.formDriver.value.driverEntryCpf,
-          driverEntryRg: this.formDriver.value.driverEntryRg ?? "",
-          driverEntryPhoto: this.formDriver.value.driverEntryPhoto,
-          driverEntryPhotoDoc1: this.formDriver.value.driverEntryPhotoDoc1,
-          driverEntryPhotoDoc2: this.formDriver.value.driverEntryPhotoDoc2,
-
-          placa: this.formVehicle.value.vehicleNew == "not" ? this.formVehicle.value.placa : '',
-          frota: this.formVehicle.value.frota,
-          kmEntry: this.formVehicle.value.kmEntry ?? "",
-
-          photo1: this.formVehicle.value.photo1,
-          photo2: this.formVehicle.value.photo2,
-          photo3: this.formVehicle.value.photo3,
-          photo4: this.formVehicle.value.photo4,
-
-          modelId: this.formVehicle.value.modelVehicle?.at(0)?.id,
-          modelDescription: this.formVehicle.value.modelVehicle?.at(0)?.description,
-
-          idUserAttendant: this.formVehicle.value.UserAttendant?.at(0)?.id,
-          nameUserAttendant: this.formVehicle.value.UserAttendant?.at(0)?.name,
-
-          quantityTrafficCone: this.formVehicle.value.quantityTrafficCone,
-          quantityExtinguisher: this.formVehicle.value.quantityExtinguisher,
-          quantityTire: this.formVehicle.value.quantityTire,
-          quantityTireComplete: this.formVehicle.value.quantityTireComplete,
-          quantityToolBox: this.formVehicle.value.quantityToolBox,
-
-          serviceOrder: this.formVehicle.value.serviceOrder,
-          vehicleNew: this.formVehicle.value.vehicleNew,
-
-          informationConcierge: this.formVehicle.value.informationConcierge,
-
-        });
-
-        this.arrayFormAtendimento.push(this.formAtendimento.value);
-
-        //Toast Info
-        this.showAddSuccess();
-
-        //Reset Form
-        this.resetFormVehicle();
-
-      }
-    });
-
+  //Dialog Vehicle entry
+  public showDialogVehicle() {
+    this.dialogVehicleVisible = true;
   }
+  //Valid
+  private validVehicleEntry(): boolean {
 
-  saveVehicle() {
+    const { value } = this.formVehicle;
 
-    const vehicles = this.arrayFormAtendimento;
+    if ((value.placa == "" && value.vehicleNew == "not")) {
+      this.messageService.add({ severity: 'error', summary: 'Placa', detail: "Não informada", icon: 'pi pi-times' });
+      return false;
+    }
+    if (value.modelVehicle.length == 0) {
+      this.messageService.add({ severity: 'error', summary: 'Modelo', detail: "Não selecionado", icon: 'pi pi-times' });
+      return false;
+    }
+    if (value.dateEntry == null) {
+      this.messageService.add({ severity: 'error', summary: 'Data Entrada', detail: "Não informada", icon: 'pi pi-times' });
+      return false;
+    }
+    if (value.dateEntry > new Date()) {
+      this.messageService.add({ severity: 'error', summary: 'Data Entrada', detail: "Maior que data atual", icon: 'pi pi-times' });
+      return false;
+    }
+    if (value.datePrevisionExit != null && value.datePrevisionExit < new Date()) {
+      this.messageService.add({ severity: 'error', summary: 'Data Previsão Saída', detail: "Menor que data atual", icon: 'pi pi-times' });
+      return false;
+    }
+    if (value.color.length == 0) {
+      this.messageService.add({ severity: 'error', summary: 'Cor', detail: "Não seleciona", icon: 'pi pi-times' });
+      return false;
+    }
+    return true;
+  }
+  //Add or Delete Vehicle entry
+  public addVehicleEntry() {
 
-    for (let index = 0; index < vehicles.length; index++) {
-      const element = vehicles.at(index);
-
-      this.vehicleService.entrySave$(element).subscribe((data) => {
-
-        if (data.status == 201) {
-
-          this.showVehicleSaveSuccess(element.placa);
-
-          //remove os veículo já salvo
-          this.removerVehiclePlaca(element.placa);
-
-          if (this.arrayFormAtendimento.length == 0) {
-            this.showVehicleSaveAllSuccess();
-
-            this.dialogVehicleVisible = false;
-
-            this.activeStepper = 0;
-
-            //Reset Forms
-            this.resetFormAtendimento();
-
-            this.formClientCompany.reset();
-
-            this.formDriver.reset();
-
-            this.resetFormVehicle();
-
-
-          }
-
+    if (this.validVehicleEntry()) {
+      this.vehicleService.entryFilterPlaca$(this.formVehicle.value.placa).subscribe(data => {
+        if (data.status == 200) {
+          const uppercase = new UpperCasePipe();
+          this.messageService.add({ severity: 'error', summary: 'Placa ' + uppercase.transform(this.formVehicle.value.placa), detail: "Veículo já se encontra na empresa", icon: 'pi pi-car', life: 10000 });
         }
-
-      }, (error) => {
-        if (error.status == 409) {
-          this.showPlacaExist(index);
-        }
-
+      }, error => {
+        this.loadVehicleEntry();
       });
 
     }
 
   }
+  public deleteVehicleEntry(index: number) {
 
-  showPlacaExist(index: number) {
-    const uppercase = new UpperCasePipe();
-    this.messageService.add({ severity: 'error', summary: 'Placa ' + uppercase.transform(this.arrayFormAtendimento.at(index).placa), detail: "Veículo já se encontra na empresa", icon: 'pi pi-car', life: 10000 });
-  }
+    var listTemp: any[] = [];
 
-  showAddSuccess() {
-    this.messageService.add({ severity: 'success', summary: 'Veículo adicionado', detail: this.formVehicle.value.modelVehicle?.at(0)?.description, icon: 'pi pi-car' });
-  }
+    for (let i = 0; i < this.listVehicleEntry.length; i++) {
+      const element = this.listVehicleEntry[i];
+      if (i != index) {
+        listTemp.push(element);
+      }
 
-  showVehicleSaveSuccess(placa: string) {
-    const uppercase = new UpperCasePipe();
-    this.messageService.add({ severity: 'success', summary: 'Veículo Salvo', detail: "Placa " + uppercase.transform(placa), icon: 'pi pi-check' });
-  }
+    }
 
-  showVehicleSaveAllSuccess() {
-    this.messageService.add({ severity: 'success', summary: 'Salvo', detail: "Veículos salvo com sucesso", icon: 'pi pi-check' });
-  }
+    this.listVehicleEntry = [];
 
-  showDialogVehicle() {
+    for (let vehicle of listTemp) {
+      this.listVehicleEntry.push(vehicle);
+    }
 
-    if (this.arrayFormAtendimento.length > 0) {
-      this.dialogVehicleVisible = true;
+    if (this.listVehicleEntry.length == 0) {
+      this.dialogVehicleVisible = false;
     }
 
   }
+  //save
+  private loadVehicleEntry() {
+    const clientValue = this.formClientCompany.value;
+    const driverValue = this.formDriver.value;
+    const vehicleValue = this.formVehicle.value;
 
-  deleteEntryPhotoDriver() {
-    this.driverEntryPhoto = "";
-    this.formDriver.patchValue({ driverEntryPhoto: null });
-  }
-  deleteEntryFileDriver1() {
-    this.driverEntryPhotoDoc1 = "";
-    this.formDriver.patchValue({ driverEntryPhotoDoc1: null });
-  }
-  deleteEntryFileDriver2() {
-    this.driverEntryPhotoDoc2 = "";
-    this.formDriver.patchValue({ driverEntryPhotoDoc2: null });
-  }
+    this.vehicleEntry = new VehicleEntry();
 
-  deleteFileVehicle1() {
-    this.photoVehicle1 = "";
-    this.formVehicle.patchValue({ photo1: null });
+    this.vehicleEntry.companyId = this.user.companyId;
+    this.vehicleEntry.resaleId = this.user.resaleId;
+    this.vehicleEntry.idUserEntry = this.user.id;
+    this.vehicleEntry.nameUserEntry = this.user.name;
+    this.vehicleEntry.status = 'entradaAutorizada';
+    this.vehicleEntry.stepEntry = 'atendimento';
+    this.vehicleEntry.budgetStatus = 'semOrcamento';
+    this.vehicleEntry.statusAuthExit = 'NotAuth';
+
+    this.vehicleEntry.clientCompanyId = clientValue.clientCompanyId;
+    this.vehicleEntry.clientCompanyName = clientValue.clientCompanyName;
+    this.vehicleEntry.clientCompanyCnpj = clientValue.clientCompanyCnpj;
+    this.vehicleEntry.clientCompanyCpf = clientValue.clientCompanyCpf;
+    this.vehicleEntry.clientCompanyRg = clientValue.clientCompanyRg;
+
+    this.vehicleEntry.driverEntryName = driverValue.driverEntryName;
+    this.vehicleEntry.driverEntryCpf = driverValue.driverEntryCpf;
+    this.vehicleEntry.driverEntryRg = driverValue.driverEntryRg;
+    this.vehicleEntry.driverEntryPhoto = driverValue.driverEntryPhoto;
+    this.vehicleEntry.driverEntryPhotoDoc1 = driverValue.driverEntryPhotoDoc1;
+    this.vehicleEntry.driverEntryPhotoDoc2 = driverValue.driverEntryPhotoDoc2;
+
+    this.vehicleEntry.placa = vehicleValue.placa;
+    this.vehicleEntry.frota = vehicleValue.frota;
+    this.vehicleEntry.modelId = vehicleValue.modelVehicle.at(0).id;
+    this.vehicleEntry.modelDescription = vehicleValue.modelVehicle.at(0).description;
+    this.vehicleEntry.dateEntry = vehicleValue.dateEntry;
+    this.vehicleEntry.datePrevisionExit = vehicleValue.datePrevisionExit;
+    this.vehicleEntry.color = vehicleValue.color.at(0).color;
+    this.vehicleEntry.kmEntry = vehicleValue.kmEntry ?? null;
+    this.vehicleEntry.quantityTrafficCone = vehicleValue.quantityTrafficCone;
+    this.vehicleEntry.quantityExtinguisher = vehicleValue.quantityExtinguisher;
+    this.vehicleEntry.quantityTire = vehicleValue.quantityTire;
+    this.vehicleEntry.quantityTireComplete = vehicleValue.quantityTireComplete;
+    this.vehicleEntry.quantityToolBox = vehicleValue.quantityToolBox;
+
+    this.vehicleEntry.idUserAttendant = vehicleValue.UserAttendant.at(0)?.id ?? null;
+    this.vehicleEntry.nameUserAttendant = vehicleValue.UserAttendant.at(0)?.name ?? null;
+    this.vehicleEntry.photo1 = vehicleValue.photo1;
+    this.vehicleEntry.photo2 = vehicleValue.photo2;
+    this.vehicleEntry.photo3 = vehicleValue.photo3;
+    this.vehicleEntry.photo4 = vehicleValue.photo4
+    this.vehicleEntry.vehicleNew = vehicleValue.vehicleNew;
+    this.vehicleEntry.serviceOrder = vehicleValue.serviceOrder;
+    this.vehicleEntry.informationConcierge = vehicleValue.informationConcierge;
+
+    //Add list of vehicle
+    this.listVehicleEntry.push(this.vehicleEntry);
+    this.messageService.add({ severity: 'success', summary: 'Veículo adicionado', detail: this.vehicleEntry.modelDescription, icon: 'pi pi-truck' });
+
+    this.cleanFormVehicle();
   }
-  deleteFileVehicle2() {
-    this.photoVehicle2 = "";
-    this.formVehicle.patchValue({ photo2: null });
-  }
-  deleteFileVehicle3() {
-    this.photoVehicle3 = "";
-    this.formVehicle.patchValue({ photo3: null });
-  }
-  deleteFileVehicle4() {
-    this.photoVehicle4 = "";
-    this.formVehicle.patchValue({ photo4: null });
+  public saveVehicleEntry() {
+
+    for (let index = 0; index < this.listVehicleEntry.length; index++) {
+      const vehicle = this.listVehicleEntry[index];
+      this.vehicleService.entrySave$(vehicle).subscribe(data => {
+
+        if (data.status == 201) {
+          if (vehicle.vehicleNew == 'not') {
+            const uppercase = new UpperCasePipe();
+            this.messageService.add({ severity: 'success', summary: 'Veículo Salvo', detail: "Placa " + uppercase.transform(vehicle.placa), icon: 'pi pi-check' });
+          }
+
+          if (index == (this.listVehicleEntry.length - 1)) {
+            this.messageService.add({ severity: 'success', summary: 'Veículos', detail: "Salvo com sucesso", icon: 'pi pi-check' });
+
+            this.dialogVehicleVisible = false;
+            this.listVehicleEntry = [];
+
+            this.cleanFormDriver();
+            this.cleanFormClientCompany();
+            this.stepperClientCompany();
+          }
+        }
+      }, error => {
+
+      });
+    }
+
+
   }
 
 }
