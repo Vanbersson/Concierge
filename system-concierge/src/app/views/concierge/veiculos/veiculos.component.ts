@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule, NgOptimizedImage, UpperCasePipe } from '@angular/common';
+import { CommonModule, DatePipe, NgOptimizedImage, UpperCasePipe } from '@angular/common';
 import { FormControl, FormGroup, FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
+
+import moment from 'moment';
 
 //PrimeNG
 import { TableModule } from 'primeng/table';
@@ -31,7 +33,7 @@ import { StorageService } from '../../../services/storage/storage.service';
   imports: [CommonModule, FormsModule, RouterModule, NgOptimizedImage, ToastModule, TableModule, DropdownModule, TagModule, ProgressBarModule, SliderModule, MultiSelectModule, CardModule, ButtonModule, InputTextModule],
   templateUrl: './veiculos.component.html',
   styleUrl: './veiculos.component.scss',
-  providers: [MessageService]
+  providers: [MessageService, DatePipe]
 })
 export default class VeiculosComponent implements OnInit {
 
@@ -65,7 +67,7 @@ export default class VeiculosComponent implements OnInit {
     private storageService: StorageService,
     private router: Router,
     private messageService: MessageService) {
-    
+
   }
 
   ngOnInit(): void {
@@ -88,10 +90,32 @@ export default class VeiculosComponent implements OnInit {
 
   }
 
-  listVehicles() {
+  public listVehicles() {
     this.vehicleService.entryList$().subscribe((data) => {
 
       for (let index = 0; index < data.length; index++) {
+
+        if (data[index].vehicleNew == "yes") {
+          data[index].placa = "novo";
+        } else {
+          var placa = data[index].placa;
+          data[index].placa = placa.substring(0, 3) + "-" + placa.substring(3, 7);
+        }
+
+        if (data[index].nameUserAttendant == null) {
+          data[index].nameUserAttendant = "falta";
+        }
+
+        if (data[index].clientCompanyName == 'not') {
+          data[index].clientCompanyName = "falta";
+        } else {
+          var nome = data[index].clientCompanyName.split(' ');
+          data[index].clientCompanyName = nome[0] + " " + nome[1];
+        }
+        data[index].days = this.calcDay(new Date(data[index].dateEntry));
+        
+        data[index].dateEntry = this.convertDatetoString(new Date(data[index].dateEntry));
+        
 
         switch (data[index].budgetStatus) {
           case 'pendenteAprovacao':
@@ -110,31 +134,44 @@ export default class VeiculosComponent implements OnInit {
             break;
         }
 
-        if (data[index].vehicleNew == "yes") {
-          data[index].placa = "novo";
-        } else {
-          var placa = data[index].placa;
-          data[index].placa = placa.substring(0, 3) + "-" + placa.substring(3, 7);
-        }
-        var nome = data[index].clientCompanyName.split(' ');
-        data[index].clientCompanyName = nome[0] + " " + nome[1];
-
       }
       this.listVehicleEntry = data;
     });
   }
 
-  novoAtendimento() {
-    this.router.navigateByUrl('portaria/atendimento');
+  private convertDatetoString(date: Date): string {
+    var datepipe = new DatePipe('pt-BR');
+    var dateTransf = datepipe.transform(date, 'dd/MM/yyyy HH:mm');
+    return dateTransf;
+  }
+
+  private calcDay(date: Date): number {
+    return moment().diff(date, 'days');
+  }
+
+  public severityDay(vehicle: VehicleEntry): any {
+
+    if (vehicle.datePrevisionExit == null) {
+      if (vehicle.days <= 10) {
+        return 'success';
+      }
+      if (vehicle.days > 10 && vehicle.days <= 20) {
+        return 'warning';
+      }
+      if (vehicle.days > 20) {
+        return 'danger';
+      }
+    } else {
+
+    }
+
+    return 'success';
+
   }
 
   onSelectionChange(event: any) {
 
     console.log('Itens selecionados:', this.selectedItems.length);
-  }
-
-  getPlaca(placa: string) {
-
   }
 
   getSeverity(value: string): any {

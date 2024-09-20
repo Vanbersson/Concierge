@@ -26,6 +26,7 @@ import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 import { TagModule } from 'primeng/tag';
 import { ImageModule } from 'primeng/image';
+import { CheckboxModule } from 'primeng/checkbox';
 
 //Service
 import { VehicleModelService } from '../../../services/vehicle-model/vehicle-model.service';
@@ -41,17 +42,15 @@ import { IModelVehicle } from '../../../interfaces/vehicle-model/imodel-vehicle'
 //Class
 import { User } from '../../../models/user/user';
 import { ClientCompany } from '../../../models/clientcompany/client-company';
-import { error } from 'console';
 import { VehicleEntry } from '../../../models/vehicle/vehicle-entry';
 import { IColor } from '../../../interfaces/icolor';
-import { HttpResponse } from '@angular/common/http';
-import { Observable } from 'rxjs';
+
 
 
 @Component({
   selector: 'app-atendimento',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, StepperModule, NgOptimizedImage, ImageModule, ToastModule, TagModule, DialogModule, BadgeModule, TabViewModule, TableModule, IconFieldModule, InputIconModule, CardModule, InputNumberModule, ButtonModule, InputTextModule, InputTextareaModule, CalendarModule, RadioButtonModule, InputGroupModule, InputMaskModule, MultiSelectModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, StepperModule, NgOptimizedImage, ImageModule, ToastModule, CheckboxModule, TagModule, DialogModule, BadgeModule, TabViewModule, TableModule, IconFieldModule, InputIconModule, CardModule, InputNumberModule, ButtonModule, InputTextModule, InputTextareaModule, CalendarModule, RadioButtonModule, InputGroupModule, InputMaskModule, MultiSelectModule],
   providers: [MessageService],
   templateUrl: './atendimento.component.html',
   styleUrl: './atendimento.component.scss'
@@ -81,8 +80,9 @@ export default class AtendimentoComponent {
   });
 
   formClientCompany = new FormGroup({
-    clientCompanyId: new FormControl<number | null>(null, Validators.required),
-    clientCompanyName: new FormControl<string>('', Validators.required),
+    ClientCompanyNot: new FormControl<string | null>(null),
+    clientCompanyId: new FormControl<number | null>(null),
+    clientCompanyName: new FormControl<string>(''),
     clientCompanyCnpj: new FormControl<string>(''),
     clientCompanyCpf: new FormControl<string>(''),
     clientCompanyRg: new FormControl<string | null>(null),
@@ -146,7 +146,6 @@ export default class AtendimentoComponent {
 
   //Dialog Vehicle entry
   dialogVehicleVisible: boolean = false;
-  // arrayFormAtendimento: VehicleEntry[] = [];
   listVehicleEntry: VehicleEntry[] = [];
 
   constructor(
@@ -174,6 +173,8 @@ export default class AtendimentoComponent {
       { color: 'Roxo' },
       { color: 'Outro' }
     ];
+
+    this.addValidationClientCompany();
   }
 
   private async openCamera(): Promise<Photo> {
@@ -313,24 +314,36 @@ export default class AtendimentoComponent {
 
   }
   private addFormValidatorsClientCompany() {
-
     if (this.clientCompany.fisjur == "Juridica") {
       this.formClientCompany.controls['clientCompanyCpf'].removeValidators(Validators.required);
       this.formClientCompany.controls['clientCompanyCpf'].updateValueAndValidity();
-
       this.formClientCompany.controls['clientCompanyCnpj'].addValidators(Validators.required);
       this.formClientCompany.controls['clientCompanyCnpj'].updateValueAndValidity();
-
     } else {
-
       this.formClientCompany.controls['clientCompanyCnpj'].removeValidators(Validators.required);
       this.formClientCompany.controls['clientCompanyCnpj'].updateValueAndValidity();
-
       this.formClientCompany.controls['clientCompanyCpf'].addValidators(Validators.required);
       this.formClientCompany.controls['clientCompanyCpf'].updateValueAndValidity();
-
     }
-
+  }
+  private validationClientCompany() {
+    if (this.formClientCompany.value.ClientCompanyNot != 'not' || this.formClientCompany.value.ClientCompanyNot == null) {
+      this.formClientCompany.controls['clientCompanyId'].removeValidators(Validators.required);
+      this.formClientCompany.controls['clientCompanyId'].updateValueAndValidity();
+      this.formClientCompany.controls['clientCompanyName'].removeValidators(Validators.required);
+      this.formClientCompany.controls['clientCompanyName'].updateValueAndValidity();
+    } else {
+      this.formClientCompany.controls['clientCompanyId'].addValidators(Validators.required);
+      this.formClientCompany.controls['clientCompanyId'].updateValueAndValidity();
+      this.formClientCompany.controls['clientCompanyName'].addValidators(Validators.required);
+      this.formClientCompany.controls['clientCompanyName'].updateValueAndValidity();
+    }
+  }
+  private addValidationClientCompany() {
+    this.formClientCompany.controls['clientCompanyId'].addValidators(Validators.required);
+    this.formClientCompany.controls['clientCompanyId'].updateValueAndValidity();
+    this.formClientCompany.controls['clientCompanyName'].addValidators(Validators.required);
+    this.formClientCompany.controls['clientCompanyName'].updateValueAndValidity();
   }
   public nextStepperClientCompany() {
     if (this.formClientCompany.valid) {
@@ -597,11 +610,16 @@ export default class AtendimentoComponent {
     this.vehicleEntry.budgetStatus = 'semOrcamento';
     this.vehicleEntry.statusAuthExit = 'NotAuth';
 
-    this.vehicleEntry.clientCompanyId = clientValue.clientCompanyId;
-    this.vehicleEntry.clientCompanyName = clientValue.clientCompanyName;
-    this.vehicleEntry.clientCompanyCnpj = clientValue.clientCompanyCnpj;
-    this.vehicleEntry.clientCompanyCpf = clientValue.clientCompanyCpf;
-    this.vehicleEntry.clientCompanyRg = clientValue.clientCompanyRg;
+    if (this.formClientCompany.value.ClientCompanyNot != 'not' || this.formClientCompany.value.ClientCompanyNot == null) {
+      this.vehicleEntry.clientCompanyId = clientValue.clientCompanyId;
+      this.vehicleEntry.clientCompanyName = clientValue.clientCompanyName;
+      this.vehicleEntry.clientCompanyCnpj = clientValue.clientCompanyCnpj;
+      this.vehicleEntry.clientCompanyCpf = clientValue.clientCompanyCpf;
+      this.vehicleEntry.clientCompanyRg = clientValue.clientCompanyRg;
+    } else {
+      this.vehicleEntry.clientCompanyId = 1;
+      this.vehicleEntry.clientCompanyName = 'not';
+    }
 
     this.vehicleEntry.driverEntryName = driverValue.driverEntryName;
     this.vehicleEntry.driverEntryCpf = driverValue.driverEntryCpf;

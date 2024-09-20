@@ -12,8 +12,9 @@ export class VehicleEntry implements IVehicleEntry {
 
     idUserEntry: number = 0;
     nameUserEntry: string = '';
-    dateEntry: Date | null = null;
+    dateEntry: Date | string | null = null;
     datePrevisionExit: Date | null = null;
+    days: number = 0;
 
     idUserAttendant: number | null = null;
     nameUserAttendant: string = '';

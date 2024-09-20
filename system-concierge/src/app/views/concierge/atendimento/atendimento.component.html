@@ -5,7 +5,7 @@
         <span>Atendimento de veículos</span>
         <div class="layout-button-alert">
             @if (listVehicleEntry.length > 0) {
-             <p-badge [value]="listVehicleEntry.length" severity="warning"></p-badge> 
+            <p-badge [value]="listVehicleEntry.length" severity="warning"></p-badge>
             <p-button icon="pi pi-truck" [rounded]="true" severity="warning" [outlined]="true" [text]="true"
                 size="large" (onClick)="showDialogVehicle()" />
             }
@@ -32,6 +32,11 @@
                             Por favor selecione a empresa em que esse veículo pertence
                         </p>
                         <div class="p-fluid p-formgrid grid">
+                            <div class="col-12 flex align-items-center  gap-1">
+                                <p-checkbox inputId="ClientCompanyNotId" value="not"
+                                    formControlName="ClientCompanyNot" (click)="validationClientCompany()"/>
+                                <label for="ClientCompanyNotId">Empresa sem cadastro!</label>
+                            </div>
                             <div class="field col-12 md:col-1">
                                 <label for="clientCompanyId">Codígo</label>
                                 <p-inputNumber inputId="clientCompanyId" [useGrouping]="false"

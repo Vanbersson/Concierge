@@ -9,7 +9,7 @@ export interface IVehicleEntry {
     budgetStatus: string;
     idUserEntry: number;
     nameUserEntry: string;
-    dateEntry: Date | null;
+    dateEntry: Date | string;
     datePrevisionExit: Date | null;
 
     idUserAttendant: number | null;

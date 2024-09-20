@@ -147,11 +147,11 @@ export default class ManutencaoComponent implements OnInit {
 
   //ClientCompany
   formClientCompany = new FormGroup({
-    clientCompanyId: new FormControl<number>(0, Validators.required),
+    clientCompanyId: new FormControl<number | null>(null, Validators.required),
     clientCompanyName: new FormControl<string>('', Validators.required),
     clientCompanyCnpj: new FormControl<string>(''),
     clientCompanyCpf: new FormControl<string>(''),
-    clientCompanyRg: new FormControl<string>(''),
+    clientCompanyRg: new FormControl<string| null>(null),
   });
 
   formClientCompanyFilter = new FormGroup({
@@ -402,13 +402,15 @@ export default class ManutencaoComponent implements OnInit {
     this.porteiroInfo = this.vehicleEntry.informationConcierge!;
 
     //Form Proprietario
-    this.formClientCompany.patchValue({
-      clientCompanyId: this.vehicleEntry.clientCompanyId,
-      clientCompanyName: this.vehicleEntry.clientCompanyName,
-      clientCompanyCnpj: this.vehicleEntry.clientCompanyCnpj,
-      clientCompanyCpf: this.vehicleEntry.clientCompanyCpf,
-      clientCompanyRg: this.vehicleEntry.clientCompanyRg,
-    });
+    if (this.vehicleEntry.clientCompanyName != 'not') {
+      this.formClientCompany.patchValue({
+        clientCompanyId: this.vehicleEntry.clientCompanyId,
+        clientCompanyName: this.vehicleEntry.clientCompanyName,
+        clientCompanyCnpj: this.vehicleEntry.clientCompanyCnpj,
+        clientCompanyCpf: this.vehicleEntry.clientCompanyCpf,
+        clientCompanyRg: this.vehicleEntry.clientCompanyRg,
+      });
+    }
 
     //Form Driver
     this.formDriver.patchValue({
@@ -598,8 +600,6 @@ export default class ManutencaoComponent implements OnInit {
   hideDialogFilterClientCompany() {
     this.dialogVisibleClientCompany = false;
   }
-
-
   //Driver
   async photoEntryDriver() {
     const image = this.openCamera();
@@ -1031,7 +1031,7 @@ export default class ManutencaoComponent implements OnInit {
     this.vehicleEntry.color = vehicleValue.color.at(0).color;
 
     this.vehicleEntry.idUserAttendant = vehicleValue.userAttendant.at(0)?.id ?? null;
-    this.vehicleEntry.nameUserAttendant = vehicleValue.userAttendant.at(0)?.name ?? null ;
+    this.vehicleEntry.nameUserAttendant = vehicleValue.userAttendant.at(0)?.name ?? null;
 
     this.vehicleEntry.kmEntry = vehicleValue.kmEntry;
     this.vehicleEntry.kmExit = vehicleValue.kmExit;
