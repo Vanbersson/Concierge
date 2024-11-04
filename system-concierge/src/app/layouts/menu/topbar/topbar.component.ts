@@ -2,6 +2,7 @@ import { Component, signal, ViewChild, ElementRef, Output, EventEmitter } from '
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { FormControl, FormsModule, ReactiveFormsModule, FormGroup, Validators } from '@angular/forms';
+import { VehicleExitComponent } from '../../../views/concierge/vehicle-exit/vehicle-exit.component';
 
 //PrimeNg
 import { ButtonModule } from 'primeng/button';
@@ -17,6 +18,7 @@ import { DropdownModule } from "primeng/dropdown";
 import { ImageModule } from 'primeng/image';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
+import { OverlayPanelModule } from 'primeng/overlaypanel';
 
 
 //Service
@@ -27,10 +29,11 @@ import { IUser } from '../../../interfaces/user/iuser';
 import { StorageService } from '../../../services/storage/storage.service';
 
 
+
 @Component({
   selector: 'app-topbar',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterLink, ToastModule, ButtonModule, SidebarModule, DialogModule, BadgeModule, AvatarModule, InputMaskModule, ImageModule, InputTextModule, RadioButtonModule, DropdownModule, PasswordModule],
+  imports: [CommonModule,VehicleExitComponent, FormsModule, ReactiveFormsModule, RouterLink,OverlayPanelModule, ToastModule, ButtonModule, SidebarModule, DialogModule, BadgeModule, AvatarModule, InputMaskModule, ImageModule, InputTextModule, RadioButtonModule, DropdownModule, PasswordModule],
   templateUrl: './topbar.component.html',
   styleUrl: './topbar.component.scss',
   providers: [MessageService]
@@ -66,6 +69,7 @@ export class TopbarComponent {
   userPhoto!: string;
   userEmail!: string;
   userRoleDescription!: string;
+  limitDiscount = signal<number>(0);
 
   userFormView = new FormGroup({
     status: new FormControl<string>({ value: '', disabled: true }),
@@ -121,7 +125,7 @@ export class TopbarComponent {
   }
 
   getPhotoUser() {
-    this.userPhoto = this.storageService.photo != "null" ? this.storageService.photo : "";
+   this.userPhoto = this.storageService.photo;
   }
 
   getRoleUser() {
@@ -152,6 +156,7 @@ export class TopbarComponent {
   dataViewUser() {
 
     this.userEmail = this.user.email;
+    this.limitDiscount.set(this.user.limitDiscount);
     this.userFormView.patchValue({
       status: this.user.status,
       name: this.user.name,

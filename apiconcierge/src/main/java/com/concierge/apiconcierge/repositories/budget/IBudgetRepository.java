@@ -4,8 +4,8 @@ import com.concierge.apiconcierge.models.budget.Budget;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-
 @Repository
-public interface BudgetIRepository extends JpaRepository<Budget, Integer> {
+public interface IBudgetRepository extends JpaRepository<Budget, Integer> {
+
+    Budget findByVehicleEntryId(Integer vehicleEntryId);
 }

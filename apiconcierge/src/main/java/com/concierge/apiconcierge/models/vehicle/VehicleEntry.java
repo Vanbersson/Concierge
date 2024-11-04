@@ -39,9 +39,6 @@ public class VehicleEntry implements Serializable {
     @Column(name = "step_entry")
     private StepVehicleEnum stepEntry;
 
-    @Column(name = "budget_id")
-    private Integer budgetId;
-
     @Column(name = "budget_status")
     private StatusBudgetEnum budgetStatus;
 
@@ -57,6 +54,15 @@ public class VehicleEntry implements Serializable {
 
     @Column(name = "date_prevision_exit")
     private Date datePrevisionExit;
+
+    @Column(name = "user_id_exit")
+    private Integer userIdExit;
+
+    @Column(name = "user_name_exit")
+    private String userNameExit;
+
+    @Column(name = "date_exit")
+    private Date dateExit;
 
     @JoinColumn(table = "tb_user", referencedColumnName = "id")
     @Column(name = "id_user_attendant")

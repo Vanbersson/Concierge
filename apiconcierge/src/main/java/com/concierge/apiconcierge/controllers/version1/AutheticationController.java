@@ -21,6 +21,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.net.http.HttpHeaders;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/auth")
@@ -48,10 +50,17 @@ public class AutheticationController {
         //Last Session
         user.setLastSession(new Date());
         this.userRepository.save(user);
+        Map<String, Object> map = new HashMap<>();
+        if(user.getPhoto() == null){
+            map.put("photo","");
+        }else{
+            map.put("photo",user.getPhoto());
+        }
+        map.put("name",user.getName());
+        map.put("roleDesc",user.getRoleDesc());
+        map.put("token",token);
 
-        var response = new AuthResponseDto(user.getPhoto(), user.getName(), user.getRoleDesc(), token);
-
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        return ResponseEntity.status(HttpStatus.OK).body(map);
     }
 
     @PostMapping("/validToken")

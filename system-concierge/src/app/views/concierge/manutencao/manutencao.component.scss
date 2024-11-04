@@ -1,12 +1,20 @@
 :host {
 
+    .layout-main-between {
+        width: 100%;
+        min-height: calc(100vh - 15rem);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+
+    }
+
     .layout-input-disabled {
         display: flex;
         font-size: 1rem;
         padding: 0.75rem;
         border-radius: 6px;
         border: 1px solid var(--color-grey-300);
-
     }
 
     .layout-input-disabled-area-text {
@@ -41,6 +49,7 @@
             display: flex;
             align-items: center;
             height: 29px;
+            padding-right: 1.5rem;
         }
 
     }
@@ -84,10 +93,12 @@
         }
     }
 
-    ::ng-deep .p-image-preview-container>img {
+   
+
+   /*  ::ng-deep .p-image-preview-container>img {
         width: 80px;
         height: 80px;
-    }
+    } */
 
     .layout-file {
         display: flex;
@@ -150,12 +161,37 @@
         border: solid 1px var(--color-grey-300);
     }
 
+    ::ng-deep {
+        .p-button.p-button-secondary-custom {
+            color: #475569;
+            background-color: #f1f5f9;
+            border: 1px solid #f1f5f9
+        }
+        .p-button.p-button-secondary-custom:hover {
+            background-color: #e9ecee;
+            border: 1px solid #e9ecee
+        }
+
+        .p-button.p-button-success-custom {
+            color: #475569;
+            background-color: #acf3aa;
+            border: 1px solid #acf3aa
+        }
+        .p-button.p-button-success-custom:hover {
+            background-color: #a0f19e;
+            border: 1px solid #a0f19e
+        }
+
+        .p-image-preview-container>img {
+            width: 80px;
+            height: 80px;
+        }
+    }
+
     /* Small devices (portrait tablets and large phones, 600px and up) */
     @media only screen and (min-width: 375px) and (max-width: 667px) {
-
         .mobile-disabled {
             display: none;
-
         }
 
         .layourt-button-action {
@@ -164,13 +200,12 @@
 
         .layourt-button-action-speedDial {
             display: flex;
-            position: absolute !important;
-            top: 40vh;
-            right: 16vw;
+            position: fixed !important;
+            bottom: 32vh;
+            right: 18vw;
         }
 
         ::ng-deep {
-
             .p-image-preview-container>img {
                 width: 68px;
                 height: 68px;

@@ -81,6 +81,25 @@ public class ClientCompany implements Serializable {
     @Column(name = "address_complement")
     private String addressComplement;
 
+    @Column(name = "contact_name")
+    private String contactName;
+
+    @Column(name = "contact_email")
+    private String contactEmail;
+
+    @Column(name = "contact_ddd_phone")
+    private String contactDDDPhone;
+
+    @Column(name = "contact_phone")
+    private String contactPhone;
+
+    @Column(name = "contact_ddd_cellphone")
+    private String contactDDDCellphone;
+
+    @Column(name = "contact_cellphone")
+    private String contactCellphone;
+
+
 
 
 

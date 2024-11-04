@@ -8,14 +8,14 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 public record ClientCompanyDto(
-        @NotNull Integer companyId,
-        @NotNull Integer resaleId,
+        Integer companyId,
+        Integer resaleId,
         Integer id,
-        @NotNull StatusEnableDisable status,
-        @NotBlank String name,
+        StatusEnableDisable status,
+        String name,
         String fantasia,
-        @NotNull CliForEnum clifor,
-        @NotNull FisJurEnum fisjur,
+        CliForEnum clifor,
+        FisJurEnum fisjur,
         String cnpj,
         String cpf,
         String rg,
@@ -25,12 +25,18 @@ public record ClientCompanyDto(
         String cellphone,
         String dddPhone,
         String phone,
-        @NotBlank String zipCode,
-        @NotBlank String state,
-        @NotBlank String city,
-        @NotBlank String neighborhood,
-        @NotBlank String address,
-        @NotBlank String addressNumber,
-        String addressComplement
+        String zipCode,
+        String state,
+        String city,
+        String neighborhood,
+        String address,
+        String addressNumber,
+        String addressComplement,
+        String contactName,
+        String contactEmail,
+        String contactDDDPhone,
+        String contactPhone,
+        String contactDDDCellphone,
+        String contactCellphone
 ) {
 }

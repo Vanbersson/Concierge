@@ -2,12 +2,12 @@ import { Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import { Observable } from 'rxjs';
 import { HttpClient, HttpHeaders, HttpResponse } from '@angular/common/http';
-import { IBudgetService } from '../../interfaces/budget/ibudget-service';
 import { StorageService } from '../storage/storage.service';
-import { IBudget } from '../../interfaces/budget/ibudget';
+
 import { IBudgetNew } from '../../interfaces/budget/ibudget-new';
 import { BudgetRequisition } from '../../models/budget/budget-requisition';
 import { BudgetServiceItem } from '../../models/budget/budget-item-service';
+import { Budget } from '../../models/budget/budget';
 
 @Injectable({
   providedIn: 'root'
@@ -16,8 +16,16 @@ export class BudgetService {
 
   constructor(private http: HttpClient, private storage: StorageService) { }
 
-  addBudget$(vehicleId: IBudgetNew): Observable<HttpResponse<IBudget>> {
-    return this.http.post<IBudget>(environment.apiuUrl + "/vehicle/entry/budget/save", vehicleId, { headers: this.myHeaders(), observe: 'response', responseType: 'json' });
+  addBudget$(vehicleId: IBudgetNew): Observable<HttpResponse<Budget>> {
+    return this.http.post<Budget>(environment.apiuUrl + "/vehicle/entry/budget/save", vehicleId, { headers: this.myHeaders(), observe: 'response', responseType: 'json' });
+  }
+
+  updateBudget$(budget: Budget): Observable<HttpResponse<Budget>> {
+    return this.http.post<Budget>(environment.apiuUrl + "/vehicle/entry/budget/update", budget, { headers: this.myHeaders(), observe: 'response', responseType: 'json' });
+  }
+
+  getBudgetFilterVehicle$(vehicleId: number): Observable<Budget> {
+    return this.http.get<Budget>(environment.apiuUrl + "/vehicle/entry/budget/filter/vehicle/" + vehicleId, { headers: this.myHeaders() });
   }
 
   //Requisition

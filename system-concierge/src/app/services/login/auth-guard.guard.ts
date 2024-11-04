@@ -7,7 +7,7 @@ export const authGuardGuard: CanActivateFn = (route, state) => {
   const router = inject(Router);
   const storage = inject(StorageService);
 
-  if (!storage.token || !storage.roleDesc || !storage.name || !storage.photo) {
+  if (!storage.token || !storage.roleDesc || !storage.name) {
     storage.deleteStorage();
     router.navigateByUrl("/login");
     return false;

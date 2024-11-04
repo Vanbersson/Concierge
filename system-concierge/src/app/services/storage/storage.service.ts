@@ -11,7 +11,7 @@ export class StorageService {
   constructor() { }
 
   set photo(photo: string) {
-    sessionStorage.setItem('photo', photo);
+      sessionStorage.setItem('photo', photo);
   }
   get photo(): string {
     return sessionStorage.getItem("photo");

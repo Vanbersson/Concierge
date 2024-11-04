@@ -6,6 +6,8 @@ import { StorageService } from '../storage/storage.service';
 
 //class
 import { VehicleEntry } from '../../models/vehicle/vehicle-entry';
+import { VehicleEntryAuth } from '../../models/vehicle/vehicle-entry-auth';
+import { MessageError } from '../../models/error/messageerror';
 
 @Injectable({
   providedIn: 'root'
@@ -22,8 +24,11 @@ export class VehicleService {
     return this.http.post<VehicleEntry>(environment.apiuUrl + "/vehicle/entry/update", vehicle, { headers: this.myHeaders(), observe: 'response' });
   }
 
-  entryList$(): Observable<VehicleEntry[]> {
-    return this.http.get<VehicleEntry[]>(environment.apiuUrl + "/vehicle/entry/all", { headers: this.myHeaders() });
+  allAuthorized$(): Observable<VehicleEntry[]> {
+    return this.http.get<VehicleEntry[]>(environment.apiuUrl + "/vehicle/entry/allAuthorized", { headers: this.myHeaders() });
+  }
+  allPendingAuthorization$(): Observable<VehicleEntry[]> {
+    return this.http.get<VehicleEntry[]>(environment.apiuUrl + "/vehicle/entry/allPendingAuthorization", { headers: this.myHeaders() });
   }
 
   entryFilterId$(id: number): Observable<HttpResponse<VehicleEntry>> {
@@ -37,16 +42,16 @@ export class VehicleService {
 
 
   /* Falta */
-  entryAddAuth(auth: any) {
-    return this.http.post(environment.apiuUrl + "/vehicleEntry/add/authorization", auth, { headers: this.myHeaders(), observe: 'response', responseType: 'text' });
+  entryAddAuth(auth: VehicleEntryAuth): Observable<HttpResponse<VehicleEntryAuth>> {
+    return this.http.post<VehicleEntryAuth>(environment.apiuUrl + "/vehicle/entry/authorization/add", auth, { headers: this.myHeaders(), observe: 'response' });
   }
 
-  entryDeleteAuth1(auth: any) {
-    return this.http.post(environment.apiuUrl + "/vehicleEntry/delete/authorization1", auth, { headers: this.myHeaders(), observe: 'response', responseType: 'text' });
+  entryDeleteAuth1(auth: VehicleEntryAuth) {
+    return this.http.post(environment.apiuUrl + "/vehicle/entry/authorization/delete1", auth, { headers: this.myHeaders(), observe: 'response', responseType: 'text' });
   }
 
-  entryDeleteAuth2(auth: any) {
-    return this.http.post(environment.apiuUrl + "/vehicleEntry/delete/authorization2", auth, { headers: this.myHeaders(), observe: 'response', responseType: 'text' });
+  entryDeleteAuth2(auth: VehicleEntryAuth) {
+    return this.http.post(environment.apiuUrl + "/vehicle/entry/authorization/delete2", auth, { headers: this.myHeaders(), observe: 'response', responseType: 'text' });
   }
 
   private myHeaders(): HttpHeaders {

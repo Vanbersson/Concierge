@@ -19,6 +19,7 @@ import { StorageService } from '../../services/storage/storage.service';
 
 //Interface
 import { IAuth } from '../../interfaces/auth/iauth';
+import { BusyService } from '../../components/loading/busy.service';
 
 
 @Component({
@@ -46,7 +47,9 @@ export default class LoginComponent implements OnInit {
     private messageService: MessageService,
     private _fb: FormBuilder,
     private router: Router,
-    public layoutService: LayoutService, private storageService: StorageService) {
+    public layoutService: LayoutService,
+    private storageService: StorageService,
+    private busyService: BusyService) {
 
 
   }
@@ -71,35 +74,30 @@ export default class LoginComponent implements OnInit {
     if (valid) {
       this.login = { email: value.email, password: value.password };
 
+      this.busyService.busy();
       this.auth.login(this.login).subscribe(
         (data) => {
-          
+
           this.storageService.photo = data.body.photo;
           this.storageService.name = data.body.name;
           this.storageService.roleDesc = data.body.roleDesc;
           this.storageService.token = data.body.token;
-
-          this.showSuccess(data.body.name);
+          this.busyService.idle();
+         
+          this.messageService.add({ severity: 'success', summary: 'Bem-vindo', detail: data.body.name, icon: 'pi pi-lock-open', life: 2000 });
 
           setTimeout(() => {
             this.router.navigateByUrl('/dashboard');
           }, 2000);
 
         }, (error) => {
-          this.showError();
+          this.busyService.idle();
+          this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Login ou senha inválido', icon: 'pi pi-lock', life: 2000 });
         }
       );
 
     }
 
-  }
-
-  showSuccess(nome: string) {
-    this.messageService.add({ severity: 'success', summary: 'Bem-vindo', detail: nome, icon: 'pi pi-lock-open', life: 3000 });
-  }
-
-  showError() {
-    this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Login ou senha inválido', icon: 'pi pi-lock' });
   }
 
   forgetPass() {

@@ -1,6 +1,24 @@
-:host{
-    >a{
-        text-decoration: none;
-        color: var(--color-grey-700);
+:host {
+
+    ::ng-deep {
+        span {
+            text-decoration: none;
+            color: #334155;
+        }
+        
+        .p-panelmenu .p-panelmenu-content {
+            border: none;
+        }
+    
+        .p-panelmenu .p-panelmenu-header .p-panelmenu-header-content {
+            border: none;
+        }
+    
     }
+
+    .sidestyle{
+        width: 100%;
+    }
+
 }
+

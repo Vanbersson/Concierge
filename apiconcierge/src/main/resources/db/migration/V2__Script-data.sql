@@ -23,9 +23,7 @@ VALUES
 INSERT INTO `tb_resale`
 (`company_id`,`status`, `name`, `cnpj`, `email`, `cellphone`, `phone`,  `zip_code`, `state`, `city`, `neighborhood`, `address`, `address_number`)
 VALUES
-(1,0,'Nativa Máquinas e Implementos Ltda','08274520000102','ti@nativarossi.com.br','','8135211030','54590000', 'PE','Cabo de Santo Agostinho','Distrito DIPER','Via pedro rossi','382'),
-(1,1,'Nativa Máquinas Peças','06274520000202','ti@nativarossi.com.br','','8135211030','54590000', 'PB','Cabo de Santo Agostinho','Distrito DIPER','Via pedro rossi','382'),
-(1,1,'Nativa Máquinas Serviços','04274520000303','ti@nativarossi.com.br','','8135211030','54590000', 'AL','Cabo de Santo Agostinho','Distrito DIPER','Via pedro rossi','382');
+(1,0,'Nativa Máquinas e Implementos Ltda','08274520000102','ti@nativarossi.com.br','','8135211030','54590000', 'PE','Cabo de Santo Agostinho','Distrito DIPER','Via pedro rossi','382');
 
 INSERT INTO `tb_user_role`
 (`company_id`, `resale_id`, `status`, `description`)
@@ -44,12 +42,12 @@ VALUES
 (1,1,0,'Recursos Humanos');
 
 INSERT INTO `tb_user`
-(`company_id`, `resale_id`, `status`, `name`,`email`, `password`, `cellphone`, `role_id`,`role_desc`,`role_func`)
+(`company_id`, `resale_id`, `status`, `name`,`email`, `password`, `cellphone`, `role_id`,`role_desc`,`role_func`,`limit_discount`)
 VALUES
-(1,1,0,'Administrador','vambersson@gmail.com','$2a$10$9EKoKdyZdu.iFS8QnBykoOCW1Gix0PB/k6PN5L5t7URoddZ.wsu9i','81982158862',1,'TI',0),
-(1,1,0,'Daniela Batista','servicos1@nativarossi.com.br','$2a$12$9ikssJkNBTMRacAricc9/uCJkj1LE7bL8jdYN6QtLb7AkpRthLUai','81996660114',2,'Vendedor',1),
-(1,1,0,'Allyson Rogerio','servicos2@nativarossi.com.br','$2a$12$9ikssJkNBTMRacAricc9/uCJkj1LE7bL8jdYN6QtLb7AkpRthLUai','81996670018',2,'Vendedor',1),
-(1,1,0,'Alef Fernando','servicos3@nativarossi.com.br','$2a$12$9ikssJkNBTMRacAricc9/uCJkj1LE7bL8jdYN6QtLb7AkpRthLUai','8196670017',2,'Vendedor',1);
+(1,1,0,'Administrador','vambersson@gmail.com','$2a$10$9EKoKdyZdu.iFS8QnBykoOCW1Gix0PB/k6PN5L5t7URoddZ.wsu9i','81982158862',1,'TI',0,100),
+(1,1,0,'Daniela Batista','servicos1@nativarossi.com.br','$2a$12$9ikssJkNBTMRacAricc9/uCJkj1LE7bL8jdYN6QtLb7AkpRthLUai','81996660114',2,'Vendedor',1,10),
+(1,1,0,'Allyson Rogerio','servicos2@nativarossi.com.br','$2a$12$9ikssJkNBTMRacAricc9/uCJkj1LE7bL8jdYN6QtLb7AkpRthLUai','81996670018',2,'Vendedor',1,10),
+(1,1,0,'Alef Fernando','servicos3@nativarossi.com.br','$2a$12$9ikssJkNBTMRacAricc9/uCJkj1LE7bL8jdYN6QtLb7AkpRthLUai','8196670017',2,'Vendedor',1,10);
 
 INSERT INTO tb_vehicle_model
 (company_id, resale_id, status, description)
@@ -78,14 +76,27 @@ VALUES
 (1,1,0,'P.F. Consumidor'),
 (1,1,0,'O.C. Outro Consumidor');
 
+INSERT INTO tb_type_payment
+(`company_id`, `resale_id`, `status`, `description`)
+VALUE
+(1,1,0,'dinheiro espécie'),
+(1,1,0,'faturamento especial'),
+(1,1,0,'pix'),
+(1,1,0,'cartão de crédito'),
+(1,1,0,'cartão de débito');
+
 INSERT INTO `tb_client_company`
 (`company_id`, `resale_id`, `status`, `name`, `fantasia`, `clifor`, `fisjur`,`cnpj`, `cpf`, `rg`,
  `email_home`, `email_work`, `ddd_cellphone`, `cellphone`, `ddd_phone`, `phone`, `zip_code`, `state`, `city`,
- `neighborhood`, `address`, `address_number`, `address_complement`)
-VALUES (1,1,0,'bbm logistica s.a','bbm logistica s.a',0,1,'01107327000804','','','','','81','981541754','','',
-'54503900','pe','cabo de santos agostinho', 'distrito industrial diper','km 96,4 bloco central de frete','0',''),
+ `neighborhood`, `address`, `address_number`, `address_complement`,
+ `contact_name`, `contact_email`, `contact_ddd_phone`, `contact_phone`, `contact_ddd_cellphone`, `contact_cellphone`)
+VALUES
+(1,1,0,'bbm logistica s.a','bbm logistica s.a',0,1,'01107327000804','','','','','81','981541754','','',
+'54503900','pe','cabo de santos agostinho', 'distrito industrial diper','km 96,4 bloco central de frete','0','','','','','','',''),
+(1,1,0,'Janeide Maria','Janeide Maria',0,0,'','06892001452','1234567','','','81','981541754','','',
+'54503900','pe','cabo de santos agostinho', 'distrito industrial diper','km 96,4 bloco central de frete','0','','','','','','',''),
 (1,1,0,'santin equipamentos transp. importação exportação ltda','santin',0,1,'05134355000197','','','','','','','16','33939999',
-'14820000','sp','americo brasiliense', 'iii distrito industrial','av. herminio cristovão','110','');
+'14820000','sp','americo brasiliense', 'iii distrito industrial','av. herminio cristovão','110','','','','','','','');
 
 
 

@@ -1,31 +1,31 @@
-import { IVehicleEntry } from "../../interfaces/vehicle/ivehicle-entry";
-
-
-export class VehicleEntry implements IVehicleEntry {
+export class VehicleEntry {
     companyId: number = 0;
     resaleId: number = 0;
     id: number = 0;
     status: string = '';
     stepEntry: string = '';
-    budgetId: number | null = null;
     budgetStatus: string = '';
 
     idUserEntry: number = 0;
     nameUserEntry: string = '';
-    dateEntry: Date | string | null = null;
-    datePrevisionExit: Date | null = null;
+    dateEntry: Date | string = '';
+    datePrevisionExit: Date | string = '';
     days: number = 0;
 
-    idUserAttendant: number | null = null;
+    userIdExit: number = 0;
+    userNameExit: string = '';
+    dateExit: Date | string = '';
+
+    idUserAttendant: number = 0;
     nameUserAttendant: string = '';
 
-    idUserExitAuth1: number | null = null;
+    idUserExitAuth1: number = 0;
     nameUserExitAuth1: string = '';
-    dateExitAuth1: Date | null = null;
+    dateExitAuth1: Date | string = '';
 
-    idUserExitAuth2: number | null = null;
+    idUserExitAuth2: number = 0;
     nameUserExitAuth2: string = '';
-    dateExitAuth2: Date | null = null;
+    dateExitAuth2: Date | string = '';
 
     statusAuthExit: string = '';
 
@@ -41,18 +41,18 @@ export class VehicleEntry implements IVehicleEntry {
     driverEntryName: string = '';
     driverEntryCpf: string = '';
     driverEntryRg: string = '';
-    driverEntryPhoto: string | null = null;
-    driverEntrySignature: string | null = null;
-    driverEntryPhotoDoc1: string | null = null;
-    driverEntryPhotoDoc2: string | null = null;
+    driverEntryPhoto: string = '';
+    driverEntrySignature: string = '';
+    driverEntryPhotoDoc1: string = '';
+    driverEntryPhotoDoc2: string = '';
 
     driverExitName: string = '';
     driverExitCpf: string = '';
     driverExitRg: string = '';
-    driverExitPhoto: string | null = null;
-    driverExitSignature: string | null = null;
-    driverExitPhotoDoc1: string | null = null;
-    driverExitPhotoDoc2: string | null = null;
+    driverExitPhoto: string = '';
+    driverExitSignature: string = '';
+    driverExitPhotoDoc1: string = '';
+    driverExitPhotoDoc2: string = '';
 
     color: string = '';
     placa: string = '';
@@ -61,10 +61,10 @@ export class VehicleEntry implements IVehicleEntry {
     kmEntry: string = '';
     kmExit: string = '';
 
-    photo1: string | null = null;
-    photo2: string | null = null;
-    photo3: string | null = null;
-    photo4: string | null = null;
+    photo1: string = '';
+    photo2: string = '';
+    photo3: string = '';
+    photo4: string = '';
 
     quantityExtinguisher: number = 0;
     quantityTrafficCone: number = 0;

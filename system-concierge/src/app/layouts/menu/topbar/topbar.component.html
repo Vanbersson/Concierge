@@ -1,6 +1,6 @@
 <div class="layout-topbar">
     <a class="layout-topbar-logo" routerLink="/">
-        <img src="assets/layout/images/logotruck.png" alt="logo">
+        <img src="assets/layout/images/logo-black.png" alt="logo">
         <span>AUTOPOINT</span>
     </a>
 
@@ -16,13 +16,16 @@
     <div #topbarmenu class="layout-topbar-menu"
         [ngClass]="{'layout-topbar-menu-mobile-active':layoutService.state.profileSidebarVisible}">
 
+        <button class="p-link layout-topbar-button" (click)="opVehicle.toggle($event)">
+            <i class="pi pi-car"></i>
+            <span>Veículos</span>
+        </button>
         <button class="p-link layout-topbar-button">
             <i class="pi pi-bell"></i>
             <span>Notificação</span>
         </button>
-
         <button class="p-link layout-topbar-button" (click)="showSideBarRight()">
-            <i class="pi pi-user"></i>
+            <i class="pi pi-align-right"></i>
             <span>Configuração</span>
         </button>
 
@@ -144,27 +147,33 @@
             </div>
 
             <div class="field col-12 md:col-12">
-                <label for="nameid">Nome</label>
+                <span class="text-500">Nome</span>
                 <input pInputText id="nameid" type="text" formControlName="name" />
                 <small class="p-error block"
                     *ngIf="userFormView.get('name')?.invalid && userFormView.get('name')?.dirty">
                     Campo obrigatório</small>
             </div>
 
-            <div class="field col-12 md:col-8">
-                <label for="emailid">Email</label>
+            <div class="field col-12 md:col-6">
+                <span class="text-500">Email</span>
                 <div class="layout-input-disabled">
-                    <span>{{userEmail}}</span>
+                    <span class="text-500 font-medium"><strong>{{userEmail}}</strong></span>
                 </div>
             </div>
 
             <div class="field col-12 md:col-4">
-                <label for="cellphoneid">Celular</label>
+                <span class="text-500">Celular</span>
                 <p-inputMask id="cellphoneid" mask="(99) 9 9999-9999" formControlName="cellphone" unmask="true" />
+            </div>
+            <div class="field col-12 md:col-2">
+                <span class="text-500">Desconto</span>
+                <div class="layout-input-disabled">
+                    <span class="text-500 font-medium"><strong>{{limitDiscount()}}%</strong></span>
+                </div>
             </div>
 
             <div class="field col-12 md:col-4">
-                <label for="passwordid">Senha</label>
+                <span class="text-500">Senha</span>
                 <p-password id="passwordid" formControlName="password" [feedback]="false" [toggleMask]="true" />
                 <small class="p-error block"
                     *ngIf="userFormView.get('password')?.invalid && userFormView.get('password')?.dirty">
@@ -172,7 +181,7 @@
             </div>
 
             <div class="field col-12 md:col-4">
-                <label for="passwordvalidid">Repetir senha</label>
+                <span class="text-500">Repetir senha</span>
                 <p-password id="passwordvalidid" formControlName="passwordValid" [feedback]="false"
                     [toggleMask]="true" />
                 <small class="p-error block"
@@ -181,9 +190,9 @@
             </div>
 
             <div class="field col-12 md:col-4">
-                <label for="userrole">Cargo</label>
+                <span class="text-500">Cargo</span>
                 <div class="layout-input-disabled">
-                    <span>{{userRoleDescription | uppercase}}</span>
+                    <span class="text-500 font-medium"><strong>{{userRoleDescription | uppercase}}</strong></span>
                 </div>
             </div>
 
@@ -215,3 +224,7 @@
 
     </form>
 </p-dialog>
+
+<p-overlayPanel #opVehicle [style]="{ width: '480px' }">
+    <app-vehicle-exit></app-vehicle-exit>
+</p-overlayPanel>

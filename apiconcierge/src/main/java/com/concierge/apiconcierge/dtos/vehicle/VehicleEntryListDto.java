@@ -12,8 +12,7 @@ import java.util.Date;
  status, step_entry,budget_id, budget_status, name_user_entry,date_entry, name_user_attendant,id_user_exit_auth1, id_user_exit_auth2, status_auth_exit, model_description, client_company_name,placa,frota,vehicle_new
  */
 public record VehicleEntryListDto(
-        Integer companyId,
-        Integer resaleId,
+
         Integer id,
         String placa,
         VehicleYesNotEnum vehicleNew,
@@ -23,7 +22,6 @@ public record VehicleEntryListDto(
         String nameUserAttendant,
         String clientCompanyName,
         StatusBudgetEnum budgetStatus,
-        Integer idUserExitAuth1,
-        Integer idUserExitAuth2,
+
         StatusAuthExitEnum statusAuthExit) {
 }

@@ -1,6 +1,9 @@
 <div class="layout-card">
 
-    <p-toast/>
+ 
+    
+
+    <p-toast />
 
     <p-toast position="top-center" key="toastInfoDiscount" (onClose)="onCloseAlertDiscount()" [baseZIndex]="5000">
         <ng-template let-message pTemplate="headless" let-closeFn="closeFn">
@@ -10,8 +13,9 @@
                     <p class="m-0 font-semibold text-base text-white">
                         {{ message.summary }}
                     </p>
-                    <p class="m-0 text-primary-500 text-2xl text-700">
-                        {{ (totalBudgetDiscountService() + totalBudgetDiscountItem()) | currency }}
+                    <p class="m-0 text-primary-500  text-700">
+                        {{ (totalBudgetDiscountService() + totalBudgetDiscountItem()) | currency }} de
+                        {{(totalBudgetService() * limitUserDiscount()/100) | currency}}
                     </p>
                     <div class="flex flex-column gap-2">
                         <p-progressBar [value]="progressDiscount" [showValue]="false" [style]="{ height: '4px' }" />
@@ -20,7 +24,6 @@
                         </label>
                     </div>
                     <div class="flex gap-3 mb-3">
-                        <p-button label="Do seu desconto!" [text]="true" styleClass="p-0" (onClick)="closeFn($event)" />
                         <p-button label="Entendi" [text]="true" styleClass="text-white p-0"
                             (onClick)="closeFn($event)" />
                     </div>
@@ -32,292 +35,521 @@
     <div class="layout-card-title">
         <span>Orçamento</span>
         <div class="layourt-button-back">
-            <button pButton severity="secondary" icon="pi pi-arrow-left" size="small" label="Voltar"
-                routerLink="/portaria/manutencao/1"></button>
+            <button pButton type="button" [text]="true" severity="contrast" icon="pi pi-sign-out" 
+                [routerLink]="'/portaria/manutencao/'+vehicleId()"></button>
         </div>
     </div>
-    
-    <p-tabView>
-        <p-tabPanel header="Resumo">
+
+    <form [formGroup]="formBudget">
+
+        <div class="card">
             <div class="grid p-fluid p-formgrid">
-                <div class="col-12 md:col-5">
-
-                    <form [formGroup]="formDiscount">
-                        <div class="grid p-fluid p-formgrid">
-                            <div class="col-12">
-                                <span>Desconto Serviço</span>
-                            </div>
-                            <div class="field col-12 md:col-4">
-                                <p-inputNumber suffix="%" formControlName="servPer" />
-                                <small>Desconto em Percentual</small>
-                            </div>
-
-                            <div class="field col-12 md:col-4">
-                                <p-inputNumber prefix="R$ " mode="decimal" [maxFractionDigits]="2"
-                                    formControlName="servVal" />
-                                <small>Desconto em Valor</small>
-                            </div>
-                            <div class="field col-12 md:col-4">
-                                <button pButton icon="pi pi-calculator" severity="secondary" class="mr-1"
-                                    (click)="addDiscountAllService()"></button>
-                                <button pButton icon="pi pi-times" severity="danger"
-                                    (click)="deleteAllDiscountService()"></button>
-                            </div>
-
-                        </div>
-                    </form>
-
-                    <form>
-                        <div class="grid p-fluid p-formgrid">
-                            <div class="col-12">
-                                <span>Desconto Peças</span>
-                            </div>
-                            <div class="field col-12 md:col-4">
-                                <p-inputNumber suffix="%" />
-                                <small>Desconto em Percentual</small>
-                            </div>
-
-                            <div class="field col-12 md:col-4">
-                                <p-inputNumber prefix="R$ " />
-                                <small>Desconto em Valor</small>
-                            </div>
-                            <div class="field col-12 md:col-4">
-                                <button pButton icon="pi pi-calculator" severity="secondary" class="mr-1"></button>
-                                <button pButton icon="pi pi-times" severity="danger"></button>
-                            </div>
-                        </div>
-                    </form>
-
+                <div class="col-12 md:col-2">
+                    <span class="text-500">Nrº Orçamento</span>
+                    <div class="layout-input-disabled">
+                        <span class="text-500 font-medium "><strong>{{viewBudgetId()}}</strong></span>
+                    </div>
                 </div>
-                <div class="md:col-2 mobile-disabled">
-                    <p-divider layout="vertical" />
+                <div class=" col-12 md:col-3">
+                    <span class="text-500">Data Geração</span>
+                    <div class="layout-input-disabled">
+                        <span class="text-500 font-medium ">
+                            <strong> {{viewBudgetDateGeneration() | date: 'dd/MM/yyyy HH:mm'}}</strong>
+                        </span>
+                    </div>
                 </div>
-                <div class="col-12 md:col-5">
-                    <div class="card">
-                        <div class="grid p-fluid p-formgrid">
-                            <div class="col-12 flex justify-content-between align-items-center">
-                                <span class="text-500">Serviço/Peças</span>
+                <div class="col-12 md:col-2">
+                    <span class="text-500">Validade</span>
+                    <p-calendar [iconDisplay]="'input'" [showIcon]="true" dateFormat="dd/mm/yy"
+                        formControlName="dateValidation" />
+                </div>
+                <div class="col-12 md:col-3">
+                    <span class="text-500">Responsavel</span>
+                    <input pInputText formControlName="nameResponsible" />
+                </div>
+                <div class="col-12 md:col-2">
+                    <span class="text-500">Consultor</span>
+                    <div class="layout-input-disabled">
+                        <span class="text-500 font-medium ">
+                            <strong>Daniela Batista</strong>
+                        </span>
+                    </div>
+                </div>
+                <div class="col-12 md:col-6">
+                    <span class="text-500">Cliente</span>
+                    <div class="layout-input-disabled">
+                        <span class="text-500 font-medium">
+                            <strong>{{viewClientName()| uppercase}}</strong>
+                        </span>
+                    </div>
+                </div>
+                @if(viewClientCnpj()!= ""){
+                <div class="col-12 md:col-4">
+                    <span class="text-500">CNPJ</span>
+                    <div class="layout-input-disabled">
+                        <span class="text-500 font-medium"><strong>{{viewClientCnpj()}}</strong></span>
+                    </div>
+                </div>
+                }@else {
+                <div class="col-12 md:col-4">
+                    <span class="text-500">CPF</span>
+                    <div class="layout-input-disabled">
+                        <span class="text-500 font-medium"><strong>{{viewClientCpf()}}</strong></span>
+                    </div>
+                </div>
+                }
 
-                                <div class="flex align-items-center justify-content-center bg-gray-100 border-round"
-                                    [ngStyle]="{width: '2.5rem', height: '2.5rem'}">
-                                    <i class="pi pi-book text-gray-500 text-xl"></i>
-                                </div>
-                            </div>
-                            <div class="col-12">
-                                <span class="text-500 mr-1">Serviço:</span>
-                                <span class="text-green-700  font-medium text-xl">+</span>
-                                <span class="text-500">{{totalBudgetService() | currency }}</span>
-                            </div>
-                            <div class="col-12">
-                                <span class="text-500 mr-1">Peças:</span>
-                                <span class="text-green-700 font-medium text-xl">+</span>
-                                <span class="text-500">{{totalBudgetItem() | currency}}</span>
-                            </div>
-                            <div class="col-12">
-                                <span class="text-500 mr-1">Desconto:</span>
-                                <span class="text-red-700 font-medium text-xl">-</span>
-                                <span class="text-500">{{(totalBudgetDiscountService() + totalBudgetItem()) |
-                                    currency}}</span>
-                            </div>
-                            <div class="col-12 flex">
-                                <span class="text-700 text-lg mr-1 ">Total:</span>
-                                <div class="text-700 font-medium text-lg">
-                                    {{
+                <div class="col-12 md:col-2">
+                    <span class="text-500">Telefone Cliente</span>
+                    <div class="layout-input-disabled">
+                        <span class="text-500 font-medium"> <strong>{{viewClientPhone()}}</strong></span>
+                    </div>
+                </div>
+                <div class="col-12 md:col-4">
+                    <span class="text-500">Contato</span>
+                    <div class="layout-input-disabled">
+                        <span class="text-500 font-medium"><strong>{{viewClientContactName()}}</strong></span>
+                    </div>
+                </div>
+                <div class="col-12 md:col-4">
+                    <span class="text-500">EMail</span>
+                    <div class="layout-input-disabled">
+                        <span class="text-500 font-medium"><strong>{{viewClientContactEmail()}}</strong></span>
+                    </div>
+                </div>
+                <div class="col-12 md:col-2">
+                    <span class="text-500">Celular</span>
+                    <div class="layout-input-disabled">
+                        <span class="text-500 font-medium"><strong>{{viewClientContactCellphone()}}</strong></span>
+                    </div>
+                </div>
+                <div class="col-12 md:col-2">
+                    <span class="text-500">Telefone</span>
+                    <div class="layout-input-disabled">
+                        <span class="text-500 font-medium"> <strong>{{viewClientContactPhone()}}</strong></span>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="grid">
+                    <div class="col-8 md:col-2">
+                        <span class="text-500">CEP</span>
+                        <div class="layout-input-disabled">
+                            <span class="text-500 font-medium"> <strong>{{viewClientZipCode()}}</strong></span>
+                        </div>
+                    </div>
+                    <div class="col-4 md:col-2">
+                        <span class="text-500">UF</span>
+                        <div class="layout-input-disabled">
+                            <span class="text-500 font-medium"><strong>{{viewClientState() | uppercase}}</strong></span>
+                        </div>
+                    </div>
+                    <div class="col-12 md:col-4">
+                        <span class="text-500">Município</span>
+                        <div class="layout-input-disabled">
+                            <span class="text-500 font-medium"><strong>{{viewClientCity() | uppercase}}</strong></span>
+                        </div>
+                    </div>
+                    <div class="col-12 md:col-4">
+                        <span class="text-500">Bairro</span>
+                        <div class="layout-input-disabled">
+                            <span class="text-500 font-medium"><strong>{{viewClientNeighborhood() |
+                                    uppercase}}</strong></span>
+                        </div>
+                    </div>
+                    <div class="col-12 md:col-6">
+                        <span class="text-500">Logradouro</span>
+                        <div class="layout-input-disabled">
+                            <span class="text-500 font-medium"><strong>{{viewClientAddress() |
+                                    uppercase}}</strong></span>
+                        </div>
+                    </div>
+                    <div class="col-12 md:col-1">
+                        <span class="text-500">Nrº</span>
+                        <div class="layout-input-disabled">
+                            <span class="text-500 font-medium"><strong>{{viewClientAddressNumber() |
+                                    uppercase}}</strong></span>
+                        </div>
+                    </div>
+                    <div class="col-12 md:col-5">
+                        <span class="text-500">Complemento</span>
+                        <div class="layout-input-disabled">
+                            <span class="text-500 font-medium"><strong>{{viewClientAddressComplement() |
+                                    uppercase}}</strong></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="mb-2"></div>
+            <div class="card">
+                <div class="grid">
+                    <div class="col-6 md:col-2">
+                        <span class="text-500">Placa</span>
+                        <div class="layout-input-disabled">
+                            <span class="text-500 font-medium"><strong>KTG-5210</strong></span>
+                        </div>
+                    </div>
+                    <div class="col-6 md:col-2">
+                        <span class="text-500">Frota</span>
+                        <div class="layout-input-disabled">
+                            <span class="text-500 font-medium"><strong>2510</strong></span>
+                        </div>
+                    </div>
+                    <div class="col-12 md:col-2">
+                        <span class="text-500">Modelo</span>
+                        <div class="layout-input-disabled">
+                            <span class="text-500 font-medium"><strong>Cavalo Mecanico</strong></span>
+                        </div>
+                    </div>
+                    <div class="col-6 md:col-2">
+                        <span class="text-500">Cor</span>
+                        <div class="layout-input-disabled">
+                            <span class="text-500 font-medium"><strong>Branco</strong></span>
+                        </div>
+                    </div>
+                    <div class="col-6 md:col-2">
+                        <span class="text-500">KM</span>
+                        <div class="layout-input-disabled">
+                            <span class="text-500 font-medium"><strong>12000</strong></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="mb-2"></div>
+        <div class="card">
+            <div class="grid p-fluid p-formgrid">
+                <div class="col-12 md:col-6">
+                    <span class="text-500">Informações complementares</span>
+                    <textarea pInputTextarea id="informacao" rows="5" cols="30"
+                        formControlName="information"></textarea>
+                </div>
+                <div class="col-12 md:col-6">
+                    <div class="grid p-fluid p-formgrid">
+                        <div class="col-12 md:col-4">
+                            <span>Forma de pagamento</span>
+                            <p-multiSelect [options]="listPayment" optionLabel="payment" display="chip"
+                                [selectionLimit]="1" placeholder="Selecione" formControlName="typePayment" />
+                        </div>
+                        <div class="col-12 md:col-4 flex flex-column">
+                            <span class="text-500">Total Orçamento</span>
+                            <span class="text-900 font-medium text-4xl">
+                                <strong>{{
                                     (totalBudgetService() + totalBudgetItem()) - (totalBudgetDiscountService() +
                                     totalBudgetDiscountItem()) | currency
-                                    }} </div>
-                            </div>
+                                    }} </strong>
+                            </span>
+                        </div>
+                        <div class="col-12 md:col-4 flex flex-column">
+                            <span class="text-500">Total Desconto</span>
+                            <span class="text-900 font-medium text-4xl">
+                                <strong>{{(totalBudgetDiscountService() + totalBudgetDiscountItem()) |
+                                    currency}}</strong>
+                            </span>
+                        </div>
+                        <div class="col-12 md:col-4">
+                            <button pButton type="button" label="Fazer Orçamento" size="large" [raised]="true"
+                                severity="warning" (click)="showDialogBudget()"></button>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="md:col-12 mobile-disabled">
-                <p-divider />
-            </div>
-            <div class="flex gap-2">
-                <button pButton label="Concluido" icon="pi pi-check" severity="success"></button>
-                <button pButton label="Imprimir" icon="pi pi-print" text="true" severity="secondary"></button>
-            </div>
-        </p-tabPanel>
+        </div>
+    </form>
 
-        <p-tabPanel header="Solicitação">
+    <div class="mt-2">
+        <button pButton type="button" label="Salvar Orçamento" size="small" [raised]="true" severity="secondary-custom"
+            icon="pi pi-check" (click)="saveBudget()"></button>
+        <button pButton type="button" label="Enviar" size="small" [raised]="true" severity="success-custom"
+            icon="pi pi-send" class="ml-2"></button>
+    </div>
 
-            <form [formGroup]="formBudgetRequisition">
-                <div class="p-fluid p-formgrid grid">
+    <p-dialog [(visible)]="visibleBudget" header="Fazer Orçamento" [modal]="true" [maximizable]="true"
+        [style]="{ width: '80rem' }" [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }">
 
-                    <div class="field col-12">
-                        <label for="idbudgetrequisition">Descrição da solicitação</label>
-                        <p-inputGroup>
-                            <input pInputText id="idbudgetrequisition" type="text" formControlName="description" />
+        <p-tabView>
+            <p-tabPanel header="Resumo">
+                <div class="grid p-fluid p-formgrid">
+                    <div class="col-12 md:col-5">
 
-                            @if(formBudgetRequisition.value.ordem != 0){
-                            <button pButton type="button" icon="pi pi-check" class="p-button-primary"
-                                (click)="updateBudgetRequisition()"></button>
-                            <button pButton type="button" icon="pi pi-times" class="p-button-danger"
-                                (click)=" cleanBudgetRequisition()"></button>
-                            }@else {
-                            <button pButton type="button" icon="pi pi-plus" class="p-button-primary"
-                                (click)="saveBudgetRequisition()"></button>
-                            }
+                        <form [formGroup]="formDiscount">
+                            <div class="grid p-fluid p-formgrid">
+                                <div class="col-12">
+                                    <span>Desconto Serviço</span>
+                                </div>
+                                <div class="field col-12 md:col-4">
+                                    <p-inputNumber suffix="%" formControlName="servPer" />
+                                    <small>Desconto em Percentual</small>
+                                </div>
 
-                        </p-inputGroup>
+                                <div class="field col-12 md:col-4">
+                                    <p-inputNumber prefix="R$ " mode="decimal" [maxFractionDigits]="2"
+                                        formControlName="servVal" />
+                                    <small>Desconto em Valor</small>
+                                </div>
+                                <div class="field col-12 md:col-4">
+                                    <button pButton icon="pi pi-calculator" severity="secondary" class="mr-1"
+                                        (click)="addDiscountAllService()"></button>
+                                    <button pButton icon="pi pi-times" severity="danger"
+                                        (click)="deleteAllDiscountService()"></button>
+                                </div>
+
+                            </div>
+                        </form>
+
+                        <form>
+                            <div class="grid p-fluid p-formgrid">
+                                <div class="col-12">
+                                    <span>Desconto Peças</span>
+                                </div>
+                                <div class="field col-12 md:col-4">
+                                    <p-inputNumber suffix="%" />
+                                    <small>Desconto em Percentual</small>
+                                </div>
+
+                                <div class="field col-12 md:col-4">
+                                    <p-inputNumber prefix="R$ " />
+                                    <small>Desconto em Valor</small>
+                                </div>
+                                <div class="field col-12 md:col-4">
+                                    <button pButton icon="pi pi-calculator" severity="secondary" class="mr-1"></button>
+                                    <button pButton icon="pi pi-times" severity="danger"></button>
+                                </div>
+                            </div>
+                        </form>
 
                     </div>
+                    <div class="md:col-2 mobile-disabled">
+                        <p-divider layout="vertical" />
+                    </div>
+                    <div class="col-12 md:col-5">
+                        <div class="card">
+                            <div class="grid p-fluid p-formgrid">
+                                <div class="col-12 flex justify-content-between align-items-center">
+                                    <span class="text-500">Serviço/Peças</span>
 
-
-
+                                    <div class="flex align-items-center justify-content-center bg-gray-100 border-round"
+                                        [ngStyle]="{width: '2.5rem', height: '2.5rem'}">
+                                        <i class="pi pi-book text-gray-500 text-xl"></i>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <span class="text-500 mr-1">Serviço:</span>
+                                    <span class="text-green-700  font-medium text-xl">+</span>
+                                    <span class="text-500">{{totalBudgetService() | currency }}</span>
+                                </div>
+                                <div class="col-12">
+                                    <span class="text-500 mr-1">Peças:</span>
+                                    <span class="text-green-700 font-medium text-xl">+</span>
+                                    <span class="text-500">{{totalBudgetItem() | currency}}</span>
+                                </div>
+                                <div class="col-12">
+                                    <span class="text-500 mr-1">Desconto:</span>
+                                    <span class="text-red-700 font-medium text-xl">-</span>
+                                    <span class="text-500">{{(totalBudgetDiscountService() + totalBudgetItem()) |
+                                        currency}}</span>
+                                </div>
+                                <div class="col-12 flex">
+                                    <span class="text-700 text-lg mr-1 ">Total:</span>
+                                    <div class="text-700 font-medium text-lg">
+                                        {{
+                                        (totalBudgetService() + totalBudgetItem()) - (totalBudgetDiscountService() +
+                                        totalBudgetDiscountItem()) | currency
+                                        }} </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </form>
+                <div class="md:col-12 mobile-disabled">
+                    <p-divider />
+                </div>
+            </p-tabPanel>
 
-            <p-table [value]="listBudgetRequisition" selectionMode="single" styleClass="p-datatable-sm"
-                [tableStyle]="{ 'width': '100%','height':'30rem' }" [scrollable]="true" scrollHeight="30rem">
-                <ng-template pTemplate="header">
-                    <tr>
-                        <th style="width: 10rem;">Ordem</th>
-                        <th style="width: 80rem;">Descrição</th>
-                        <th style="width: 10rem;">Editar</th>
-                        <th style="width: 10rem;">Remover</th>
-                    </tr>
-                </ng-template>
-                <ng-template pTemplate="body" let-requi>
-                    <tr>
-                        <td style="width: 10rem;">{{requi.ordem}}</td>
-                        <td style="width: 80rem;">{{requi.description}}</td>
-                        <td style="width: 10rem;"> <p-button icon="pi pi-pencil" [rounded]="true" [text]="true"
-                                size="small" severity="primary" (onClick)="editarBudgetRequisition(requi)"></p-button>
-                        </td>
-                        <td style="width: 10rem;">
-                            <p-button icon="pi pi-trash" [rounded]="true" [text]="true" size="small" severity="danger"
-                                (onClick)="removerBudgetRequisition(requi.ordem)"></p-button>
-                        </td>
-                    </tr>
-                </ng-template>
-            </p-table>
+            <p-tabPanel header="Solicitação">
 
-        </p-tabPanel>
+                <form [formGroup]="formBudgetRequisition">
+                    <div class="p-fluid p-formgrid grid">
 
-        <p-tabPanel header="Serviços">
-            <form [formGroup]="formBudgetService">
-                <div class="p-fluid p-formgrid grid">
+                        <div class="field col-12">
+                            <label for="idbudgetrequisition">Descrição da solicitação</label>
+                            <p-inputGroup>
+                                <input pInputText id="idbudgetrequisition" type="text" formControlName="description" />
 
-                    <div class="field col-12 md:col-6">
-                        <label for="idbudgetDescService">Descrição do serviço</label>
-                        <input pInputText id="idbudgetDescService" type="text" formControlName="description" />
-                    </div>
-                    <div class="field col-12 md:col-2">
-                        <label for="Quantidade">Tempo serviço</label>
-                        <p-inputNumber [showButtons]="true" buttonLayout="horizontal" inputId="horizontal"
-                            spinnerMode="horizontal" [step]="0.50"
-                            decrementButtonClass="p-button-outlined p-button-danger"
-                            incrementButtonClass="p-button-outlined p-button-success" incrementButtonIcon="pi pi-plus"
-                            decrementButtonIcon="pi pi-minus" formControlName="hourService" />
-                    </div>
-                    <div class="field col-12 md:col-2">
+                                @if(formBudgetRequisition.value.ordem != 0){
+                                <button pButton type="button" icon="pi pi-check" class="p-button-primary"
+                                    (click)="updateBudgetRequisition()"></button>
+                                <button pButton type="button" icon="pi pi-times" class="p-button-danger"
+                                    (click)=" cleanBudgetRequisition()"></button>
+                                }@else {
+                                <button pButton type="button" icon="pi pi-plus" class="p-button-primary"
+                                    (click)="saveBudgetRequisition()"></button>
+                                }
 
-                        <label for="valor">Valor hora</label>
-                        <p-inputNumber mode="decimal" inputId="currency-br" locale="pt-BR" [minFractionDigits]="2"
-                            formControlName="price" />
+                            </p-inputGroup>
+
+                        </div>
+
+
 
                     </div>
-                    <div class="field col-12 md:col-2">
-                        <label for="Quantidade">Desconto</label>
-                        <p-inputGroup>
+                </form>
+
+                <p-table [value]="listBudgetRequisition" selectionMode="single" styleClass="p-datatable-sm"
+                    [tableStyle]="{ 'width': '100%','height':'30rem' }" [scrollable]="true" scrollHeight="30rem">
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th style="width: 10rem;">Ordem</th>
+                            <th style="width: 80rem;">Descrição</th>
+                            <th style="width: 10rem;">Editar</th>
+                            <th style="width: 10rem;">Remover</th>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-requi>
+                        <tr>
+                            <td style="width: 10rem;">{{requi.ordem}}</td>
+                            <td style="width: 80rem;">{{requi.description}}</td>
+                            <td style="width: 10rem;"> <p-button icon="pi pi-pencil" [rounded]="true" [text]="true"
+                                    size="small" severity="primary"
+                                    (onClick)="editarBudgetRequisition(requi)"></p-button>
+                            </td>
+                            <td style="width: 10rem;">
+                                <p-button icon="pi pi-trash" [rounded]="true" [text]="true" size="small"
+                                    severity="danger" (onClick)="removerBudgetRequisition(requi.ordem)"></p-button>
+                            </td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+
+            </p-tabPanel>
+
+            <p-tabPanel header="Serviços">
+                <form [formGroup]="formBudgetService">
+                    <div class="p-fluid p-formgrid grid">
+
+                        <div class="field col-12 md:col-6">
+                            <label for="idbudgetDescService">Descrição do serviço</label>
+                            <input pInputText id="idbudgetDescService" type="text" formControlName="description" />
+                            <small class="p-error block" *ngIf="formBudgetService.get('description')?.invalid">
+                                Campo obrigatório</small>
+                        </div>
+                        <div class="field col-12 md:col-2">
+                            <label for="Quantidade">Tempo serviço</label>
+                            <p-inputNumber [showButtons]="true" buttonLayout="horizontal" inputId="horizontal"
+                                spinnerMode="horizontal" [step]="0.50"
+                                decrementButtonClass="p-button-outlined p-button-danger"
+                                incrementButtonClass="p-button-outlined p-button-success"
+                                incrementButtonIcon="pi pi-plus" decrementButtonIcon="pi pi-minus"
+                                formControlName="hourService" />
+                            <small class="p-error block" *ngIf="formBudgetService.get('hourService')?.invalid">
+                                Campo obrigatório</small>
+                        </div>
+                        <div class="field col-12 md:col-2">
+                            <label for="valor">Valor hora</label>
                             <p-inputNumber mode="decimal" inputId="currency-br" locale="pt-BR" [minFractionDigits]="2"
-                                formControlName="discount" />
+                                formControlName="price" />
+                            <small class="p-error block" *ngIf="formBudgetService.get('price')?.invalid">
+                                Campo obrigatório</small>
+                        </div>
+                        <div class="field col-12 md:col-2">
+                            <label for="Quantidade">Desconto</label>
+                            <p-inputGroup>
+                                <p-inputNumber mode="decimal" inputId="currency-br" locale="pt-BR"
+                                    [minFractionDigits]="2" formControlName="discount" />
+                                @if(budgetServiceItem.id == ""){
+                                <button pButton type="button" icon="pi pi-plus" class="p-button-primary"
+                                    (click)="saveBudgetService()"></button>
+                                }@else {
+                                <button pButton type="button" icon="pi pi-check" class="p-button-primary"
+                                    (click)="updateBudgetService(formBudgetService.value)"></button>
+                                <button pButton type="button" icon="pi pi-times" class="p-button-danger"
+                                    (click)="cleanBudgetService()"></button>
+                                }
+                            </p-inputGroup>
+                        </div>
 
-                            @if(budgetServiceItem.id == ""){
-                            <button pButton type="button" icon="pi pi-plus" class="p-button-primary"
-                                (click)="saveBudgetService()"></button>
-                            }@else {
-                            <button pButton type="button" icon="pi pi-check" class="p-button-primary"
-                                (click)="updateBudgetService(formBudgetService.value)"></button>
-                            <button pButton type="button" icon="pi pi-times" class="p-button-danger"
-                                (click)="cleanBudgetService()"></button>
-                            }
-
-                        </p-inputGroup>
                     </div>
+                </form>
+                <p-table [value]="listBudgetService" selectionMode="single" styleClass="p-datatable-sm"
+                    [tableStyle]="{ 'width': '100%','height':'30rem' }" [scrollable]="true" scrollHeight="30rem">
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th style="width: 10rem;">Ordem</th>
+                            <th style="width: 40rem;">Descrição</th>
+                            <th style="width: 10rem;">Tempo</th>
+                            <th style="width: 10rem;">Valor</th>
+                            <th style="width: 10rem;">Desconto</th>
 
+                            <th style="width: 10rem;">Total</th>
+                            <th style="width: 5rem;">Editar</th>
+                            <th style="width: 5rem;">Remover</th>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-service>
+                        <tr style="height: 10px;">
+                            <td style="width: 10rem;">{{ service.ordem }}</td>
+                            <td style="width: 40rem;">{{ service.description | uppercase }}</td>
+                            <td style="width: 10rem;">{{ service.hourService }}</td>
+                            <td style="width: 10rem;">{{ service.price | currency }}</td>
+                            <td style="width: 10rem;">{{ service.discount | currency }}</td>
+
+                            <td style="width: 10rem;">{{
+                                (service.price * service.hourService )-service.discount | currency
+                                }}</td>
+
+                            <td style="width: 5rem;"> <p-button icon="pi pi-pencil" [rounded]="true" [text]="true"
+                                    size="small" severity="primary" (onClick)="editarBudgetService(service)"></p-button>
+                            </td>
+                            <td style="width: 5rem;"> <p-button icon="pi pi-trash" [rounded]="true" [text]="true"
+                                    size="small" severity="danger"
+                                    (onClick)="removerBudgetService(service.ordem)"></p-button></td>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="footer">
+                        <tr>
+                            <td colspan="4" class="text-right">Totais</td>
+                            <td>{{totalBudgetDiscountService() | currency}}</td>
+                            <td>{{(totalBudgetService() - totalBudgetDiscountService()) | currency}}</td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    </ng-template>
+
+                </p-table>
+            </p-tabPanel>
+
+            <p-tabPanel header="Peças">
+                <div class="mb-3">
+                    <button pButton type="button" label="Peças" icon="pi pi-plus" [outlined]="true"></button>
                 </div>
-            </form>
-            <p-table [value]="listBudgetService" selectionMode="single" styleClass="p-datatable-sm"
-                [tableStyle]="{ 'width': '100%','height':'30rem' }" [scrollable]="true" scrollHeight="30rem">
-                <ng-template pTemplate="header">
-                    <tr>
-                        <th style="width: 10rem;">Ordem</th>
-                        <th style="width: 40rem;">Descrição</th>
-                        <th style="width: 10rem;">Tempo</th>
-                        <th style="width: 10rem;">Valor</th>
-                        <th style="width: 10rem;">Desconto</th>
+                <p-table [value]="listBudgetItem" selectionMode="single" styleClass="p-datatable-sm"
+                    [tableStyle]="{ 'width': '100%','height':'30rem' }" [scrollable]="true" scrollHeight="30rem">
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th style="width: 10rem;">Ordem</th>
+                            <th style="width: 10rem;">Código</th>
+                            <th style="width: 20rem;">Descrição</th>
+                            <th style="width: 10rem;">Quantidade</th>
+                            <th style="width: 10rem;">Valor</th>
+                            <th style="width: 10rem;">Desconto</th>
+                            <th style="width: 10rem;">Total</th>
+                            <th style="width: 10rem;">Editar</th>
+                            <th style="width: 10rem;">Remover</th>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body">
 
-                        <th style="width: 10rem;">Total</th>
-                        <th style="width: 5rem;">Editar</th>
-                        <th style="width: 5rem;">Remover</th>
-                    </tr>
-                </ng-template>
-                <ng-template pTemplate="body" let-service>
-                    <tr style="height: 10px;">
-                        <td style="width: 10rem;">{{ service.ordem }}</td>
-                        <td style="width: 40rem;">{{ service.description | uppercase }}</td>
-                        <td style="width: 10rem;">{{ service.hourService }}</td>
-                        <td style="width: 10rem;">{{ service.price | currency }}</td>
-                        <td style="width: 10rem;">{{ service.discount | currency }}</td>
+                    </ng-template>
+                    <ng-template pTemplate="footer">
 
-                        <td style="width: 10rem;">{{
-                            (service.price * service.hourService )-service.discount | currency
-                            }}</td>
+                    </ng-template>
 
-                        <td style="width: 5rem;"> <p-button icon="pi pi-pencil" [rounded]="true" [text]="true"
-                                size="small" severity="primary" (onClick)="editarBudgetService(service)"></p-button>
-                        </td>
-                        <td style="width: 5rem;"> <p-button icon="pi pi-trash" [rounded]="true" [text]="true"
-                                size="small" severity="danger"
-                                (onClick)="removerBudgetService(service.ordem)"></p-button></td>
-                    </tr>
-                </ng-template>
-                <ng-template pTemplate="footer">
-                    <tr>
-                        <td colspan="4" class="text-right">Totais</td>
-                        <td>{{totalBudgetDiscountService() | currency}}</td>
-                        <td>{{(totalBudgetService() - totalBudgetDiscountService()) | currency}}</td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                </ng-template>
-
-            </p-table>
-        </p-tabPanel>
-
-        <p-tabPanel header="Peças">
-            <div class="mb-3">
-                <button pButton type="button" label="Peças" icon="pi pi-plus" [outlined]="true"></button>
-            </div>
-            <p-table [value]="listBudgetItem" selectionMode="single" styleClass="p-datatable-sm"
-                [tableStyle]="{ 'width': '100%','height':'30rem' }" [scrollable]="true" scrollHeight="30rem">
-                <ng-template pTemplate="header">
-                    <tr>
-                        <th style="width: 10rem;">Ordem</th>
-                        <th style="width: 10rem;">Código</th>
-                        <th style="width: 20rem;">Descrição</th>
-                        <th style="width: 10rem;">Quantidade</th>
-                        <th style="width: 10rem;">Valor</th>
-                        <th style="width: 10rem;">Desconto</th>
-                        <th style="width: 10rem;">Total</th>
-                        <th style="width: 10rem;">Editar</th>
-                        <th style="width: 10rem;">Remover</th>
-                    </tr>
-                </ng-template>
-                <ng-template pTemplate="body">
-
-                </ng-template>
-                <ng-template pTemplate="footer">
-
-                </ng-template>
-
-            </p-table>
-        </p-tabPanel>
-    </p-tabView>
-    
-
-
+                </p-table>
+            </p-tabPanel>
+        </p-tabView>
+        <div class="flex justify-content-end gap-2 mt-3">
+            <button pButton type="button" pRipple label="Fechar" icon="pi pi-times" class="p-button-text"
+                (click)="closeDialogBudget()"></button>
+        </div>
+    </p-dialog>
 </div>

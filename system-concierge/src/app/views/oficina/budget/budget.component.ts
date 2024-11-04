@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit, signal } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute, RouterModule } from '@angular/router';
 import { FormControl, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
@@ -14,6 +14,10 @@ import { TabViewModule } from 'primeng/tabview';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { DividerModule } from 'primeng/divider';
 import { ToastModule } from 'primeng/toast';
+import { CalendarModule } from 'primeng/calendar';
+import { InputTextareaModule } from 'primeng/inputtextarea';
+import { MultiSelectModule } from 'primeng/multiselect';
+import { DialogModule } from 'primeng/dialog';
 
 
 //Interface
@@ -31,19 +35,36 @@ import { BudgetRequisition } from '../../../models/budget/budget-requisition';
 import { BudgetServiceItem } from '../../../models/budget/budget-item-service';
 import { BudgetItem } from '../../../models/budget/budget-item';
 import { error } from 'console';
+import { lastValueFrom } from 'rxjs';
+import { Budget } from '../../../models/budget/budget';
+import { ClientecompanyService } from '../../../services/clientecompany/clientecompany.service';
+import { ClientCompany } from '../../../models/clientcompany/client-company';
+import { BusyService } from '../../../components/loading/busy.service';
+
+
+export interface IListPayment {
+  payment: string,
+}
+
 
 @Component({
   selector: 'app-budget',
   standalone: true,
-  imports: [CommonModule, RouterModule, InputTextModule, ButtonModule, ReactiveFormsModule, InputMaskModule, ProgressBarModule, ToastModule, InputGroupModule, InputNumberModule, TabViewModule, TableModule, DividerModule],
+  imports: [CommonModule, RouterModule, InputTextModule, ButtonModule, ReactiveFormsModule, InputMaskModule, DialogModule, MultiSelectModule, CalendarModule, InputTextareaModule, ProgressBarModule, ToastModule, InputGroupModule, InputNumberModule, TabViewModule, TableModule, DividerModule],
   templateUrl: './budget.component.html',
   styleUrl: './budget.component.scss',
   providers: [MessageService]
 })
-export default class BudgetComponent implements OnInit {
-  private user: IUser = null;
-  private budgetId: number = 0;
+export default class BudgetComponent implements OnInit, OnDestroy {
 
+
+  private user: IUser;
+  budget: Budget;
+  vehicleId = signal<number>(0);
+
+  listPayment: IListPayment[] = [];
+
+  visibleBudget: boolean = false;
   requisition: BudgetRequisition;
   budgetServiceItem: BudgetServiceItem;
   budgetItem: BudgetItem;
@@ -57,11 +78,20 @@ export default class BudgetComponent implements OnInit {
   totalBudgetItem = signal<number>(0);
   totalBudgetDiscountService = signal<number>(0);
   totalBudgetDiscountItem = signal<number>(0);
+  limitUserDiscount = signal<number>(0);
 
   visibleDiscount = false;
   progressDiscount: number = 0;
   progressTotal: number = 0;
   intervalDiscount = null;
+  private percentAletDiscount = 60;
+
+  formBudget = new FormGroup({
+    dateValidation: new FormControl<Date | string>(""),
+    nameResponsible: new FormControl<string>(""),
+    typePayment: new FormControl<IListPayment[]>([]),
+    information: new FormControl<string>(""),
+  });
 
   formBudgetRequisition = new FormGroup({
     id: new FormControl<string>(''),
@@ -73,8 +103,8 @@ export default class BudgetComponent implements OnInit {
   formBudgetService = new FormGroup<any>({
     description: new FormControl<string>('', Validators.required),
     hourService: new FormControl<number>(0.0, Validators.required),
-    price: new FormControl<number>(275.0, Validators.required),
-    discount: new FormControl<number>(0.0, Validators.required),
+    price: new FormControl<number>(0, Validators.required),
+    discount: new FormControl<number>(0),
   });
 
   formDiscount = new FormGroup({
@@ -84,31 +114,179 @@ export default class BudgetComponent implements OnInit {
     itemVal: new FormControl(0),
   });
 
+  viewBudgetId = signal<number>(0);
+  viewBudgetDateGeneration = signal<Date | null>(null);
+
+  viewClientName = signal<string>("");
+  viewClientCnpj = signal<string>("");
+  viewClientCpf = signal<string>("");
+  viewClientPhone = signal<string>("");
+
+  viewClientZipCode = signal<string>("");
+  viewClientState = signal<string>("");
+  viewClientCity = signal<string>("");
+  viewClientNeighborhood = signal<string>("");
+  viewClientAddress = signal<string>("");
+  viewClientAddressNumber = signal<string>("");
+  viewClientAddressComplement = signal<string>("");
+
+  viewClientContactName = signal<string>("");
+  viewClientContactEmail = signal<string>("");
+  viewClientContactCellphone = signal<string>("");
+  viewClientContactPhone = signal<string>("");
+
   constructor(private userService: UserService,
     private router: Router,
     private layoutService: LayoutService,
     private storageService: StorageService,
     private messageService: MessageService,
     private budgetService: BudgetService,
+    private serviceClienteCompany: ClientecompanyService,
     private activatedRoute: ActivatedRoute,
     private cdr: ChangeDetectorRef) {
 
     this.userService.getUser$().subscribe(data => {
       this.user = data;
+      this.limitUserDiscount.set(this.user.limitDiscount);
     });
 
     this.budgetServiceItem = new BudgetServiceItem();
-    this.budgetId = Number.parseInt(this.activatedRoute.snapshot.params['id']);
+    this.vehicleId.set(Number.parseInt(this.activatedRoute.snapshot.params['vehicleid']));
+  }
+  ngOnInit(): void {  
+
+    this.listPayment = [
+      { payment: 'AVista' },
+      { payment: 'Faturado' },
+      { payment: 'Cartão Debito' },
+      { payment: 'Cartão Credito' }
+    ];
+
+    this.getBudget();
+
+  }
+  ngOnDestroy(): void {
 
   }
 
-  ngOnInit(): void {
-    this.getListBudgetRequisition();
-    this.getListBudgetSetvice();
+  showDialogBudget() {
+    this.visibleBudget = true;
   }
+  closeDialogBudget() {
+    this.visibleBudget = false;
+  }
+  private getBudget() {
+    this.budgetService.getBudgetFilterVehicle$(this.vehicleId()).subscribe(data => {
+      this.budget = data;
+
+      this.getClientCompany(data.clientCompanyId);
+
+
+
+      this.getListBudgetRequisition();
+      this.getListBudgetSetvice();
+
+      this.formBudget.patchValue({
+        dateValidation: data.dateValidation != "" ? new Date(data.dateValidation) : null,
+        nameResponsible: data.nameResponsible,
+        typePayment: data.typePayment != "" ? [{ payment: data.typePayment }] : [],
+        information: data.information,
+      });
+
+      this.viewBudgetId.set(this.budget.id);
+      this.viewBudgetDateGeneration.set(new Date(this.budget.dateGeneration));
+    }, error => {
+
+    });
+  }
+
+  private getClientCompany(id: number) {
+
+    this.serviceClienteCompany.getId$(id).subscribe(data => {
+      this.viewClientName.set(data.body.name);
+      if (data.body.fisjur == "Juridica") {
+        const CNPJ = data.body.cnpj.substring(0, 2) + "." + data.body.cnpj.substring(2, 5) + "." + data.body.cnpj.substring(5, 8) + "/" + data.body.cnpj.substring(8, 12) + "-" + data.body.cnpj.substring(12, 14);
+        this.viewClientCnpj.set(CNPJ);
+      }
+      if (data.body.fisjur == "Fisica") {
+        const CPF = data.body.cpf.substring(0, 3) + "." + data.body.cpf.substring(3, 6) + "." + data.body.cpf.substring(6, 9) + "-" + data.body.cpf.substring(9, 11);
+        this.viewClientCpf.set(CPF);
+      }
+      if (data.body.dddPhone != "") {
+        this.viewClientPhone.set("(" + data.body.dddPhone + ") " + data.body.phone);
+      }
+      this.viewClientZipCode.set(data.body.zipCode.substring(0, 5) + "-" + data.body.zipCode.substring(5, 8));
+      this.viewClientState.set(data.body.state);
+      this.viewClientCity.set(data.body.city);
+      this.viewClientNeighborhood.set(data.body.neighborhood);
+      this.viewClientAddress.set(data.body.address);
+      this.viewClientAddressNumber.set(data.body.addressNumber);
+      this.viewClientAddressComplement.set(data.body.addressComplement);
+      this.viewClientContactName.set(data.body.contactName);
+      this.viewClientContactEmail.set(data.body.contactEmail);
+      if (data.body.contactCellphone != "") {
+        this.viewClientContactCellphone.set(this.maskCellphone(data.body.contactDDDCellphone, data.body.contactCellphone));
+      }
+      if (data.body.contactPhone != "") {
+        this.viewClientContactPhone.set(this.maskPhone(data.body.contactDDDPhone, data.body.contactPhone));
+      }
+
+    }, error => {
+
+    });
+  }
+
+  saveBudget() {
+
+    const { value } = this.formBudget;
+
+    this.budget.dateValidation = value?.dateValidation ?? "";
+    this.budget.nameResponsible = value.nameResponsible;
+    this.budget.typePayment = value.typePayment.at(0)?.payment ?? "";
+    this.budget.information = value.information;
+
+    this.budgetService.updateBudget$(this.budget).subscribe(data => {
+      if (data.status == 200) {
+        this.messageService.add({ severity: 'success', summary: 'Orçamento', detail: 'Atualizado com sucesso', icon: 'pi pi-check' });
+      }
+
+    }, error => {
+      const DATEVALIDATION = "Date validation not informed.";
+      const NAMERESPONSIBLE = "Name responsible not informed.";
+      if (error.status == 401) {
+
+        if (error.error.messageError == DATEVALIDATION) {
+          this.messageService.add({ severity: 'error', summary: 'Data Validade', detail: "Não informado", icon: 'pi pi-times' });
+        }
+        if (error.error.messageError == NAMERESPONSIBLE) {
+          this.messageService.add({ severity: 'error', summary: 'Responsavel', detail: "Não informado", icon: 'pi pi-times' });
+        }
+
+      }
+
+    });
+  }
+
+  private maskCellphone(dddCellphone: string, cellphone: string): string {
+    if (cellphone.length != 9)
+      return "";
+    if (dddCellphone.length != 2)
+      return "";
+    var cellphone = "(" + dddCellphone + ") " + cellphone.substring(0, 1) + " " + cellphone.substring(1, 5) + "-" + cellphone.substring(5, 9);
+    return cellphone;
+  }
+  private maskPhone(dddPhone: string, phone: string): string {
+    if (phone.length != 8)
+      return "";
+    if (dddPhone.length != 2)
+      return "";
+    var phone = "(" + dddPhone + ") " + phone.substring(0, 4) + "-" + phone.substring(4, 8);
+    return phone;
+  }
+
 
   getListBudgetRequisition() {
-    this.budgetService.getBudgetRequisition$(this.budgetId!).subscribe((data) => {
+    this.budgetService.getBudgetRequisition$(this.budget.id).subscribe((data) => {
       this.listBudgetRequisition = data;
     });
   }
@@ -121,7 +299,7 @@ export default class BudgetComponent implements OnInit {
       this.requisition = new BudgetRequisition();
       this.requisition.companyId = this.user.companyId;
       this.requisition.resaleId = this.user.resaleId;
-      this.requisition.budgetId = this.budgetId;
+      this.requisition.budgetId = this.budget.id;
       this.requisition.ordem = this.getSizeListBudgetRequisition() + 1;
       this.requisition.description = value.description;
 
@@ -147,7 +325,7 @@ export default class BudgetComponent implements OnInit {
       this.requisition.companyId = this.user.companyId;
       this.requisition.resaleId = this.user.resaleId;
       this.requisition.id = value.id;
-      this.requisition.budgetId = this.budgetId;
+      this.requisition.budgetId = this.budget.id;
       this.requisition.ordem = value.ordem;
       this.requisition.description = value.description;
 
@@ -233,24 +411,35 @@ export default class BudgetComponent implements OnInit {
 
   //Service
 
-  getListBudgetSetvice() {
+  private async getListBudgetSetvice(): Promise<boolean> {
 
-    this.budgetService.getBudgetService$(this.budgetId).subscribe((data) => {
+    /* this.budgetService.getBudgetService$(this.budgetId).subscribe((data) => {
       this.listBudgetService = data;
       this.somaService();
     }, (error) => {
 
-    });
+    }); */
+
+    try {
+      var data = await lastValueFrom(this.budgetService.getBudgetService$(this.budget.id));
+
+      this.listBudgetService = data;
+      this.somaService();
+      return true;
+    } catch (error) {
+      this.getListBudgetSetvice();
+    }
+    return false;
 
   }
 
-  saveBudgetService() {
+  public saveBudgetService() {
     if (this.validSaveBudgetService()) {
       const { value } = this.formBudgetService;
 
       this.budgetServiceItem.companyId = this.user.companyId;
       this.budgetServiceItem.resaleId = this.user.resaleId;
-      this.budgetServiceItem.budgetId = this.budgetId;
+      this.budgetServiceItem.budgetId = this.budget.id;
       this.budgetServiceItem.status = "NaoAprovado";
 
       this.budgetServiceItem.ordem = this.getSizeListBudgetService() + 1;
@@ -271,9 +460,10 @@ export default class BudgetComponent implements OnInit {
 
   }
 
-  updateBudgetService(service: BudgetServiceItem) {
+  public updateBudgetService(service: BudgetServiceItem) {
 
     if (this.validUpdateBudgetService()) {
+
       this.budgetServiceItem.description = service.description;
       this.budgetServiceItem.hourService = service.hourService;
       this.budgetServiceItem.price = service.price;
@@ -293,42 +483,25 @@ export default class BudgetComponent implements OnInit {
   private validSaveBudgetService() {
     const { value, valid } = this.formBudgetService;
 
-    if (this.listBudgetRequisition.length == 0) {
-      this.alertShowRequisition1();
+    if (!this.validInput()) {
       return false;
-    } else if (!valid) {
-      this.alertShowService3();
-      return false;
-    } else if (value.hourService < 0) {
+    }
 
-      return false;
-    } else if (value.discount < 0) {
-      this.alertShowDiscount4();
-      return false;
-    } if (value.hourService! <= 0 || value.price! <= 0) {
-      this.alertShowService3();
-      return false;
-    } else if (value.discount > (value.price * value.hourService)) {
-      this.alertShowDiscount0();
-      return false;
-    } else if (value.discount > 0) {
-
+    if (value.discount > 0) {
       const newDiscount = this.totalBudgetDiscountService() + value.discount;
       const newTotal = this.totalBudgetService() + (value.price * value.hourService);
-
       const percent = (newTotal * this.user.limitDiscount) / 100;
-
       if (newDiscount > percent) {
-        this.alertShowDiscount1();
+        this.messageService.add({ severity: 'error', summary: 'Desconto', detail: 'Maior que o permitido', icon: 'pi pi-times' });
         return false;
       }
-
       this.progressTotal = (newDiscount * 100) / percent;
-
-      if (this.progressTotal > 50) {
+      if (this.progressTotal > this.percentAletDiscount) {
         this.infoPercenDiscount();
       }
-
+    }
+    if (!valid) {
+      return false;
     }
 
     return true;
@@ -337,24 +510,13 @@ export default class BudgetComponent implements OnInit {
   private validUpdateBudgetService(): boolean {
     const { value, valid } = this.formBudgetService;
 
-    if (this.listBudgetRequisition.length == 0) {
-      this.alertShowRequisition1();
+    if (!this.validInput()) {
       return false;
-    } else if (!valid) {
-      this.alertShowService3();
-      return false;
-    } else if (value.hourService! <= 0 || value.price! <= 0) {
-      this.alertShowService3();
-      return false;
-    } else if (value.discount < 0) {
-      this.alertShowDiscount4();
-      return false;
-    } else if (value.discount > (value.price * value.hourService)) {
-      this.alertShowDiscount0();
-      return false;
-    } else if (value.discount > 0) {
-      const newDiscount = value.discount;
-      const newTotal = (value.price * value.hourService);
+    }
+
+    if (value.discount > 0) {
+      var newDiscount = value.discount;
+      var newTotal = (value.price * value.hourService);
 
       var tempTotal = 0;
       var tempDiscount = 0;
@@ -367,25 +529,43 @@ export default class BudgetComponent implements OnInit {
         }
 
       }
-
-      tempTotal += newTotal;
-      tempDiscount += newDiscount;
-
-      const percent = (tempTotal * this.user.limitDiscount) / 100;
-
-      if (tempDiscount > percent) {
-        this.alertShowDiscount1();
+      newTotal += tempTotal;
+      newDiscount += tempDiscount;
+      const percent = (newTotal * this.user.limitDiscount) / 100;
+      if (newDiscount > percent) {
+        this.messageService.add({ severity: 'error', summary: 'Desconto', detail: 'Maior que o permitido', icon: 'pi pi-times' });
         return false;
       }
-
-      this.progressTotal = (tempDiscount * 100) / percent;
-
-      if (this.progressTotal > 50) {
+      this.progressTotal = (newDiscount * 100) / percent;
+      if (this.progressTotal > this.percentAletDiscount) {
         this.infoPercenDiscount();
       }
-
     }
+    return true;
+  }
 
+  private validInput(): boolean {
+
+    const { value } = this.formBudgetService;
+    if (this.listBudgetRequisition.length == 0) {
+      this.alertShowRequisition1();
+      return false;
+    } else if (value.description == "") {
+      this.messageService.add({ severity: 'error', summary: 'Descrição', detail: 'Não informado', icon: 'pi pi-times' });
+      return false;
+    } else if (value.hourService <= 0) {
+      this.messageService.add({ severity: 'error', summary: 'Tempo Serviço', detail: 'Não informado', icon: 'pi pi-times' });
+      return false;
+    } else if (value.price <= 0) {
+      this.messageService.add({ severity: 'error', summary: 'Valor Hora', detail: 'Não informado', icon: 'pi pi-times' });
+      return false;
+    } else if (value.discount < 0) {
+      this.messageService.add({ severity: 'error', summary: 'Desconto', detail: 'Valor não permitido', icon: 'pi pi-times' });
+      return false;
+    } else if (value.discount > (value.price * value.hourService)) {
+      this.messageService.add({ severity: 'error', summary: 'Desconto', detail: 'Maior que o valor do serviço', icon: 'pi pi-times' });
+      return false;
+    }
     return true;
   }
 
@@ -393,7 +573,7 @@ export default class BudgetComponent implements OnInit {
 
     this.budgetServiceItem.companyId = service.companyId;
     this.budgetServiceItem.resaleId = service.resaleId;
-    this.budgetServiceItem.budgetId = this.budgetId;
+    this.budgetServiceItem.budgetId = this.budget.id;
     this.budgetServiceItem.id = service.id;
     this.budgetServiceItem.status = service.status;
     this.budgetServiceItem.ordem = service.ordem;
@@ -490,7 +670,7 @@ export default class BudgetComponent implements OnInit {
 
   deleteAllDiscountService() {
     if (this.totalBudgetDiscountService() > 0) {
-      this.budgetService.deleteDiscountAllService$(this.budgetId).subscribe((data) => {
+      this.budgetService.deleteDiscountAllService$(this.budget.id).subscribe((data) => {
         if (data.status == 200) {
           this.getListBudgetSetvice();
           this.alertShowDiscount2();
@@ -517,12 +697,12 @@ export default class BudgetComponent implements OnInit {
     }
 
     if (newValueDiscount > valueLimitDisc) {
-      this.alertShowDiscount1();
+      this.messageService.add({ severity: 'error', summary: 'Desconto', detail: 'Maior que o permitido', icon: 'pi pi-times' });
       return false;
     }
 
     if (newValueDiscountPerc > valueLimitDisc) {
-      this.alertShowDiscount1();
+      this.messageService.add({ severity: 'error', summary: 'Desconto', detail: 'Maior que o permitido', icon: 'pi pi-times' });
       return false;
     }
 
@@ -530,7 +710,7 @@ export default class BudgetComponent implements OnInit {
 
   }
 
-  addDiscountAllService() {
+  public addDiscountAllService() {
 
     if (this.validDiscountService()) {
 
@@ -555,19 +735,23 @@ export default class BudgetComponent implements OnInit {
 
       for (let index = 0; index < this.listBudgetService.length; index++) {
         var element = this.listBudgetService[index];
-
-        //Last
+        //Last Discount
         if (index == this.listBudgetService.length - 1) {
-
           element.discount = discount + discountResto;
-          this.budgetService.updateBudgetService$(element).subscribe((data) => {
+          this.budgetService.updateBudgetService$(element).subscribe(async (data) => {
             if (data.status == 200) {
-              this.getListBudgetSetvice();
+              this.messageService.add({ severity: 'success', summary: 'Desconto', detail: 'Aplicado com sucesso', icon: 'pi pi-check' });
+              const result = await this.getListBudgetSetvice();
+
+              const percent = (this.totalBudgetService() * this.limitUserDiscount()) / 100;
+              this.progressTotal = (this.totalBudgetDiscountService() * 100) / percent;
+              if (this.progressTotal > this.percentAletDiscount) {
+                this.infoPercenDiscount();
+              }
             };
           });
 
         } else {
-
           element.discount = discount;
           this.budgetService.updateBudgetService$(element).subscribe();
         }
@@ -575,13 +759,11 @@ export default class BudgetComponent implements OnInit {
       }
 
       this.cleanFormDiscount();
-      this.alertShowDiscount3();
     }
 
   }
 
   private cleanFormDiscount() {
-
     this.formDiscount.patchValue({ servPer: 0, servVal: 0, itemPer: 0, itemVal: 0 });
   }
 
@@ -589,7 +771,7 @@ export default class BudgetComponent implements OnInit {
     this.visibleDiscount = false;
   }
 
-  infoPercenDiscount() {
+  private infoPercenDiscount() {
     if (!this.visibleDiscount) {
       this.messageService.add({ key: 'toastInfoDiscount', sticky: true, severity: 'custom', summary: 'Você atingiu.' });
       this.visibleDiscount = true;
@@ -614,31 +796,23 @@ export default class BudgetComponent implements OnInit {
     }
   }
 
-  alertShowDiscount0() {
-    this.messageService.add({ severity: 'error', summary: 'Desconto', detail: 'Maior que o valor calculado', icon: 'pi pi-times' });
-  }
 
-  alertShowDiscount1() {
-    this.messageService.add({ severity: 'error', summary: 'Desconto', detail: 'Maior que o permitido', icon: 'pi pi-times' });
-  }
+
+
 
   alertShowDiscount2() {
     this.messageService.add({ severity: 'success', summary: 'Desconto', detail: 'Removido com sucesso', icon: 'pi pi-check' });
   }
 
-  alertShowDiscount3() {
-    this.messageService.add({ severity: 'success', summary: 'Desconto', detail: 'Aplicado com sucesso', icon: 'pi pi-check' });
-  }
-  alertShowDiscount4() {
-    this.messageService.add({ severity: 'error', summary: 'Desconto', detail: 'Valor não permitido', icon: 'pi pi-times' });
-  }
+
+
 
   alertShowRequisition0() {
     this.messageService.add({ severity: 'success', summary: 'Solicitação', detail: 'Adicionada com sucesso', icon: 'pi pi-plus' });
   }
 
   alertShowRequisition1() {
-    this.messageService.add({ severity: 'info', summary: 'Atenção', detail: 'Não a solicitação', icon: 'pi pi-exclamation-triangle' });
+    this.messageService.add({ severity: 'info', summary: 'Atenção', detail: 'Não a solicitação' });
   }
 
   alertShowRequisition2() {
@@ -646,7 +820,7 @@ export default class BudgetComponent implements OnInit {
   }
 
   alertShowRequisition3() {
-    this.messageService.add({ severity: 'info', summary: 'Solicitação', detail: 'Não pode ser removida', icon: 'pi pi-exclamation-triangle' });
+    this.messageService.add({ severity: 'info', summary: 'Solicitação', detail: 'Não pode ser removida' });
   }
 
   alertShowService0() {
@@ -657,8 +831,5 @@ export default class BudgetComponent implements OnInit {
     this.messageService.add({ severity: 'success', summary: 'Serviço', detail: 'Atualizado com sucesso', icon: 'pi pi-check' });
   }
 
-  alertShowService3() {
-    this.messageService.add({ severity: 'error', summary: 'Serviço', detail: 'Não foi possivel adicionar', icon: 'pi pi-exclamation-triangle' });
-  }
 
 }

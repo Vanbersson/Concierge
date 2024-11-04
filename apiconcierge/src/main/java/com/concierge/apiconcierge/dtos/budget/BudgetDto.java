@@ -9,7 +9,14 @@ public record BudgetDto(
         Integer companyId,
         Integer resaleId,
         Integer id,
+        Integer vehicleEntryId,
         StatusBudgetEnum status,
-        Date dateGeration,
-        Date dateAuth) {
+        Date dateGeneration,
+        Date dateValidation,
+        Date dateAuthorization,
+        String nameResponsible,
+        String typePayment,
+        Integer idUserAttendant,
+        Integer clientCompanyId,
+        String information) {
 }

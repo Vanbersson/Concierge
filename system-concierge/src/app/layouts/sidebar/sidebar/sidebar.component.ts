@@ -5,6 +5,7 @@ import { CommonModule } from '@angular/common';
 import { PanelMenuModule } from 'primeng/panelmenu';
 import { ButtonModule } from 'primeng/button';
 import { MenuItem } from 'primeng/api';
+
 import { LayoutService } from '../../layout/service/layout.service';
 
 
@@ -36,7 +37,6 @@ export class SidebarComponent implements OnInit {
       {
         key: '1',
         label: 'Portaria',
-        icon: 'pi pi-truck',
         expanded: true,
         items: [
           {
@@ -77,6 +77,8 @@ export class SidebarComponent implements OnInit {
         key: '2',
         label: 'Peças',
         icon: 'pi pi-book',
+        disabled: true,
+        visible: false,
         items: [
           {
             key: '2_0',
@@ -132,7 +134,6 @@ export class SidebarComponent implements OnInit {
       {
         key: '3',
         label: 'Oficina',
-        icon: 'pi pi-calendar',
         items: [
           {
             key: '3_0',
@@ -140,7 +141,7 @@ export class SidebarComponent implements OnInit {
             items: [
               {
                 key: '3_0_0',
-                label: 'Novo',
+                label: 'Atendimento',
 
               },
               {
@@ -149,31 +150,35 @@ export class SidebarComponent implements OnInit {
 
               },
             ]
-          },
-          {
-           key:'3_1',
-           label:'Manutenção Clientes' 
           }
-
-
+        ]
+      }, 
+      {
+        key: '4',
+        label: 'Faturamento',
+        items: [
+          ,
+          {
+            key: '4_1',
+            label: 'Manutenção Clientes'
+          }
         ]
       },
       {
-        key:'99',
-        label:'Configuração',
-        icon:'pi pi-corg',
-        items:[
+        key: '99',
+        label: 'Configurações',
+        items: [
           {
-            key:'99_0',
-            label:'Empresa',
-            icon:'pi pi-building',
-            routerLink:'configuracao/empresa'
+            key: '99_0',
+            label: 'Empresa',
+            icon: 'pi pi-building',
+            routerLink: 'configuracao/empresa'
           },
           {
-            key:'99_1',
-            label:'Cadastro Usuários',
-            icon:'pi pi-users',
-            routerLink:'configuracao/usuario'
+            key: '99_1',
+            label: 'Cadastro Usuários',
+            icon: 'pi pi-users',
+            routerLink: 'configuracao/usuario'
           }
         ]
       }

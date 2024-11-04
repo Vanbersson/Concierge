@@ -1,0 +1,48 @@
+<div class="layout-card-title">
+    <span class="text-600">Saída de veículos</span>
+    <p-button label="Saída" icon="pi pi-sign-out" severity="danger" size="small" />
+</div>
+<p-table #tableFilter dataKey="id" [value]="listVehicleExit"
+    [globalFilterFields]="['id','placa','modelDescription', 'frota','dateEntry','clientCompanyName','nameUserAttendant']"
+    selectionMode="multiple" [(selection)]="selectedItems" [paginator]="true" [rows]="10"
+    [rowsPerPageOptions]="[10, 25, 50]" styleClass="p-datatable-sm">
+    <ng-template pTemplate="caption">
+        <div class="flex">
+            <button pButton type="button" icon="pi pi-refresh" size="small" (click)="listVehicles()"></button>
+            <p-iconField iconPosition="left" class="ml-auto">
+                <p-inputIcon>
+                    <i class="pi pi-search"></i>
+                </p-inputIcon>
+                <input pInputText type="text" (input)="tableFilter.filterGlobal($any($event.target).value, 'contains')"
+                    placeholder="Pesquisar" />
+            </p-iconField>
+        </div>
+    </ng-template>
+    <ng-template pTemplate="header">
+        <tr>
+            <th>Código</th>
+            <th>Placa</th>
+            <th>Modelo</th>
+            <th>Consultor</th>
+        </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-vehicle let-rowIndex="rowIndex">
+        <tr [pSelectableRow]="vehicle" [pSelectableRowIndex]="rowIndex">
+            <td><span class="text-500">{{ vehicle.id }}</span></td>
+            <td>
+                @if(vehicle.placa == "NOVO"){
+                <div class="flex align-items-center justify-content-center bg-blue-100 border-round"
+                    [ngStyle]="{width: '3.5rem', height: '2.5rem'}">
+                    <span class="text-500">NOVO</span>
+                </div>
+                }@else {
+                <span class="text-500">{{vehicle.placa | uppercase}}</span>
+                }
+            </td>
+            <td><span class="text-500">{{ vehicle.modelDescription | uppercase }}</span>
+            <td>
+                <span class="text-500">{{ vehicle.nameUserAttendant | uppercase }}</span>
+            </td>
+        </tr>
+    </ng-template>
+</p-table>

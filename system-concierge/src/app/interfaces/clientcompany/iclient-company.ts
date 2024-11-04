@@ -23,4 +23,10 @@ export interface IClientCompany {
     address: string;
     addressNumber: string;
     addressComplement: string;
+    contactName: string;
+    contactEmail: string;
+    contactDDDPhone: string;
+    contactPhone: string;
+    contactDDDCellphone: string;
+    contactCellphone: string;
 }

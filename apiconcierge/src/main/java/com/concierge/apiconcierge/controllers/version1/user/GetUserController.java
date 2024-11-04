@@ -12,6 +12,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @RestController
 @RequestMapping("/user/filter/token")
 public class GetUserController {
@@ -28,25 +31,33 @@ public class GetUserController {
         String token = request.getHeader("Authorization").replace("Bearer ", "");
         String email = this.tokenService.validToken(token);
 
-        if (email == "") return ResponseEntity.badRequest().build();
+        if (email.isBlank()) return ResponseEntity.badRequest().build();
 
         User user = this.repository.findByEmail(email);
+        Map<String, Object> map = new HashMap<>();
 
-        Object ob = new UserResponseDto(
-                user.getCompanyId(),
-                user.getResaleId(),
-                user.getId(),
-                user.getStatus(),
-                user.getName(),
-                user.getEmail(),
-                user.getCellphone(),
-                user.getLimitDiscount(),
-                user.getPhoto(),
-                user.getRoleId(),
-                user.getRoleDesc(),
-                user.getRoleFunc());
+        map.put("companyId", user.getCompanyId());
+        map.put("resaleId", user.getResaleId());
+        map.put("id", user.getId());
+        map.put("status", user.getStatus());
+        map.put("name", user.getName());
+        map.put("email", user.getEmail());
+        map.put("cellphone", user.getCellphone());
+        if (user.getLimitDiscount() == null) {
+            map.put("limitDiscount", 0);
+        } else {
+            map.put("limitDiscount", user.getLimitDiscount());
+        }
+        if (user.getPhoto() == null) {
+            map.put("photo", "");
+        } else {
+            map.put("photo", user.getPhoto());
+        }
+        map.put("roleId", user.getRoleId());
+        map.put("roleDesc", user.getRoleDesc());
+        map.put("roleDesc", user.getRoleFunc());
 
-        return ResponseEntity.ok(ob);
+        return ResponseEntity.ok(map);
 
     }
 }

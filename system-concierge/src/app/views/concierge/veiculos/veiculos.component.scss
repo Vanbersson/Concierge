@@ -1,11 +1,10 @@
-
-:host{
-    .layout-card-title{
+:host {
+    .layout-card-title {
         display: flex;
         justify-content: space-between;
         margin-bottom: 1rem;
-    
-        span{
+
+        span {
             display: flex;
             align-items: center;
             font-size: 1.25rem;
@@ -14,9 +13,23 @@
             padding-left: 1.5rem;
         }
 
-        
+    }
+
+    .mobile-visible{
+        display: none;
+    }
+
+    
+
+    @media only screen and (min-width: 375px) and (max-width: 667px) {
+        .mobile-visible-none {
+            display: none;
+        }
+        .mobile-visible {
+            display: flex;
+            justify-content: center;
+           
+        }
+
     }
 }
-
-
-

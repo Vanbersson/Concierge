@@ -52,7 +52,7 @@ export const routes: Routes = [
                 path: 'oficina',
                 children: [
                     {
-                        path: 'orcamento/:id',
+                        path: 'orcamento/:vehicleid',
                         title: 'Orçamento',
                         loadComponent: () => import('./views/oficina/budget/budget.component')
                     },
