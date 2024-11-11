@@ -61,8 +61,8 @@ import { BusyService } from '../../../components/loading/busy.service';
 interface EventItem {
   description?: string;
   icon?: string;
-  color?:string;
- 
+  color?: string;
+
 }
 
 
@@ -76,7 +76,7 @@ interface EventItem {
 })
 export default class ManutencaoComponent implements OnInit {
 
-  events: EventItem[];
+  stepEntry: EventItem[];
 
   private user: User;
   private vehicleEntry: VehicleEntry;
@@ -211,54 +211,33 @@ export default class ManutencaoComponent implements OnInit {
     private messageService: MessageService,
     private busyService: BusyService
 
-  ) {
+  ) { }
+
+  ngOnInit(): void {
     this.busyService.busy();
 
-    this.events = [
-      { description: 'Atendimento',  icon: 'pi pi-check', color: '#22c55e' },
-      { description: 'Orçamento', icon: 'pi pi-spin pi-cog', color: '#673AB7' },
-      { description: 'Serviço em execução', icon: 'pi pi-times', color: '#607D8B' },
-      { description: 'Serviço concluido', icon: 'pi pi-times', color: '#607D8B' },
-      { description: 'Saída', icon: 'pi pi-times', color: '#607D8B' }
-    //  "Atendimento", "Orçamento", "Serviço em execução", "Serviço concluido", "Saída"
-    ];
+    //Id vehicle entry
+    this.id = this.activatedRoute.snapshot.params['id'];
 
     //get User
     this.userService.getUser$().subscribe(data => {
       this.user = data;
     });
 
-    //new vehicle
-    this.vehicleEntry = new VehicleEntry();
-
-    //Id vehicle entry
-    this.id = this.activatedRoute.snapshot.params['id'];
-  }
-  ngOnInit(): void {
-
-    this.cores = [
-      { color: 'Branco' },
-      { color: 'Preto' },
-      { color: 'Azul' },
-      { color: 'Verde' },
-      { color: 'Cinza' },
-      { color: 'Vermelho' },
-      { color: 'Amarelo' },
-      { color: 'Rosa' },
-      { color: 'Roxo' },
-      { color: 'Outro' }
-    ];
     //UserAttendant
     this.userService.getUserFilterRoleId$(2).subscribe((data) => {
       this.attendantsUser = data;
     });
+
     //models vehicle enabled
     this.vehicleModelService.getAllEnabled$().subscribe((data) => {
       this.modelVehicles = data;
     });
+
     this.vehicleService.entryFilterId$(this.id).subscribe((data) => {
       if (data.status == 200) {
         this.vehicleEntry = data.body;
+        this.stepEvent(this.vehicleEntry.stepEntry);
         this.loadForms();
         this.busyService.idle();
       }
@@ -274,6 +253,21 @@ export default class ManutencaoComponent implements OnInit {
         this.router.navigateByUrl("/");
       }
     });
+
+
+
+    this.cores = [
+      { color: 'Branco' },
+      { color: 'Preto' },
+      { color: 'Azul' },
+      { color: 'Verde' },
+      { color: 'Cinza' },
+      { color: 'Vermelho' },
+      { color: 'Amarelo' },
+      { color: 'Rosa' },
+      { color: 'Roxo' },
+      { color: 'Outro' }
+    ];
 
     this.itemsButtonMenu = [
       {
@@ -307,6 +301,67 @@ export default class ManutencaoComponent implements OnInit {
     ];
 
     this.disableInput();
+
+  }
+
+  private stepEvent(event: string) {
+
+    switch (event) {
+      case "Attendant":
+        this.stepEntry = [
+          { description: 'Atendimento', icon: 'pi pi-spin pi-cog', color: '#673AB7' },
+          { description: 'Orçamento', icon: 'pi pi-times', color: '#607D8B' },
+          { description: 'Serviço em execução', icon: 'pi pi-times', color: '#607D8B' },
+          { description: 'Serviço concluido', icon: 'pi pi-times', color: '#607D8B' },
+          { description: 'Saída', icon: 'pi pi-times', color: '#607D8B' }
+        ];
+        break;
+      case "Budget":
+        this.stepEntry = [
+          { description: 'Atendimento', icon: 'pi pi-check', color: '#22c55e' },
+          { description: 'Orçamento', icon: 'pi pi-spin pi-cog', color: '#673AB7' },
+          { description: 'Serviço em execução', icon: 'pi pi-times', color: '#607D8B' },
+          { description: 'Serviço concluido', icon: 'pi pi-times', color: '#607D8B' },
+          { description: 'Saída', icon: 'pi pi-times', color: '#607D8B' }
+        ];
+        break;
+      case "Running_Service":
+        this.stepEntry = [
+          { description: 'Atendimento', icon: 'pi pi-check', color: '#22c55e' },
+          { description: 'Orçamento', icon: 'pi pi-check', color: '#22c55e' },
+          { description: 'Serviço em execução', icon: 'pi pi-spin pi-cog', color: '#673AB7' },
+          { description: 'Serviço concluido', icon: 'pi pi-times', color: '#607D8B' },
+          { description: 'Saída', icon: 'pi pi-times', color: '#607D8B' }
+        ];
+        break;
+      case "Full_Service":
+        this.stepEntry = [
+          { description: 'Atendimento', icon: 'pi pi-check', color: '#22c55e' },
+          { description: 'Orçamento', icon: 'pi pi-check', color: '#22c55e' },
+          { description: 'Serviço em execução', icon: 'pi pi-check', color: '#22c55e' },
+          { description: 'Serviço concluido', icon: 'pi pi-spin pi-cog', color: '#673AB7' },
+          { description: 'Saída', icon: 'pi pi-times', color: '#607D8B' }
+        ];
+        break;
+      case "Exit":
+        this.stepEntry = [
+          { description: 'Atendimento', icon: 'pi pi-check', color: '#22c55e' },
+          { description: 'Orçamento', icon: 'pi pi-check', color: '#22c55e' },
+          { description: 'Serviço em execução', icon: 'pi pi-check', color: '#22c55e' },
+          { description: 'Serviço concluido', icon: 'pi pi-check', color: '#22c55e' },
+          { description: 'Saída', icon: 'pi pi-check', color: '#22c55e' }
+        ];
+        break;
+      default:
+        this.stepEntry = [
+          { description: 'Atendimento', icon: 'pi pi-times', color: '#607D8B' },
+          { description: 'Orçamento', icon: 'pi pi-times', color: '#607D8B' },
+          { description: 'Serviço em execução', icon: 'pi pi-times', color: '#607D8B' },
+          { description: 'Serviço concluido', icon: 'pi pi-times', color: '#607D8B' },
+          { description: 'Saída', icon: 'pi pi-times', color: '#607D8B' }
+        ];
+        break;
+    }
 
   }
   private async openCamera(): Promise<Photo> {

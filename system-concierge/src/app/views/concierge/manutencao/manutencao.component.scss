@@ -1,5 +1,10 @@
 :host {
 
+    .mobile-visible-none {
+        display: flex;
+        justify-content: center;
+    }
+
     .layout-main-between {
         width: 100%;
         min-height: calc(100vh - 15rem);
@@ -93,13 +98,6 @@
         }
     }
 
-   
-
-   /*  ::ng-deep .p-image-preview-container>img {
-        width: 80px;
-        height: 80px;
-    } */
-
     .layout-file {
         display: flex;
         flex-direction: column;
@@ -167,6 +165,7 @@
             background-color: #f1f5f9;
             border: 1px solid #f1f5f9
         }
+
         .p-button.p-button-secondary-custom:hover {
             background-color: #e9ecee;
             border: 1px solid #e9ecee
@@ -177,6 +176,7 @@
             background-color: #acf3aa;
             border: 1px solid #acf3aa
         }
+
         .p-button.p-button-success-custom:hover {
             background-color: #a0f19e;
             border: 1px solid #a0f19e
@@ -190,7 +190,7 @@
 
     /* Small devices (portrait tablets and large phones, 600px and up) */
     @media only screen and (min-width: 375px) and (max-width: 667px) {
-        .mobile-disabled {
+        .mobile-visible-none {
             display: none;
         }
 

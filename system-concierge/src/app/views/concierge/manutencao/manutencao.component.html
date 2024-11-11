@@ -2,26 +2,28 @@
     <p-toast />
     <div class="layout-card-title">
         <span>Manutenção de veículos</span>
+
         <div class="layourt-button-back">
             <button pButton [text]="true" severity="contrast" icon="pi pi-sign-out"
                 routerLink="/portaria/veiculos"></button>
         </div>
-    </div> 
-    <div class="flex justify-content-center " >
-        <p-timeline [value]="events" layout="horizontal" style="width: 70rem;">
+    </div>
+
+    <div class="mobile-visible-none">
+        <p-timeline [value]="stepEntry" layout="horizontal" style="width: 70rem;">
             <ng-template pTemplate="marker" let-event>
-                <span 
-                    class="flex w-2rem h-2rem align-items-center justify-content-center text-white border-circle z-1 shadow-1" 
+                <span
+                    class="flex w-2rem h-2rem align-items-center justify-content-center text-white border-circle z-1 shadow-1"
                     [style]="{ 'background-color': event.color }">
-                        <i [class]="event.icon"></i>
+                    <i [class]="event.icon"></i>
                 </span>
             </ng-template>
             <ng-template pTemplate="content" let-event>
-               <span>{{ event.description }}</span> 
+                <span>{{ event.description }}</span>
             </ng-template>
         </p-timeline>
-    </div>   
-    
+    </div>
+
     <div class="layout-main-between">
         <p-tabView>
             <p-tabPanel header="Veículo">
@@ -363,8 +365,8 @@
                             </div>
                             <div class="field col-12 md:col-1 flex flex-column">
                                 <label>Filtrar</label>
-                                <button pButton type="submit" class="p-button-warning w-full" icon="pi pi-search"
-                                   ></button>
+                                <button pButton type="submit" class="p-button-warning w-full"
+                                    icon="pi pi-search"></button>
                             </div>
 
                         </div>
