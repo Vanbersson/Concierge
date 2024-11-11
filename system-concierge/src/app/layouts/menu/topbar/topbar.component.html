@@ -1,3 +1,4 @@
+<p-toast />
 <div class="layout-topbar">
     <a class="layout-topbar-logo" routerLink="/">
         <img src="assets/layout/images/logo-black.png" alt="logo">
@@ -117,7 +118,7 @@
     </ng-template>
 </p-sidebar>
 
-<p-toast />
+
 <p-dialog [(visible)]="visibleDialogUser" [modal]="true" [style]="{ width: '50rem' }"
     [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }">
     <form [formGroup]="userFormView" (ngSubmit)="updateUser()">
@@ -225,6 +226,6 @@
     </form>
 </p-dialog>
 
-<p-overlayPanel #opVehicle [style]="{ width: '480px' }">
+<p-overlayPanel #opVehicle>
     <app-vehicle-exit></app-vehicle-exit>
 </p-overlayPanel>

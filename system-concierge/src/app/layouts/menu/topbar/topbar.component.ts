@@ -1,4 +1,4 @@
-import { Component, signal, ViewChild, ElementRef, Output, EventEmitter } from '@angular/core';
+import { Component, signal, ViewChild, ElementRef, Output, EventEmitter, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { FormControl, FormsModule, ReactiveFormsModule, FormGroup, Validators } from '@angular/forms';
@@ -17,8 +17,10 @@ import { PasswordModule } from 'primeng/password';
 import { DropdownModule } from "primeng/dropdown";
 import { ImageModule } from 'primeng/image';
 import { ToastModule } from 'primeng/toast';
-import { MessageService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
 import { OverlayPanelModule } from 'primeng/overlaypanel';
+import { TableModule } from 'primeng/table';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 
 
 //Service
@@ -27,18 +29,20 @@ import { UserRoleService } from '../../../services/user-role/user-role.service';
 import { LayoutService } from '../../layout/service/layout.service';
 import { IUser } from '../../../interfaces/user/iuser';
 import { StorageService } from '../../../services/storage/storage.service';
+import { VehicleEntry } from '../../../models/vehicle/vehicle-entry';
+import { VehicleService } from '../../../services/vehicle/vehicle.service';
 
 
 
 @Component({
   selector: 'app-topbar',
   standalone: true,
-  imports: [CommonModule,VehicleExitComponent, FormsModule, ReactiveFormsModule, RouterLink,OverlayPanelModule, ToastModule, ButtonModule, SidebarModule, DialogModule, BadgeModule, AvatarModule, InputMaskModule, ImageModule, InputTextModule, RadioButtonModule, DropdownModule, PasswordModule],
+  imports: [CommonModule, VehicleExitComponent, FormsModule, ReactiveFormsModule, RouterLink, OverlayPanelModule, ConfirmDialogModule,TableModule, ToastModule, ButtonModule, SidebarModule, DialogModule, BadgeModule, AvatarModule, InputMaskModule, ImageModule, InputTextModule, RadioButtonModule, DropdownModule, PasswordModule],
   templateUrl: './topbar.component.html',
   styleUrl: './topbar.component.scss',
-  providers: [MessageService]
+  providers: [ConfirmationService, MessageService]
 })
-export class TopbarComponent {
+export class TopbarComponent implements OnInit, OnDestroy {
 
   private user: IUser = null;
 
@@ -94,9 +98,17 @@ export class TopbarComponent {
   constructor(public layoutService: LayoutService, private storageService: StorageService,
     private router: Router,
     private userService: UserService,
+    private vehicleService: VehicleService,
     private userRoleService: UserRoleService,
-    private messageService: MessageService) {
+    private messageService: MessageService,
+    private confirmationService: ConfirmationService) {
 
+  }
+  ngOnDestroy(): void {
+  
+  }
+  ngOnInit(): void {
+   
   }
 
   closeSession() {
@@ -125,7 +137,7 @@ export class TopbarComponent {
   }
 
   getPhotoUser() {
-   this.userPhoto = this.storageService.photo;
+    this.userPhoto = this.storageService.photo;
   }
 
   getRoleUser() {
@@ -144,7 +156,7 @@ export class TopbarComponent {
       this.user = data;
       this.visibleDialogUser = true;
       this.dataViewUser();
-    },(error)=>{
+    }, (error) => {
 
     });
   }
@@ -255,7 +267,6 @@ export class TopbarComponent {
   get firstLetter(): string {
     return this.userName.substring(0, 1);
   }
-
 
 
 }

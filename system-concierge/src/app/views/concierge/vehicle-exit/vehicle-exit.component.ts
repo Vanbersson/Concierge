@@ -6,7 +6,9 @@ import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
 import { ButtonModule } from 'primeng/button';
 import { TableModule } from 'primeng/table';
-import { MessageService } from 'primeng/api';
+import { ToastModule } from 'primeng/toast';
+import { ConfirmationService, MessageService } from 'primeng/api';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 
 
 import { VehicleService } from '../../../services/vehicle/vehicle.service';
@@ -17,30 +19,47 @@ import { BusyService } from '../../../components/loading/busy.service';
 @Component({
   selector: 'app-vehicle-exit',
   standalone: true,
-  imports: [CommonModule, ButtonModule, TableModule, InputTextModule, IconFieldModule, InputIconModule],
+  imports: [CommonModule, ButtonModule, TableModule, InputTextModule, IconFieldModule, InputIconModule, ConfirmDialogModule, ToastModule],
   templateUrl: './vehicle-exit.component.html',
-  styleUrl: './vehicle-exit.component.scss'
+  styleUrl: './vehicle-exit.component.scss',
+  providers: [ConfirmationService, MessageService]
 })
 export class VehicleExitComponent implements OnInit, OnDestroy {
   private intervalVehiclesAuthorized: any;
   listVehicleExit: VehicleEntry[] = [];
-  selectedItems: VehicleEntry[] = [];
+  selectedVehicle: VehicleEntry[] = [];
 
-  constructor(private vehicleService: VehicleService,
+  constructor(
+    private vehicleService: VehicleService,
     private messageService: MessageService,
+    private confirmationService: ConfirmationService,
     private busyService: BusyService) {
-    
+
   }
 
   ngOnInit(): void {
     this.listVehicles();
 
-   // this.taskVehiclesAuthorized();
+    // this.taskVehiclesAuthorized();
   }
   ngOnDestroy(): void {
     if (this.intervalVehiclesAuthorized) {
       clearInterval(this.intervalVehiclesAuthorized); // Para o setInterval
     }
+  }
+
+  confirm() {
+   
+     this.confirmationService.confirm({
+       header: 'Confirmar saída?',
+       message: 'Por favor confirme para continuar.',
+       accept: () => {
+         this.messageService.add({ severity: 'success', summary: 'Saída de veículo', detail: 'Confirmado', life: 3000 });
+       },
+       reject: () => {
+         this.messageService.add({ severity: 'error', summary: 'Saída de veículo', detail: 'Cancelado',icon:'pi pi-times', life: 3000 });
+       }
+     }); 
   }
 
 
