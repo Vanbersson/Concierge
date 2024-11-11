@@ -46,8 +46,7 @@ export default class VeiculosComponent implements OnInit, OnDestroy {
   notAuth = STATUS_VEHICLE_ENTRY_NOTAUTH;
   firstAuth = STATUS_VEHICLE_ENTRY_FIRSTAUTH;
   authorized = STATUS_VEHICLE_ENTRY_AUTHORIZED;
-
-  selectedVeiculo!: { id: number, placa: string, frota: string, modelo: string, dataEntrada: string, porteiro: string, empresa: string, orcamento: string };
+  
   statusOrcamento!: any[];
   statusLiberacao!: any[];
   listVehicleEntry: VehicleEntry[] = [];
@@ -149,11 +148,6 @@ export default class VeiculosComponent implements OnInit, OnDestroy {
       this.messageService.add({ severity: 'error', summary: 'Servidor', detail: "Não disponível", icon: 'pi pi-times' });
       this.busyService.idle();
     });
-  }
-
-  onSelectionChange(event: any) {
-
-    console.log('Itens selecionados:', this.selectedItems.length);
   }
 
   getSeverity(value: string): any {
