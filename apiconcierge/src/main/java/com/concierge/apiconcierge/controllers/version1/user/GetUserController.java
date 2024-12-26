@@ -26,7 +26,7 @@ public class GetUserController {
     private UserRepository repository;
 
     @GetMapping
-    public ResponseEntity<Object> getUser(HttpServletRequest request) {
+    public ResponseEntity<Object> userToken(HttpServletRequest request) {
 
         String token = request.getHeader("Authorization").replace("Bearer ", "");
         String email = this.tokenService.validToken(token);
@@ -55,7 +55,7 @@ public class GetUserController {
         }
         map.put("roleId", user.getRoleId());
         map.put("roleDesc", user.getRoleDesc());
-        map.put("roleDesc", user.getRoleFunc());
+        map.put("roleFunc", user.getRoleFunc());
 
         return ResponseEntity.ok(map);
 

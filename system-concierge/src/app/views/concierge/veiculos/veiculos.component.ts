@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { CommonModule, DatePipe, NgOptimizedImage, UpperCasePipe } from '@angular/common';
+import { CommonModule, DatePipe, UpperCasePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 
@@ -26,15 +26,15 @@ import { StorageService } from '../../../services/storage/storage.service';
 import { VehicleEntryAuth } from '../../../models/vehicle/vehicle-entry-auth';
 import { User } from '../../../models/user/user';
 import { UserService } from '../../../services/user/user.service';
-import { error } from 'console';
 import { lastValueFrom } from 'rxjs';
 import { HttpResponse } from '@angular/common/http';
 import { BusyService } from '../../../components/loading/busy.service';
+import { error } from 'console';
 
 @Component({
   selector: 'app-veiculos',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, NgOptimizedImage, ToastModule, DropdownModule,TableModule, InputIconModule, IconFieldModule, TagModule, MultiSelectModule, ButtonModule, InputTextModule],
+  imports: [CommonModule, FormsModule, RouterModule, ToastModule, DropdownModule, TableModule, InputIconModule, IconFieldModule, TagModule, MultiSelectModule, ButtonModule, InputTextModule],
   templateUrl: './veiculos.component.html',
   styleUrl: './veiculos.component.scss',
   providers: [MessageService, DatePipe]
@@ -46,7 +46,7 @@ export default class VeiculosComponent implements OnInit, OnDestroy {
   notAuth = STATUS_VEHICLE_ENTRY_NOTAUTH;
   firstAuth = STATUS_VEHICLE_ENTRY_FIRSTAUTH;
   authorized = STATUS_VEHICLE_ENTRY_AUTHORIZED;
-  
+
   statusOrcamento!: any[];
   statusLiberacao!: any[];
   listVehicleEntry: VehicleEntry[] = [];
@@ -62,13 +62,12 @@ export default class VeiculosComponent implements OnInit, OnDestroy {
     private messageService: MessageService,
     private busyService: BusyService) {
 
-      this.busyService.busy();
+
     //get User
     this.userService.getUser$().subscribe(data => {
       this.user = data;
     });
   }
-
   ngOnInit(): void {
 
     this.listVehicles();
@@ -93,63 +92,79 @@ export default class VeiculosComponent implements OnInit, OnDestroy {
       clearInterval(this.intervalId); // Para o setInterval
     }
   }
-
   private taskVehicles(): Promise<void> {
     return new Promise(() => {
       this.intervalId = setInterval(() => {
-        this.listVehicles();
+        this.listV();
       }, 20000);
     });
 
   }
 
-  public listVehicles() {
+  private listV() {
 
+    this.vehicleService.allPendingAuthorization$().subscribe(data => {
+      for (let index = 0; index < data.length; index++) {
+        data[index] = this.preListV(data[index]);
+      }
+      this.listVehicleEntry = data;
+    }, error => {
+      this.messageService.add({ severity: 'error', summary: 'Servidor', detail: "Não disponível", icon: 'pi pi-times' });
+    });
+  }
+
+  private preListV(vehicle: VehicleEntry): VehicleEntry {
+
+    if (vehicle.vehicleNew == "yes") {
+      vehicle.placa = "NOVO";
+    }
+
+    if (vehicle.nameUserAttendant == "") {
+      vehicle.nameUserAttendant = "FALTA";
+    }
+
+    if (vehicle.clientCompanyName == "") {
+      vehicle.clientCompanyName = "FALTA";
+    } else {
+      var nome = vehicle.clientCompanyName.split(' ');
+      vehicle.clientCompanyName = nome[0] + " " + nome[1];
+    }
+
+    switch (vehicle.budgetStatus) {
+      case 'pendenteAprovacao':
+        vehicle.budgetStatus = 'Pendente Aprovação';
+        break;
+      case 'naoEnviado':
+        vehicle.budgetStatus = 'Não Enviado';
+        break;
+      case 'semOrcamento':
+        vehicle.budgetStatus = 'Sem Orçamento';
+        break;
+      case 'Aprovado':
+        break;
+      case 'naoAprovado':
+        vehicle.budgetStatus = 'Não Aprovado';
+        break;
+    }
+
+    return vehicle;
+
+  }
+
+  public listVehicles() {
+    this.busyService.busy();
     this.vehicleService.allPendingAuthorization$().subscribe((data) => {
 
       for (let index = 0; index < data.length; index++) {
-
-        if (data[index].vehicleNew == "yes") {
-          data[index].placa = "NOVO";
-        }
-
-        if (data[index].nameUserAttendant == "") {
-          data[index].nameUserAttendant = "FALTA";
-        }
-
-        if (data[index].clientCompanyName == "") {
-          data[index].clientCompanyName = "FALTA";
-        } else {
-          var nome = data[index].clientCompanyName.split(' ');
-          data[index].clientCompanyName = nome[0] + " " + nome[1];
-        }
-
-        switch (data[index].budgetStatus) {
-          case 'pendenteAprovacao':
-            data[index].budgetStatus = 'Pendente Aprovação';
-            break;
-          case 'naoEnviado':
-            data[index].budgetStatus = 'Não Enviado';
-            break;
-          case 'semOrcamento':
-            data[index].budgetStatus = 'Sem Orçamento';
-            break;
-          case 'Aprovado':
-            break;
-          case 'naoAprovado':
-            data[index].budgetStatus = 'Não Aprovado';
-            break;
-        }
-
+        data[index] = this.preListV(data[index]);
       }
       this.listVehicleEntry = data;
       this.busyService.idle();
     }, error => {
-      this.messageService.add({ severity: 'error', summary: 'Servidor', detail: "Não disponível", icon: 'pi pi-times' });
       this.busyService.idle();
+      this.messageService.add({ severity: 'error', summary: 'Servidor', detail: "Não disponível", icon: 'pi pi-times' });
     });
   }
-
   getSeverity(value: string): any {
 
     switch (value) {
@@ -167,11 +182,9 @@ export default class VeiculosComponent implements OnInit, OnDestroy {
 
     return 'warning';
   }
-
   editVeiculo(id: number) {
-    this.router.navigateByUrl('portaria/manutencao/' + id);
+    this.router.navigateByUrl('portaria/mannutencao-entrada-veiculo/' + id);
   }
-
   //Authorization exit
   public addAuthorizationAll() {
     for (let index = 0; index < this.selectedItems.length; index++) {
@@ -179,7 +192,6 @@ export default class VeiculosComponent implements OnInit, OnDestroy {
       this.authorization(element);
     }
   }
-
   public async authorization(vehicle: VehicleEntry) {
     if (vehicle.statusAuthExit != this.authorized) {
       var result = await this.addAuthorization(vehicle);
@@ -220,7 +232,6 @@ export default class VeiculosComponent implements OnInit, OnDestroy {
       this.messageService.add({ severity: 'info', summary: 'Veículo', detail: "Já liberado" });
     }
   }
-
   private async addAuthorization(vehicle: VehicleEntry): Promise<HttpResponse<VehicleEntryAuth>> {
     var auth = new VehicleEntryAuth();
     auth.idVehicle = vehicle.id;
@@ -248,7 +259,7 @@ export default class VeiculosComponent implements OnInit, OnDestroy {
       return error;
     }
 
-  } 
+  }
 
 
 

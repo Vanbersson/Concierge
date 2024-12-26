@@ -1,22 +1,19 @@
 package com.concierge.apiconcierge.controllers.version1.clientcompany;
 
+import com.concierge.apiconcierge.dtos.MessageErrorDto;
 import com.concierge.apiconcierge.dtos.clientcompany.ClientCompanyDto;
-import com.concierge.apiconcierge.dtos.clientcompany.ClientCompanyUpdateDto;
 import com.concierge.apiconcierge.models.clientcompany.ClientCompany;
-import com.concierge.apiconcierge.models.clientcompany.ClientCompanyType;
-import com.concierge.apiconcierge.models.clientcompany.CliForEnum;
-import com.concierge.apiconcierge.models.clientcompany.FisJurEnum;
-import com.concierge.apiconcierge.repositories.clientcompany.ClientCompanyIRepository;
-import com.concierge.apiconcierge.repositories.clientcompany.ClientCompanyRepository;
-import com.concierge.apiconcierge.repositories.clientcompany.ClientCompanyTypeRepository;
-import jakarta.validation.Valid;
+import com.concierge.apiconcierge.repositories.clientcompany.IClientCompanyRepository;
+import com.concierge.apiconcierge.services.clientcompany.ClientCompanyService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -24,72 +21,55 @@ import java.util.Optional;
 public class ClientCompanyController {
 
     @Autowired
-    private ClientCompanyIRepository clientIRepository;
+    private IClientCompanyRepository clientIRepository;
+
+    @Autowired
+    private ClientCompanyService service;
 
     @PostMapping("/save")
-    public ResponseEntity<Object> saveClientCompany(@RequestBody @Valid ClientCompanyDto data) {
+    public ResponseEntity<Object> save(@RequestBody ClientCompanyDto data) {
 
-        if (data.fisjur() == FisJurEnum.Juridica) {
-
-            ClientCompany client0 = this.clientIRepository.findByCnpj(data.cnpj());
-
-            if (client0 != null) return ResponseEntity.status(HttpStatus.CONFLICT).body("CNPJ already exists.");
-
+        try {
             ClientCompany clientCompany = new ClientCompany();
             BeanUtils.copyProperties(data, clientCompany);
+            Integer id = this.service.save(clientCompany);
+            Map<String, Object> map = new HashMap<>();
+            map.put("id", id);
+            return ResponseEntity.status(HttpStatus.CREATED).body(map);
 
-            clientCompany.setCpf("");
-            clientCompany.setRg("");
-
-            this.clientIRepository.save(clientCompany);
-
-            return ResponseEntity.status(HttpStatus.CREATED).build();
-
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageErrorDto(ex.getMessage()));
         }
 
-        if (data.fisjur() == FisJurEnum.Fisica) {
-
-            ClientCompany client0 = this.clientIRepository.findByCpf(data.cpf());
-
-            if (client0 != null) return ResponseEntity.status(HttpStatus.CONFLICT).body("CPF already exists.");
-
-            ClientCompany client1 = clientIRepository.findByRg(data.rg());
-
-            if (client1 != null) return ResponseEntity.status(HttpStatus.CONFLICT).body("RG already exists.");
-
-            ClientCompany clientCompany = new ClientCompany();
-            BeanUtils.copyProperties(data, clientCompany);
-
-            clientCompany.setCnpj("");
-
-            this.clientIRepository.save(clientCompany);
-
-            return ResponseEntity.status(HttpStatus.CREATED).build();
-
-        }
-
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
     @PostMapping("/update")
-    public ResponseEntity<Object> updateClientCompany(@RequestBody @Valid ClientCompanyUpdateDto data) {
-        Optional<ClientCompany> client0 = this.clientIRepository.findById(data.id());
+    public ResponseEntity<Object> update(@RequestBody ClientCompanyDto data) {
+        try {
+            ClientCompany clientCompany = new ClientCompany();
+            BeanUtils.copyProperties(data, clientCompany);
 
-        if (client0.isEmpty()) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            boolean result = this.service.update(clientCompany);
+            return ResponseEntity.status(HttpStatus.OK).build();
 
-        ClientCompany client = client0.get();
-        BeanUtils.copyProperties(data, client);
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageErrorDto(ex.getMessage()));
+        }
+    }
 
-        this.clientIRepository.save(client);
-
-        return ResponseEntity.ok().build();
+    @GetMapping("/filter/all")
+    public ResponseEntity<List<ClientCompany>> all() {
+        return ResponseEntity.ok(this.service.listAllLocal());
     }
 
     @GetMapping("/filter/id/{id}")
-    public ResponseEntity<Object> getIdClientCompany(@PathVariable(name = "id") Integer id) {
-        Optional<ClientCompany> company = clientIRepository.findById(id);
-        if (company.isEmpty()) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        return ResponseEntity.ok().body(company);
+    public ResponseEntity<Object> filterId(@PathVariable(name = "id") Integer id) {
+        ClientCompany client = this.service.filterIdLocal(id);
+        if (client == null)
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+
+        return ResponseEntity.ok().body(client);
+
     }
 
 

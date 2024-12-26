@@ -4,7 +4,6 @@ import { Router, RouterOutlet } from '@angular/router';
 import { LayoutService } from './layouts/layout/service/layout.service';
 import { NgxSpinnerModule } from 'ngx-spinner';
 
-
 @Component({
   selector: 'app-root',
   standalone: true,

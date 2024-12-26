@@ -85,19 +85,6 @@ VALUE
 (1,1,0,'cartão de crédito'),
 (1,1,0,'cartão de débito');
 
-INSERT INTO `tb_client_company`
-(`company_id`, `resale_id`, `status`, `name`, `fantasia`, `clifor`, `fisjur`,`cnpj`, `cpf`, `rg`,
- `email_home`, `email_work`, `ddd_cellphone`, `cellphone`, `ddd_phone`, `phone`, `zip_code`, `state`, `city`,
- `neighborhood`, `address`, `address_number`, `address_complement`,
- `contact_name`, `contact_email`, `contact_ddd_phone`, `contact_phone`, `contact_ddd_cellphone`, `contact_cellphone`)
-VALUES
-(1,1,0,'bbm logistica s.a','bbm logistica s.a',0,1,'01107327000804','','','','','81','981541754','','',
-'54503900','pe','cabo de santos agostinho', 'distrito industrial diper','km 96,4 bloco central de frete','0','','','','','','',''),
-(1,1,0,'Janeide Maria','Janeide Maria',0,0,'','06892001452','1234567','','','81','981541754','','',
-'54503900','pe','cabo de santos agostinho', 'distrito industrial diper','km 96,4 bloco central de frete','0','','','','','','',''),
-(1,1,0,'santin equipamentos transp. importação exportação ltda','santin',0,1,'05134355000197','','','','','','','16','33939999',
-'14820000','sp','americo brasiliense', 'iii distrito industrial','av. herminio cristovão','110','','','','','','','');
-
 
 
 

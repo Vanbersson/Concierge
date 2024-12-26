@@ -2,6 +2,7 @@ package com.concierge.apiconcierge.validation.budget;
 
 import com.concierge.apiconcierge.models.budget.Budget;
 import com.concierge.apiconcierge.models.vehicle.VehicleEntry;
+import com.concierge.apiconcierge.models.vehicle.enums.VehicleYesNotEnum;
 import com.concierge.apiconcierge.repositories.budget.IBudgetRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,7 +12,7 @@ import java.util.Optional;
 @Service
 public class BudgetValidation implements IBudgetValidation {
 
-    private static final String SUCCESS = "success.";
+    private static final String SUCCESS = "Success.";
     @Autowired
     private IBudgetRepository repository;
 
@@ -28,7 +29,7 @@ public class BudgetValidation implements IBudgetValidation {
     private final String TYPEPAYMENT = "type payment not informed.";
     private final String ATTENDANT = "Attendant not informed.";
     private final String CLIENTCOMPANY = "ClientCompany not informed.";
-
+    private final String SERVICEORDER ="Equal service order not.";
     private final String NOTFOUND = "Not Exists.";
 
     @Override
@@ -37,6 +38,9 @@ public class BudgetValidation implements IBudgetValidation {
             return ATTENDANT;
         if (vehicle.getClientCompanyId() == null || vehicle.getClientCompanyId() == 0 || vehicle.getClientCompanyName().isBlank())
             return CLIENTCOMPANY;
+        if(vehicle.getServiceOrder() == VehicleYesNotEnum.not)
+            return SERVICEORDER;
+
         return SUCCESS;
     }
 

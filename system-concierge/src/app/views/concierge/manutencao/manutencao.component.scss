@@ -3,6 +3,7 @@
     .mobile-visible-none {
         display: flex;
         justify-content: center;
+        
     }
 
     .layout-main-between {
@@ -160,6 +161,9 @@
     }
 
     ::ng-deep {
+        .p-timeline-horizontal{
+            width: 70rem;
+        }
         .p-button.p-button-secondary-custom {
             color: #475569;
             background-color: #f1f5f9;

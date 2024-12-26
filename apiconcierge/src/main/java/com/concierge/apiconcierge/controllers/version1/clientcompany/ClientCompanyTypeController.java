@@ -2,7 +2,7 @@ package com.concierge.apiconcierge.controllers.version1.clientcompany;
 
 import com.concierge.apiconcierge.dtos.clientcompany.ClientCompanyTypeDto;
 import com.concierge.apiconcierge.models.clientcompany.ClientCompanyType;
-import com.concierge.apiconcierge.repositories.clientcompany.ClientCompanyTypeRepository;
+import com.concierge.apiconcierge.repositories.clientcompany.IClientCompanyTypeRepository;
 import jakarta.validation.Valid;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +18,7 @@ import java.util.Optional;
 public class ClientCompanyTypeController {
 
     @Autowired
-    ClientCompanyTypeRepository typeRepository;
+    IClientCompanyTypeRepository typeRepository;
 
     @PostMapping("/add")
     public ResponseEntity<Object> addType(@PathVariable(name = "companyid") Integer companyId,

@@ -1,5 +1,5 @@
-import { Component, inject, OnInit } from '@angular/core';
-import { CommonModule, DatePipe, UpperCasePipe } from '@angular/common';
+import { Component, OnInit } from '@angular/core';
+import { CommonModule, UpperCasePipe } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { Validators, FormsModule, ReactiveFormsModule, FormGroup, FormControl } from '@angular/forms';
 
@@ -30,6 +30,8 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { SpeedDialModule } from 'primeng/speeddial';
 import { CheckboxModule } from 'primeng/checkbox';
 import { TimelineModule } from 'primeng/timeline';
+import { NgxImageCompressService } from 'ngx-image-compress';
+
 
 //Service
 import { VehicleService } from '../../../services/vehicle/vehicle.service';
@@ -55,8 +57,8 @@ import { StorageService } from '../../../services/storage/storage.service';
 import { BudgetService } from '../../../services/budget/budget.service';
 import { LayoutService } from '../../../layouts/layout/service/layout.service';
 import { VehicleEntryAuth } from '../../../models/vehicle/vehicle-entry-auth';
-import { error } from 'console';
 import { BusyService } from '../../../components/loading/busy.service';
+
 
 interface EventItem {
   description?: string;
@@ -75,6 +77,9 @@ interface EventItem {
   providers: [ConfirmationService, MessageService]
 })
 export default class ManutencaoComponent implements OnInit {
+
+  RESPONSE_SUCCESS: string = "Success.";
+  IMAGE_MAX_SIZE: number = 4243795;
 
   stepEntry: EventItem[];
 
@@ -209,7 +214,8 @@ export default class ManutencaoComponent implements OnInit {
     private serviceClienteCompany: ClientecompanyService,
     private confirmationService: ConfirmationService,
     private messageService: MessageService,
-    private busyService: BusyService
+    private busyService: BusyService,
+    private ngxImageCompressService: NgxImageCompressService
 
   ) { }
 
@@ -239,22 +245,18 @@ export default class ManutencaoComponent implements OnInit {
         this.vehicleEntry = data.body;
         this.stepEvent(this.vehicleEntry.stepEntry);
         this.loadForms();
-        this.busyService.idle();
       }
     }, error => {
       this.busyService.idle();
       if (error.status == 404) {
         this.messageService.add({ severity: 'error', summary: 'Erro', detail: "Vaículo não encontrado", icon: 'pi pi-times' });
         setTimeout(() => {
-
           this.router.navigateByUrl("/portaria/veiculos");
         }, 2000)
       } else {
         this.router.navigateByUrl("/");
       }
     });
-
-
 
     this.cores = [
       { color: 'Branco' },
@@ -369,7 +371,7 @@ export default class ManutencaoComponent implements OnInit {
     const image = await Camera.getPhoto({
       quality: 80,
       allowEditing: false,
-      resultType: CameraResultType.Base64
+      resultType: CameraResultType.DataUrl
     });
     return image;
   }
@@ -382,7 +384,7 @@ export default class ManutencaoComponent implements OnInit {
     this.formVehicle.get('nameUserExitAuth1').enable();
     this.formVehicle.get('nameUserExitAuth2').enable();
   }
-  private loadForms() {
+  private async loadForms() {
     //Form vehicle
 
     for (var model of this.modelVehicles) {
@@ -509,7 +511,10 @@ export default class ManutencaoComponent implements OnInit {
     }
 
     if (this.vehicleEntry.statusAuthExit != this.notAuth) {
-      this.addRequireAttendant();
+      if (this.vehicleEntry.serviceOrder == "yes") {
+        this.addRequireAttendant();
+      }
+
       this.addRequireDriverExitName();
       if (this.vehicleEntry.driverExitCpf != "") {
         this.addRequireDriverExitCpf();
@@ -520,6 +525,7 @@ export default class ManutencaoComponent implements OnInit {
 
     }
 
+    this.busyService.idle();
   }
   //Vehicle
   public placaRequiredAdd() {
@@ -576,24 +582,66 @@ export default class ManutencaoComponent implements OnInit {
     this.formVehicle.controls['userAttendant'].updateValueAndValidity();
   }
   public async photoFile1Vehicle() {
-    const image = this.openCamera();
-    this.photoVehicle1 = (await image).base64String;
-    this.formVehicle.patchValue({ photo1: this.photoVehicle1 });
+
+    this.ngxImageCompressService.uploadFile().then(({ image, orientation }) => {
+      if (this.ngxImageCompressService.byteCount(image) > this.IMAGE_MAX_SIZE) {
+        this.messageService.add({ severity: 'error', summary: 'Imagem', detail: 'Tamanha máximo 3MB', icon: 'pi pi-times', life: 3000 });
+      } else {
+        this.ngxImageCompressService.compressFile(image, orientation, 50, 40).then((compressedImage) => {
+
+          // Remover o prefixo "data:image/jpeg;base64," se existir
+          const base64Data = compressedImage.split(',')[1];
+          this.photoVehicle1 = base64Data;
+          this.formVehicle.patchValue({ photo1: this.photoVehicle1 });
+        });
+      }
+    });
+
   }
   public async photoFile2Vehicle() {
-    const image = this.openCamera();
-    this.photoVehicle2 = (await image).base64String;
-    this.formVehicle.patchValue({ photo2: this.photoVehicle2 });
+    this.ngxImageCompressService.uploadFile().then(({ image, orientation }) => {
+
+      if (this.ngxImageCompressService.byteCount(image) > this.IMAGE_MAX_SIZE) {
+        this.messageService.add({ severity: 'error', summary: 'Imagem', detail: 'Tamanha máximo 3MB', icon: 'pi pi-times', life: 3000 });
+      } else {
+        this.ngxImageCompressService.compressFile(image, orientation, 50, 40).then((compressedImage) => {
+          // Remover o prefixo "data:image/jpeg;base64," se existir
+          const base64Data = compressedImage.split(',')[1];
+          this.photoVehicle2 = base64Data
+          this.formVehicle.patchValue({ photo2: this.photoVehicle2 });
+        });
+      }
+    });
   }
   public async photoFile3Vehicle() {
-    const image = this.openCamera();
-    this.photoVehicle3 = (await image).base64String;
-    this.formVehicle.patchValue({ photo3: this.photoVehicle3 });
+    this.ngxImageCompressService.uploadFile().then(({ image, orientation }) => {
+
+      if (this.ngxImageCompressService.byteCount(image) > this.IMAGE_MAX_SIZE) {
+        this.messageService.add({ severity: 'error', summary: 'Imagem', detail: 'Tamanha máximo 3MB', icon: 'pi pi-times', life: 3000 });
+      } else {
+        this.ngxImageCompressService.compressFile(image, orientation, 50, 40).then((compressedImage) => {
+          // Remover o prefixo "data:image/jpeg;base64," se existir
+          const base64Data = compressedImage.split(',')[1];
+          this.photoVehicle3 = base64Data
+          this.formVehicle.patchValue({ photo3: this.photoVehicle3 });
+        });
+      }
+    });
   }
   public async photoFile4Vehicle() {
-    const image = this.openCamera();
-    this.photoVehicle4 = (await image).base64String;
-    this.formVehicle.patchValue({ photo4: this.photoVehicle4 });
+    this.ngxImageCompressService.uploadFile().then(({ image, orientation }) => {
+      if (this.ngxImageCompressService.byteCount(image) > this.IMAGE_MAX_SIZE) {
+        this.messageService.add({ severity: 'error', summary: 'Imagem', detail: 'Tamanha máximo 3MB', icon: 'pi pi-times', life: 3000 });
+      } else {
+        this.ngxImageCompressService.compressFile(image, orientation, 50, 40).then((compressedImage) => {
+
+          // Remover o prefixo "data:image/jpeg;base64," se existir
+          const base64Data = compressedImage.split(',')[1];
+          this.photoVehicle4 = base64Data
+          this.formVehicle.patchValue({ photo4: this.photoVehicle4 });
+        });
+      }
+    });
   }
   public deleteFileVehicle1() {
     this.photoVehicle1 = "";
@@ -644,7 +692,7 @@ export default class ManutencaoComponent implements OnInit {
       auth.idUserExitAuth = this.user.id;
       auth.nameUserExitAuth = this.user.name;
       this.vehicleService.entryDeleteAuth1(auth).subscribe((data) => {
-        if (data.body == "success.") {
+        if (data.body == this.RESPONSE_SUCCESS) {
           this.messageService.add({ severity: 'success', summary: 'Autorização', detail: 'Removida com sucesso', icon: 'pi pi-check' });
           this.formVehicle.patchValue({
             idUserExitAuth1: 0,
@@ -667,7 +715,7 @@ export default class ManutencaoComponent implements OnInit {
       auth.idUserExitAuth = this.user.id;
       auth.nameUserExitAuth = this.user.name;
       this.vehicleService.entryDeleteAuth2(auth).subscribe((data) => {
-        if (data.body == "success.") {
+        if (data.body == this.RESPONSE_SUCCESS) {
           this.messageService.add({ severity: 'success', summary: 'Autorização', detail: 'Removida com sucesso', icon: 'pi pi-check' });
           this.formVehicle.patchValue({
             idUserExitAuth2: 0,
@@ -793,10 +841,8 @@ export default class ManutencaoComponent implements OnInit {
     if (value.clientCompanyTipo == "j") {
 
       if (value.clientCompanyId) {
-        this.serviceClienteCompany.getId$(value.clientCompanyId).subscribe((data) => {
-          if (data.status == 200) {
-            this.dialogListClientCompany.push(data.body);
-          }
+        this.serviceClienteCompany.getIdExternal$(value.clientCompanyId).subscribe((data) => {
+          this.dialogListClientCompany = data;
           this.dialogloadingClientCompany = false;
         }, (error) => {
           this.dialogloadingClientCompany = false;
@@ -813,9 +859,7 @@ export default class ManutencaoComponent implements OnInit {
         });
       } else if (value.clientCompanyCnpj) {
         this.serviceClienteCompany.getCnpj$(value.clientCompanyCnpj).subscribe((data) => {
-          if (data.status == 200) {
-            this.dialogListClientCompany.push(data.body);
-          }
+          this.dialogListClientCompany = data;
           this.dialogloadingClientCompany = false;
         }, (error) => {
           this.dialogloadingClientCompany = false;
@@ -835,11 +879,9 @@ export default class ManutencaoComponent implements OnInit {
       // P/Física
 
       if (value.clientCompanyId) {
-        this.serviceClienteCompany.getId$(value.clientCompanyId).subscribe((data) => {
-          if (data.status == 200) {
-            this.dialogListClientCompany.push(data.body);
-            this.dialogloadingClientCompany = false;
-          }
+        this.serviceClienteCompany.getIdExternal$(value.clientCompanyId).subscribe((data) => {
+          this.dialogListClientCompany = data;
+          this.dialogloadingClientCompany = false;
         }, (error) => {
           this.dialogloadingClientCompany = false;
         });
@@ -852,18 +894,7 @@ export default class ManutencaoComponent implements OnInit {
         this.dialogloadingClientCompany = false;
       } else if (value.clientCompanyCpf) {
         this.serviceClienteCompany.getCpf$(value.clientCompanyCpf).subscribe((data) => {
-          if (data.status == 200) {
-            this.dialogListClientCompany.push(data.body);
-          }
-          this.dialogloadingClientCompany = false;
-        }, (error) => {
-          this.dialogloadingClientCompany = false;
-        });
-      } else if (value.clientCompanyRg) {
-        this.serviceClienteCompany.getRg$(value.clientCompanyRg).subscribe((data) => {
-          if (data.status == 200) {
-            this.dialogListClientCompany.push(data.body);
-          }
+          this.dialogListClientCompany = data;
           this.dialogloadingClientCompany = false;
         }, (error) => {
           this.dialogloadingClientCompany = false;
@@ -883,34 +914,95 @@ export default class ManutencaoComponent implements OnInit {
   }
   //Driver
   public async photoEntryDriver() {
-    const image = this.openCamera();
-    this.driverEntryPhoto = (await image).base64String;
-    this.formDriver.patchValue({ driverEntryPhoto: this.driverEntryPhoto });
+    this.ngxImageCompressService.uploadFile().then(({ image, orientation }) => {
+
+      if (this.ngxImageCompressService.byteCount(image) > this.IMAGE_MAX_SIZE) {
+        this.messageService.add({ severity: 'error', summary: 'Imagem', detail: 'Tamanha máximo 3MB', icon: 'pi pi-times', life: 3000 });
+      } else {
+        this.ngxImageCompressService.compressFile(image, orientation, 50, 40).then((compressedImage) => {
+
+          // Remover o prefixo "data:image/jpeg;base64," se existir
+          const base64Data = compressedImage.split(',')[1];
+          this.driverEntryPhoto = base64Data;
+          this.formDriver.patchValue({ driverEntryPhoto: this.driverEntryPhoto });
+        });
+      }
+    });
   }
   public async photoEntryFile1Driver() {
-    const image = this.openCamera();
-    this.driverEntryPhotoDoc1 = (await image).base64String;
-    this.formDriver.patchValue({ driverEntryPhotoDoc1: this.driverEntryPhotoDoc1 });
+    this.ngxImageCompressService.uploadFile().then(({ image, orientation }) => {
+      if (this.ngxImageCompressService.byteCount(image) > this.IMAGE_MAX_SIZE) {
+        this.messageService.add({ severity: 'error', summary: 'Imagem', detail: 'Tamanha máximo 3MB', icon: 'pi pi-times', life: 3000 });
+      } else {
+        this.ngxImageCompressService.compressFile(image, orientation, 50, 40).then((compressedImage) => {
+
+          // Remover o prefixo "data:image/jpeg;base64," se existir
+          const base64Data = compressedImage.split(',')[1];
+          this.driverEntryPhotoDoc1 = base64Data;
+          this.formDriver.patchValue({ driverEntryPhotoDoc1: this.driverEntryPhotoDoc1 });
+        });
+      }
+    });
   }
   public async photoEntryFile2Driver() {
-    const image = this.openCamera();
-    this.driverEntryPhotoDoc2 = (await image).base64String;
-    this.formDriver.patchValue({ driverEntryPhotoDoc2: this.driverEntryPhotoDoc2 });
+    this.ngxImageCompressService.uploadFile().then(({ image, orientation }) => {
+      if (this.ngxImageCompressService.byteCount(image) > this.IMAGE_MAX_SIZE) {
+        this.messageService.add({ severity: 'error', summary: 'Imagem', detail: 'Tamanha máximo 3MB', icon: 'pi pi-times', life: 3000 });
+      } else {
+        this.ngxImageCompressService.compressFile(image, orientation, 50, 40).then((compressedImage) => {
+
+          // Remover o prefixo "data:image/jpeg;base64," se existir
+          const base64Data = compressedImage.split(',')[1];
+          this.driverEntryPhotoDoc2 = base64Data;
+          this.formDriver.patchValue({ driverEntryPhotoDoc2: this.driverEntryPhotoDoc2 });
+        });
+      }
+    });
   }
   public async photoExitDriver() {
-    const image = this.openCamera();
-    this.driverExitPhoto = (await image).base64String;
-    this.formDriver.patchValue({ driverExitPhoto: this.driverExitPhoto });
+    this.ngxImageCompressService.uploadFile().then(({ image, orientation }) => {
+      if (this.ngxImageCompressService.byteCount(image) > this.IMAGE_MAX_SIZE) {
+        this.messageService.add({ severity: 'error', summary: 'Imagem', detail: 'Tamanha máximo 3MB', icon: 'pi pi-times', life: 3000 });
+      } else {
+        this.ngxImageCompressService.compressFile(image, orientation, 50, 40).then((compressedImage) => {
+
+          // Remover o prefixo "data:image/jpeg;base64," se existir
+          const base64Data = compressedImage.split(',')[1];
+          this.driverExitPhoto = base64Data;
+          this.formDriver.patchValue({ driverExitPhoto: this.driverExitPhoto });
+        });
+      }
+    });
   }
   public async photoExitFile1Driver() {
-    const image = this.openCamera();
-    this.driverExitPhotoDoc1 = (await image).base64String;
-    this.formDriver.patchValue({ driverExitPhotoDoc1: this.driverExitPhotoDoc1 });
+    this.ngxImageCompressService.uploadFile().then(({ image, orientation }) => {
+      if (this.ngxImageCompressService.byteCount(image) > this.IMAGE_MAX_SIZE) {
+        this.messageService.add({ severity: 'error', summary: 'Imagem', detail: 'Tamanha máximo 3MB', icon: 'pi pi-times', life: 3000 });
+      } else {
+        this.ngxImageCompressService.compressFile(image, orientation, 50, 40).then((compressedImage) => {
+
+          // Remover o prefixo "data:image/jpeg;base64," se existir
+          const base64Data = compressedImage.split(',')[1];
+          this.driverExitPhotoDoc1 = base64Data;
+          this.formDriver.patchValue({ driverExitPhotoDoc1: this.driverExitPhotoDoc1 });
+        });
+      }
+    });
   }
   public async photoExitFile2Driver() {
-    const image = this.openCamera();
-    this.driverExitPhotoDoc2 = (await image).base64String;
-    this.formDriver.patchValue({ driverExitPhotoDoc2: this.driverExitPhotoDoc2 });
+    this.ngxImageCompressService.uploadFile().then(({ image, orientation }) => {
+      if (this.ngxImageCompressService.byteCount(image) > this.IMAGE_MAX_SIZE) {
+        this.messageService.add({ severity: 'error', summary: 'Imagem', detail: 'Tamanha máximo 3MB', icon: 'pi pi-times', life: 3000 });
+      } else {
+        this.ngxImageCompressService.compressFile(image, orientation, 50, 40).then((compressedImage) => {
+
+          // Remover o prefixo "data:image/jpeg;base64," se existir
+          const base64Data = compressedImage.split(',')[1];
+          this.driverExitPhotoDoc2 = base64Data;
+          this.formDriver.patchValue({ driverExitPhotoDoc2: this.driverExitPhotoDoc2 });
+        });
+      }
+    });
   }
   //Remover fotos motorista entrada
   public deleteEntryPhotoDriver() {
@@ -992,7 +1084,7 @@ export default class ManutencaoComponent implements OnInit {
   public confirmGerarOrcamento() {
 
     if (this.vehicleEntry.budgetStatus != "semOrcamento") {
-      this.router.navigateByUrl("/oficina/orcamento/" + this.formVehicle.value.id);
+      this.router.navigateByUrl("/oficina/manutencao-orcamento/" + this.formVehicle.value.id);
     } else {
       this.confirmationService.confirm({
         header: 'Confirmar',
@@ -1011,19 +1103,23 @@ export default class ManutencaoComponent implements OnInit {
               this.vehicleEntry.budgetStatus = data.body.status;
               this.messageService.add({ severity: 'info', summary: 'Orçamento - ' + data.body.id, detail: 'Gerado com sucesso', life: 3000 });
               setTimeout(() => {
-                this.router.navigateByUrl('/oficina/orcamento/' + this.formVehicle.value.id);
+                this.router.navigateByUrl('/oficina/manutencao-orcamento/' + this.formVehicle.value.id);
               }, 3000);
             }
 
           }, error => {
             const CLIENTCOMPANY = "ClientCompany not informed.";
             const ATTENDANT = "Attendant not informed.";
+            const SERVICEORDER = "Equal service order not.";
             if (error.status == 401) {
               if (error.error.messageError == CLIENTCOMPANY) {
                 this.messageService.add({ severity: 'error', summary: 'Empresa', detail: "Não informada", icon: 'pi pi-times' });
               }
               if (error.error.messageError == ATTENDANT) {
                 this.messageService.add({ severity: 'error', summary: 'Consultor', detail: "Não informado", icon: 'pi pi-times' });
+              }
+              if (error.error.messageError == SERVICEORDER) {
+                this.messageService.add({ severity: 'error', summary: 'Ordem Serviço', detail: "Informado não", icon: 'pi pi-times' });
               }
             }
 
@@ -1068,12 +1164,22 @@ export default class ManutencaoComponent implements OnInit {
       this.messageService.add({ severity: 'error', summary: 'Cor', detail: "Não informada", icon: 'pi pi-times' });
       return false;
     }
-    if (vehicleValue.statusAuthExit != this.notAuth) {
-      if (vehicleValue.userAttendant.length == 0) {
-        this.messageService.add({ severity: 'error', summary: 'Consultor', detail: "Não informada", icon: 'pi pi-times' });
-        return false;
+
+
+    if (vehicleValue.serviceOrder == "yes") {
+
+      if (vehicleValue.statusAuthExit != this.notAuth) {
+        if (vehicleValue.userAttendant.length == 0) {
+          this.messageService.add({ severity: 'error', summary: 'Consultor', detail: "Não informado", icon: 'pi pi-times' });
+          return false;
+        }
       }
+
+    } else {
+
+
     }
+
     if (clientCompanyValue.clientCompanyNot.length == 0) {
       if (clientCompanyValue.clientCompanyId == null || clientCompanyValue.clientCompanyName == "") {
         this.messageService.add({ severity: 'error', summary: 'Proprietário', detail: "Não informado", icon: 'pi pi-times' });
@@ -1111,6 +1217,7 @@ export default class ManutencaoComponent implements OnInit {
     this.vehicleEntry.dateEntry = vehicleValue.dateEntry;
     this.vehicleEntry.datePrevisionExit = vehicleValue?.datePrevisionExit ?? "";
     this.vehicleEntry.placa = vehicleValue.placa;
+    this.vehicleEntry.placasJunto = "";
     this.vehicleEntry.frota = vehicleValue.frota;
     this.vehicleEntry.modelId = vehicleValue.modelVehicle.at(0).id;
     this.vehicleEntry.modelDescription = vehicleValue.modelVehicle.at(0).description;
@@ -1138,10 +1245,10 @@ export default class ManutencaoComponent implements OnInit {
     this.vehicleEntry.numServiceOrder = vehicleValue?.numServiceOrder ?? "";
     this.vehicleEntry.numNfe = vehicleValue?.numNfe ?? "";
     this.vehicleEntry.numNfse = vehicleValue?.numNfse ?? "";
-    this.vehicleEntry.photo1 = vehicleValue.photo1;
-    this.vehicleEntry.photo2 = vehicleValue.photo2;
-    this.vehicleEntry.photo3 = vehicleValue.photo3;
-    this.vehicleEntry.photo4 = vehicleValue.photo4;
+    this.vehicleEntry.photo1 = vehicleValue.photo1 ?? "";
+    this.vehicleEntry.photo2 = vehicleValue.photo2 ?? "";
+    this.vehicleEntry.photo3 = vehicleValue.photo3 ?? "";
+    this.vehicleEntry.photo4 = vehicleValue.photo4 ?? "";
     this.vehicleEntry.vehicleNew = vehicleValue.vehicleNew;
     this.vehicleEntry.serviceOrder = vehicleValue.serviceOrder;
     this.vehicleEntry.information = vehicleValue.information;
@@ -1163,18 +1270,18 @@ export default class ManutencaoComponent implements OnInit {
     this.vehicleEntry.driverEntryName = driverValue.driverEntryName;
     this.vehicleEntry.driverEntryCpf = driverValue.driverEntryCpf;
     this.vehicleEntry.driverEntryRg = driverValue?.driverEntryRg ?? "";
-    this.vehicleEntry.driverEntryPhoto = driverValue.driverEntryPhoto;
-    this.vehicleEntry.driverEntrySignature = driverValue.driverEntrySignature;
-    this.vehicleEntry.driverEntryPhotoDoc1 = driverValue.driverEntryPhotoDoc1;
-    this.vehicleEntry.driverEntryPhotoDoc2 = driverValue.driverEntryPhotoDoc2;
+    this.vehicleEntry.driverEntryPhoto = driverValue.driverEntryPhoto ?? "";
+    this.vehicleEntry.driverEntrySignature = driverValue.driverEntrySignature ?? "";
+    this.vehicleEntry.driverEntryPhotoDoc1 = driverValue.driverEntryPhotoDoc1 ?? "";
+    this.vehicleEntry.driverEntryPhotoDoc2 = driverValue.driverEntryPhotoDoc2 ?? "";
 
     this.vehicleEntry.driverExitName = driverValue.driverExitName;
     this.vehicleEntry.driverExitCpf = driverValue.driverExitCpf;
     this.vehicleEntry.driverExitRg = driverValue?.driverExitRg ?? "";
-    this.vehicleEntry.driverExitPhoto = driverValue.driverExitPhoto;
-    this.vehicleEntry.driverExitSignature = driverValue.driverExitSignature;
-    this.vehicleEntry.driverExitPhotoDoc1 = driverValue.driverExitPhotoDoc1;
-    this.vehicleEntry.driverExitPhotoDoc2 = driverValue.driverExitPhotoDoc2;
+    this.vehicleEntry.driverExitPhoto = driverValue.driverExitPhoto ?? "";
+    this.vehicleEntry.driverExitSignature = driverValue.driverExitSignature ?? "";
+    this.vehicleEntry.driverExitPhotoDoc1 = driverValue.driverExitPhotoDoc1 ?? "";
+    this.vehicleEntry.driverExitPhotoDoc2 = driverValue.driverExitPhotoDoc2 ?? "";
 
   }
   public saveVehicle() {

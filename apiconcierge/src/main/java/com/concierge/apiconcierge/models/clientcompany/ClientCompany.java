@@ -29,7 +29,6 @@ public class ClientCompany implements Serializable {
     private Integer resaleId;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     private StatusEnableDisable status;

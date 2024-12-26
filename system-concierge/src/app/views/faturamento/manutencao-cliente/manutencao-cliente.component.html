@@ -1,0 +1,78 @@
+<div class="layout-card">
+
+    <div class="layout-card-title">
+        <span>Manutenção de clientes</span>
+    </div>
+    <p-table #dt1 dataKey="id" [value]="clients" 
+    [rowHover]="true" 
+    [showCurrentPageReport]="true"    
+    currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} entradas"
+    [globalFilterFields]="['id', 'fantasia', 'name', 'cnpj', 'cpf']" 
+    [paginator]="true" 
+    [rows]="10"
+    [rowsPerPageOptions]="[10, 25, 50]" 
+    styleClass="p-datatable-sm">
+        <ng-template pTemplate="caption">
+            <div class="flex justify-content-between">
+                <p-iconField iconPosition="left">
+                    <p-inputIcon>
+                        <i class="pi pi-search"></i>
+                    </p-inputIcon>
+                    <input pInputText type="text" (input)="dt1.filterGlobal($event.target.value, 'contains')"
+                        placeholder="Pesquisar" />
+                </p-iconField>
+                <button pButton label="Cliente" [outlined]="true" icon="pi pi-user-plus"
+                    (click)="showDialog()"></button>
+            </div>
+        </ng-template>
+        <ng-template pTemplate="header">
+            <tr>
+                <th class="font-normal" pSortableColumn="id" style="width:10%">
+                    Código <p-sortIcon field="id" />
+                </th>
+                <th class="font-normal" pSortableColumn="fantasia" style="width:20%">
+                    Fantasia <p-sortIcon field="fantasia" />
+                </th>
+                <th class="font-normal" pSortableColumn="name" style="width:30%">
+                    Nome <p-sortIcon field="name" />
+                </th>
+                <th class="font-normal" pSortableColumn="cnpj" style="width:20%">
+                    CNPJ <p-sortIcon field="cnpj" />
+                </th>
+                <th class="font-normal" pSortableColumn="cpf" style="width:20%">
+                    CPF <p-sortIcon field="cpf" />
+                </th>
+                <th class="font-normal">Editar</th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-client>
+            <tr>
+                <td>{{client.id}}</td>
+                <td>{{client.fantasia}}</td>
+                <td>{{client.name}}</td>
+                <td>{{client.cnpj}}</td>
+                <td>{{client.cpf}}</td>
+                <td><p-button icon="pi pi-pencil" [text]="true" /></td>
+            </tr>
+
+        </ng-template>
+    </p-table>
+
+    <p-dialog [(visible)]="visible" [modal]="true">
+        <form>
+            <div class="p-fluid p-formgrid grid">
+                <div class="field col-12 md:col-2">
+                    <label for="clientId">Código</label>
+                    <input id="clientId" pInputText />
+                </div>
+                <div class="field col-12 md:col-6">
+                    <label for="ClientName">Razão Social</label>
+                    <input id="ClientName" pInputText />
+                </div>
+
+            </div>
+        </form>
+
+
+    </p-dialog>
+</div>

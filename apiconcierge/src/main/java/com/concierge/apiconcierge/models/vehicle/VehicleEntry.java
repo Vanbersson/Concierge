@@ -177,6 +177,9 @@ public class VehicleEntry implements Serializable {
 
     private String placa;
 
+    @Column(name = "placas_junto")
+    private String placasJunto;
+
     private String frota;
 
     @Column(name = "vehicle_new")

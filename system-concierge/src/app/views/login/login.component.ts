@@ -66,9 +66,6 @@ export default class LoginComponent implements OnInit {
   }
 
   onSubmit() {
-
-    //Senha Administrador
-    //VjslM@1236!
     const { valid, value } = this.loginForm;
 
     if (valid) {
@@ -83,7 +80,7 @@ export default class LoginComponent implements OnInit {
           this.storageService.roleDesc = data.body.roleDesc;
           this.storageService.token = data.body.token;
           this.busyService.idle();
-         
+
           this.messageService.add({ severity: 'success', summary: 'Bem-vindo', detail: data.body.name, icon: 'pi pi-lock-open', life: 2000 });
 
           setTimeout(() => {

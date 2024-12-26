@@ -5,12 +5,12 @@
 
         <div class="layourt-button-back">
             <button pButton [text]="true" severity="contrast" icon="pi pi-sign-out"
-                routerLink="/portaria/veiculos"></button>
+                routerLink="/portaria/lista-entrada-veiculo"></button>
         </div>
     </div>
 
-    <div class="mobile-visible-none">
-        <p-timeline [value]="stepEntry" layout="horizontal" style="width: 70rem;">
+    <div class="mobile-visible-none" >
+        <p-timeline [value]="stepEntry" layout="horizontal">
             <ng-template pTemplate="marker" let-event>
                 <span
                     class="flex w-2rem h-2rem align-items-center justify-content-center text-white border-circle z-1 shadow-1"

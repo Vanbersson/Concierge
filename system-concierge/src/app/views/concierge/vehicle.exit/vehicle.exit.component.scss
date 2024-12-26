@@ -1,0 +1,23 @@
+:host {
+    .layout-badge-info {
+        display: flex;
+        
+        p-badge {
+            position: absolute;
+            margin-left: 40px;
+        }
+    }
+
+    @media (max-width: 991px) {
+        .layout-badge-info {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+
+            p-badge {
+                position: relative;
+                margin-left: auto;
+            }
+        }
+    }
+}

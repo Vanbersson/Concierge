@@ -1,0 +1,34 @@
+<div class="layout-card">
+    <p-table #dtParts dataKey="id" [value]="parts" [globalFilterFields]="['id', 'code','description']"
+    [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 25, 50]" styleClass="p-datatable-sm">
+        <ng-template pTemplate="caption">
+            <div class="flex justify-content-between">
+                <p-iconField iconPosition="left">
+                    <p-inputIcon>
+                        <i class="pi pi-search"></i>
+                    </p-inputIcon>
+                    <input pInputText type="text" (input)="dtParts.filterGlobal($event.target.value, 'contains')"
+                        placeholder="Pesquisar" />
+                </p-iconField>
+                <button pButton label="Peças" [outlined]="true" icon="pi pi-plus"
+                    ></button>
+            </div>
+        </ng-template>
+        <ng-template pTemplate="header">
+            <tr>
+                <th class="font-normal">Código</th>
+                <th class="font-normal">Descrição</th>
+                <th class="font-normal">Unidade Medida</th>
+                <th class="font-normal">Preço</th>
+                <th class="font-normal">Qtd. Disponível</th>
+            </tr>
+
+        </ng-template>
+        <ng-template pTemplate="body">
+            
+        </ng-template>
+
+    </p-table>
+</div>
+
+

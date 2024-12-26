@@ -1,4 +1,3 @@
-<p-toast />
 <div class="layout-topbar">
     <a class="layout-topbar-logo" routerLink="/">
         <img src="assets/layout/images/logo-black.png" alt="logo">
@@ -17,10 +16,7 @@
     <div #topbarmenu class="layout-topbar-menu"
         [ngClass]="{'layout-topbar-menu-mobile-active':layoutService.state.profileSidebarVisible}">
 
-        <button class="p-link layout-topbar-button" (click)="opVehicle.toggle($event)">
-            <i class="pi pi-car"></i>
-            <span>Veículos</span>
-        </button>
+        <app-vehicleexit></app-vehicleexit>
         <button class="p-link layout-topbar-button">
             <i class="pi pi-bell"></i>
             <span>Notificação</span>
@@ -35,7 +31,6 @@
 </div>
 
 <p-sidebar #sidebarRef [(visible)]="visibleSideBarRight" position="right" styleClass="w-20rem">
-
     <ng-template pTemplate="headless">
 
         <div class="layout-sidebar-header">
@@ -62,13 +57,7 @@
         </div>
         <div class="layout-sidebar-content">
 
-            <a class="layout-sidebar-content-card" (click)="showDialogUser()">
-                <i class="pi pi-user"></i>
-                <div class="layout-sidebar-content-card-item">
-                    <span class="sidebar-content-card-item-title">Perfil</span>
-                    <span>Dados do usuário</span>
-                </div>
-            </a>
+            <app-userprofile/>
 
             <a class="layout-sidebar-content-card">
                 <i class="pi pi-cog"></i>
@@ -90,14 +79,14 @@
 
                 <span class="layout-notification-title">Notificações</span>
 
-                @if ( qtdAlert() == 0 ) {
+                @if ( qtdNotification() == 0 ) {
                 <span class="layout-notification-message">Você não tem notificação</span>
                 }@else{
-                @if ( qtdAlert() > 1 ) {
-                <span class="layout-notification-message">Você tem {{qtdAlert()}} notificações</span>
+                @if ( qtdNotification() > 1 ) {
+                <span class="layout-notification-message">Você tem {{qtdNotification()}} notificações</span>
                 }@else {
-                @if ( qtdAlert() > 0 ) {
-                <span class="layout-notification-message">Você tem {{qtdAlert()}} notificação</span>
+                @if ( qtdNotification() > 0 ) {
+                <span class="layout-notification-message">Você tem {{qtdNotification()}} notificação</span>
                 }
                 }
 
@@ -117,115 +106,3 @@
         </div>
     </ng-template>
 </p-sidebar>
-
-
-<p-dialog [(visible)]="visibleDialogUser" [modal]="true" [style]="{ width: '50rem' }"
-    [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }">
-    <form [formGroup]="userFormView" (ngSubmit)="updateUser()">
-        <div class="p-fluid p-formgrid grid">
-
-            <div class="field col-12 flex align-items-center justify-content-center ">
-
-                <div class="layout-photo-person mb-5">
-
-                    @if(userPhoto){
-                    <p-image [imageStyle]="{'border-radius':'100%','object-fit':'cover'}"
-                        src="data:image/png;base64,{{userPhoto}}" alt="imagem motorista" height="80" width="80"
-                        [preview]="true" />
-
-                    <button pButton severity="danger" [text]="true" label="Remover"
-                        (click)="deleteEntryPhotoDriver()"></button>
-                    }@else{
-                    <div class="layout-photo-person-label">
-                        <label for="userPhoto">Foto</label>
-                        <input type="file" id="userPhoto" (change)="selectEntryPhotoDriver($event)"
-                            accept="image/png, image/jpeg" />
-                    </div>
-                    }
-
-                </div>
-
-            </div>
-
-            <div class="field col-12 md:col-12">
-                <span class="text-500">Nome</span>
-                <input pInputText id="nameid" type="text" formControlName="name" />
-                <small class="p-error block"
-                    *ngIf="userFormView.get('name')?.invalid && userFormView.get('name')?.dirty">
-                    Campo obrigatório</small>
-            </div>
-
-            <div class="field col-12 md:col-6">
-                <span class="text-500">Email</span>
-                <div class="layout-input-disabled">
-                    <span class="text-500 font-medium"><strong>{{userEmail}}</strong></span>
-                </div>
-            </div>
-
-            <div class="field col-12 md:col-4">
-                <span class="text-500">Celular</span>
-                <p-inputMask id="cellphoneid" mask="(99) 9 9999-9999" formControlName="cellphone" unmask="true" />
-            </div>
-            <div class="field col-12 md:col-2">
-                <span class="text-500">Desconto</span>
-                <div class="layout-input-disabled">
-                    <span class="text-500 font-medium"><strong>{{limitDiscount()}}%</strong></span>
-                </div>
-            </div>
-
-            <div class="field col-12 md:col-4">
-                <span class="text-500">Senha</span>
-                <p-password id="passwordid" formControlName="password" [feedback]="false" [toggleMask]="true" />
-                <small class="p-error block"
-                    *ngIf="userFormView.get('password')?.invalid && userFormView.get('password')?.dirty">
-                    Campo obrigatório</small>
-            </div>
-
-            <div class="field col-12 md:col-4">
-                <span class="text-500">Repetir senha</span>
-                <p-password id="passwordvalidid" formControlName="passwordValid" [feedback]="false"
-                    [toggleMask]="true" />
-                <small class="p-error block"
-                    *ngIf="userFormView.get('passwordValid')?.invalid && userFormView.get('passwordValid')?.dirty">
-                    Campo Obrigatório</small>
-            </div>
-
-            <div class="field col-12 md:col-4">
-                <span class="text-500">Cargo</span>
-                <div class="layout-input-disabled">
-                    <span class="text-500 font-medium"><strong>{{userRoleDescription | uppercase}}</strong></span>
-                </div>
-            </div>
-
-            <div class="field col-12">
-
-                <div class="layout-card-option">
-
-                    <div class="layout-card-option-title">Situação</div>
-                    <div class="flex align-items-center">
-                        <p-radioButton inputId="ativo" value="ativo" formControlName="status"></p-radioButton>
-                        <label for="ativo" class="ml-2">Ativado</label>
-                    </div>
-                    <div class="flex align-items-center">
-                        <p-radioButton inputId="inativo" value="inativo" formControlName="status"></p-radioButton>
-                        <label for="inativo" class="ml-2">Desativado</label>
-                    </div>
-
-                </div>
-
-            </div>
-
-
-        </div>
-        <div class="flex justify-content-end gap-2 mt-3">
-            <button pButton type="button" pRipple label="Cancelar" icon="pi pi-times" class="p-button-text"
-                (click)="hideDialogUser()"></button>
-            <button pButton type="submit" pRipple label="Salvar" icon="pi pi-check" class="p-button-text"></button>
-        </div>
-
-    </form>
-</p-dialog>
-
-<p-overlayPanel #opVehicle>
-    <app-vehicle-exit></app-vehicle-exit>
-</p-overlayPanel>

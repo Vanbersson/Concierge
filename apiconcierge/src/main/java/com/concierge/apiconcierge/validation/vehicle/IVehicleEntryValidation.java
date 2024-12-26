@@ -7,6 +7,7 @@ import java.util.List;
 public interface IVehicleEntryValidation {
     public String save(VehicleEntry vehicle);
     public String update(VehicleEntry vehicle);
+    public String exit(VehicleEntry vehicle);
     public String addAuthExit(VehicleEntry vehicle);
     public String deleteAuthExit1(VehicleEntry vehicle);
     public String deleteAuthExit2(VehicleEntry vehicle);

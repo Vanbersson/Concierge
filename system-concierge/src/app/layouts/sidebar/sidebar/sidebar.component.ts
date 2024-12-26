@@ -42,31 +42,32 @@ export class SidebarComponent implements OnInit {
           {
             key: '1_1',
             label: 'Atendimento',
-            routerLink: 'portaria/atendimento'
+            routerLink: 'portaria/atendimento-veiculo'
           },
           {
             key: '1_2',
             label: 'Veículos',
-            routerLink: 'portaria/veiculos'
+            routerLink: 'portaria/lista-entrada-veiculo'
           },
           {
             key: '1_3',
             label: 'Manutenção',
-            routerLink: 'portaria/manutencao',
+            routerLink: 'portaria/mannutencao-entrada-veiculo',
             visible: false
           },
           {
             key: '1_4',
-            label: 'Cadastro',
+            label: 'Cadastros',
             items: [
               {
                 key: '1_4_0',
                 label: 'Modelo',
-                routerLink: 'portaria/modelo-veiculo'
+                routerLink: 'portaria/manutencao-modelo-veiculo'
               },
               {
                 key: '1_4_1',
-                label: 'Veículo'
+                label: 'Veículo',
+                 routerLink: 'portaria/manutencao-veiculo'
               }
             ]
           },
@@ -150,6 +151,11 @@ export class SidebarComponent implements OnInit {
 
               },
             ]
+          },
+          {
+            key:'3_1',
+            label:'Manutenção Peças',
+            routerLink:'oficina/pecas'
           }
         ]
       }, 
@@ -160,7 +166,8 @@ export class SidebarComponent implements OnInit {
           ,
           {
             key: '4_1',
-            label: 'Manutenção Clientes'
+            label: 'Manutenção Clientes',
+            routerLink:'faturamento/manutencao-cliente'
           }
         ]
       },
@@ -185,10 +192,6 @@ export class SidebarComponent implements OnInit {
     ];
 
   }
-
-
-
-
 
 
 }

@@ -3,11 +3,14 @@ package com.concierge.apiconcierge.services.vehicle;
 import com.concierge.apiconcierge.dtos.vehicle.AuthExit;
 import com.concierge.apiconcierge.exceptions.vehicle.VehicleEntryException;
 import com.concierge.apiconcierge.models.budget.enums.StatusBudgetEnum;
+import com.concierge.apiconcierge.models.clientcompany.ClientCompany;
+import com.concierge.apiconcierge.models.status.StatusEnableDisable;
 import com.concierge.apiconcierge.models.vehicle.VehicleEntry;
 import com.concierge.apiconcierge.models.vehicle.enums.StatusAuthExitEnum;
 import com.concierge.apiconcierge.models.vehicle.enums.StatusVehicleEnum;
 import com.concierge.apiconcierge.models.vehicle.enums.StepVehicleEnum;
 import com.concierge.apiconcierge.repositories.vehicle.IVehicleEntryRepository;
+import com.concierge.apiconcierge.services.clientcompany.ClientCompanyService;
 import com.concierge.apiconcierge.validation.vehicle.VehicleEntryValidation;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,13 +25,16 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class VehicleEntryService implements IVehicleEntryService {
 
-    private static final String SUCCESS = "success.";
+    private static final String SUCCESS = "Success.";
 
     @Autowired
     private IVehicleEntryRepository repository;
 
     @Autowired
     private VehicleEntryValidation validation;
+
+    @Autowired
+    private ClientCompanyService clientCompanyService;
 
     @SneakyThrows
     @Override
@@ -39,6 +45,29 @@ public class VehicleEntryService implements IVehicleEntryService {
             VehicleEntry vehicleEntry = this.loadVehicle(vehicle);
             String message = this.validation.save(vehicleEntry);
             if (message.equals(SUCCESS)) {
+
+                if (vehicleEntry.getClientCompanyId() != null) {
+                    //Consulta local o cliente
+                    ClientCompany clientLocal = this.clientCompanyService.filterIdLocal(vehicleEntry.getClientCompanyId());
+                    if (clientLocal == null) {
+                        //Consulta Remoto e salva localmente o cliente
+                        ClientCompany clientNew = this.clientCompanyService.filterIdRemote(vehicleEntry.getClientCompanyId());
+
+                        //Save local
+                        clientNew.setCompanyId(vehicleEntry.getCompanyId());
+                        clientNew.setResaleId(vehicleEntry.getResaleId());
+                        clientNew.setStatus(StatusEnableDisable.ativo);
+                        clientNew.setContactName("");
+                        clientNew.setContactEmail("");
+                        clientNew.setContactDDDPhone("");
+                        clientNew.setContactPhone("");
+                        clientNew.setContactDDDCellphone("");
+                        clientNew.setContactCellphone("");
+
+                        Integer resultClientNew = this.clientCompanyService.save(clientNew);
+                    }
+                }
+
                 result = this.repository.save(vehicleEntry);
             } else {
                 throw new VehicleEntryException(message);
@@ -52,11 +81,36 @@ public class VehicleEntryService implements IVehicleEntryService {
     @SneakyThrows
     @Override
     public boolean update(VehicleEntry vehicle) {
+        VehicleEntry result;
         try {
             VehicleEntry vehicleEntry = this.loadVehicle(vehicle);
             String message = this.validation.update(vehicleEntry);
             if (message.equals(SUCCESS)) {
-                this.repository.save(vehicleEntry);
+
+                if (vehicleEntry.getClientCompanyId() != null) {
+                    //Consulta local o cliente
+                    ClientCompany clientLocal = this.clientCompanyService.filterIdLocal(vehicleEntry.getClientCompanyId());
+                    if (clientLocal == null) {
+                        //Consulta Remoto e salva localmente o cliente
+                        ClientCompany clientNew = this.clientCompanyService.filterIdRemote(vehicleEntry.getClientCompanyId());
+
+                        //Save local
+                        clientNew.setCompanyId(vehicleEntry.getCompanyId());
+                        clientNew.setResaleId(vehicleEntry.getResaleId());
+                        clientNew.setStatus(StatusEnableDisable.ativo);
+                        clientNew.setContactName("");
+                        clientNew.setContactEmail("");
+                        clientNew.setContactDDDPhone("");
+                        clientNew.setContactPhone("");
+                        clientNew.setContactDDDCellphone("");
+                        clientNew.setContactCellphone("");
+
+                        Integer resultClientNew = this.clientCompanyService.save(clientNew);
+                    }
+
+                }
+
+                result = this.repository.save(vehicleEntry);
             } else {
                 throw new VehicleEntryException(message);
             }
@@ -65,9 +119,36 @@ public class VehicleEntryService implements IVehicleEntryService {
         }
         return true;
     }
+
     @SneakyThrows
     @Override
-    public List<Object> allAuthorized(){
+    public String exit(VehicleEntry vehicle) {
+        try {
+
+            Optional<VehicleEntry> optional = this.repository.findById(vehicle.getId());
+            VehicleEntry vehicleEntry = optional.get();
+
+            vehicleEntry.setStepEntry(StepVehicleEnum.Exit);
+            vehicleEntry.setUserIdExit(vehicle.getUserIdExit());
+            vehicleEntry.setUserNameExit(vehicle.getUserNameExit());
+            vehicleEntry.setDateExit(vehicle.getDateExit());
+
+            String message = this.validation.exit(vehicleEntry);
+            if (message.equals(SUCCESS)) {
+                this.repository.save(vehicleEntry);
+            } else {
+                throw new VehicleEntryException(message);
+            }
+        } catch (Exception ex) {
+            throw new VehicleEntryException(ex.getMessage());
+        }
+
+        return SUCCESS;
+    }
+
+    @SneakyThrows
+    @Override
+    public List<Object> allAuthorized() {
 
         List<Object> list = new ArrayList();
 
@@ -104,7 +185,7 @@ public class VehicleEntryService implements IVehicleEntryService {
 
     @SneakyThrows
     @Override
-    public List<Object> allPendingAuthorization(){
+    public List<Object> allPendingAuthorization() {
         List<Object> list = new ArrayList();
 
         try {
@@ -197,6 +278,19 @@ public class VehicleEntryService implements IVehicleEntryService {
                 return null;
 
             return this.loadObject(vehicle);
+        } catch (Exception ex) {
+            throw new VehicleEntryException(ex.getMessage());
+        }
+    }
+
+    @SneakyThrows
+    @Override
+    public String NotExistsVehicle(String placa) {
+        try {
+            VehicleEntry vehicle = repository.findByNotExistsVehicle(placa);
+            if (vehicle == null)
+                return SUCCESS;
+            throw new VehicleEntryException("Placa exists.");
         } catch (Exception ex) {
             throw new VehicleEntryException(ex.getMessage());
         }
@@ -354,7 +448,6 @@ public class VehicleEntryService implements IVehicleEntryService {
         return status;
     }
 
-
     private Map<String, Object> loadObject(VehicleEntry vehicle) {
         Map<String, Object> map = new HashMap<>();
 
@@ -363,11 +456,6 @@ public class VehicleEntryService implements IVehicleEntryService {
         map.put("id", vehicle.getId());
         map.put("status", vehicle.getStatus());
         map.put("stepEntry", vehicle.getStepEntry());
-       /*if (vehicle.getBudgetId() == null) {
-            map.put("budgetId", 0);
-        } else {
-            map.put("budgetId", vehicle.getBudgetId());
-        }*/
         map.put("budgetStatus", vehicle.getBudgetStatus());
         map.put("idUserEntry", vehicle.getIdUserEntry());
         map.put("nameUserEntry", vehicle.getNameUserEntry());
@@ -511,4 +599,5 @@ public class VehicleEntryService implements IVehicleEntryService {
 
         return map;
     }
+
 }

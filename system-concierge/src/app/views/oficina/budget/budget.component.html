@@ -1,8 +1,4 @@
 <div class="layout-card">
-
- 
-    
-
     <p-toast />
 
     <p-toast position="top-center" key="toastInfoDiscount" (onClose)="onCloseAlertDiscount()" [baseZIndex]="5000">
@@ -35,8 +31,8 @@
     <div class="layout-card-title">
         <span>Orçamento</span>
         <div class="layourt-button-back">
-            <button pButton type="button" [text]="true" severity="contrast" icon="pi pi-sign-out" 
-                [routerLink]="'/portaria/manutencao/'+vehicleId()"></button>
+            <button pButton type="button" [text]="true" severity="contrast" icon="pi pi-sign-out"
+                [routerLink]="'/portaria/mannutencao-entrada-veiculo/'+vehicleId()"></button>
         </div>
     </div>
 
@@ -186,31 +182,32 @@
                     <div class="col-6 md:col-2">
                         <span class="text-500">Placa</span>
                         <div class="layout-input-disabled">
-                            <span class="text-500 font-medium"><strong>KTG-5210</strong></span>
+                            <span class="text-500 font-medium"><strong>{{viewClientPlaca() | uppercase}}</strong></span>
                         </div>
                     </div>
                     <div class="col-6 md:col-2">
                         <span class="text-500">Frota</span>
                         <div class="layout-input-disabled">
-                            <span class="text-500 font-medium"><strong>2510</strong></span>
+                            <span class="text-500 font-medium"><strong>{{viewClientFrota() | uppercase}}</strong></span>
                         </div>
                     </div>
                     <div class="col-12 md:col-2">
                         <span class="text-500">Modelo</span>
                         <div class="layout-input-disabled">
-                            <span class="text-500 font-medium"><strong>Cavalo Mecanico</strong></span>
+                            <span class="text-500 font-medium"><strong>{{viewClientModelDescription() |
+                                    uppercase}}</strong></span>
                         </div>
                     </div>
                     <div class="col-6 md:col-2">
                         <span class="text-500">Cor</span>
                         <div class="layout-input-disabled">
-                            <span class="text-500 font-medium"><strong>Branco</strong></span>
+                            <span class="text-500 font-medium"><strong>{{viewClientColor() | uppercase}}</strong></span>
                         </div>
                     </div>
                     <div class="col-6 md:col-2">
                         <span class="text-500">KM</span>
                         <div class="layout-input-disabled">
-                            <span class="text-500 font-medium"><strong>12000</strong></span>
+                            <span class="text-500 font-medium"><strong>{{viewClientKmEntry()}}</strong></span>
                         </div>
                     </div>
                 </div>
@@ -235,15 +232,15 @@
                             <span class="text-500">Total Orçamento</span>
                             <span class="text-900 font-medium text-4xl">
                                 <strong>{{
-                                    (totalBudgetService() + totalBudgetItem()) - (totalBudgetDiscountService() +
-                                    totalBudgetDiscountItem()) | currency
+                                    (totalBudgetService() + totalBudgetParts()) - (totalBudgetDiscountService() +
+                                    totalBudgetDiscountParts()) | currency
                                     }} </strong>
                             </span>
                         </div>
                         <div class="col-12 md:col-4 flex flex-column">
                             <span class="text-500">Total Desconto</span>
                             <span class="text-900 font-medium text-4xl">
-                                <strong>{{(totalBudgetDiscountService() + totalBudgetDiscountItem()) |
+                                <strong>{{(totalBudgetDiscountService() + totalBudgetDiscountParts()) |
                                     currency}}</strong>
                             </span>
                         </div>
@@ -265,8 +262,7 @@
     </div>
 
     <p-dialog [(visible)]="visibleBudget" header="Fazer Orçamento" [modal]="true" [maximizable]="true"
-        [style]="{ width: '80rem' }" [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }">
-
+        [style]="{ width: '80rem',height:'80rem' }" [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }">
         <p-tabView>
             <p-tabPanel header="Resumo">
                 <div class="grid p-fluid p-formgrid">
@@ -341,20 +337,20 @@
                                 <div class="col-12">
                                     <span class="text-500 mr-1">Peças:</span>
                                     <span class="text-green-700 font-medium text-xl">+</span>
-                                    <span class="text-500">{{totalBudgetItem() | currency}}</span>
+                                    <span class="text-500">{{totalBudgetParts() | currency}}</span>
                                 </div>
                                 <div class="col-12">
                                     <span class="text-500 mr-1">Desconto:</span>
                                     <span class="text-red-700 font-medium text-xl">-</span>
-                                    <span class="text-500">{{(totalBudgetDiscountService() + totalBudgetItem()) |
+                                    <span class="text-500">{{(totalBudgetDiscountService() + totalBudgetParts()) |
                                         currency}}</span>
                                 </div>
                                 <div class="col-12 flex">
                                     <span class="text-700 text-lg mr-1 ">Total:</span>
                                     <div class="text-700 font-medium text-lg">
                                         {{
-                                        (totalBudgetService() + totalBudgetItem()) - (totalBudgetDiscountService() +
-                                        totalBudgetDiscountItem()) | currency
+                                        (totalBudgetService() + totalBudgetParts()) - (totalBudgetDiscountService() +
+                                        totalBudgetDiscountParts()) | currency
                                         }} </div>
                                 </div>
                             </div>
@@ -367,7 +363,6 @@
             </p-tabPanel>
 
             <p-tabPanel header="Solicitação">
-
                 <form [formGroup]="formBudgetRequisition">
                     <div class="p-fluid p-formgrid grid">
 
@@ -395,14 +390,15 @@
                     </div>
                 </form>
 
-                <p-table [value]="listBudgetRequisition" selectionMode="single" styleClass="p-datatable-sm"
-                    [tableStyle]="{ 'width': '100%','height':'30rem' }" [scrollable]="true" scrollHeight="30rem">
+                <p-table [value]="listBudgetRequisition" [paginator]="true" [rows]="10"
+                    [rowsPerPageOptions]="[10, 25, 50]" styleClass="p-datatable-sm" [scrollable]="true"
+                    scrollHeight="400px">
                     <ng-template pTemplate="header">
                         <tr>
-                            <th style="width: 10rem;">Ordem</th>
-                            <th style="width: 80rem;">Descrição</th>
-                            <th style="width: 10rem;">Editar</th>
-                            <th style="width: 10rem;">Remover</th>
+                            <th class="font-normal" style="width: 10rem;">Ordem</th>
+                            <th class="font-normal" style="width: 80rem;">Descrição</th>
+                            <th class="font-normal" style="width: 10rem;">Editar</th>
+                            <th class="font-normal" style="width: 10rem;">Remover</th>
                         </tr>
                     </ng-template>
                     <ng-template pTemplate="body" let-requi>
@@ -420,7 +416,6 @@
                         </tr>
                     </ng-template>
                 </p-table>
-
             </p-tabPanel>
 
             <p-tabPanel header="Serviços">
@@ -470,19 +465,18 @@
 
                     </div>
                 </form>
-                <p-table [value]="listBudgetService" selectionMode="single" styleClass="p-datatable-sm"
-                    [tableStyle]="{ 'width': '100%','height':'30rem' }" [scrollable]="true" scrollHeight="30rem">
+                <p-table [value]="listBudgetService" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 25, 50]"
+                    styleClass="p-datatable-sm" [scrollable]="true" scrollHeight="400px">
                     <ng-template pTemplate="header">
                         <tr>
-                            <th style="width: 10rem;">Ordem</th>
-                            <th style="width: 40rem;">Descrição</th>
-                            <th style="width: 10rem;">Tempo</th>
-                            <th style="width: 10rem;">Valor</th>
-                            <th style="width: 10rem;">Desconto</th>
-
-                            <th style="width: 10rem;">Total</th>
-                            <th style="width: 5rem;">Editar</th>
-                            <th style="width: 5rem;">Remover</th>
+                            <th class="font-normal" style="width: 10rem;">Ordem</th>
+                            <th class="font-normal" style="width: 40rem;">Descrição</th>
+                            <th class="font-normal" style="width: 10rem;">Tempo</th>
+                            <th class="font-normal" style="width: 10rem;">Valor</th>
+                            <th class="font-normal" style="width: 10rem;">Desconto</th>
+                            <th class="font-normal" style="width: 10rem;">Total</th>
+                            <th class="font-normal" style="width: 5rem;">Editar</th>
+                            <th class="font-normal" style="width: 5rem;">Remover</th>
                         </tr>
                     </ng-template>
                     <ng-template pTemplate="body" let-service>
@@ -519,37 +513,133 @@
             </p-tabPanel>
 
             <p-tabPanel header="Peças">
-                <div class="mb-3">
-                    <button pButton type="button" label="Peças" icon="pi pi-plus" [outlined]="true"></button>
-                </div>
-                <p-table [value]="listBudgetItem" selectionMode="single" styleClass="p-datatable-sm"
-                    [tableStyle]="{ 'width': '100%','height':'30rem' }" [scrollable]="true" scrollHeight="30rem">
+                <p-table #dtPecas dataKey="id" [value]="listBudgetParts" 
+                [globalFilterFields]="['code', 'description', 'price', 'discount','Total']"
+                [paginator]="true" [rows]="10"
+                    [rowsPerPageOptions]="[10, 25, 50]" styleClass="p-datatable-sm">
+                    <ng-template pTemplate="caption">
+                        <div class="flex justify-content-between">
+                            <p-iconField iconPosition="left">
+                                <p-inputIcon>
+                                    <i class="pi pi-search"></i>
+                                </p-inputIcon>
+                                <input pInputText type="text"
+                                    (input)="dtPecas.filterGlobal($event.target.value, 'contains')"
+                                    placeholder="Pesquisar" />
+                            </p-iconField>
+                            <button pButton label="Peças" [outlined]="true" icon="pi pi-plus"
+                                (click)="showDialogParts()"></button>
+                        </div>
+                    </ng-template>
                     <ng-template pTemplate="header">
                         <tr>
-                            <th style="width: 10rem;">Ordem</th>
-                            <th style="width: 10rem;">Código</th>
-                            <th style="width: 20rem;">Descrição</th>
-                            <th style="width: 10rem;">Quantidade</th>
-                            <th style="width: 10rem;">Valor</th>
-                            <th style="width: 10rem;">Desconto</th>
-                            <th style="width: 10rem;">Total</th>
-                            <th style="width: 10rem;">Editar</th>
-                            <th style="width: 10rem;">Remover</th>
+                            <th class="font-normal" style="width: 10rem;">Código</th>
+                            <th class="font-normal" style="width: 45rem;">Descrição</th>
+                            <th class="font-normal" style="width: 10rem;">Quantidade</th>
+                            <th class="font-normal" style="width: 10rem;">Valor</th>
+                            <th class="font-normal" style="width: 10rem;">Desconto</th>
+                            <th class="font-normal" style="width: 10rem;">Total</th>
+                            <th class="font-normal" style="width: 5rem;">Remover</th>
                         </tr>
                     </ng-template>
-                    <ng-template pTemplate="body">
-
+                    <ng-template pTemplate="body" let-parts>
+                        <tr>
+                            <td>{{parts.code}}</td>
+                            <td>{{parts.description}}</td>
+                            <td>{{parts.qtdAvailable}}</td>
+                            <td>{{parts.price | currency }}</td>
+                            <td>{{parts.discount | currency }}</td>
+                            <td>{{( ( parts.qtdAvailable * parts.price ) - parts.discount) | currency}}</td>
+                            <td>
+                                <p-button icon="pi pi-trash" [text]="true" size="small"
+                                    severity="danger"></p-button>
+                            </td>
+                        </tr>
                     </ng-template>
                     <ng-template pTemplate="footer">
-
+                        <tr>
+                            <td colspan="3" class="text-right">Totais</td>
+                            <td>{{totalBudgetParts() | currency}}</td>
+                            <td>{{totalBudgetDiscountParts() | currency}}</td>
+                            <td>{{(totalBudgetParts() - totalBudgetDiscountParts()) | currency}}</td>
+                            <td></td>
+                        </tr>
                     </ng-template>
-
                 </p-table>
             </p-tabPanel>
         </p-tabView>
-        <div class="flex justify-content-end gap-2 mt-3">
+        <div class="flex justify-content-end mt-3">
             <button pButton type="button" pRipple label="Fechar" icon="pi pi-times" class="p-button-text"
                 (click)="closeDialogBudget()"></button>
         </div>
+    </p-dialog>
+
+    <p-dialog [(visible)]="visibleParts" header="Peças" [modal]="true" [style]="{ width: '70rem'}" [maximizable]="true"
+        [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }">
+        <form [formGroup]="formParts" (submit)="filterParts()">
+            <div class="grid p-fluid p-formgrid">
+                <div class="field col-12 md:col-4">
+                    <span>Código</span>
+                    <input pInputText id="idCode" type="text" formControlName="code" />
+                </div>
+                <div class="field col-12 md:col-6">
+                    <span>Descrição</span>
+                    <p-inputGroup>
+                        <input id="Iddescription" type="text" pInputText formControlName="desc" />
+                        <button type="submit" pButton icon="pi pi-search" class="p-button-warning"></button>
+                    </p-inputGroup>
+                </div>
+                <div class="field col-12 md:col-2 flex justify-content-center align-items-end">
+                    <button pButton type="button" label="Limpar" icon="pi pi-trash" severity="danger"
+                        (click)="cleanParts()"></button>
+                </div>
+                <div class="field col-12 md:col-2">
+                    <span>Quantidade</span>
+                    <input pInputText id="idQtd" type="text" formControlName="qtdAvailable" />
+                </div>
+                <div class="field col-12 md:col-2">
+                    <span>Preço</span>
+                    <p-inputNumber mode="currency" currency="BRL" locale="pt-BR" formControlName="price" />
+                </div>
+                <div class="field col-12 md:col-2">
+                    <span>Desconto</span>
+                    <p-inputNumber mode="currency" currency="BRL" locale="pt-BR" formControlName="discount" />
+                </div>
+                <div class="field col-12 md:col-3 flex justify-content-center align-items-end">
+                    <button pButton label="Confirmar" icon="pi pi-check" [raised]="true" [disabled]="selectPartsVisible"
+                        (click)=" selectPartsConfirme()"></button>
+                </div>
+            </div>
+
+            <p-table dataKey="id" [value]="listParts" (onRowSelect)="onSelectEventParts($event)"
+                (onRowUnselect)="onUnSelectEventParts($event)" selectionMode="single" [(selection)]="selectedParts"
+                [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 25, 50]" styleClass="p-datatable-sm">
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th class="font-normal" tyle="width: 10rem;">Código</th>
+                        <th class="font-normal" tyle="width: 40rem;">Descrição</th>
+                        <th class="font-normal" tyle="width: 10rem;">Quantidade</th>
+                        <th class="font-normal" tyle="width: 10rem;">Unidade</th>
+                        <th class="font-normal" tyle="width: 10rem;">Preço</th>
+                        <th class="font-normal" tyle="width: 20rem;">Locação</th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-parts>
+                    <tr [pSelectableRow]="parts">
+                        <td>{{parts.code}}</td>
+                        <td>{{parts.description}}</td>
+                        <td>{{parts.qtdAvailable}}</td>
+                        <td>{{parts.unitMeasure}}</td>
+                        <td>{{parts.price | currency }}</td>
+                        <td>{{parts.locationStreet +"-"+parts.locationBookcase+"-"+parts.locationShelf}}</td>
+                    </tr>
+
+                </ng-template>
+            </p-table>
+            <div class="flex justify-content-end">
+                <button pButton type="button" pRipple label="Cancelar" icon="pi pi-times" class="p-button-text"
+                    (click)="hideDialogParts()"></button>
+            </div>
+        </form>
     </p-dialog>
 </div>

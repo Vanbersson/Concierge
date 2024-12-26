@@ -4,14 +4,21 @@
         <span class="text-500 font-medium">Veículos</span>
         <div class="flex gap-2">
             <p-button icon="pi pi-plus" label="Atendimento" [outlined]="true"
-                routerLink="/portaria/atendimento"></p-button>
+                routerLink="/portaria/atendimento-veiculo"></p-button>
             <p-button icon="pi pi-refresh" (onClick)="listVehicles()" />
         </div>
     </div>
 
-    <p-table #tableFilter dataKey="id" [value]="listVehicleEntry" [(selection)]="selectedItems"
+    <p-table #tableFilter dataKey="id" [value]="listVehicleEntry" 
+        [rowHover]="true" 
+        [showCurrentPageReport]="true"    
+        currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} entradas"
+        [(selection)]="selectedItems"
         [globalFilterFields]="['id','placa','modelDescription', 'frota','dateEntry','clientCompanyName','nameUserAttendant']"
-        [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 25, 50]" styleClass="p-datatable-sm">
+        [paginator]="true" 
+        [rows]="10" 
+        [rowsPerPageOptions]="[10, 25, 50]" 
+        styleClass="p-datatable-sm">
         <ng-template pTemplate="caption">
             <div class="mobile-visible">
                 <div class="flex">
@@ -28,32 +35,32 @@
         </ng-template>
         <ng-template pTemplate="header">
             <tr class="mobile-visible-none">
-                <th>Sel.</th>
-                <th pSortableColumn="id" style="width:10%">Código <p-sortIcon field="id"></p-sortIcon></th>
-                <th pSortableColumn="placa" style="width:15%">Placa <p-sortIcon field="placa"></p-sortIcon></th>
-                <th pSortableColumn="modelDescription" style="width:15%">Modelo <p-sortIcon
+                <th style="font-weight: 400;">Sel.</th>
+                <th pSortableColumn="id" style="width:10%;font-weight: 400;">Código <p-sortIcon field="id"></p-sortIcon></th>
+                <th pSortableColumn="placa" style="width:15%;font-weight: 400;">Placa <p-sortIcon field="placa"></p-sortIcon></th>
+                <th pSortableColumn="modelDescription" style="width:15%;font-weight: 400;">Modelo <p-sortIcon
                         field="modelDescription"></p-sortIcon></th>
-                <th pSortableColumn="frota" style="width:15%">Frota <p-sortIcon field="frota"></p-sortIcon></th>
+                <th pSortableColumn="frota" style="width:15%;font-weight: 400;">Frota <p-sortIcon field="frota"></p-sortIcon></th>
 
-                <th pSortableColumn="dateEntry" style="width:15%">Entrada <p-sortIcon field="dateEntry"></p-sortIcon>
+                <th pSortableColumn="dateEntry" style="width:15%;font-weight: 400;">Entrada <p-sortIcon field="dateEntry"></p-sortIcon>
                 </th>
-                <th pSortableColumn="clientCompanyName" style="width:15%">Empresa
+                <th pSortableColumn="clientCompanyName" style="width:15%;font-weight: 400;">Empresa
                     <p-sortIcon field="clientCompanyName"></p-sortIcon>
                 </th>
-                <th pSortableColumn="nameUserAttendant" style="width:15%">Consultor
+                <th pSortableColumn="nameUserAttendant" style="width:15%;font-weight: 400;">Consultor
                     <p-sortIcon field="nameUserAttendant"></p-sortIcon>
                 </th>
-                <th pSortableColumn="budgetStatus" style="width:15%">Orçamento <p-sortIcon
+                <th pSortableColumn="budgetStatus" style="width:15%;font-weight: 400;">Orçamento <p-sortIcon
                         field="budgetStatus"></p-sortIcon>
                 </th>
-                <th pSortableColumn="statusAuthExit" style="width:10%">Liberação<p-sortIcon
+                <th pSortableColumn="statusAuthExit" style="width:10%;font-weight: 400;">Liberação<p-sortIcon
                         field="statusAuthExit"></p-sortIcon>
 
                 </th>
-                <th pSortableColumn="days" style="width:5%">Dias<p-sortIcon field="days"></p-sortIcon>
+                <th pSortableColumn="days" style="width:5%;font-weight: 400;">Dias<p-sortIcon field="days"></p-sortIcon>
                 </th>
-                <th>Editar</th>
-                <th>Liberar</th>
+                <th style="font-weight: 400;">Editar</th>
+                <th style="font-weight: 400;">Liberar</th>
 
             </tr>
             <tr class="mobile-visible">

@@ -12,6 +12,8 @@ public interface IVehicleEntryService {
 
     public boolean update(VehicleEntry vehicle);
 
+    public String exit(VehicleEntry vehicle);
+
     public List<Object> allAuthorized();
 
     public List<Object> allPendingAuthorization();
@@ -21,6 +23,8 @@ public interface IVehicleEntryService {
     public  Map<String, Object> filterId(Integer id);
 
     public  Map<String, Object> filterPlaca(String placa);
+
+    public String NotExistsVehicle(String placa);
 
     public Map<String, Object> addAuthExit(AuthExit authExit);
 

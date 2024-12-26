@@ -55,13 +55,16 @@
             background-color: #a0f19e;
             border: 1px solid #a0f19e
         }
+
+        .p-button-label {
+            font-weight: 400;
+        }
     }
 
     /* Small devices (portrait tablets and large phones, 600px and up) */
     @media only screen and (min-width: 375px) and (max-width: 667px) {
         .mobile-disabled {
             display: none;
-
         }
     }
 }

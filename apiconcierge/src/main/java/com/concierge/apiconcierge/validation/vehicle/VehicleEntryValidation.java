@@ -13,7 +13,7 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
 
     @Autowired
     private IVehicleEntryRepository repository;
-    private static final String SUCCESS = "success.";
+    private static final String SUCCESS = "Success.";
     private final String ID = "Id not informed.";
     private final String DATEENTRY = "DateEntry not informed.";
     private final String PLACA = "Placa not informed.";
@@ -31,7 +31,6 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
 
     @Override
     public String save(VehicleEntry vehicle) {
-        String message = SUCCESS;
 
         if (vehicle.getDateEntry() == null)
             return DATEENTRY;
@@ -50,24 +49,26 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
         if (!vehicle.getDriverEntryRg().isBlank())
             if (vehicle.getDriverEntryRg().length() > 11)
                 return RG;
-        return message;
+        return SUCCESS;
     }
 
     @Override
     public String update(VehicleEntry vehicle) {
-        String message = SUCCESS;
         if (vehicle.getId() == null || vehicle.getId() == 0)
             return ID;
         if (vehicle.getDateEntry() == null)
             return DATEENTRY;
+
         if (vehicle.getVehicleNew() == VehicleYesNotEnum.not) {
             if (vehicle.getPlaca().isBlank())
                 return PLACA;
         }
-        if (vehicle.getModelId() == null || vehicle.getModelDescription().isBlank())
-            return VEHICLEMODEL;
+
         if (vehicle.getColor() == null)
             return COLOR;
+
+        if (vehicle.getModelId() == null || vehicle.getModelDescription().isBlank())
+            return VEHICLEMODEL;
 
         int countDriver = 0;
         if (!vehicle.getDriverEntryName().isBlank()) {
@@ -82,46 +83,84 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
         if (countDriver <= 1) {
             return DRIVERENTRY;
         }
-        if (vehicle.getStatusAuthExit() != StatusAuthExitEnum.NotAuth) {
 
-            if (vehicle.getIdUserAttendant() == null || vehicle.getIdUserAttendant() == 0 || vehicle.getNameUserAttendant().isBlank())
-                return ATTENDANT;
+        if(vehicle.getServiceOrder() == VehicleYesNotEnum.yes){
+            if (vehicle.getBudgetStatus() != StatusBudgetEnum.semOrcamento) {
+                if (vehicle.getIdUserAttendant() == null || vehicle.getIdUserAttendant() == 0 || vehicle.getNameUserAttendant().isBlank())
+                    return BUDGET_ATTENDANT;
 
-            if (vehicle.getClientCompanyId() == null || vehicle.getClientCompanyId() == 0 || vehicle.getClientCompanyName().isBlank())
-                return CLIENTCOMPANY;
-            countDriver = 0;
-            if (!vehicle.getDriverExitName().isBlank()) {
-                countDriver++;
+                if (vehicle.getClientCompanyId() == null || vehicle.getClientCompanyId() == 0 || vehicle.getClientCompanyName().isBlank())
+                    return BUDGET_CLIENTCOMPANY;
             }
-            if (!vehicle.getDriverExitCpf().isBlank()) {
-                countDriver++;
+
+            if (vehicle.getStatusAuthExit() != StatusAuthExitEnum.NotAuth) {
+
+                if (vehicle.getIdUserAttendant() == null || vehicle.getIdUserAttendant() == 0 || vehicle.getNameUserAttendant().isBlank())
+                    return ATTENDANT;
+
+                if (vehicle.getClientCompanyId() == null || vehicle.getClientCompanyId() == 0 || vehicle.getClientCompanyName().isBlank())
+                    return CLIENTCOMPANY;
+                countDriver = 0;
+                if (!vehicle.getDriverExitName().isBlank()) {
+                    countDriver++;
+                }
+                if (!vehicle.getDriverExitCpf().isBlank()) {
+                    countDriver++;
+                }
+                if (!vehicle.getDriverExitRg().isBlank()) {
+                    countDriver++;
+                }
+                if (countDriver <= 1)
+                    return DRIVEREXIT;
             }
-            if (!vehicle.getDriverExitRg().isBlank()) {
-                countDriver++;
+        }else{
+            if (vehicle.getStatusAuthExit() != StatusAuthExitEnum.NotAuth) {
+
+                if (vehicle.getClientCompanyId() == null || vehicle.getClientCompanyId() == 0 || vehicle.getClientCompanyName().isBlank())
+                    return CLIENTCOMPANY;
+                countDriver = 0;
+                if (!vehicle.getDriverExitName().isBlank()) {
+                    countDriver++;
+                }
+                if (!vehicle.getDriverExitCpf().isBlank()) {
+                    countDriver++;
+                }
+                if (!vehicle.getDriverExitRg().isBlank()) {
+                    countDriver++;
+                }
+                if (countDriver <= 1)
+                    return DRIVEREXIT;
             }
-            if (countDriver <= 1)
-                return DRIVEREXIT;
         }
 
-        if(vehicle.getBudgetStatus() != StatusBudgetEnum.semOrcamento){
-            if (vehicle.getIdUserAttendant() == null || vehicle.getIdUserAttendant() == 0 || vehicle.getNameUserAttendant().isBlank())
-                return BUDGET_ATTENDANT;
-
-            if (vehicle.getClientCompanyId() == null || vehicle.getClientCompanyId() == 0 || vehicle.getClientCompanyName().isBlank())
-                return BUDGET_CLIENTCOMPANY;
-        }
-        return message;
+        return SUCCESS;
     }
 
-    @Override
-    public String addAuthExit(VehicleEntry vehicle) {
-        if (vehicle.getClientCompanyId() == null || vehicle.getClientCompanyId() == 0 || vehicle.getClientCompanyName().isBlank()) {
-            return CLIENTCOMPANY;
-        }
-        if (vehicle.getIdUserAttendant() == null || vehicle.getIdUserAttendant() == 0 || vehicle.getNameUserAttendant().isBlank()) {
-            return ATTENDANT;
-        }
+    public String exit(VehicleEntry vehicle) {
+        if (vehicle.getDateEntry() == null)
+            return DATEENTRY;
+        if (vehicle.getModelId() == null || vehicle.getModelDescription().isBlank())
+            return VEHICLEMODEL;
+        if (vehicle.getColor() == null)
+            return COLOR;
+        if(vehicle.getStatusAuthExit() != StatusAuthExitEnum.Authorized)
+            return NOTAUTHEXIT;
+
         int countDriver = 0;
+        if (!vehicle.getDriverEntryName().isBlank()) {
+            countDriver++;
+        }
+        if (!vehicle.getDriverEntryCpf().isBlank()) {
+            countDriver++;
+        }
+        if (!vehicle.getDriverEntryRg().isBlank()) {
+            countDriver++;
+        }
+        if (countDriver <= 1) {
+            return DRIVERENTRY;
+        }
+
+        countDriver = 0;
         if (!vehicle.getDriverExitName().isBlank()) {
             countDriver++;
         }
@@ -131,9 +170,58 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
         if (!vehicle.getDriverExitRg().isBlank()) {
             countDriver++;
         }
-        if (countDriver < 2) {
+        if (countDriver <= 1)
             return DRIVEREXIT;
+
+
+        return SUCCESS;
+    }
+
+    @Override
+    public String addAuthExit(VehicleEntry vehicle) {
+
+        if (vehicle.getServiceOrder().equals(VehicleYesNotEnum.yes)) {
+            if (vehicle.getClientCompanyId() == null || vehicle.getClientCompanyId() == 0 || vehicle.getClientCompanyName().isBlank()) {
+                return CLIENTCOMPANY;
+            }
+            if (vehicle.getIdUserAttendant() == null || vehicle.getIdUserAttendant() == 0 || vehicle.getNameUserAttendant().isBlank()) {
+                return ATTENDANT;
+            }
+            int countDriver = 0;
+            if (!vehicle.getDriverExitName().isBlank()) {
+                countDriver++;
+            }
+            if (!vehicle.getDriverExitCpf().isBlank()) {
+                countDriver++;
+            }
+            if (!vehicle.getDriverExitRg().isBlank()) {
+                countDriver++;
+            }
+            if (countDriver < 2) {
+                return DRIVEREXIT;
+            }
+        } else {
+
+            if (vehicle.getClientCompanyId() == null || vehicle.getClientCompanyId() == 0 || vehicle.getClientCompanyName().isBlank()) {
+                return CLIENTCOMPANY;
+            }
+
+            int countDriver = 0;
+            if (!vehicle.getDriverExitName().isBlank()) {
+                countDriver++;
+            }
+            if (!vehicle.getDriverExitCpf().isBlank()) {
+                countDriver++;
+            }
+            if (!vehicle.getDriverExitRg().isBlank()) {
+                countDriver++;
+            }
+            if (countDriver < 2) {
+                return DRIVEREXIT;
+            }
+
         }
+
 
         return SUCCESS;
     }

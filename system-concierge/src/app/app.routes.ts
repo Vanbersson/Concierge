@@ -27,24 +27,29 @@ export const routes: Routes = [
                 children: [
 
                     {
-                        path: 'atendimento',
+                        path: 'atendimento-veiculo',
                         title: 'Atendimento',
-                        loadComponent: () => import('./views/concierge/atendimento/atendimento.component')
+                        loadComponent: () => import('./views/concierge/vehicle.entry/vehicle.entry.component')
                     },
                     {
-                        path: 'veiculos',
-                        title: 'Veículos',
+                        path: 'lista-entrada-veiculo',
+                        title: 'Lista Veículos',
                         loadComponent: () => import('./views/concierge/veiculos/veiculos.component')
                     },
                     {
-                        path: 'manutencao/:id',
-                        title: 'Manutenção',
+                        path: 'mannutencao-entrada-veiculo/:id',
+                        title: 'Manutenção Entrada',
                         loadComponent: () => import('./views/concierge/manutencao/manutencao.component')
                     },
                     {
-                        path: 'modelo-veiculo',
-                        title: 'Modelos veículo',
-                        loadComponent: () => import('./views/concierge/modelo-veiculo/modelo-veiculo.component')
+                        path: 'manutencao-modelo-veiculo',
+                        title: 'Manutenção Modelo',
+                        loadComponent: () => import('./views/concierge/register/vehicle.model.register/vehicle.model.register.component')
+                    },
+                    {
+                        path: 'manutencao-veiculo',
+                        title: 'Manutenção Veículo',
+                        loadComponent: () => import('./views/concierge/register/vehicle.register/vehicle.register.component')
                     },
                 ]
             },
@@ -52,9 +57,25 @@ export const routes: Routes = [
                 path: 'oficina',
                 children: [
                     {
-                        path: 'orcamento/:vehicleid',
-                        title: 'Orçamento',
+                        path: 'manutencao-orcamento/:vehicleid',
+                        title: 'Manutenção Orçamento',
                         loadComponent: () => import('./views/oficina/budget/budget.component')
+                    },
+                    {
+                        path: 'pecas',
+                        title: 'Peças',
+                        loadComponent: () => import('./views/oficina/parts/parts.component')
+                    },
+                ]
+
+            },
+            {
+                path: 'faturamento',
+                children: [
+                    {
+                        path: 'manutencao-cliente',
+                        title: 'Cliente',
+                        loadComponent: () => import('./views/faturamento/manutencao-cliente/manutencao-cliente.component')
                     },
                 ]
 

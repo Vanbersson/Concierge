@@ -15,4 +15,10 @@ export class Budget implements IBudget {
     clientCompanyId: number = 0;
     information: string = "";
 
+    placa: string="";
+    frota: string="";
+    modelDescription:string="";
+    color:string ="";
+    kmEntry:string="";
+
 }

@@ -56,6 +56,7 @@ export class VehicleEntry {
 
     color: string = '';
     placa: string = '';
+    placasJunto: string='';
     frota: string = '';
     vehicleNew: string = '';
     kmEntry: string = '';

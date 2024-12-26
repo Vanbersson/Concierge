@@ -24,9 +24,14 @@ export class VehicleService {
     return this.http.post<VehicleEntry>(environment.apiuUrl + "/vehicle/entry/update", vehicle, { headers: this.myHeaders(), observe: 'response' });
   }
 
+  entryExit$(vehicle: VehicleEntry): Observable<HttpResponse<VehicleEntry>> {
+    return this.http.post<VehicleEntry>(environment.apiuUrl + "/vehicle/entry/exit", vehicle, { headers: this.myHeaders(), observe: 'response' });
+  }
+
   allAuthorized$(): Observable<VehicleEntry[]> {
     return this.http.get<VehicleEntry[]>(environment.apiuUrl + "/vehicle/entry/allAuthorized", { headers: this.myHeaders() });
   }
+
   allPendingAuthorization$(): Observable<VehicleEntry[]> {
     return this.http.get<VehicleEntry[]>(environment.apiuUrl + "/vehicle/entry/allPendingAuthorization", { headers: this.myHeaders() });
   }
@@ -37,6 +42,10 @@ export class VehicleService {
 
   entryFilterPlaca$(placa: string): Observable<HttpResponse<VehicleEntry>> {
     return this.http.get<VehicleEntry>(environment.apiuUrl + "/vehicle/entry/filter/placa/" + placa, { headers: this.myHeaders(), observe: 'response' });
+  }
+
+  notExistsVehicle(placa: string) {
+    return this.http.get(environment.apiuUrl + "/vehicle/entry/filter/notexists/placa/" + placa, { headers: this.myHeaders(), observe: 'response', responseType: 'text' });
   }
 
 

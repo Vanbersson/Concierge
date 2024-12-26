@@ -18,11 +18,12 @@ import { CalendarModule } from 'primeng/calendar';
 import { InputTextareaModule } from 'primeng/inputtextarea';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { DialogModule } from 'primeng/dialog';
+import { InputIconModule } from 'primeng/inputicon';
+import { IconFieldModule } from 'primeng/iconfield';
 
 
 //Interface
 import { IUser } from '../../../interfaces/user/iuser';
-
 
 //Service
 import { LayoutService } from '../../../layouts/layout/service/layout.service';
@@ -34,12 +35,12 @@ import { UserService } from '../../../services/user/user.service';
 import { BudgetRequisition } from '../../../models/budget/budget-requisition';
 import { BudgetServiceItem } from '../../../models/budget/budget-item-service';
 import { BudgetItem } from '../../../models/budget/budget-item';
-import { error } from 'console';
 import { lastValueFrom } from 'rxjs';
 import { Budget } from '../../../models/budget/budget';
 import { ClientecompanyService } from '../../../services/clientecompany/clientecompany.service';
-import { ClientCompany } from '../../../models/clientcompany/client-company';
-import { BusyService } from '../../../components/loading/busy.service';
+import { PartsService } from '../../../services/parts/parts.service';
+import { error } from 'console';
+import { Parts } from '../../../models/parts/Parts';
 
 
 export interface IListPayment {
@@ -50,14 +51,12 @@ export interface IListPayment {
 @Component({
   selector: 'app-budget',
   standalone: true,
-  imports: [CommonModule, RouterModule, InputTextModule, ButtonModule, ReactiveFormsModule, InputMaskModule, DialogModule, MultiSelectModule, CalendarModule, InputTextareaModule, ProgressBarModule, ToastModule, InputGroupModule, InputNumberModule, TabViewModule, TableModule, DividerModule],
+  imports: [CommonModule, RouterModule, InputTextModule, ButtonModule, ReactiveFormsModule, InputIconModule, IconFieldModule, InputMaskModule, DialogModule, MultiSelectModule, CalendarModule, InputTextareaModule, ProgressBarModule, ToastModule, InputGroupModule, InputNumberModule, TabViewModule, TableModule, DividerModule],
   templateUrl: './budget.component.html',
   styleUrl: './budget.component.scss',
   providers: [MessageService]
 })
 export default class BudgetComponent implements OnInit, OnDestroy {
-
-
   private user: IUser;
   budget: Budget;
   vehicleId = signal<number>(0);
@@ -72,12 +71,10 @@ export default class BudgetComponent implements OnInit, OnDestroy {
   listBudgetRequisition: BudgetRequisition[] = [];
   listBudgetService: BudgetServiceItem[] = [];
 
-  listBudgetItem: BudgetItem[] = [];
-
   totalBudgetService = signal<number>(0);
-  totalBudgetItem = signal<number>(0);
+  totalBudgetParts = signal<number>(0);
   totalBudgetDiscountService = signal<number>(0);
-  totalBudgetDiscountItem = signal<number>(0);
+  totalBudgetDiscountParts = signal<number>(0);
   limitUserDiscount = signal<number>(0);
 
   visibleDiscount = false;
@@ -135,13 +132,38 @@ export default class BudgetComponent implements OnInit, OnDestroy {
   viewClientContactCellphone = signal<string>("");
   viewClientContactPhone = signal<string>("");
 
-  constructor(private userService: UserService,
-    private router: Router,
-    private layoutService: LayoutService,
+  viewClientPlaca = signal<string>("");
+  viewClientFrota = signal<string>("");
+  viewClientModelDescription = signal<string>("");
+  viewClientColor = signal<string>("");
+  viewClientKmEntry = signal<string>("");
+
+  //Parts
+  visibleParts: boolean = false;
+  selectPartsVisible = true;
+  listParts: Parts[] = [];
+
+  listBudgetParts: Parts[] = [];
+
+  selectedParts!: Parts;
+  formParts = new FormGroup({
+    code: new FormControl(''),
+    desc: new FormControl(''),
+    price: new FormControl<null | number>(null),
+    discount: new FormControl<number>(0),
+    qtdAvailable: new FormControl<number>(0)
+  });
+
+
+  constructor(
+    private userService: UserService,
+    private partsService: PartsService,
     private storageService: StorageService,
-    private messageService: MessageService,
     private budgetService: BudgetService,
     private serviceClienteCompany: ClientecompanyService,
+    private router: Router,
+    private layoutService: LayoutService,
+    private messageService: MessageService,
     private activatedRoute: ActivatedRoute,
     private cdr: ChangeDetectorRef) {
 
@@ -153,7 +175,7 @@ export default class BudgetComponent implements OnInit, OnDestroy {
     this.budgetServiceItem = new BudgetServiceItem();
     this.vehicleId.set(Number.parseInt(this.activatedRoute.snapshot.params['vehicleid']));
   }
-  ngOnInit(): void {  
+  ngOnInit(): void {
 
     this.listPayment = [
       { payment: 'AVista' },
@@ -175,13 +197,19 @@ export default class BudgetComponent implements OnInit, OnDestroy {
   closeDialogBudget() {
     this.visibleBudget = false;
   }
+
   private getBudget() {
     this.budgetService.getBudgetFilterVehicle$(this.vehicleId()).subscribe(data => {
       this.budget = data;
 
+      this.viewClientPlaca.set(data.placa.substring(0, 3) + "-" + data.placa.substring(3, 7));
+      this.viewClientFrota.set(data.frota);
+      this.viewClientModelDescription.set(data.modelDescription);
+      this.viewClientColor.set(data.color);
+      this.viewClientKmEntry.set(data.kmEntry);
+
+
       this.getClientCompany(data.clientCompanyId);
-
-
 
       this.getListBudgetRequisition();
       this.getListBudgetSetvice();
@@ -203,32 +231,35 @@ export default class BudgetComponent implements OnInit, OnDestroy {
   private getClientCompany(id: number) {
 
     this.serviceClienteCompany.getId$(id).subscribe(data => {
-      this.viewClientName.set(data.body.name);
-      if (data.body.fisjur == "Juridica") {
-        const CNPJ = data.body.cnpj.substring(0, 2) + "." + data.body.cnpj.substring(2, 5) + "." + data.body.cnpj.substring(5, 8) + "/" + data.body.cnpj.substring(8, 12) + "-" + data.body.cnpj.substring(12, 14);
+
+      var client = data;
+
+      this.viewClientName.set(client.name);
+      if (client.fisjur == "Juridica") {
+        const CNPJ = client.cnpj.substring(0, 2) + "." + client.cnpj.substring(2, 5) + "." + client.cnpj.substring(5, 8) + "/" + client.cnpj.substring(8, 12) + "-" + client.cnpj.substring(12, 14);
         this.viewClientCnpj.set(CNPJ);
       }
-      if (data.body.fisjur == "Fisica") {
-        const CPF = data.body.cpf.substring(0, 3) + "." + data.body.cpf.substring(3, 6) + "." + data.body.cpf.substring(6, 9) + "-" + data.body.cpf.substring(9, 11);
+      if (client.fisjur == "Fisica") {
+        const CPF = client.cpf.substring(0, 3) + "." + client.cpf.substring(3, 6) + "." + client.cpf.substring(6, 9) + "-" + client.cpf.substring(9, 11);
         this.viewClientCpf.set(CPF);
       }
-      if (data.body.dddPhone != "") {
-        this.viewClientPhone.set("(" + data.body.dddPhone + ") " + data.body.phone);
+      if (client.dddPhone != "") {
+        this.viewClientPhone.set("(" + client.dddPhone + ") " + client.phone);
       }
-      this.viewClientZipCode.set(data.body.zipCode.substring(0, 5) + "-" + data.body.zipCode.substring(5, 8));
-      this.viewClientState.set(data.body.state);
-      this.viewClientCity.set(data.body.city);
-      this.viewClientNeighborhood.set(data.body.neighborhood);
-      this.viewClientAddress.set(data.body.address);
-      this.viewClientAddressNumber.set(data.body.addressNumber);
-      this.viewClientAddressComplement.set(data.body.addressComplement);
-      this.viewClientContactName.set(data.body.contactName);
-      this.viewClientContactEmail.set(data.body.contactEmail);
-      if (data.body.contactCellphone != "") {
-        this.viewClientContactCellphone.set(this.maskCellphone(data.body.contactDDDCellphone, data.body.contactCellphone));
+      this.viewClientZipCode.set(client.zipCode.substring(0, 5) + "-" + client.zipCode.substring(5, 8));
+      this.viewClientState.set(client.state);
+      this.viewClientCity.set(client.city);
+      this.viewClientNeighborhood.set(client.neighborhood);
+      this.viewClientAddress.set(client.address);
+      this.viewClientAddressNumber.set(client.addressNumber);
+      this.viewClientAddressComplement.set(client.addressComplement);
+      this.viewClientContactName.set(client.contactName);
+      this.viewClientContactEmail.set(client.contactEmail);
+      if (client.contactCellphone != "") {
+        this.viewClientContactCellphone.set(this.maskCellphone(client.contactDDDCellphone, client.contactCellphone));
       }
-      if (data.body.contactPhone != "") {
-        this.viewClientContactPhone.set(this.maskPhone(data.body.contactDDDPhone, data.body.contactPhone));
+      if (client.contactPhone != "") {
+        this.viewClientContactPhone.set(this.maskPhone(client.contactDDDPhone, client.contactPhone));
       }
 
     }, error => {
@@ -283,7 +314,6 @@ export default class BudgetComponent implements OnInit, OnDestroy {
     var phone = "(" + dddPhone + ") " + phone.substring(0, 4) + "-" + phone.substring(4, 8);
     return phone;
   }
-
 
   getListBudgetRequisition() {
     this.budgetService.getBudgetRequisition$(this.budget.id).subscribe((data) => {
@@ -794,6 +824,97 @@ export default class BudgetComponent implements OnInit, OnDestroy {
         this.cdr.markForCheck();
       }, 10);
     }
+  }
+
+  //Parts
+  showDialogParts() {
+    this.visibleParts = true;
+  }
+  hideDialogParts() {
+    this.visibleParts = false;
+  }
+
+  onSelectEventParts(event: any) {
+    this.formParts.patchValue({
+      qtdAvailable: 0,
+      price: this.selectedParts.price
+    });
+    this.selectPartsVisible = false;
+  }
+
+  onUnSelectEventParts(event: any) {
+    this.formParts.patchValue({
+      qtdAvailable: null,
+      price: null
+    })
+    this.selectPartsVisible = true;
+  }
+
+  cleanParts() {
+    this.formParts.patchValue({
+      code: "",
+      desc: "",
+      qtdAvailable: null,
+      price: null,
+      discount: 0
+    })
+    this.selectedParts = null;
+    this.selectPartsVisible = true;
+  }
+
+
+  filterParts() {
+    const { value } = this.formParts;
+    if (value.code != '') {
+      this.partsService.getExternalFilterCode$(value.code).subscribe(data => {
+        this.listParts = data;
+      }, error => { });
+    } else if (value.desc != '') {
+      this.partsService.getExternalFilterDesc$(value.desc).subscribe(data => {
+        this.listParts = data;
+      }, error => { });
+    }
+
+  }
+
+  private getParts() {
+    this.partsService.getFilterBudget$(1).subscribe(data => {
+      this.listBudgetParts = data;
+    }, error => {
+
+    });
+  }
+
+  selectPartsConfirme() {
+    const { value } = this.formParts;
+
+    if (this.selectedParts == null) {
+      this.messageService.add({ severity: 'error', summary: 'Peças', detail: 'Não selecionada', icon: 'pi pi-times' });
+    } else if (value.qtdAvailable <= 0) {
+      this.messageService.add({ severity: 'info', summary: 'Quantidade', detail: 'Não informada' });
+    } else if (value.price <= 0) {
+      this.messageService.add({ severity: 'info', summary: 'Preço', detail: 'Não informado' });
+    } else if (value.discount < 0) {
+      this.messageService.add({ severity: 'error', summary: 'Disconto', detail: 'Inválido', icon: 'pi pi-times' });
+    } else if (value.discount > (value.qtdAvailable * value.price)) {
+      this.messageService.add({ severity: 'error', summary: 'Disconto', detail: 'Inválido', icon: 'pi pi-times' });
+    } else {
+      this.hideDialogParts();
+
+      this.selectedParts.qtdAvailable = value.qtdAvailable;
+      this.selectedParts.discount = value.discount;
+      this.selectedParts.price = value.price;
+
+      const tempTotalParts = this.totalBudgetParts();
+      const tempTotalDiscount = this.totalBudgetDiscountParts();
+
+      this.totalBudgetParts.set((value.qtdAvailable * value.price) + tempTotalParts);
+      this.totalBudgetDiscountParts.set(tempTotalDiscount + value.discount);
+
+      this.listBudgetParts.push(this.selectedParts);
+      this.cleanParts();
+    }
+
   }
 
 

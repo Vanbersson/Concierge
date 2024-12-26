@@ -37,12 +37,24 @@ public class VehicleEntryController {
     }
 
     @PostMapping("/update")
-    public ResponseEntity<Object> updateVehicle(@RequestBody VehicleEntryUpdateDto data) {
+    public ResponseEntity<Object> updateVehicle(@RequestBody VehicleEntryDto data) {
         try {
             VehicleEntry vehicleEntry = new VehicleEntry();
             BeanUtils.copyProperties(data, vehicleEntry);
             boolean result = this.service.update(vehicleEntry);
             return ResponseEntity.status(HttpStatus.OK).build();
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageErrorDto(ex.getMessage()));
+        }
+    }
+
+    @PostMapping("/exit")
+    public ResponseEntity<Object> confirmationExit(@RequestBody VehicleEntryDto data) {
+        try {
+            VehicleEntry vehicle = new VehicleEntry();
+            BeanUtils.copyProperties(data, vehicle);
+            String result = this.service.exit(vehicle);
+            return ResponseEntity.ok(result);
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageErrorDto(ex.getMessage()));
         }
@@ -66,7 +78,6 @@ public class VehicleEntryController {
         }
     }
 
-
     @GetMapping("/filter/id/{id}")
     public ResponseEntity<Object> getId(@PathVariable(name = "id") Integer id) {
         try {
@@ -86,6 +97,16 @@ public class VehicleEntryController {
             if (vehicle == null)
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
             return ResponseEntity.ok(vehicle);
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageErrorDto(ex.getMessage()));
+        }
+    }
+
+    @GetMapping("/filter/notexists/placa/{placa}")
+    public ResponseEntity<Object> notExistsVehicle(@PathVariable(name = "placa") String placa) {
+        try {
+            String message = this.service.NotExistsVehicle(placa);
+            return ResponseEntity.ok(message);
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageErrorDto(ex.getMessage()));
         }

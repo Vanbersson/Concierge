@@ -112,7 +112,7 @@
  CREATE TABLE tb_client_company (
      company_id int not null,
      resale_id int not null,
-     id int not null AUTO_INCREMENT,
+     id int not null,
      status tinyint not null,
      name varchar(255) not null,
      fantasia varchar(255),
@@ -181,6 +181,23 @@
 
  );
 
+ CREATE TABLE tb_parts(
+    company_id int not null,
+    resale_id int not null,
+    id int not null,
+    status tinyint not null,
+    code varchar(20) not null,
+    description varchar(100),
+    qtd_available float,
+    qtd_accounting float,
+    unit_measure varchar(2) not null,
+    location_street varchar(2),
+    location_bookcase varchar(2),
+    location_shelf varchar(2),
+    date_last_entry datetime,
+    primary key(id)
+ );
+
  CREATE TABLE tb_vehicle_entry(
      company_id int not null,
      resale_id int not null,
@@ -238,6 +255,7 @@
 
      color tinyint,
      placa varchar(7),
+     placas_junto varchar(255),
      frota varchar(10),
      vehicle_new tinyint not null,
      km_entry varchar(10),
@@ -317,11 +335,11 @@
  CREATE TABLE tb_budget_item(
       company_id int not null,
       resale_id int not null,
-      id binary(16) unique,
+      id int not null,
       budget_id int not null,
       status tinyint not null,
       ordem int not null,
-      code_item varchar(20) not null,
+      code varchar(20) not null,
       description varchar(100) not null,
       quantity int not null,
       discount float not null,
