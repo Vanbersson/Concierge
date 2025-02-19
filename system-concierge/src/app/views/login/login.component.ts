@@ -20,6 +20,7 @@ import { StorageService } from '../../services/storage/storage.service';
 //Interface
 import { IAuth } from '../../interfaces/auth/iauth';
 import { BusyService } from '../../components/loading/busy.service';
+import { MenuUserService } from '../../services/menu/menu-user.service';
 
 
 @Component({
@@ -32,14 +33,11 @@ import { BusyService } from '../../components/loading/busy.service';
 })
 export default class LoginComponent implements OnInit {
 
-  user: IUser = null;
   login: IAuth;
-  token: string = "";
-
 
   loginForm = this._fb.group<IAuth>({
-    email: 'vambersson@gmail.com',
-    password: 'VjslM@1236!',
+    email: '',
+    password: '',
   });
 
   constructor(
@@ -49,56 +47,74 @@ export default class LoginComponent implements OnInit {
     private router: Router,
     public layoutService: LayoutService,
     private storageService: StorageService,
-    private busyService: BusyService) {
-
+    private busyService: BusyService,
+    private menuUserService: MenuUserService
+  ) {
 
   }
   ngOnInit(): void {
     this.addValidation();
   }
-
-  addValidation() {
+  private addValidation() {
     this.loginForm.controls["email"].addValidators([Validators.email, Validators.required]);
     this.loginForm.controls["email"].updateValueAndValidity();
 
-    this.loginForm.controls["password"].addValidators([Validators.minLength(8)]);
+    this.loginForm.controls["password"].addValidators([Validators.minLength(8),Validators.required]);
     this.loginForm.controls["password"].updateValueAndValidity();
   }
-
-  onSubmit() {
+  public loginUser() {
     const { valid, value } = this.loginForm;
 
     if (valid) {
       this.login = { email: value.email, password: value.password };
 
       this.busyService.busy();
-      this.auth.login(this.login).subscribe(
-        (data) => {
 
+      this.auth.login(this.login).subscribe({
+        next: (data) => {
+          this.storageService.companyId = data.body.companyId.toString();
+          this.storageService.resaleId = data.body.resaleId.toString();
           this.storageService.photo = data.body.photo;
+          this.storageService.id = data.body.id.toString();
           this.storageService.name = data.body.name;
+          this.storageService.email = this.login.email;
+          this.storageService.cellphone = data.body.cellphone;
           this.storageService.roleDesc = data.body.roleDesc;
+          this.storageService.limitDiscount = data.body.limitDiscount.toString();
           this.storageService.token = data.body.token;
-          this.busyService.idle();
+
+          this.menusUser();
 
           this.messageService.add({ severity: 'success', summary: 'Bem-vindo', detail: data.body.name, icon: 'pi pi-lock-open', life: 2000 });
 
           setTimeout(() => {
             this.router.navigateByUrl('/dashboard');
           }, 2000);
-
-        }, (error) => {
+        },
+        error: (error) => {
           this.busyService.idle();
           this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Login ou senha inválido', icon: 'pi pi-lock', life: 2000 });
+        },
+        complete: () => {
+          this.busyService.idle();
         }
-      );
+      });
 
     }
 
   }
-
-  forgetPass() {
+  public forgetPass() {
     console.log('Forget Password!');
+  }
+  private menusUser() {
+    this.menuUserService.getFilterMenuUser$(this.storageService.companyId, this.storageService.resaleId, this.storageService.id).subscribe(data => {
+      var keys = "";
+      for (let a = 0; a < data.length; a++) {
+        const element = data[a];
+        keys += element.key + ",";
+      }
+      this.storageService.menus = keys;
+    });
   }
 
 }

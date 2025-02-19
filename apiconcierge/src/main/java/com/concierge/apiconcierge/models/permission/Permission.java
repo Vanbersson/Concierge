@@ -1,4 +1,4 @@
-package com.concierge.apiconcierge.models.permissions;
+package com.concierge.apiconcierge.models.permission;
 
 import jakarta.persistence.*;
 import lombok.*;

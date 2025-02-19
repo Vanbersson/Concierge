@@ -233,9 +233,33 @@
 
                             <div class="field col-12 md:col-2">
                                 <label for="vehiclemodelid">Modelos</label>
-                                <p-multiSelect id="vehiclemodelid" [options]="vehicleModels$ | async"
-                                    optionLabel="description" display="chip" [selectionLimit]="1"
-                                    placeholder="Selecione" formControlName="modelVehicle" />
+                                <p-multiSelect [options]="vehicleModels$ | async" 
+                                    display="chip" 
+                                    [selectionLimit]="1"
+                                    placeholder="Selecione" 
+                                    optionLabel="description"
+                                    formControlName="modelVehicle">
+                                    <ng-template let-value pTemplate="selectedItems">
+                                        <div class="inline-flex align-items-center gap-2"
+                                            *ngFor="let model of value">
+                                            @if(model.photo){
+                                                <p-image [src]="'data:image/png;base64,'+model.photo" alt="" height="18"
+                                                width="18" [preview]="false" />
+                                            }
+                                            <div>{{ model.description }}</div>
+                                        </div>
+                                        <div *ngIf="!value || value.length === 0">Selecione</div>
+                                    </ng-template>
+                                    <ng-template let-model pTemplate="item">
+                                        <div class="flex align-items-center gap-2">
+                                            @if(model.photo){
+                                                <p-image [src]="'data:image/png;base64,'+model.photo" alt="" height="18"
+                                                width="18" [preview]="false" />
+                                            }
+                                            <div>{{ model.description }}</div>
+                                        </div>
+                                    </ng-template>
+                                </p-multiSelect>
                                 <small class="p-error block" *ngIf="formVehicle.get('modelVehicle')?.invalid">
                                     Campo obrigatório</small>
                             </div>
@@ -505,12 +529,6 @@
                 <p-inputMask id="clientCompanyCpf" mask="999.999.999-99" [unmask]="true"
                     formControlName="clientCompanyCpf" />
             </div>
-
-            <!--  <div class="field col-12 md:col-2">
-                <label for="clientCompanyRg">RG</label>
-                <p-inputNumber id="clientCompanyRg" mode="decimal" [useGrouping]="false"
-                    formControlName="clientCompanyRg" />
-            </div> -->
 
             <div class="field col-12 md:col-3">
 

@@ -1,7 +1,10 @@
 package com.concierge.apiconcierge.services.vehicle;
 
 import com.concierge.apiconcierge.dtos.vehicle.AuthExit;
+import com.concierge.apiconcierge.dtos.vehicle.VehicleExitSaveDto;
 import com.concierge.apiconcierge.exceptions.vehicle.VehicleEntryException;
+
+import com.concierge.apiconcierge.models.budget.Budget;
 import com.concierge.apiconcierge.models.budget.enums.StatusBudgetEnum;
 import com.concierge.apiconcierge.models.clientcompany.ClientCompany;
 import com.concierge.apiconcierge.models.status.StatusEnableDisable;
@@ -9,8 +12,11 @@ import com.concierge.apiconcierge.models.vehicle.VehicleEntry;
 import com.concierge.apiconcierge.models.vehicle.enums.StatusAuthExitEnum;
 import com.concierge.apiconcierge.models.vehicle.enums.StatusVehicleEnum;
 import com.concierge.apiconcierge.models.vehicle.enums.StepVehicleEnum;
+import com.concierge.apiconcierge.repositories.permission.IPermissionUserRepository;
 import com.concierge.apiconcierge.repositories.vehicle.IVehicleEntryRepository;
+import com.concierge.apiconcierge.services.budget.BudgetService;
 import com.concierge.apiconcierge.services.clientcompany.ClientCompanyService;
+import com.concierge.apiconcierge.util.ConstantsMessage;
 import com.concierge.apiconcierge.validation.vehicle.VehicleEntryValidation;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +31,6 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class VehicleEntryService implements IVehicleEntryService {
 
-    private static final String SUCCESS = "Success.";
 
     @Autowired
     private IVehicleEntryRepository repository;
@@ -36,20 +41,24 @@ public class VehicleEntryService implements IVehicleEntryService {
     @Autowired
     private ClientCompanyService clientCompanyService;
 
+    @Autowired
+    BudgetService budgetService;
+
     @SneakyThrows
     @Override
     public Integer save(VehicleEntry vehicle) {
-        VehicleEntry result;
+
         try {
             vehicle.setId(null);
             VehicleEntry vehicleEntry = this.loadVehicle(vehicle);
             String message = this.validation.save(vehicleEntry);
-            if (message.equals(SUCCESS)) {
+            if (message.equals(ConstantsMessage.SUCCESS)) {
 
                 if (vehicleEntry.getClientCompanyId() != null) {
                     //Consulta local o cliente
-                    ClientCompany clientLocal = this.clientCompanyService.filterIdLocal(vehicleEntry.getClientCompanyId());
+                    ClientCompany clientLocal = this.clientCompanyService.filterId(vehicleEntry.getClientCompanyId());
                     if (clientLocal == null) {
+
                         //Consulta Remoto e salva localmente o cliente
                         ClientCompany clientNew = this.clientCompanyService.filterIdRemote(vehicleEntry.getClientCompanyId());
 
@@ -67,31 +76,32 @@ public class VehicleEntryService implements IVehicleEntryService {
                         Integer resultClientNew = this.clientCompanyService.save(clientNew);
                     }
                 }
-
-                result = this.repository.save(vehicleEntry);
+                VehicleEntry result = this.repository.save(vehicleEntry);
+                return result.getId();
             } else {
                 throw new VehicleEntryException(message);
             }
         } catch (Exception ex) {
             throw new VehicleEntryException(ex.getMessage());
         }
-        return result.getId();
+
     }
 
     @SneakyThrows
     @Override
-    public boolean update(VehicleEntry vehicle) {
-        VehicleEntry result;
+    public String update(VehicleEntry vehicle) {
+
         try {
             VehicleEntry vehicleEntry = this.loadVehicle(vehicle);
             String message = this.validation.update(vehicleEntry);
-            if (message.equals(SUCCESS)) {
+            if (message.equals(ConstantsMessage.SUCCESS)) {
 
                 if (vehicleEntry.getClientCompanyId() != null) {
                     //Consulta local o cliente
-                    ClientCompany clientLocal = this.clientCompanyService.filterIdLocal(vehicleEntry.getClientCompanyId());
+                    ClientCompany clientLocal = this.clientCompanyService.filterId(vehicleEntry.getClientCompanyId());
+                    //Consulta Remoto e salva localmente o cliente
                     if (clientLocal == null) {
-                        //Consulta Remoto e salva localmente o cliente
+                        //Consulta Remoto
                         ClientCompany clientNew = this.clientCompanyService.filterIdRemote(vehicleEntry.getClientCompanyId());
 
                         //Save local
@@ -108,34 +118,48 @@ public class VehicleEntryService implements IVehicleEntryService {
                         Integer resultClientNew = this.clientCompanyService.save(clientNew);
                     }
 
+                    if (vehicle.getBudgetStatus() != StatusBudgetEnum.semOrcamento) {
+                        this.updateBudget(vehicleEntry);
+                    }
+
                 }
 
-                result = this.repository.save(vehicleEntry);
+                this.repository.save(vehicleEntry);
+                return ConstantsMessage.SUCCESS;
             } else {
                 throw new VehicleEntryException(message);
             }
         } catch (Exception ex) {
             throw new VehicleEntryException(ex.getMessage());
         }
-        return true;
+
+    }
+
+    private void updateBudget(VehicleEntry vehicle) {
+        //update client budget
+        Budget budget = this.budgetService.filterBudgetVehicle(vehicle.getId());
+        budget.setClientCompanyId(vehicle.getClientCompanyId());
+        budget.setIdUserAttendant(vehicle.getIdUserAttendant());
+        this.budgetService.updateBudget(budget);
     }
 
     @SneakyThrows
     @Override
-    public String exit(VehicleEntry vehicle) {
+    public String exit(VehicleExitSaveDto dataExit) {
         try {
 
-            Optional<VehicleEntry> optional = this.repository.findById(vehicle.getId());
+            Optional<VehicleEntry> optional = this.repository.findById(dataExit.vehicleId());
             VehicleEntry vehicleEntry = optional.get();
 
             vehicleEntry.setStepEntry(StepVehicleEnum.Exit);
-            vehicleEntry.setUserIdExit(vehicle.getUserIdExit());
-            vehicleEntry.setUserNameExit(vehicle.getUserNameExit());
-            vehicleEntry.setDateExit(vehicle.getDateExit());
+            vehicleEntry.setUserIdExit(dataExit.userId());
+            vehicleEntry.setUserNameExit(dataExit.userName());
+            vehicleEntry.setDateExit(dataExit.dateExit());
 
             String message = this.validation.exit(vehicleEntry);
-            if (message.equals(SUCCESS)) {
+            if (message.equals(ConstantsMessage.SUCCESS)) {
                 this.repository.save(vehicleEntry);
+                return ConstantsMessage.SUCCESS;
             } else {
                 throw new VehicleEntryException(message);
             }
@@ -143,7 +167,7 @@ public class VehicleEntryService implements IVehicleEntryService {
             throw new VehicleEntryException(ex.getMessage());
         }
 
-        return SUCCESS;
+
     }
 
     @SneakyThrows
@@ -289,7 +313,7 @@ public class VehicleEntryService implements IVehicleEntryService {
         try {
             VehicleEntry vehicle = repository.findByNotExistsVehicle(placa);
             if (vehicle == null)
-                return SUCCESS;
+                return ConstantsMessage.SUCCESS;
             throw new VehicleEntryException("Placa exists.");
         } catch (Exception ex) {
             throw new VehicleEntryException(ex.getMessage());
@@ -305,10 +329,12 @@ public class VehicleEntryService implements IVehicleEntryService {
             if (vehicle0.isEmpty())
                 throw new VehicleEntryException();
             VehicleEntry vehicle = vehicle0.get();
-            String message = this.validation.addAuthExit(vehicle);
+            String message = this.validation.addAuthExit(vehicle, authExit);
 
-            if (message.equals(SUCCESS)) {
+            if (ConstantsMessage.SUCCESS.equals(message)) {
+
                 if (vehicle.getIdUserExitAuth1() == null) {
+
                     vehicle.setIdUserExitAuth1(authExit.idUserExitAuth());
                     vehicle.setNameUserExitAuth1(authExit.nameUserExitAuth());
                     vehicle.setDateExitAuth1(new Date());
@@ -353,15 +379,15 @@ public class VehicleEntryService implements IVehicleEntryService {
                 throw new VehicleEntryException();
 
             VehicleEntry vehicle = vehicle0.get();
-            String message = this.validation.deleteAuthExit1(vehicle);
-            if (message.equals(SUCCESS)) {
+            String message = this.validation.deleteAuthExit1(vehicle, authExit);
+            if (message.equals(ConstantsMessage.SUCCESS)) {
                 vehicle.setIdUserExitAuth1(null);
                 vehicle.setNameUserExitAuth1("");
                 vehicle.setDateExitAuth1(null);
                 vehicle.setStatusAuthExit(this.deleteAuthExit(vehicle.getStatusAuthExit()));
 
                 this.repository.save(vehicle);
-                return SUCCESS;
+                return ConstantsMessage.SUCCESS;
             } else {
                 throw new VehicleEntryException(message);
             }
@@ -379,15 +405,15 @@ public class VehicleEntryService implements IVehicleEntryService {
                 throw new VehicleEntryException();
 
             VehicleEntry vehicle = vehicle0.get();
-            String message = this.validation.deleteAuthExit2(vehicle);
-            if (message.equals(SUCCESS)) {
+            String message = this.validation.deleteAuthExit2(vehicle, authExit);
+            if (message.equals(ConstantsMessage.SUCCESS)) {
                 vehicle.setIdUserExitAuth2(null);
                 vehicle.setNameUserExitAuth2("");
                 vehicle.setDateExitAuth2(null);
                 vehicle.setStatusAuthExit(this.deleteAuthExit(vehicle.getStatusAuthExit()));
 
                 this.repository.save(vehicle);
-                return SUCCESS;
+                return ConstantsMessage.SUCCESS;
             } else {
                 throw new VehicleEntryException(message);
             }
@@ -592,6 +618,7 @@ public class VehicleEntryService implements IVehicleEntryService {
         map.put("quantityTireComplete", vehicle.getQuantityTireComplete());
         map.put("quantityToolBox", vehicle.getQuantityToolBox());
         map.put("serviceOrder", vehicle.getServiceOrder());
+        map.put("numServiceOrder", vehicle.getNumServiceOrder());
         map.put("numNfe", vehicle.getNumNfe());
         map.put("numNfse", vehicle.getNumNfse());
         map.put("information", vehicle.getInformation());

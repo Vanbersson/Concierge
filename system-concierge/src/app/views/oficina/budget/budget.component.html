@@ -1,6 +1,8 @@
 <div class="layout-card">
+    <!-- Toast -->
     <p-toast />
 
+    <!-- Toast discount  -->
     <p-toast position="top-center" key="toastInfoDiscount" (onClose)="onCloseAlertDiscount()" [baseZIndex]="5000">
         <ng-template let-message pTemplate="headless" let-closeFn="closeFn">
             <section class="flex p-3 gap-3 w-full bg-black-alpha-90 shadow-2" style="border-radius: 10px">
@@ -10,8 +12,9 @@
                         {{ message.summary }}
                     </p>
                     <p class="m-0 text-primary-500  text-700">
-                        {{ (totalBudgetDiscountService() + totalBudgetDiscountItem()) | currency }} de
-                        {{(totalBudgetService() * limitUserDiscount()/100) | currency}}
+                        
+                        {{ (totalBudgetDiscountService() + totalBudgetDiscountParts() ) | currency }}  de
+                        {{(totalBudgetService() * limitUserDiscount()/100) | currency}} 
                     </p>
                     <div class="flex flex-column gap-2">
                         <p-progressBar [value]="progressDiscount" [showValue]="false" [style]="{ height: '4px' }" />
@@ -21,7 +24,7 @@
                     </div>
                     <div class="flex gap-3 mb-3">
                         <p-button label="Entendi" [text]="true" styleClass="text-white p-0"
-                            (onClick)="closeFn($event)" />
+                            (onClick)="closeFn($event)"/>
                     </div>
                 </div>
             </section>
@@ -67,7 +70,7 @@
                     <span class="text-500">Consultor</span>
                     <div class="layout-input-disabled">
                         <span class="text-500 font-medium ">
-                            <strong>Daniela Batista</strong>
+                            <strong>{{viewAttendantName()}}</strong>
                         </span>
                     </div>
                 </div>
@@ -102,25 +105,25 @@
                     </div>
                 </div>
                 <div class="col-12 md:col-4">
-                    <span class="text-500">Contato</span>
+                    <span class="text-500">Contato/Nome</span>
                     <div class="layout-input-disabled">
                         <span class="text-500 font-medium"><strong>{{viewClientContactName()}}</strong></span>
                     </div>
                 </div>
                 <div class="col-12 md:col-4">
-                    <span class="text-500">EMail</span>
+                    <span class="text-500">Contato/E-Mail</span>
                     <div class="layout-input-disabled">
                         <span class="text-500 font-medium"><strong>{{viewClientContactEmail()}}</strong></span>
                     </div>
                 </div>
                 <div class="col-12 md:col-2">
-                    <span class="text-500">Celular</span>
+                    <span class="text-500">Contato/Celular</span>
                     <div class="layout-input-disabled">
                         <span class="text-500 font-medium"><strong>{{viewClientContactCellphone()}}</strong></span>
                     </div>
                 </div>
                 <div class="col-12 md:col-2">
-                    <span class="text-500">Telefone</span>
+                    <span class="text-500">Contato/Telefone</span>
                     <div class="layout-input-disabled">
                         <span class="text-500 font-medium"> <strong>{{viewClientContactPhone()}}</strong></span>
                     </div>
@@ -261,6 +264,7 @@
             icon="pi pi-send" class="ml-2"></button>
     </div>
 
+    <!-- Budget -->
     <p-dialog [(visible)]="visibleBudget" header="Fazer Orçamento" [modal]="true" [maximizable]="true"
         [style]="{ width: '80rem',height:'80rem' }" [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }">
         <p-tabView>
@@ -574,6 +578,7 @@
         </div>
     </p-dialog>
 
+    <!-- Parts -->
     <p-dialog [(visible)]="visibleParts" header="Peças" [modal]="true" [style]="{ width: '70rem'}" [maximizable]="true"
         [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }">
         <form [formGroup]="formParts" (submit)="filterParts()">
@@ -595,7 +600,8 @@
                 </div>
                 <div class="field col-12 md:col-2">
                     <span>Quantidade</span>
-                    <input pInputText id="idQtd" type="text" formControlName="qtdAvailable" />
+                    
+                    <p-inputNumber mode="decimal" [minFractionDigits]="2" formControlName="qtdAvailable" />
                 </div>
                 <div class="field col-12 md:col-2">
                     <span>Preço</span>
@@ -606,7 +612,7 @@
                     <p-inputNumber mode="currency" currency="BRL" locale="pt-BR" formControlName="discount" />
                 </div>
                 <div class="field col-12 md:col-3 flex justify-content-center align-items-end">
-                    <button pButton label="Confirmar" icon="pi pi-check" [raised]="true" [disabled]="selectPartsVisible"
+                    <button pButton label="Confirmar" icon="pi pi-check" [raised]="true" [disabled]="partsDisabledButton"
                         (click)=" selectPartsConfirme()"></button>
                 </div>
             </div>
@@ -637,7 +643,7 @@
                 </ng-template>
             </p-table>
             <div class="flex justify-content-end">
-                <button pButton type="button" pRipple label="Cancelar" icon="pi pi-times" class="p-button-text"
+                <button pButton type="button" pRipple label="Fechar" icon="pi pi-times" class="p-button-text"
                     (click)="hideDialogParts()"></button>
             </div>
         </form>

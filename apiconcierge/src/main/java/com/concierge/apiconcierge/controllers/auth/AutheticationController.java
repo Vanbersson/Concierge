@@ -1,4 +1,4 @@
-package com.concierge.apiconcierge.controllers.version1.auth;
+package com.concierge.apiconcierge.controllers.auth;
 
 import com.concierge.apiconcierge.dtos.auth.AuthenticationDto;
 import com.concierge.apiconcierge.models.user.User;
@@ -62,12 +62,6 @@ public class AutheticationController {
         }
 
         return ResponseEntity.status(HttpStatus.OK).body(map);
-    }
-
-    @PostMapping("/validToken")
-    public ResponseEntity<Object> validToken(){
-
-        return ResponseEntity.ok().build();
     }
 
 }

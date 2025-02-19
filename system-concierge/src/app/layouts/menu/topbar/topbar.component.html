@@ -1,6 +1,6 @@
 <div class="layout-topbar">
     <a class="layout-topbar-logo" routerLink="/">
-        <img src="assets/layout/images/logo-black.png" alt="logo">
+        <img src="assets/layout/images/logo-light.png" alt="logo">
         <span>AUTOPOINT</span>
     </a>
 
@@ -45,7 +45,7 @@
                     <p-image [imageStyle]="{'border-radius':'100%','object-fit':'cover'}"
                         src="data:image/png;base64,{{userPhoto}}" alt="imagem motorista" height="56" width="56" />
                     }@else {
-                    <p-avatar [label]="firstLetter" size="xlarge" shape="circle"></p-avatar>
+                    <p-avatar [label]="firstLetter" size="xlarge" shape="circle" [style]="{ 'background-color': '#dee9fc' }"></p-avatar>
                     }
                 </div>
                 <div class="layout-sidebar-header-title">
@@ -57,7 +57,7 @@
         </div>
         <div class="layout-sidebar-content">
 
-            <app-userprofile/>
+            <app-userprofile />
 
             <a class="layout-sidebar-content-card">
                 <i class="pi pi-cog"></i>
@@ -82,17 +82,14 @@
                 @if ( qtdNotification() == 0 ) {
                 <span class="layout-notification-message">Você não tem notificação</span>
                 }@else{
-                @if ( qtdNotification() > 1 ) {
-                <span class="layout-notification-message">Você tem {{qtdNotification()}} notificações</span>
-                }@else {
-                @if ( qtdNotification() > 0 ) {
-                <span class="layout-notification-message">Você tem {{qtdNotification()}} notificação</span>
+                    @if ( qtdNotification() > 1 ) {
+                    <span class="layout-notification-message">Você tem {{qtdNotification()}} notificações</span>
+                    }@else {
+                        @if ( qtdNotification() > 0 ) {
+                        <span class="layout-notification-message">Você tem {{qtdNotification()}} notificação</span>
+                        }
+                    }
                 }
-                }
-
-
-                }
-
             </div>
             <a class="layout-sidebar-content-card">
                 <i class="pi pi-bell"></i>

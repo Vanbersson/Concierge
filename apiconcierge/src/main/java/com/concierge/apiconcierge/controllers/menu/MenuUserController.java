@@ -1,4 +1,4 @@
-package com.concierge.apiconcierge.controllers.version1.menu;
+package com.concierge.apiconcierge.controllers.menu;
 
 import com.concierge.apiconcierge.dtos.message.MessageResponseDto;
 import com.concierge.apiconcierge.dtos.menu.MenuUserDto;

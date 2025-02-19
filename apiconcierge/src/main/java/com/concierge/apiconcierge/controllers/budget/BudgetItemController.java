@@ -1,4 +1,4 @@
-package com.concierge.apiconcierge.controllers.version1.budget;
+package com.concierge.apiconcierge.controllers.budget;
 
 import com.concierge.apiconcierge.dtos.message.MessageResponseDto;
 import com.concierge.apiconcierge.dtos.budget.BudgetItemDto;

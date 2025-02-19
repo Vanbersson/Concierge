@@ -7,6 +7,7 @@ import com.concierge.apiconcierge.models.vehicle.VehicleEntry;
 import com.concierge.apiconcierge.models.vehicle.enums.StepVehicleEnum;
 import com.concierge.apiconcierge.repositories.budget.IBudgetRepository;
 import com.concierge.apiconcierge.repositories.vehicle.IVehicleEntryRepository;
+import com.concierge.apiconcierge.util.ConstantsMessage;
 import com.concierge.apiconcierge.validation.budget.BudgetValidation;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,15 +34,15 @@ public class BudgetService implements IBudgetService {
 
     @SneakyThrows
     @Override
-    public Integer save(Integer vehicleEntryId) {
+    public Integer save(Integer vehicleEntryId, String userEmail) {
         Budget result;
         try {
             Optional<VehicleEntry> vehicle = this.repositoryVehicleEntry.findById(vehicleEntryId);
             if (vehicle.isEmpty())
-                throw new BudgetException("Unauthorized.");
+                throw new BudgetException();
 
             VehicleEntry vehicleEntry = vehicle.get();
-            String message = this.validation.save(vehicleEntry);
+            String message = this.validation.save(vehicleEntry,userEmail);
 
             if (message.equals(SUCCESS)) {
                 Budget budget = new Budget();
@@ -74,15 +75,25 @@ public class BudgetService implements IBudgetService {
 
     @SneakyThrows
     @Override
-    public boolean update(Budget budget) {
+    public boolean update(Budget budget, String userEmail) {
         try {
-            String message = this.validation.update(budget);
+            String message = this.validation.update(budget,userEmail);
             if (message.equals(SUCCESS)) {
                 this.repository.save(budget);
                 return true;
             } else {
                 throw new BudgetException(message);
             }
+        } catch (Exception ex) {
+            throw new BudgetException(ex.getMessage());
+        }
+    }
+
+    @SneakyThrows
+    public String updateBudget(Budget budget) {
+        try {
+            this.repository.save(budget);
+            return ConstantsMessage.SUCCESS;
         } catch (Exception ex) {
             throw new BudgetException(ex.getMessage());
         }
@@ -108,6 +119,15 @@ public class BudgetService implements IBudgetService {
             map.put("kmEntry", ve.getKmEntry());
 
             return map;
+        } catch (Exception ex) {
+            throw new BudgetException(ex.getMessage());
+        }
+    }
+
+    @SneakyThrows
+    public Budget filterBudgetVehicle(Integer vehicleId) {
+        try {
+            return this.repository.findByVehicleEntryId(vehicleId);
         } catch (Exception ex) {
             throw new BudgetException(ex.getMessage());
         }

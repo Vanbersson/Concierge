@@ -7,7 +7,7 @@ import { StorageService } from '../storage/storage.service';
 //class
 import { VehicleEntry } from '../../models/vehicle/vehicle-entry';
 import { VehicleEntryAuth } from '../../models/vehicle/vehicle-entry-auth';
-import { MessageError } from '../../models/error/messageerror';
+import { VehicleExit } from '../../models/vehicle/vehicle-exit';
 
 @Injectable({
   providedIn: 'root'
@@ -24,8 +24,8 @@ export class VehicleService {
     return this.http.post<VehicleEntry>(environment.apiuUrl + "/vehicle/entry/update", vehicle, { headers: this.myHeaders(), observe: 'response' });
   }
 
-  entryExit$(vehicle: VehicleEntry): Observable<HttpResponse<VehicleEntry>> {
-    return this.http.post<VehicleEntry>(environment.apiuUrl + "/vehicle/entry/exit", vehicle, { headers: this.myHeaders(), observe: 'response' });
+  entryExit$(vehicle: VehicleExit): Observable<HttpResponse<VehicleExit>> {
+    return this.http.post<VehicleExit>(environment.apiuUrl + "/vehicle/entry/exit", vehicle, { headers: this.myHeaders(), observe: 'response' });
   }
 
   allAuthorized$(): Observable<VehicleEntry[]> {
@@ -55,12 +55,12 @@ export class VehicleService {
     return this.http.post<VehicleEntryAuth>(environment.apiuUrl + "/vehicle/entry/authorization/add", auth, { headers: this.myHeaders(), observe: 'response' });
   }
 
-  entryDeleteAuth1(auth: VehicleEntryAuth) {
-    return this.http.post(environment.apiuUrl + "/vehicle/entry/authorization/delete1", auth, { headers: this.myHeaders(), observe: 'response', responseType: 'text' });
+  entryDeleteAuth1(auth: VehicleEntryAuth): Observable<HttpResponse<VehicleEntryAuth>> {
+    return this.http.post<VehicleEntryAuth>(environment.apiuUrl + "/vehicle/entry/authorization/delete1", auth, { headers: this.myHeaders(), observe: 'response' });
   }
 
-  entryDeleteAuth2(auth: VehicleEntryAuth) {
-    return this.http.post(environment.apiuUrl + "/vehicle/entry/authorization/delete2", auth, { headers: this.myHeaders(), observe: 'response', responseType: 'text' });
+  entryDeleteAuth2(auth: VehicleEntryAuth): Observable<HttpResponse<VehicleEntryAuth>> {
+    return this.http.post<VehicleEntryAuth>(environment.apiuUrl + "/vehicle/entry/authorization/delete2", auth, { headers: this.myHeaders(), observe: 'response' });
   }
 
   private myHeaders(): HttpHeaders {

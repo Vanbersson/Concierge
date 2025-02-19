@@ -11,8 +11,8 @@
 	<groupId>com.concierge</groupId>
 	<artifactId>apiconcierge</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	 <!--<packaging>war</packaging>-->
-	<name>apiconcierge</name>
+	<!-- <packaging>war</packaging> -->
+	<name>apiAutopoint</name>
 	<description>Concierge system api</description>
 	<properties>
 		<java.version>17</java.version>

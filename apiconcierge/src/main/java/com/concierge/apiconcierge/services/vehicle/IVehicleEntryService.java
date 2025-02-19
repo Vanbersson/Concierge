@@ -1,6 +1,7 @@
 package com.concierge.apiconcierge.services.vehicle;
 
 import com.concierge.apiconcierge.dtos.vehicle.AuthExit;
+import com.concierge.apiconcierge.dtos.vehicle.VehicleExitSaveDto;
 import com.concierge.apiconcierge.models.vehicle.VehicleEntry;
 
 import java.util.List;
@@ -10,9 +11,9 @@ public interface IVehicleEntryService {
 
     public Integer save(VehicleEntry vehicle);
 
-    public boolean update(VehicleEntry vehicle);
+    public String update(VehicleEntry vehicle);
 
-    public String exit(VehicleEntry vehicle);
+    public String exit(VehicleExitSaveDto dataExit);
 
     public List<Object> allAuthorized();
 

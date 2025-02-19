@@ -1,4 +1,4 @@
-package com.concierge.apiconcierge.controllers.version1;
+package com.concierge.apiconcierge.controllers;
 
 import com.concierge.apiconcierge.dtos.CompanyDto;
 import com.concierge.apiconcierge.dtos.ResaleDto;

@@ -10,20 +10,18 @@ import java.util.Date;
 import java.util.UUID;
 
 public record UserDto(
-        @NotNull Integer companyId,
-        @NotNull Integer resaleId,
+        Integer companyId,
+        Integer resaleId,
         Integer id,
-        @NotNull StatusEnableDisable status,
-        @NotBlank  String name,
-        @NotBlank String email,
-        @NotBlank String password,
-        @NotBlank String cellphone,
-
+        StatusEnableDisable status,
+        String name,
+        String email,
+        String password,
+        String cellphone,
         Integer limitDiscount,
         byte[] photo,
-        @NotNull Integer roleId,
-        @NotBlank String roleDesc,
-        @NotNull UserRoleEnum roleFunc,
-
+        Integer roleId,
+        String roleDesc,
+        UserRoleEnum roleFunc,
         Date lastSession) {
 }

@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute, RouterModule } from '@angular/router';
 import { FormControl, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
@@ -22,11 +22,7 @@ import { InputIconModule } from 'primeng/inputicon';
 import { IconFieldModule } from 'primeng/iconfield';
 
 
-//Interface
-import { IUser } from '../../../interfaces/user/iuser';
-
 //Service
-import { LayoutService } from '../../../layouts/layout/service/layout.service';
 import { StorageService } from '../../../services/storage/storage.service';
 import { BudgetService } from '../../../services/budget/budget.service';
 import { UserService } from '../../../services/user/user.service';
@@ -39,14 +35,15 @@ import { lastValueFrom } from 'rxjs';
 import { Budget } from '../../../models/budget/budget';
 import { ClientecompanyService } from '../../../services/clientecompany/clientecompany.service';
 import { PartsService } from '../../../services/parts/parts.service';
-import { error } from 'console';
 import { Parts } from '../../../models/parts/Parts';
+import { HttpResponse } from '@angular/common/http';
+import { ClientCompany } from '../../../models/clientcompany/client-company';
+import { User } from '../../../models/user/user';
+import { BusyService } from '../../../components/loading/busy.service';
 
-
-export interface IListPayment {
+export interface IPayment {
   payment: string,
 }
-
 
 @Component({
   selector: 'app-budget',
@@ -57,11 +54,11 @@ export interface IListPayment {
   providers: [MessageService]
 })
 export default class BudgetComponent implements OnInit, OnDestroy {
-  private user: IUser;
-  budget: Budget;
+
+  private budget: Budget;
   vehicleId = signal<number>(0);
 
-  listPayment: IListPayment[] = [];
+  listPayment: IPayment[] = [];
 
   visibleBudget: boolean = false;
   requisition: BudgetRequisition;
@@ -86,7 +83,7 @@ export default class BudgetComponent implements OnInit, OnDestroy {
   formBudget = new FormGroup({
     dateValidation: new FormControl<Date | string>(""),
     nameResponsible: new FormControl<string>(""),
-    typePayment: new FormControl<IListPayment[]>([]),
+    typePayment: new FormControl<IPayment[]>([]),
     information: new FormControl<string>(""),
   });
 
@@ -119,6 +116,8 @@ export default class BudgetComponent implements OnInit, OnDestroy {
   viewClientCpf = signal<string>("");
   viewClientPhone = signal<string>("");
 
+  viewAttendantName = signal<string>("");
+
   viewClientZipCode = signal<string>("");
   viewClientState = signal<string>("");
   viewClientCity = signal<string>("");
@@ -140,7 +139,8 @@ export default class BudgetComponent implements OnInit, OnDestroy {
 
   //Parts
   visibleParts: boolean = false;
-  selectPartsVisible = true;
+
+  partsDisabledButton = true;
   listParts: Parts[] = [];
 
   listBudgetParts: Parts[] = [];
@@ -149,7 +149,7 @@ export default class BudgetComponent implements OnInit, OnDestroy {
   formParts = new FormGroup({
     code: new FormControl(''),
     desc: new FormControl(''),
-    price: new FormControl<null | number>(null),
+    price: new FormControl<number>(0),
     discount: new FormControl<number>(0),
     qtdAvailable: new FormControl<number>(0)
   });
@@ -162,15 +162,12 @@ export default class BudgetComponent implements OnInit, OnDestroy {
     private budgetService: BudgetService,
     private serviceClienteCompany: ClientecompanyService,
     private router: Router,
-    private layoutService: LayoutService,
     private messageService: MessageService,
     private activatedRoute: ActivatedRoute,
-    private cdr: ChangeDetectorRef) {
+    private cdr: ChangeDetectorRef,
+    private busyService: BusyService) {
 
-    this.userService.getUser$().subscribe(data => {
-      this.user = data;
-      this.limitUserDiscount.set(this.user.limitDiscount);
-    });
+
 
     this.budgetServiceItem = new BudgetServiceItem();
     this.vehicleId.set(Number.parseInt(this.activatedRoute.snapshot.params['vehicleid']));
@@ -178,17 +175,119 @@ export default class BudgetComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
 
     this.listPayment = [
-      { payment: 'AVista' },
+      { payment: 'A Vista' },
       { payment: 'Faturado' },
       { payment: 'Cartão Debito' },
-      { payment: 'Cartão Credito' }
+      { payment: 'Cartão Credito' },
+      { payment: 'Pix' },
     ];
 
-    this.getBudget();
+    this.init();
 
+    this.PartsDisable();
   }
   ngOnDestroy(): void {
 
+  }
+  private async init() {
+    this.busyService.busy();
+
+    const bugetResult = await this.getBudget();
+
+    if (bugetResult.status == 200) {
+
+      //Client
+      const clientResult = await this.getClient(bugetResult.body.clientCompanyId);
+      if (clientResult.status == 200) {
+        const client = clientResult.body;
+
+        this.viewClientName.set(client.name);
+        if (client.fisjur == "Juridica") {
+          const CNPJ = client.cnpj.substring(0, 2) + "." + client.cnpj.substring(2, 5) + "." + client.cnpj.substring(5, 8) + "/" + client.cnpj.substring(8, 12) + "-" + client.cnpj.substring(12, 14);
+          this.viewClientCnpj.set(CNPJ);
+        }
+        if (client.fisjur == "Fisica") {
+          const CPF = client.cpf.substring(0, 3) + "." + client.cpf.substring(3, 6) + "." + client.cpf.substring(6, 9) + "-" + client.cpf.substring(9, 11);
+          this.viewClientCpf.set(CPF);
+        }
+        if (client.dddPhone != "") {
+          this.viewClientPhone.set("(" + client.dddPhone + ") " + client.phone);
+        }
+        this.viewClientZipCode.set(client.zipCode.substring(0, 5) + "-" + client.zipCode.substring(5, 8));
+        this.viewClientState.set(client.state);
+        this.viewClientCity.set(client.city);
+        this.viewClientNeighborhood.set(client.neighborhood);
+        this.viewClientAddress.set(client.address);
+        this.viewClientAddressNumber.set(client.addressNumber);
+        this.viewClientAddressComplement.set(client.addressComplement);
+        this.viewClientContactName.set(client.contactName);
+        this.viewClientContactEmail.set(client.contactEmail);
+        if (client.contactCellphone != "") {
+          this.viewClientContactCellphone.set(this.maskCellphone(client.contactDDDCellphone, client.contactCellphone));
+        }
+        if (client.contactPhone != "") {
+          this.viewClientContactPhone.set(this.maskPhone(client.contactDDDPhone, client.contactPhone));
+        }
+      }
+
+      //User
+      this.limitUserDiscount.set(this.storageService.limitDiscount);
+
+      //Attendant
+      const userResult = await this.getAttendant(bugetResult.body.idUserAttendant);
+      if (userResult.status == 200) {
+        this.viewAttendantName.set(userResult.body.name);
+      }
+
+      this.budget = bugetResult.body;
+
+      this.viewBudgetId.set(bugetResult.body.id);
+      this.viewBudgetDateGeneration.set(new Date(bugetResult.body.dateGeneration));
+      if (bugetResult.body.placa) {
+        this.viewClientPlaca.set(bugetResult.body.placa.substring(0, 3) + "-" + bugetResult.body.placa.substring(3, 7));
+      }
+
+      this.viewClientFrota.set(bugetResult.body.frota);
+      this.viewClientModelDescription.set(bugetResult.body.modelDescription);
+      this.viewClientColor.set(bugetResult.body.color);
+      this.viewClientKmEntry.set(bugetResult.body.kmEntry);
+
+      this.getListBudgetRequisition();
+      this.getListBudgetSetvice();
+
+      this.formBudget.patchValue({
+        dateValidation: bugetResult.body.dateValidation != "" ? new Date(bugetResult.body.dateValidation) : null,
+        nameResponsible: bugetResult.body.nameResponsible,
+        typePayment: bugetResult.body.typePayment != "" ? [{ payment: bugetResult.body.typePayment }] : [],
+        information: bugetResult.body.information,
+      });
+
+    } else {
+      this.router.navigateByUrl("/portaria/lista-entrada-veiculo");
+    }
+    this.busyService.idle();
+
+  }
+  private async getBudget(): Promise<HttpResponse<Budget>> {
+    try {
+      return await lastValueFrom(this.budgetService.getBudgetFilterVehicle$(this.vehicleId()));
+    } catch (error) {
+      return error;
+    }
+  }
+  private async getClient(id: number): Promise<HttpResponse<ClientCompany>> {
+    try {
+      return await lastValueFrom(this.serviceClienteCompany.getId$(id));
+    } catch (error) {
+      return error;
+    }
+  }
+  private async getAttendant(id: number): Promise<HttpResponse<User>> {
+    try {
+      return await lastValueFrom(this.userService.getUserFilterId(id));
+    } catch (error) {
+      return error;
+    }
   }
 
   showDialogBudget() {
@@ -197,76 +296,6 @@ export default class BudgetComponent implements OnInit, OnDestroy {
   closeDialogBudget() {
     this.visibleBudget = false;
   }
-
-  private getBudget() {
-    this.budgetService.getBudgetFilterVehicle$(this.vehicleId()).subscribe(data => {
-      this.budget = data;
-
-      this.viewClientPlaca.set(data.placa.substring(0, 3) + "-" + data.placa.substring(3, 7));
-      this.viewClientFrota.set(data.frota);
-      this.viewClientModelDescription.set(data.modelDescription);
-      this.viewClientColor.set(data.color);
-      this.viewClientKmEntry.set(data.kmEntry);
-
-
-      this.getClientCompany(data.clientCompanyId);
-
-      this.getListBudgetRequisition();
-      this.getListBudgetSetvice();
-
-      this.formBudget.patchValue({
-        dateValidation: data.dateValidation != "" ? new Date(data.dateValidation) : null,
-        nameResponsible: data.nameResponsible,
-        typePayment: data.typePayment != "" ? [{ payment: data.typePayment }] : [],
-        information: data.information,
-      });
-
-      this.viewBudgetId.set(this.budget.id);
-      this.viewBudgetDateGeneration.set(new Date(this.budget.dateGeneration));
-    }, error => {
-
-    });
-  }
-
-  private getClientCompany(id: number) {
-
-    this.serviceClienteCompany.getId$(id).subscribe(data => {
-
-      var client = data;
-
-      this.viewClientName.set(client.name);
-      if (client.fisjur == "Juridica") {
-        const CNPJ = client.cnpj.substring(0, 2) + "." + client.cnpj.substring(2, 5) + "." + client.cnpj.substring(5, 8) + "/" + client.cnpj.substring(8, 12) + "-" + client.cnpj.substring(12, 14);
-        this.viewClientCnpj.set(CNPJ);
-      }
-      if (client.fisjur == "Fisica") {
-        const CPF = client.cpf.substring(0, 3) + "." + client.cpf.substring(3, 6) + "." + client.cpf.substring(6, 9) + "-" + client.cpf.substring(9, 11);
-        this.viewClientCpf.set(CPF);
-      }
-      if (client.dddPhone != "") {
-        this.viewClientPhone.set("(" + client.dddPhone + ") " + client.phone);
-      }
-      this.viewClientZipCode.set(client.zipCode.substring(0, 5) + "-" + client.zipCode.substring(5, 8));
-      this.viewClientState.set(client.state);
-      this.viewClientCity.set(client.city);
-      this.viewClientNeighborhood.set(client.neighborhood);
-      this.viewClientAddress.set(client.address);
-      this.viewClientAddressNumber.set(client.addressNumber);
-      this.viewClientAddressComplement.set(client.addressComplement);
-      this.viewClientContactName.set(client.contactName);
-      this.viewClientContactEmail.set(client.contactEmail);
-      if (client.contactCellphone != "") {
-        this.viewClientContactCellphone.set(this.maskCellphone(client.contactDDDCellphone, client.contactCellphone));
-      }
-      if (client.contactPhone != "") {
-        this.viewClientContactPhone.set(this.maskPhone(client.contactDDDPhone, client.contactPhone));
-      }
-
-    }, error => {
-
-    });
-  }
-
   saveBudget() {
 
     const { value } = this.formBudget;
@@ -286,10 +315,10 @@ export default class BudgetComponent implements OnInit, OnDestroy {
       const NAMERESPONSIBLE = "Name responsible not informed.";
       if (error.status == 401) {
 
-        if (error.error.messageError == DATEVALIDATION) {
+        if (error.error.message == DATEVALIDATION) {
           this.messageService.add({ severity: 'error', summary: 'Data Validade', detail: "Não informado", icon: 'pi pi-times' });
         }
-        if (error.error.messageError == NAMERESPONSIBLE) {
+        if (error.error.message == NAMERESPONSIBLE) {
           this.messageService.add({ severity: 'error', summary: 'Responsavel', detail: "Não informado", icon: 'pi pi-times' });
         }
 
@@ -297,7 +326,6 @@ export default class BudgetComponent implements OnInit, OnDestroy {
 
     });
   }
-
   private maskCellphone(dddCellphone: string, cellphone: string): string {
     if (cellphone.length != 9)
       return "";
@@ -314,7 +342,6 @@ export default class BudgetComponent implements OnInit, OnDestroy {
     var phone = "(" + dddPhone + ") " + phone.substring(0, 4) + "-" + phone.substring(4, 8);
     return phone;
   }
-
   getListBudgetRequisition() {
     this.budgetService.getBudgetRequisition$(this.budget.id).subscribe((data) => {
       this.listBudgetRequisition = data;
@@ -327,8 +354,8 @@ export default class BudgetComponent implements OnInit, OnDestroy {
 
     if (valid && value.description!.toString().trim() != "") {
       this.requisition = new BudgetRequisition();
-      this.requisition.companyId = this.user.companyId;
-      this.requisition.resaleId = this.user.resaleId;
+      this.requisition.companyId = this.storageService.companyId;
+      this.requisition.resaleId = this.storageService.resaleId;
       this.requisition.budgetId = this.budget.id;
       this.requisition.ordem = this.getSizeListBudgetRequisition() + 1;
       this.requisition.description = value.description;
@@ -352,8 +379,8 @@ export default class BudgetComponent implements OnInit, OnDestroy {
     const { value, valid } = this.formBudgetRequisition;
     if (valid && value.description!.toString().trim() != "") {
       this.requisition = new BudgetRequisition();
-      this.requisition.companyId = this.user.companyId;
-      this.requisition.resaleId = this.user.resaleId;
+      this.requisition.companyId = this.storageService.companyId;
+      this.requisition.resaleId = this.storageService.resaleId;
       this.requisition.id = value.id;
       this.requisition.budgetId = this.budget.id;
       this.requisition.ordem = value.ordem;
@@ -467,8 +494,8 @@ export default class BudgetComponent implements OnInit, OnDestroy {
     if (this.validSaveBudgetService()) {
       const { value } = this.formBudgetService;
 
-      this.budgetServiceItem.companyId = this.user.companyId;
-      this.budgetServiceItem.resaleId = this.user.resaleId;
+      this.budgetServiceItem.companyId = this.storageService.companyId;
+      this.budgetServiceItem.resaleId = this.storageService.resaleId;
       this.budgetServiceItem.budgetId = this.budget.id;
       this.budgetServiceItem.status = "NaoAprovado";
 
@@ -520,7 +547,7 @@ export default class BudgetComponent implements OnInit, OnDestroy {
     if (value.discount > 0) {
       const newDiscount = this.totalBudgetDiscountService() + value.discount;
       const newTotal = this.totalBudgetService() + (value.price * value.hourService);
-      const percent = (newTotal * this.user.limitDiscount) / 100;
+      const percent = (newTotal * this.storageService.limitDiscount) / 100;
       if (newDiscount > percent) {
         this.messageService.add({ severity: 'error', summary: 'Desconto', detail: 'Maior que o permitido', icon: 'pi pi-times' });
         return false;
@@ -561,7 +588,7 @@ export default class BudgetComponent implements OnInit, OnDestroy {
       }
       newTotal += tempTotal;
       newDiscount += tempDiscount;
-      const percent = (newTotal * this.user.limitDiscount) / 100;
+      const percent = (newTotal * this.storageService.limitDiscount) / 100;
       if (newDiscount > percent) {
         this.messageService.add({ severity: 'error', summary: 'Desconto', detail: 'Maior que o permitido', icon: 'pi pi-times' });
         return false;
@@ -625,7 +652,7 @@ export default class BudgetComponent implements OnInit, OnDestroy {
     this.formBudgetService.patchValue({
       description: "",
       hourService: 0,
-      price: 275,
+      price: 0,
       discount: 0
 
     });
@@ -715,7 +742,7 @@ export default class BudgetComponent implements OnInit, OnDestroy {
     const { value } = this.formDiscount;
     if (value.servVal <= 0 && value.servPer <= 0) { return false; }
 
-    const limit = this.user.limitDiscount;
+    const limit = this.storageService.limitDiscount;
     const valueLimitDisc = (this.totalBudgetService() * limit) / 100;
     const newValueDiscountPerc = ((this.totalBudgetService() * value.servPer) / 100) + this.totalBudgetDiscountService();
     const newValueDiscount = this.totalBudgetDiscountService() + value.servVal;
@@ -802,6 +829,7 @@ export default class BudgetComponent implements OnInit, OnDestroy {
   }
 
   private infoPercenDiscount() {
+
     if (!this.visibleDiscount) {
       this.messageService.add({ key: 'toastInfoDiscount', sticky: true, severity: 'custom', summary: 'Você atingiu.' });
       this.visibleDiscount = true;
@@ -824,6 +852,7 @@ export default class BudgetComponent implements OnInit, OnDestroy {
         this.cdr.markForCheck();
       }, 10);
     }
+
   }
 
   //Parts
@@ -833,56 +862,82 @@ export default class BudgetComponent implements OnInit, OnDestroy {
   hideDialogParts() {
     this.visibleParts = false;
   }
-
+  private PartsDisable(){
+    this.formParts.get('qtdAvailable').disable();
+    this.formParts.get('price').disable();
+    this.formParts.get('discount').disable();
+  }
+  private PartsEnable(){
+    this.formParts.get('qtdAvailable').enable();
+    this.formParts.get('price').enable();
+    this.formParts.get('discount').enable();
+  }
   onSelectEventParts(event: any) {
     this.formParts.patchValue({
       qtdAvailable: 0,
-      price: this.selectedParts.price
+      discount:0,
+      price: this.selectedParts.price,
+  
     });
-    this.selectPartsVisible = false;
+    this.partsDisabledButton = false;
+    this.PartsEnable();
   }
-
   onUnSelectEventParts(event: any) {
     this.formParts.patchValue({
-      qtdAvailable: null,
-      price: null
+      qtdAvailable: 0,
+      price: 0,
+      discount:0
     })
-    this.selectPartsVisible = true;
-  }
+    this.partsDisabledButton = true;
+   
 
+    this.PartsDisable();
+   
+  }
   cleanParts() {
     this.formParts.patchValue({
       code: "",
       desc: "",
-      qtdAvailable: null,
-      price: null,
+      qtdAvailable: 0,
+      price: 0,
       discount: 0
     })
     this.selectedParts = null;
-    this.selectPartsVisible = true;
+    this.partsDisabledButton = true;
   }
+  public async filterParts() {
+    this.listParts = [];
 
-
-  filterParts() {
     const { value } = this.formParts;
     if (value.code != '') {
-      this.partsService.getExternalFilterCode$(value.code).subscribe(data => {
-        this.listParts = data;
-      }, error => { });
+      const partsResult = await this.getPartsFilterCode(value.code);
+      if (partsResult.status == 200) {
+        this.listParts = partsResult.body;
+      }
+
     } else if (value.desc != '') {
-      this.partsService.getExternalFilterDesc$(value.desc).subscribe(data => {
-        this.listParts = data;
-      }, error => { });
+      const partsResult = await this.getPartsFilterDesc(value.desc);
+      if (partsResult.status == 200) {
+        this.listParts = partsResult.body;
+      }
+
     }
 
   }
 
-  private getParts() {
-    this.partsService.getFilterBudget$(1).subscribe(data => {
-      this.listBudgetParts = data;
-    }, error => {
-
-    });
+  private async getPartsFilterCode(code: string): Promise<HttpResponse<Parts[]>> {
+    try {
+      return await lastValueFrom(this.partsService.getExternalFilterCode$(code));
+    } catch (error) {
+      return error;
+    }
+  }
+  private async getPartsFilterDesc(desc: string): Promise<HttpResponse<Parts[]>> {
+    try {
+      return await lastValueFrom(this.partsService.getExternalFilterDesc$(desc));
+    } catch (error) {
+      return error;
+    }
   }
 
   selectPartsConfirme() {
@@ -917,16 +972,9 @@ export default class BudgetComponent implements OnInit, OnDestroy {
 
   }
 
-
-
-
-
   alertShowDiscount2() {
     this.messageService.add({ severity: 'success', summary: 'Desconto', detail: 'Removido com sucesso', icon: 'pi pi-check' });
   }
-
-
-
 
   alertShowRequisition0() {
     this.messageService.add({ severity: 'success', summary: 'Solicitação', detail: 'Adicionada com sucesso', icon: 'pi pi-plus' });

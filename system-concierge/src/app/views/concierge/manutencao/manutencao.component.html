@@ -511,7 +511,6 @@
                                     <p-image src="data:image/png;base64,{{driverEntryPhotoDoc1}}" alt="" height="80"
                                         width="80" [preview]="true" />
                                     }
-
                                 </div>
                                 @if(driverEntryPhotoDoc1){
                                 <button pButton icon="pi pi-trash" severity="danger"
@@ -662,7 +661,7 @@
                 <button pButton type="button" label="Imprimir" icon="pi pi-print" size="small" [raised]="true"
                     severity="secondary-custom"></button>
                 <button pButton type="button" label="Liberar" icon="pi pi-truck" size="small" [raised]="true"
-                    severity="success-custom" (click)="addAuthorization()"></button>
+                    severity="success-custom" (click)="authExit()"></button>
             </div>
         </div>
 

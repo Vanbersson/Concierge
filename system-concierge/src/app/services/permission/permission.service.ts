@@ -5,6 +5,7 @@ import { StorageService } from '../storage/storage.service';
 import { Permission } from '../../models/permission/permission';
 import { Observable } from 'rxjs';
 import { PermissionUser } from '../../models/permission/permission-user';
+import { MessageResponse } from '../../models/message/message-response';
 
 
 @Injectable({
@@ -23,8 +24,10 @@ export class PermissionService {
         return this.http.post<PermissionUser>(environment.apiuUrl + "/permission/user/save", user, { headers: this.myHeaders(), observe: 'response' });
     }
 
-    deleteUser(user: PermissionUser): Observable<HttpResponse<PermissionUser>> {
-        return this.http.post<PermissionUser>(environment.apiuUrl + "/permission/user/all/delete", user, { headers: this.myHeaders(), observe: 'response' });
+    deleteUser(userId: number): Observable<HttpResponse<MessageResponse>> {
+        return this.http.post<MessageResponse>(environment.apiuUrl + "/permission/user/all/delete", {
+            "userId": userId
+        }, { headers: this.myHeaders(), observe: 'response' });
     }
 
     getAllUser$(userId: number): Observable<PermissionUser[]> {

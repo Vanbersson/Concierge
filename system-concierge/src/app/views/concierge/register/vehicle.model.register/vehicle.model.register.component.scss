@@ -36,26 +36,6 @@
         
     }
 
-    .layout-dialog-file {
-      
-        label {
-            padding: 18px 0px;
-            width: 200px;
-            background-color: #3B82F6;
-            color: #FFF;
-            text-align: center;
-            display: block;
-            border-radius:8px;
-            border: 1px solid var(--color-grey-300);
-            cursor: pointer;
-        }
-
-        input[type="file"] {
-            display: none;
-        }
-
-    }
-
     .layout-card-status {
         display: flex;
         flex-direction: column;
@@ -70,9 +50,5 @@
 
         }
     }
-
-    
-
-
 
 }

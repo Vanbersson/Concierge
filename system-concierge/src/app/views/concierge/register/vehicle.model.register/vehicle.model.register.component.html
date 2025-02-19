@@ -1,4 +1,5 @@
 <div class="layout-card">
+    <p-toast />
 
     <div class="layout-card-title">
         <span>Modelos de veículos</span>
@@ -11,7 +12,10 @@
             <div class="p-fluid p-formgrid grid">
 
                 <div class="mt-5 layout-dialog-img">
-                    <img [ngSrc]="pathFile" alt="Vehicle Model" height="100" width="100" loading="lazy">
+                    @if(photoModel){
+                    <p-image src="data:image/png;base64,{{photoModel}}" alt="" height="140" width="140"
+                        [preview]="false" />
+                    }
                 </div>
 
                 <div class="field col-12">
@@ -19,9 +23,8 @@
                     <input pInputText id="descricao" formControlName="description" />
                 </div>
 
-                <div class="field col-10 layout-dialog-file">
-                    <label for="file">Selecionar imagem</label>
-                    <input type="file" id="file" (change)="onSelectFile($event)" accept="image/png" />
+                <div class="field col-10">
+                    <button pButton type="button" label="Selecionar imagem" (click)="onSelectFile()"></button>
                 </div>
                 <div class="field col-2 flex align-items-center">
                     <button type="button" pButton icon="pi pi-trash" severity="danger" (click)="deleteFile()"></button>
@@ -53,18 +56,15 @@
         </form>
     </p-dialog>
 
-    <p-table #tableModel 
-    [value]="modelVehicles" 
-        [(selection)]="selectedItems" 
-        [paginator]="true" 
-        [rows]="10"
-        [rowsPerPageOptions]="[10, 25, 50]" 
-        styleClass="p-datatable-sm">
+    <p-table #tableModel [value]="modelVehicles" [(selection)]="selectedItems" [paginator]="true" [rows]="10"
+        [rowsPerPageOptions]="[10, 25, 50]" styleClass="p-datatable-sm">
         <ng-template pTemplate="header">
             <tr>
                 <th class="font-normal" style="width:5%">Sel.</th>
-                <th class="font-normal" pSortableColumn="id" style="width:10%">Código <p-sortIcon field="id"></p-sortIcon></th>
-                <th class="font-normal" pSortableColumn="status" style="width:10%">Status <p-sortIcon field="status"></p-sortIcon></th>
+                <th class="font-normal" pSortableColumn="id" style="width:10%">Código <p-sortIcon
+                        field="id"></p-sortIcon></th>
+                <th class="font-normal" pSortableColumn="status" style="width:10%">Status <p-sortIcon
+                        field="status"></p-sortIcon></th>
                 <th class="font-normal" pSortableColumn="description" style="width:45%">Descrição <p-sortIcon
                         field="description"></p-sortIcon></th>
                 <th class="font-normal" pSortableColumn="image" style="width:10%">Imagem</th>
@@ -100,21 +100,21 @@
                 <th>
                     @if (selectedItems.length > 0 ) {
 
-                        @if(selectedItems[0].status == "ativo"){
-                        <p-button icon="pi pi-times" label="Desativar" [rounded]="true" [raised]="true" [outlined]="true"
-                            severity="warning" [style]="{width:'126.13px'}" size="small"
-                            (click)="updateStatusSelected()"></p-button>
+                    @if(selectedItems[0].status == "ativo"){
+                    <p-button icon="pi pi-times" label="Desativar" [rounded]="true" [raised]="true" [outlined]="true"
+                        severity="warning" [style]="{width:'126.13px'}" size="small"
+                        (click)="updateStatusSelected()"></p-button>
 
-                        }
-                        @if(selectedItems[0].status == "inativo"){
-                        <p-button icon="pi pi-check" label="Ativar" [rounded]="true" [raised]="true" severity="success"
-                            [style]="{width:'126.13px'}" size="small" (click)="updateStatusSelected()"></p-button>
+                    }
+                    @if(selectedItems[0].status == "inativo"){
+                    <p-button icon="pi pi-check" label="Ativar" [rounded]="true" [raised]="true" severity="success"
+                        [style]="{width:'126.13px'}" size="small" (click)="updateStatusSelected()"></p-button>
 
-                        }
+                    }
 
                     }
                 </th>
-                
+
             </tr>
         </ng-template>
         <ng-template pTemplate="body" let-modelo>
@@ -137,16 +137,17 @@
                 </td>
                 <td>
                     <p-button icon="pi pi-pencil" [rounded]="true" [text]="true" severity="primary"
-                    (click)="showDialogEditar(modelo)"></p-button></td>
+                        (click)="showDialogEditar(modelo)"></p-button>
+                </td>
                 <td>
                     @if (modelo.status =="ativo") {
-                        <p-button icon="pi pi-times" label="Desativar" [rounded]="true" [raised]="true"
-                        [outlined]="true" severity="warning" [style]="{width:'126.13px'}" size="small"
+                    <p-button icon="pi pi-times" label="Desativar" [rounded]="true" [raised]="true" [outlined]="true"
+                        severity="warning" [style]="{width:'126.13px'}" size="small"
                         (click)="updateStatus(modelo)"></p-button>
                     }
 
                     @if(modelo.status =="inativo") {
-                        <p-button icon="pi pi-check" label="Ativar" [rounded]="true" [raised]="true" severity="success"
+                    <p-button icon="pi pi-check" label="Ativar" [rounded]="true" [raised]="true" severity="success"
                         [style]="{width:'126.13px'}" size="small" (click)="updateStatus(modelo)"></p-button>
                     }
                 </td>

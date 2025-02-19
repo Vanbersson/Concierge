@@ -6,9 +6,9 @@ import java.util.Map;
 
 public interface IBudgetService {
 
-    public Integer save(Integer vehicleEntryId);
+    public Integer save(Integer vehicleEntryId, String userEmail);
 
-    public boolean update(Budget budget);
+    public boolean update(Budget budget,String userEmail);
 
     public Map<String,Object> filterVehicleId(Integer vehicleId);
 }

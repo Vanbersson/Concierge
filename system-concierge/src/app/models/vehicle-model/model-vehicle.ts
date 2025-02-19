@@ -6,6 +6,6 @@ export class ModelVehicle implements IModelVehicle {
     id: number = 0;
     status: string = '';
     description: string = '';
-    photo: string | null = null;
+    photo?: string = '';
 
 }

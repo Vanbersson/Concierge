@@ -13,35 +13,23 @@ export class UserService {
   constructor(private http: HttpClient, private storage: StorageService) { }
 
   saveUser(user: User): Observable<HttpResponse<User>> {
-    return this.http.post<User>(environment.apiuUrl + "/user/add", user, { headers: this.myHeaders(), observe: 'response' });
+    return this.http.post<User>(environment.apiuUrl + "/user/save", user, { headers: this.myHeaders(), observe: 'response' });
   }
-
   updateUser(user: User): Observable<HttpResponse<User>> {
     return this.http.post<User>(environment.apiuUrl + "/user/update", user, { headers: this.myHeaders(), observe: 'response' });
   }
-
   getAll$(): Observable<User[]> {
     return this.http.get<User[]>(environment.apiuUrl + "/user/all", { headers: this.myHeaders() });
   }
-
-  getUser$(): Observable<User> {
-    return this.http.get<User>(environment.apiuUrl + "/user/filter/token", { headers: this.myHeaders(), responseType: "json" });
-  }
-
   getUserFilterId(id: number): Observable<HttpResponse<User>> {
-    return this.http.get<User>(environment.apiuUrl + "/user/filter/id/" + id, { headers: this.myHeaders(), observe: 'response', responseType: "json" });
+    return this.http.get<User>(environment.apiuUrl + "/user/filter/id/" + id, { headers: this.myHeaders(), observe: 'response'});
   }
-
   getUserFilterEmail$(email: string): Observable<HttpResponse<User>> {
-    return this.http.get<User>(environment.apiuUrl + "/user/filter/email/" + email, { headers: this.myHeaders(), observe: 'response', responseType: "json" });
+    return this.http.get<User>(environment.apiuUrl + "/user/filter/email/" + email, { headers: this.myHeaders(), observe: 'response'});
   }
-
   getUserFilterRoleId$(roleId: number): Observable<User[]> {
-    return this.http.get<User[]>(environment.apiuUrl + "/user/filter/roleid/" + roleId, { headers: this.myHeaders() });
+    return this.http.get<User[]>(environment.apiuUrl + "/user/filter/roleId/" + roleId, { headers: this.myHeaders() });
   }
-
-
-
   private myHeaders(): HttpHeaders {
     const httpOptions = new HttpHeaders({
       'Content-Type': 'application/json',
@@ -49,6 +37,5 @@ export class UserService {
     });
     return httpOptions;
   }
-
 
 }

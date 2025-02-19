@@ -30,12 +30,6 @@
         background-color: var(--color-grey-300);
         border-radius: 100%;
 
-        button {
-            width: 100px;
-            padding: 10px 0px;
-            border-radius: 0 0px 8px 8px;
-        }
-
         .layout-photo-person-label {
             display: flex;
             align-items: center;
@@ -57,8 +51,6 @@
                 display: none;
             }
         }
-
-
     }
     .layout-card-status {
         display: flex;

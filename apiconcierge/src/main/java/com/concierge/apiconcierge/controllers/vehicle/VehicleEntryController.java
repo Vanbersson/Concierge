@@ -1,4 +1,4 @@
-package com.concierge.apiconcierge.controllers.version1.vehicle;
+package com.concierge.apiconcierge.controllers.vehicle;
 
 import com.concierge.apiconcierge.dtos.message.MessageResponseDto;
 import com.concierge.apiconcierge.dtos.vehicle.*;
@@ -41,8 +41,8 @@ public class VehicleEntryController {
         try {
             VehicleEntry vehicleEntry = new VehicleEntry();
             BeanUtils.copyProperties(data, vehicleEntry);
-            boolean result = this.service.update(vehicleEntry);
-            return ResponseEntity.status(HttpStatus.OK).build();
+            String message = this.service.update(vehicleEntry);
+            return ResponseEntity.status(HttpStatus.OK).body(new MessageResponseDto(message));
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
         }
@@ -114,7 +114,7 @@ public class VehicleEntryController {
     public ResponseEntity<Object> addAuthorizationExit(@RequestBody @Valid AuthExit data) {
         try {
             Map<String, Object> map = this.service.addAuthExit(data);
-            return ResponseEntity.ok(map);
+            return ResponseEntity.status(HttpStatus.OK).body(map);
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
         }
@@ -124,7 +124,7 @@ public class VehicleEntryController {
     public ResponseEntity<Object> deleteAuthorizationExit1(@RequestBody @Valid AuthExit data) {
         try {
             String result = this.service.deleteAuthExit1(data);
-            return ResponseEntity.status(HttpStatus.OK).body(result);
+            return ResponseEntity.status(HttpStatus.OK).body(new MessageResponseDto(result));
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
         }
@@ -134,7 +134,7 @@ public class VehicleEntryController {
     public ResponseEntity<Object> deleteAuthorizationExit2(@RequestBody @Valid AuthExit data) {
         try {
             String result = this.service.deleteAuthExit2(data);
-            return ResponseEntity.status(HttpStatus.OK).body(result);
+            return ResponseEntity.status(HttpStatus.OK).body(new MessageResponseDto(result));
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
         }

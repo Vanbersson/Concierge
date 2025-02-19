@@ -1,11 +1,8 @@
-package com.concierge.apiconcierge.models.permissions;
+package com.concierge.apiconcierge.models.permission;
 
-import com.concierge.apiconcierge.models.resales.Resale;
-import com.concierge.apiconcierge.models.user.User;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.io.Serializable;
 import java.util.UUID;
 
 @Getter

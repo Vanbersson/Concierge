@@ -1,5 +1,5 @@
-package com.concierge.apiconcierge.dtos;
+package com.concierge.apiconcierge.dtos.message;
 
-public record MessageErrorDto(
-         String messageError) {
+public record MessageResponseDto(
+         String message) {
 }

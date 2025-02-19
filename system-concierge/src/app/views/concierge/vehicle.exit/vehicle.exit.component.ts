@@ -1,7 +1,6 @@
 import { Component, OnDestroy, OnInit, signal, ViewChild } from '@angular/core';
 import { CommonModule, UpperCasePipe } from '@angular/common';
 
-
 import { InputTextModule } from 'primeng/inputtext';
 import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
@@ -14,14 +13,13 @@ import { OverlayPanelModule } from 'primeng/overlaypanel';
 import { OverlayPanel } from 'primeng/overlaypanel';
 import { BadgeModule } from 'primeng/badge';
 
-
 import { VehicleService } from '../../../services/vehicle/vehicle.service';
 import { VehicleEntry } from '../../../models/vehicle/vehicle-entry';
-import { BusyService } from '../../../components/loading/busy.service';
-import { UserService } from '../../../services/user/user.service';
-import { User } from '../../../models/user/user';
 import { lastValueFrom } from 'rxjs';
 import { HttpResponse } from '@angular/common/http';
+import { TaskService } from '../../../services/task/task.service';
+import { StorageService } from '../../../services/storage/storage.service';
+import { VehicleExit } from '../../../models/vehicle/vehicle-exit';
 
 @Component({
   selector: 'app-vehicleexit',
@@ -36,34 +34,29 @@ import { HttpResponse } from '@angular/common/http';
 })
 export class VehicleExitComponent implements OnInit, OnDestroy {
 
-  private user: User;
-  private intervalVehiclesAuthorized: any;
+  private vehicleExit: VehicleExit;
   listVehicleExit: VehicleEntry[] = [];
   selectedVehicle: VehicleEntry[] = [];
 
   @ViewChild('overPanel') overPanel: OverlayPanel;
   total = signal<number>(0);
 
-  constructor(private userService: UserService,
+  constructor(
     private vehicleService: VehicleService,
     private messageService: MessageService,
     private confirmationService: ConfirmationService,
-    private busyService: BusyService) { }
+    private taskService: TaskService,
+    private storageService: StorageService) {
+
+  }
 
   ngOnInit(): void {
-    this.getUser();
     this.listVehicles();
-    this.taskVehiclesAuthorized();
+
+    this.taskService.startTask(() => this.listVehicles(), 20000);
   }
   ngOnDestroy(): void {
-    if (this.intervalVehiclesAuthorized) {
-      clearInterval(this.intervalVehiclesAuthorized); // Para o setInterval
-    }
-  }
-  getUser() {
-    this.userService.getUser$().subscribe(data => {
-      this.user = data;
-    });
+    this.taskService.stopTask();
   }
   confirm() {
 
@@ -86,36 +79,25 @@ export class VehicleExitComponent implements OnInit, OnDestroy {
     this.overPanel.toggle(null, target);
   }
   private async confirmationExit() {
-
     for (let index = 0; index < this.selectedVehicle.length; index++) {
       var element = this.selectedVehicle[index];
-      element.userIdExit = this.user.id;
-      element.userNameExit = this.user.name;
-      element.dateExit = new Date();
+      this.vehicleExit = new VehicleExit();
+      this.vehicleExit.vehicleId = element.id;
+      this.vehicleExit.userId = this.storageService.id;
+      this.vehicleExit.userName = this.storageService.name;
+      this.vehicleExit.dateExit = new Date();
 
-      element.budgetStatus = "semOrcamento";
-      element.nameUserAttendant = "";
-      element.dateEntry = "";
-
-      var result = await this.confirmationExitVehicle(element);
+      var result = await this.confirmationExitVehicle(this.vehicleExit);
       if (result.status == 200) {
         var upper = new UpperCasePipe();
         this.messageService.add({ severity: 'success', summary: 'Saída de veículo', detail: "Realizada com sucesso " + upper.transform(element.placa) });
-        this.cleanSelectionVehicle();
-      }
-
-      if (this.selectedVehicle.length == 1) {
-        this.selectedVehicle = [];
-        this.listVehicles();
-      } else if (this.selectedVehicle.length == index + 1) {
-        this.selectedVehicle = [];
-        this.listVehicles();
       }
 
     }
-
+    this.cleanSelectionVehicle();
+    this.listVehicles();
   }
-  private async confirmationExitVehicle(vehicle: VehicleEntry): Promise<HttpResponse<VehicleEntry>> {
+  private async confirmationExitVehicle(vehicle: VehicleExit): Promise<HttpResponse<VehicleExit>> {
     try {
       return await lastValueFrom(this.vehicleService.entryExit$(vehicle))
     } catch (error) {
@@ -126,32 +108,33 @@ export class VehicleExitComponent implements OnInit, OnDestroy {
     }
 
   }
-  private taskVehiclesAuthorized(): Promise<void> {
-    return new Promise(() => {
-      this.intervalVehiclesAuthorized = setInterval(() => {
-        this.listVehicles();
-      }, 30000);
-    });
-  }
   public listVehicles() {
 
-    this.vehicleService.allAuthorized$().subscribe((data) => {
+    this.vehicleService.allAuthorized$().subscribe({
+      next: (data) => {
 
-      for (let index = 0; index < data.length; index++) {
+        for (let index = 0; index < data.length; index++) {
 
-        if (data[index].vehicleNew == "yes") {
-          data[index].placa = "NOVO";
+          if (data[index].vehicleNew == "yes") {
+            data[index].placa = "NOVO";
+          }
+
+          var nome = data[index].clientCompanyName.split(' ');
+          data[index].clientCompanyName = nome[0] + " " + nome[1];
+
         }
+        this.listVehicleExit = data;
 
-        var nome = data[index].clientCompanyName.split(' ');
-        data[index].clientCompanyName = nome[0] + " " + nome[1];
+        this.total.set(data.length);
+      },
+      error: (error) => {
+
+      },
+      complete: () => {
 
       }
-      this.listVehicleExit = data;
-      this.total.set(data.length);
-    }, error => {
-      // this.messageService.add({ severity: 'error', summary: 'Servidor', detail: "Não disponível", icon: 'pi pi-times' });
     });
+
   }
 
 }

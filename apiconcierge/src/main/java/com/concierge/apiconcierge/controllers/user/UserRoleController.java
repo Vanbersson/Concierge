@@ -1,4 +1,4 @@
-package com.concierge.apiconcierge.controllers.version1.user;
+package com.concierge.apiconcierge.controllers.user;
 
 
 import com.concierge.apiconcierge.dtos.UserRoleDto;

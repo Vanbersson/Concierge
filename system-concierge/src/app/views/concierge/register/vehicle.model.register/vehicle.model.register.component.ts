@@ -1,15 +1,20 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, Validators, FormGroup, FormControl } from '@angular/forms';
-import { Router } from '@angular/router';
+import { NgxImageCompressService } from 'ngx-image-compress';
 
 //primeNG
 import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { ButtonModule } from 'primeng/button';
+import { ImageModule } from 'primeng/image';
 import { CardModule } from 'primeng/card';
 import { DialogModule } from 'primeng/dialog';
 import { DropdownModule } from 'primeng/dropdown';
+import { ToastModule } from 'primeng/toast';
+import { MessageService } from 'primeng/api';
+
+
 
 //Dialog
 import { InputTextModule } from 'primeng/inputtext';
@@ -34,29 +39,30 @@ import { IModelStatus } from '../../../../interfaces/vehicle-model/imodel-status
   imports: [CommonModule, FormsModule, ReactiveFormsModule,
     TableModule, NgOptimizedImage, TagModule,
     ButtonModule, CardModule, DialogModule, InputTextModule,
-    RadioButtonModule, DropdownModule],
-  providers: [],
+    RadioButtonModule, DropdownModule, ToastModule, ImageModule],
+  providers: [MessageService],
   templateUrl: './vehicle.model.register.component.html',
   styleUrl: './vehicle.model.register.component.scss'
 })
 export default class VehicleModelRegisterComponent implements OnInit, OnDestroy {
-  private user: User;
+
+
+  RESPONSE_SUCCESS: string = "Success.";
+  IMAGE_MAX_SIZE: number = 4243795;
+
   private modelVehicle: ModelVehicle;
   private modelVehicleStatus: IModelStatus = null;
 
   dialogVisible: boolean = false;
-
   statuses!: any[];
-
   selectedFile: any = null;
-
-  pathFile: string = "assets/layout/images/picture.png";
-
+  photoModel!: string;
   modelVehicles: ModelVehicle[] = [];
-
   selectedItems: ModelVehicle[] = [];
 
   formModel = new FormGroup({
+    companyId: new FormControl<number>(0),
+    resaleId: new FormControl<number>(0),
     id: new FormControl<number>(0),
     description: new FormControl<string>('', Validators.required),
     status: new FormControl<string>('', Validators.required),
@@ -65,22 +71,19 @@ export default class VehicleModelRegisterComponent implements OnInit, OnDestroy 
 
   constructor(
     private serviceModel: VehicleModelService,
-    public layoutService: LayoutService,
     private storageService: StorageService,
-    private router: Router,
-    private userService: UserService) { }
-  ngOnInit(): void {
-    this.userService.getUser$().subscribe(data => {
-      this.user = data;
-    });
-    //  this.modelVehicle = new ModelVehicle();
+    private messageService: MessageService,
+    private ngxImageCompressService: NgxImageCompressService) { }
 
-    this.listaModel();
+  ngOnInit(): void {
 
     this.statuses = [
       { label: 'ativo', value: 'ativo' },
       { label: 'inativo', value: 'inativo' }
     ];
+
+    this.modelVehicle = new ModelVehicle();
+    this.listaModel();
   }
   ngOnDestroy(): void {
 
@@ -104,59 +107,49 @@ export default class VehicleModelRegisterComponent implements OnInit, OnDestroy 
     this.dialogVisible = false;
   }
   showDialog() {
-
-    this.pathFile = "assets/layout/images/picture.png";
-    this.dialogVisible = true;
     this.formModel.patchValue({
-      id: null,
+      companyId: 0,
+      resaleId: 0,
+      id: 0,
       description: '',
       status: 'ativo',
-      photo: null
+      photo: ""
     });
+    this.photoModel = "";
+    this.dialogVisible = true;
   }
   showDialogEditar(modelo: ModelVehicle) {
-
     this.formModel.patchValue({
+      companyId: modelo.companyId,
+      resaleId: modelo.resaleId,
       id: modelo.id,
       description: modelo.description,
       status: modelo.status,
-      photo: modelo.photo
+      photo: modelo.photo ?? ""
     });
-
-    if (modelo.photo) {
-      this.pathFile = "data:image/png;base64," + modelo.photo;
-    } else {
-      this.pathFile = "assets/layout/images/picture.png";
-    }
-
+    this.photoModel = modelo.photo ?? "";
     this.dialogVisible = true;
   }
-  onSelectFile(event: any) {
-    const file = event.target.files[0];
+  public async onSelectFile() {
 
-    if (file) {
+    this.ngxImageCompressService.uploadFile().then(({ image, orientation }) => {
+      if (this.ngxImageCompressService.byteCount(image) > this.IMAGE_MAX_SIZE) {
+        this.messageService.add({ severity: 'error', summary: 'Imagem', detail: 'Tamanha máximo 3MB', icon: 'pi pi-times', life: 3000 });
+      } else {
+        this.ngxImageCompressService.compressFile(image, orientation, 50, 40).then((compressedImage) => {
 
-      var reader = new FileReader();
-      reader.readAsDataURL(file);
-
-      reader.onload = (event: any) => {
-
-        this.pathFile = event.target.result;
-
-        //image byte
-        const byteImg = event.target.result.split('base64,')[1];
-
-        this.formModel.patchValue({ photo: byteImg });
-      };
-
-      this.selectedFile = file;
-
-    }
+          // Remover o prefixo "data:image/jpeg;base64," se existir
+          const base64Data = compressedImage.split(',')[1];
+          this.photoModel = base64Data;
+          this.formModel.patchValue({ photo: this.photoModel });
+        });
+      }
+    });
 
   }
   deleteFile() {
-    this.pathFile = "assets/layout/images/picture.png";
-    this.formModel.patchValue({ photo: null });
+    this.formModel.patchValue({ photo: "" });
+    this.photoModel = "";
   }
   public updateStatus(model: ModelVehicle) {
 
@@ -190,31 +183,30 @@ export default class VehicleModelRegisterComponent implements OnInit, OnDestroy 
     const { valid, value } = this.formModel;
     if (valid) {
 
-      if (value.id == null) {
+      if (value.id == 0) {
         //Save
-
-        this.modelVehicle.companyId = this.user.companyId;
-        this.modelVehicle.resaleId = this.user.resaleId;
+        this.modelVehicle.companyId = this.storageService.companyId;
+        this.modelVehicle.resaleId = this.storageService.resaleId;
         this.modelVehicle.status = value.status;
         this.modelVehicle.description = value.description;
         this.modelVehicle.photo = value.photo;
 
-        this.serviceModel.addModel$(this.modelVehicle).subscribe((data) => {
-          if (data.status == 201) {
-            this.hideDialog();
-            this.formModel.reset;
-            this.listaModel();
-          }
-
-        }, (error) => {
-
+        this.serviceModel.addModel$(this.modelVehicle).subscribe({
+          next: (data) => {
+            if (data.status == 201) {
+              this.hideDialog();
+              this.formModel.reset;
+              this.listaModel();
+            }
+          },
+          error: (error) => { },
+          complete: () => { }
         });
 
       } else {
         //Update
-
-        this.modelVehicle.companyId = this.user.companyId;
-        this.modelVehicle.resaleId = this.user.resaleId;
+        this.modelVehicle.companyId = value.companyId;
+        this.modelVehicle.resaleId = value.resaleId;
         this.modelVehicle.id = value.id;
         this.modelVehicle.status = value.status;
         this.modelVehicle.description = value.description;

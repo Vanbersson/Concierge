@@ -2,9 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule, UpperCasePipe } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { Validators, FormsModule, ReactiveFormsModule, FormGroup, FormControl } from '@angular/forms';
-
-//Camera
-import { Camera, CameraResultType, Photo } from '@capacitor/camera';
+import { NgxImageCompressService } from 'ngx-image-compress';
 
 //PrimeNg
 import { TabViewModule } from 'primeng/tabview';
@@ -12,8 +10,6 @@ import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextareaModule } from 'primeng/inputtextarea';
 import { InputTextModule } from 'primeng/inputtext';
 import { ButtonModule } from 'primeng/button';
-
-
 import { InputMaskModule } from 'primeng/inputmask';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { RadioButtonModule } from 'primeng/radiobutton';
@@ -30,8 +26,6 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { SpeedDialModule } from 'primeng/speeddial';
 import { CheckboxModule } from 'primeng/checkbox';
 import { TimelineModule } from 'primeng/timeline';
-import { NgxImageCompressService } from 'ngx-image-compress';
-
 
 //Service
 import { VehicleService } from '../../../services/vehicle/vehicle.service';
@@ -44,7 +38,7 @@ import { IBudgetNew } from '../../../interfaces/budget/ibudget-new';
 import { IColor } from '../../../interfaces/icolor';
 
 //Constants
-import { STATUS_VEHICLE_ENTRY_NOTAUTH, STATUS_VEHICLE_ENTRY_FIRSTAUTH, STATUS_VEHICLE_ENTRY_AUTHORIZED } from '../../../util/constants';
+import { STATUS_VEHICLE_ENTRY_NOTAUTH, STATUS_VEHICLE_ENTRY_FIRSTAUTH, STATUS_VEHICLE_ENTRY_AUTHORIZED, MESSAGE_RESPONSE_NOT_CLIENT, MESSAGE_RESPONSE_NOT_ATTENDANT, MESSAGE_RESPONSE_NOT_DRIVEREXIT } from '../../../util/constants';
 
 //Class
 import { User } from '../../../models/user/user';
@@ -58,15 +52,19 @@ import { BudgetService } from '../../../services/budget/budget.service';
 import { LayoutService } from '../../../layouts/layout/service/layout.service';
 import { VehicleEntryAuth } from '../../../models/vehicle/vehicle-entry-auth';
 import { BusyService } from '../../../components/loading/busy.service';
-
+import { lastValueFrom } from 'rxjs';
+import { HttpResponse } from '@angular/common/http';
+import { IBudget } from '../../../interfaces/budget/ibudget';
 
 interface EventItem {
   description?: string;
   icon?: string;
   color?: string;
-
 }
-
+interface IModel {
+  description: string,
+  id: number
+}
 
 @Component({
   selector: 'app-manutencao',
@@ -83,7 +81,6 @@ export default class ManutencaoComponent implements OnInit {
 
   stepEntry: EventItem[];
 
-  private user: User;
   private vehicleEntry: VehicleEntry;
   public id: number = 0;
   //Vehicle
@@ -98,7 +95,7 @@ export default class ManutencaoComponent implements OnInit {
     color: new FormControl<IColor[]>([], Validators.required),
     kmEntry: new FormControl<string | null>(''),
     kmExit: new FormControl<string | null>(''),
-    modelVehicle: new FormControl<ModelVehicle[]>([], Validators.required),
+    modelVehicle: new FormControl<IModel[] | null>([], Validators.required),
     dateEntry: new FormControl<Date | null>(null, Validators.required),
     datePrevisionExit: new FormControl<Date | null>(null),
 
@@ -130,8 +127,8 @@ export default class ManutencaoComponent implements OnInit {
     information: new FormControl<string>('')
   });
   public cores: IColor[] = []
-  public modelVehicles: ModelVehicle[] = [];
-  private modelVehicle: ModelVehicle;
+  public modelVehicles: IModel[] = [];
+
   public attendantsUser: User[] = [];
   private attendantUser: User;
   photoVehicle1!: string;
@@ -217,46 +214,16 @@ export default class ManutencaoComponent implements OnInit {
     private busyService: BusyService,
     private ngxImageCompressService: NgxImageCompressService
 
-  ) { }
+  ) {
+
+  }
 
   ngOnInit(): void {
-    this.busyService.busy();
 
     //Id vehicle entry
     this.id = this.activatedRoute.snapshot.params['id'];
 
-    //get User
-    this.userService.getUser$().subscribe(data => {
-      this.user = data;
-    });
-
-    //UserAttendant
-    this.userService.getUserFilterRoleId$(2).subscribe((data) => {
-      this.attendantsUser = data;
-    });
-
-    //models vehicle enabled
-    this.vehicleModelService.getAllEnabled$().subscribe((data) => {
-      this.modelVehicles = data;
-    });
-
-    this.vehicleService.entryFilterId$(this.id).subscribe((data) => {
-      if (data.status == 200) {
-        this.vehicleEntry = data.body;
-        this.stepEvent(this.vehicleEntry.stepEntry);
-        this.loadForms();
-      }
-    }, error => {
-      this.busyService.idle();
-      if (error.status == 404) {
-        this.messageService.add({ severity: 'error', summary: 'Erro', detail: "Vaículo não encontrado", icon: 'pi pi-times' });
-        setTimeout(() => {
-          this.router.navigateByUrl("/portaria/veiculos");
-        }, 2000)
-      } else {
-        this.router.navigateByUrl("/");
-      }
-    });
+    this.init();
 
     this.cores = [
       { color: 'Branco' },
@@ -276,7 +243,7 @@ export default class ManutencaoComponent implements OnInit {
         icon: 'pi pi-thumbs-up',
         tooltipOptions: { tooltipLabel: 'Autorizar Saída' },
         command: () => {
-          this.addAuthorization();
+          this.authExit();
         }
       },
       {
@@ -303,9 +270,57 @@ export default class ManutencaoComponent implements OnInit {
     ];
 
     this.disableInput();
-
   }
 
+  private async init() {
+    //Show load
+    this.busyService.busy();
+
+    //Attendant
+    this.attendantsUser = await this.getUserRole();
+
+    //Model
+    const modelResult = await this.getVehicleModel();
+    for (var item of modelResult) {
+      this.modelVehicles.push({ id: item.id, description: item.description });
+    }
+
+    const vehicleResult = await this.getVehicleEntry();
+    //Close load
+    this.busyService.idle();
+
+    if (vehicleResult.status == 200) {
+      this.vehicleEntry = vehicleResult.body;
+      this.loadForms();
+    } else {
+      this.messageService.add({ severity: 'error', summary: 'Erro', detail: "Vaículo não encontrado", icon: 'pi pi-times' });
+      setTimeout(() => {
+        this.router.navigateByUrl("/portaria/lista-entrada-veiculo");
+      }, 2000)
+    }
+
+  }
+  private async getUserRole(): Promise<User[]> {
+    try {
+      return await lastValueFrom(this.userService.getUserFilterRoleId$(2));
+    } catch (error) {
+      return [];
+    }
+  }
+  private async getVehicleModel(): Promise<ModelVehicle[]> {
+    try {
+      return await lastValueFrom(this.vehicleModelService.getAllEnabled$());
+    } catch (error) {
+      return [];
+    }
+  }
+  private async getVehicleEntry(): Promise<HttpResponse<VehicleEntry>> {
+    try {
+      return await lastValueFrom(this.vehicleService.entryFilterId$(this.id));
+    } catch (error) {
+      return error;
+    }
+  }
   private stepEvent(event: string) {
 
     switch (event) {
@@ -366,16 +381,6 @@ export default class ManutencaoComponent implements OnInit {
     }
 
   }
-  private async openCamera(): Promise<Photo> {
-
-    const image = await Camera.getPhoto({
-      quality: 80,
-      allowEditing: false,
-      resultType: CameraResultType.DataUrl
-    });
-    return image;
-  }
-
   private disableInput() {
     this.formVehicle.get('nameUserExitAuth1').disable();
     this.formVehicle.get('nameUserExitAuth2').disable();
@@ -383,15 +388,13 @@ export default class ManutencaoComponent implements OnInit {
   private enableInput() {
     this.formVehicle.get('nameUserExitAuth1').enable();
     this.formVehicle.get('nameUserExitAuth2').enable();
-  }
-  private async loadForms() {
-    //Form vehicle
 
-    for (var model of this.modelVehicles) {
-      if (model.id == this.vehicleEntry.modelId) {
-        this.modelVehicle = model;
-      }
-    }
+  }
+
+  private loadForms() {
+
+    this.stepEvent(this.vehicleEntry.stepEntry);
+
     for (var attendant of this.attendantsUser) {
       if (attendant.id == this.vehicleEntry.idUserAttendant) {
         this.attendantUser = attendant;
@@ -405,7 +408,7 @@ export default class ManutencaoComponent implements OnInit {
       color: [{ color: this.vehicleEntry.color }],
       placa: this.vehicleEntry.placa,
       frota: this.vehicleEntry.frota,
-      modelVehicle: [this.modelVehicle],
+      modelVehicle: [{ id: this.vehicleEntry.modelId, description: this.vehicleEntry.modelDescription }],
       kmEntry: this.vehicleEntry.kmEntry == "" ? null : this.vehicleEntry.kmEntry,
       kmExit: this.vehicleEntry.kmExit == "" ? null : this.vehicleEntry.kmExit,
       serviceOrder: this.vehicleEntry.serviceOrder,
@@ -525,7 +528,6 @@ export default class ManutencaoComponent implements OnInit {
 
     }
 
-    this.busyService.idle();
   }
   //Vehicle
   public placaRequiredAdd() {
@@ -685,52 +687,172 @@ export default class ManutencaoComponent implements OnInit {
     this.addRequireDriverExitCpf();
     this.addRequireDriverExitRg();
   }
-  public deleteAuth1() {
+  public async authExit() {
+    const uppercase = new UpperCasePipe();
+    if (this.formVehicle.value.statusAuthExit != this.authorized) {
+
+      this.busyService.busy();
+
+      var auth = new VehicleEntryAuth();
+      auth.idVehicle = this.vehicleEntry.id;
+      auth.idUserExitAuth = this.storageService.id;
+      auth.nameUserExitAuth = this.storageService.name;
+      // auth.dateExitAuth = "";
+
+      const permissionResult = await this.addAuthExit(auth);
+      if (permissionResult.status == 200) {
+
+        if (this.formVehicle.value.statusAuthExit == this.notAuth) {
+          this.formVehicle.patchValue({
+            statusAuthExit: this.firstAuth,
+          })
+        } else if (this.formVehicle.value.statusAuthExit == this.firstAuth) {
+          this.formVehicle.patchValue({
+            statusAuthExit: this.authorized,
+          })
+        }
+
+        if (this.formVehicle.value.idUserExitAuth1 == 0) {
+          this.formVehicle.patchValue({
+            idUserExitAuth1: permissionResult.body.idUserExitAuth,
+            nameUserExitAuth1: permissionResult.body.nameUserExitAuth,
+            dateExitAuth1: permissionResult.body.dateExitAuth
+          });
+
+          this.dateExitAuth1 = permissionResult.body.dateExitAuth;
+        } else {
+          this.formVehicle.patchValue({
+            idUserExitAuth2: permissionResult.body.idUserExitAuth,
+            nameUserExitAuth2: permissionResult.body.nameUserExitAuth,
+            dateExitAuth2: permissionResult.body.dateExitAuth
+          });
+          this.dateExitAuth2 = permissionResult.body.dateExitAuth;
+        }
+        //Valid
+        this.addRequireForms();
+
+        if (this.formVehicle.value.vehicleNew == 'yes') {
+          //Autorização de saída
+          if (this.formVehicle.value.statusAuthExit == this.firstAuth) {
+            this.messageService.add({ severity: 'success', summary: 'Veículo Autorizado', detail: 'Veículo NOVO', icon: 'pi pi-check-circle' });
+          }
+          //Saída liberada
+          if (this.formVehicle.value.statusAuthExit == this.authorized) {
+            this.messageService.add({ severity: 'success', summary: 'Veículo Liberado', detail: 'Veículo NOVO', icon: 'pi pi-thumbs-up-fill' });
+          }
+        } else {
+          //Autorização de saída
+          if (this.formVehicle.value.statusAuthExit == this.firstAuth) {
+            this.messageService.add({ severity: 'success', summary: 'Veículo Autorizado', detail: 'Placa ' + uppercase.transform(this.formVehicle.value.placa), icon: 'pi pi-check-circle' });
+          }
+
+          //Saída liberada
+          if (this.formVehicle.value.statusAuthExit == this.authorized) {
+            this.messageService.add({ severity: 'success', summary: 'Veículo Liberado', detail: 'Placa ' + uppercase.transform(this.formVehicle.value.placa), icon: 'pi pi-thumbs-up-fill' });
+          }
+        }
+
+      }
+
+    } else {
+      this.messageService.add({ severity: 'info', summary: 'Veículo Liberado', detail: "Placa " + uppercase.transform(this.formVehicle.value.placa), icon: 'pi pi-thumbs-up-fill' });
+    }
+
+    this.busyService.idle();
+
+  }
+  private async addAuthExit(auth: VehicleEntryAuth): Promise<HttpResponse<VehicleEntryAuth>> {
+    try {
+      return await lastValueFrom(this.vehicleService.entryAddAuth(auth));
+    } catch (error) {
+
+      if (error.error.message == MESSAGE_RESPONSE_NOT_CLIENT) {
+        this.showClientCompany();
+      } else if (error.error.message == MESSAGE_RESPONSE_NOT_ATTENDANT) {
+        this.showUserAttendant();
+      } else if (error.error.message == MESSAGE_RESPONSE_NOT_DRIVEREXIT) {
+        this.messageService.add({ severity: 'error', summary: 'Motorista Saída', detail: "Não informado", icon: 'pi pi-times' });
+      } else if (error.error.message == "Permission not informed.") {
+        this.permissionNot();
+      } else {
+        this.messageService.add({ severity: 'error', summary: 'Erro', detail: "Não autorizado", icon: 'pi pi-times' });
+      }
+      return error;
+    }
+  }
+  public async deleteAuth1() {
     if (this.formVehicle.value.idUserExitAuth1 != 0) {
       var auth = new VehicleEntryAuth();
       auth.idVehicle = this.id;
-      auth.idUserExitAuth = this.user.id;
-      auth.nameUserExitAuth = this.user.name;
-      this.vehicleService.entryDeleteAuth1(auth).subscribe((data) => {
-        if (data.body == this.RESPONSE_SUCCESS) {
-          this.messageService.add({ severity: 'success', summary: 'Autorização', detail: 'Removida com sucesso', icon: 'pi pi-check' });
-          this.formVehicle.patchValue({
-            idUserExitAuth1: 0,
-            nameUserExitAuth1: '',
-            dateExitAuth1: null
-          });
+      auth.idUserExitAuth = this.storageService.id;
+      auth.nameUserExitAuth = this.storageService.name;
 
-          this.dateExitAuth1 = "";
-          this.updateAuthExitStatus();
-        }
-      }, error => {
+      const authResult = await this.delAuth1(auth);
 
-      });
+      if (authResult.status == 200) {
+        this.messageService.add({ severity: 'success', summary: 'Autorização', detail: 'Removida com sucesso', icon: 'pi pi-check' });
+        this.formVehicle.patchValue({
+          idUserExitAuth1: 0,
+          nameUserExitAuth1: '',
+          dateExitAuth1: null
+        });
+
+        this.dateExitAuth1 = "";
+        this.updateAuthExitStatus();
+      }
+
     }
   }
-  public deleteAuth2() {
+  private async delAuth1(auth: VehicleEntryAuth): Promise<HttpResponse<VehicleEntryAuth>> {
+    try {
+
+      return await lastValueFrom(this.vehicleService.entryDeleteAuth1(auth));
+    } catch (error) {
+      if (error.error.message == "Permission not informed.") {
+        this.permissionNot();
+      } else if (error.error.message == "Authorization of another user.") {
+        this.messageService.add({ severity: 'error', summary: 'Permissão', detail: "Autorização de outro usuário", icon: 'pi pi-times' });
+      }
+      return error;
+    }
+  }
+
+  public async deleteAuth2() {
     if (this.formVehicle.value.idUserExitAuth2 != 0) {
       var auth = new VehicleEntryAuth();
       auth.idVehicle = this.id;
-      auth.idUserExitAuth = this.user.id;
-      auth.nameUserExitAuth = this.user.name;
-      this.vehicleService.entryDeleteAuth2(auth).subscribe((data) => {
-        if (data.body == this.RESPONSE_SUCCESS) {
-          this.messageService.add({ severity: 'success', summary: 'Autorização', detail: 'Removida com sucesso', icon: 'pi pi-check' });
-          this.formVehicle.patchValue({
-            idUserExitAuth2: 0,
-            nameUserExitAuth2: '',
-            dateExitAuth2: null
-          });
+      auth.idUserExitAuth = this.storageService.id;
+      auth.nameUserExitAuth = this.storageService.name;
 
-          this.dateExitAuth2 = "";
-          this.updateAuthExitStatus();
-        }
-      }, error => {
+      const authResult = await this.delAuth2(auth);
+      if (authResult.status == 200) {
+        this.messageService.add({ severity: 'success', summary: 'Autorização', detail: 'Removida com sucesso', icon: 'pi pi-check' });
+        this.formVehicle.patchValue({
+          idUserExitAuth2: 0,
+          nameUserExitAuth2: '',
+          dateExitAuth2: null
+        });
 
-      });
+        this.dateExitAuth2 = "";
+        this.updateAuthExitStatus();
+      }
+
     }
   }
+  private async delAuth2(auth: VehicleEntryAuth): Promise<HttpResponse<VehicleEntryAuth>> {
+    try {
+
+      return await lastValueFrom(this.vehicleService.entryDeleteAuth2(auth));
+    } catch (error) {
+      if (error.error.message == "Permission not informed.") {
+        this.permissionNot();
+      } else if (error.error.message == "Authorization of another user.") {
+        this.messageService.add({ severity: 'error', summary: 'Permissão', detail: "Autorização de outro usuário", icon: 'pi pi-times' });
+      }
+      return error;
+    }
+  }
+
   private showUserAttendant() {
     this.messageService.add({ severity: 'error', summary: 'Consultor', detail: "Não informado", icon: 'pi pi-times' });
   }
@@ -1086,6 +1208,7 @@ export default class ManutencaoComponent implements OnInit {
     if (this.vehicleEntry.budgetStatus != "semOrcamento") {
       this.router.navigateByUrl("/oficina/manutencao-orcamento/" + this.formVehicle.value.id);
     } else {
+
       this.confirmationService.confirm({
         header: 'Confirmar',
         message: 'Gerar um orçamento.',
@@ -1095,35 +1218,18 @@ export default class ManutencaoComponent implements OnInit {
         rejectLabel: 'Não',
         acceptButtonStyleClass: 'p-button-outlined p-button-sm',
         acceptLabel: 'Sim',
-        accept: () => {
+        accept: async () => {
 
           this.budget = { vehicleEntryId: this.formVehicle.value.id };
-          this.budgetService.addBudget$(this.budget).subscribe((data) => {
-            if (data.status == 201) {
-              this.vehicleEntry.budgetStatus = data.body.status;
-              this.messageService.add({ severity: 'info', summary: 'Orçamento - ' + data.body.id, detail: 'Gerado com sucesso', life: 3000 });
-              setTimeout(() => {
-                this.router.navigateByUrl('/oficina/manutencao-orcamento/' + this.formVehicle.value.id);
-              }, 3000);
-            }
 
-          }, error => {
-            const CLIENTCOMPANY = "ClientCompany not informed.";
-            const ATTENDANT = "Attendant not informed.";
-            const SERVICEORDER = "Equal service order not.";
-            if (error.status == 401) {
-              if (error.error.messageError == CLIENTCOMPANY) {
-                this.messageService.add({ severity: 'error', summary: 'Empresa', detail: "Não informada", icon: 'pi pi-times' });
-              }
-              if (error.error.messageError == ATTENDANT) {
-                this.messageService.add({ severity: 'error', summary: 'Consultor', detail: "Não informado", icon: 'pi pi-times' });
-              }
-              if (error.error.messageError == SERVICEORDER) {
-                this.messageService.add({ severity: 'error', summary: 'Ordem Serviço', detail: "Informado não", icon: 'pi pi-times' });
-              }
-            }
-
-          });
+          const budgetResult = await this.saveBudget(this.budget);
+          if (budgetResult.status == 201) {
+            this.vehicleEntry.budgetStatus = budgetResult.body.status;
+            this.messageService.add({ severity: 'info', summary: 'Orçamento - ' + budgetResult.body.id, detail: 'Gerado com sucesso', life: 3000 });
+            setTimeout(() => {
+              this.router.navigateByUrl('/oficina/manutencao-orcamento/' + this.formVehicle.value.id);
+            }, 3000);
+          }
 
         }/* ,
         reject: () => {
@@ -1132,6 +1238,26 @@ export default class ManutencaoComponent implements OnInit {
       });
     }
   }
+
+  private async saveBudget(budget: IBudgetNew): Promise<HttpResponse<IBudget>> {
+    try {
+      return await lastValueFrom(this.budgetService.addBudget$(this.budget));
+    } catch (error) {
+      const SERVICEORDER = "Equal service order not.";
+      if (error.error.message == MESSAGE_RESPONSE_NOT_CLIENT) {
+        this.messageService.add({ severity: 'error', summary: 'Empresa', detail: "Não informada", icon: 'pi pi-times' });
+      } else if (error.error.message == MESSAGE_RESPONSE_NOT_ATTENDANT) {
+        this.messageService.add({ severity: 'error', summary: 'Consultor', detail: "Não informado", icon: 'pi pi-times' });
+      } else if (error.error.message == SERVICEORDER) {
+        this.messageService.add({ severity: 'error', summary: 'Ordem Serviço', detail: "Informado não", icon: 'pi pi-times' });
+      } else if (error.error.message == "Permission not informed.") {
+        this.permissionNot();
+      }
+
+      return error;
+    }
+  }
+
   //Save Vehicle Entry
   private validForms(): boolean {
     const vehicleValue = this.formVehicle.value;
@@ -1295,22 +1421,21 @@ export default class ManutencaoComponent implements OnInit {
           this.disableInput();
         }
       }, (error) => {
-        const CLIENTCOMPANY = "ClientCompany not informed.";
-        const ATTENDANT = "Attendant not informed.";
+
         const BUDGET_ATTENDANT = "BUDGET-Attendant not informed.";
         const BUDGET_CLIENTCOMPANY = "BUDGET-ClientCompany not informed.";
         if (error.status == 401) {
-          if (error.error.messageError == ATTENDANT) {
+          if (error.error.message == MESSAGE_RESPONSE_NOT_ATTENDANT) {
             this.showUserAttendant();
           }
-          if (error.error.messageError == CLIENTCOMPANY) {
+          if (error.error.message == MESSAGE_RESPONSE_NOT_CLIENT) {
             this.showClientCompany();
           }
-          if (error.error.messageError == BUDGET_ATTENDANT) {
+          if (error.error.message == BUDGET_ATTENDANT) {
             this.messageService.add({ severity: 'info', summary: 'Informação', detail: "Véiculo possui orçamento" });
             this.showUserAttendant();
           }
-          if (error.error.messageError == BUDGET_CLIENTCOMPANY) {
+          if (error.error.message == BUDGET_CLIENTCOMPANY) {
             this.messageService.add({ severity: 'info', summary: 'Informação', detail: "Véiculo possui orçamento" });
             this.showClientCompany();
 
@@ -1322,92 +1447,10 @@ export default class ManutencaoComponent implements OnInit {
     }
 
   }
-  //Add Auth
-  public addAuthorization() {
-    const uppercase = new UpperCasePipe();
-    if (this.formVehicle.value.statusAuthExit != this.authorized) {
-      var auth = new VehicleEntryAuth();
-      auth.idVehicle = this.vehicleEntry.id;
-      auth.idUserExitAuth = this.user.id;
-      auth.nameUserExitAuth = this.user.name;
-      auth.dateExitAuth = "";
 
-      this.vehicleService.entryAddAuth(auth).subscribe((data) => {
-        if (data.status == 200) {
-          if (this.formVehicle.value.statusAuthExit == this.notAuth) {
-            this.formVehicle.patchValue({
-              statusAuthExit: this.firstAuth,
-            })
-          } else if (this.formVehicle.value.statusAuthExit == this.firstAuth) {
-            this.formVehicle.patchValue({
-              statusAuthExit: this.authorized,
-            })
-          }
-
-          if (this.formVehicle.value.idUserExitAuth1 == 0) {
-            this.formVehicle.patchValue({
-              idUserExitAuth1: data.body.idUserExitAuth,
-              nameUserExitAuth1: data.body.nameUserExitAuth,
-              dateExitAuth1: data.body.dateExitAuth
-            });
-
-            this.dateExitAuth1 = data.body.dateExitAuth;
-          } else {
-            this.formVehicle.patchValue({
-              idUserExitAuth2: data.body.idUserExitAuth,
-              nameUserExitAuth2: data.body.nameUserExitAuth,
-              dateExitAuth2: data.body.dateExitAuth
-            });
-            this.dateExitAuth2 = data.body.dateExitAuth;
-          }
-          //Valid
-          this.addRequireForms();
-
-          if (this.formVehicle.value.vehicleNew == 'yes') {
-            //Autorização de saída
-            if (this.formVehicle.value.statusAuthExit == this.firstAuth) {
-              this.messageService.add({ severity: 'success', summary: 'Veículo Autorizado', detail: 'Veículo NOVO', icon: 'pi pi-check-circle' });
-            }
-            //Saída liberada
-            if (this.formVehicle.value.statusAuthExit == this.authorized) {
-              this.messageService.add({ severity: 'success', summary: 'Veículo Liberado', detail: 'Veículo NOVO', icon: 'pi pi-thumbs-up-fill' });
-            }
-          } else {
-            //Autorização de saída
-            if (this.formVehicle.value.statusAuthExit == this.firstAuth) {
-              this.messageService.add({ severity: 'success', summary: 'Veículo Autorizado', detail: 'Placa ' + uppercase.transform(this.formVehicle.value.placa), icon: 'pi pi-check-circle' });
-            }
-
-            //Saída liberada
-            if (this.formVehicle.value.statusAuthExit == this.authorized) {
-              this.messageService.add({ severity: 'success', summary: 'Veículo Liberado', detail: 'Placa ' + uppercase.transform(this.formVehicle.value.placa), icon: 'pi pi-thumbs-up-fill' });
-            }
-          }
-
-        }
-
-      }, error => {
-        if (error.status == 401) {
-          const CLIENTCOMPANY = "ClientCompany not informed.";
-          const ATTENDANT = "Attendant not informed.";
-          const DRIVEREXIT = "DriverExit not informed.";
-          if (error.status == 401) {
-            if (error.error.messageError == CLIENTCOMPANY) {
-              this.showClientCompany();
-            } else if (error.error.messageError == ATTENDANT) {
-              this.showUserAttendant();
-            } else if (error.error.messageError == DRIVEREXIT) {
-              this.messageService.add({ severity: 'error', summary: 'Motorista Saída', detail: "Não informado", icon: 'pi pi-times' });
-            }
-          }
-        }
-
-      });
-
-    } else {
-      this.messageService.add({ severity: 'info', summary: 'Veículo Liberado', detail: "Placa " + uppercase.transform(this.formVehicle.value.placa), icon: 'pi pi-thumbs-up-fill' });
-    }
+  //Permission Not
+  private permissionNot() {
+    this.messageService.add({ severity: 'error', summary: 'Permissão', detail: "Você não tem permissão", icon: 'pi pi-times' });
   }
-
 
 }

@@ -21,15 +21,14 @@ import { LayoutService } from '../../../layouts/layout/service/layout.service';
 import { VehicleService } from '../../../services/vehicle/vehicle.service';
 
 //Constants
-import { STATUS_VEHICLE_ENTRY_NOTAUTH, STATUS_VEHICLE_ENTRY_FIRSTAUTH, STATUS_VEHICLE_ENTRY_AUTHORIZED } from '../../../util/constants';
+import { STATUS_VEHICLE_ENTRY_NOTAUTH, STATUS_VEHICLE_ENTRY_FIRSTAUTH, STATUS_VEHICLE_ENTRY_AUTHORIZED, MESSAGE_RESPONSE_NOT_CLIENT, MESSAGE_RESPONSE_NOT_ATTENDANT, MESSAGE_RESPONSE_NOT_DRIVEREXIT } from '../../../util/constants';
 import { StorageService } from '../../../services/storage/storage.service';
 import { VehicleEntryAuth } from '../../../models/vehicle/vehicle-entry-auth';
-import { User } from '../../../models/user/user';
-import { UserService } from '../../../services/user/user.service';
+
 import { lastValueFrom } from 'rxjs';
 import { HttpResponse } from '@angular/common/http';
 import { BusyService } from '../../../components/loading/busy.service';
-import { error } from 'console';
+import { TaskService } from '../../../services/task/task.service';
 
 @Component({
   selector: 'app-veiculos',
@@ -41,8 +40,6 @@ import { error } from 'console';
 })
 export default class VeiculosComponent implements OnInit, OnDestroy {
 
-  private user: User;
-
   notAuth = STATUS_VEHICLE_ENTRY_NOTAUTH;
   firstAuth = STATUS_VEHICLE_ENTRY_FIRSTAUTH;
   authorized = STATUS_VEHICLE_ENTRY_AUTHORIZED;
@@ -52,25 +49,16 @@ export default class VeiculosComponent implements OnInit, OnDestroy {
   listVehicleEntry: VehicleEntry[] = [];
   selectedItems: VehicleEntry[] = [];
 
-  private intervalId: any;
-
-  constructor(private userService: UserService,
+  constructor(
     private vehicleService: VehicleService,
     public layoutService: LayoutService,
     private storageService: StorageService,
     private router: Router,
     private messageService: MessageService,
-    private busyService: BusyService) {
+    private busyService: BusyService,
+    private taskService: TaskService) { }
 
-
-    //get User
-    this.userService.getUser$().subscribe(data => {
-      this.user = data;
-    });
-  }
   ngOnInit(): void {
-
-    this.listVehicles();
 
     this.statusOrcamento = [
       { label: 'Sem Orçamento', value: 'Sem Orçamento' },
@@ -85,35 +73,29 @@ export default class VeiculosComponent implements OnInit, OnDestroy {
       { label: '1ª Liberação', value: this.firstAuth },
       { label: 'Liberado', value: this.authorized }
     ];
-    this.taskVehicles();
+
+    this.listVehicles();
+    this.taskService.startTask(() => this.listTaskVehicle(), 20000);
   }
   ngOnDestroy(): void {
-    if (this.intervalId) {
-      clearInterval(this.intervalId); // Para o setInterval
-    }
+    this.taskService.stopTask();
   }
-  private taskVehicles(): Promise<void> {
-    return new Promise(() => {
-      this.intervalId = setInterval(() => {
-        this.listV();
-      }, 20000);
+
+  private listTaskVehicle() {
+    this.vehicleService.allPendingAuthorization$().subscribe({
+      next: (data) => {
+        for (let index = 0; index < data.length; index++) {
+          data[index] = this.preList(data[index]);
+        }
+        this.listVehicleEntry = data;
+      },
+      error: (data) => { },
+      complete: () => { }
     });
 
   }
 
-  private listV() {
-
-    this.vehicleService.allPendingAuthorization$().subscribe(data => {
-      for (let index = 0; index < data.length; index++) {
-        data[index] = this.preListV(data[index]);
-      }
-      this.listVehicleEntry = data;
-    }, error => {
-      this.messageService.add({ severity: 'error', summary: 'Servidor', detail: "Não disponível", icon: 'pi pi-times' });
-    });
-  }
-
-  private preListV(vehicle: VehicleEntry): VehicleEntry {
+  private preList(vehicle: VehicleEntry): VehicleEntry {
 
     if (vehicle.vehicleNew == "yes") {
       vehicle.placa = "NOVO";
@@ -156,7 +138,7 @@ export default class VeiculosComponent implements OnInit, OnDestroy {
     this.vehicleService.allPendingAuthorization$().subscribe((data) => {
 
       for (let index = 0; index < data.length; index++) {
-        data[index] = this.preListV(data[index]);
+        data[index] = this.preList(data[index]);
       }
       this.listVehicleEntry = data;
       this.busyService.idle();
@@ -165,6 +147,7 @@ export default class VeiculosComponent implements OnInit, OnDestroy {
       this.messageService.add({ severity: 'error', summary: 'Servidor', detail: "Não disponível", icon: 'pi pi-times' });
     });
   }
+
   getSeverity(value: string): any {
 
     switch (value) {
@@ -189,12 +172,13 @@ export default class VeiculosComponent implements OnInit, OnDestroy {
   public addAuthorizationAll() {
     for (let index = 0; index < this.selectedItems.length; index++) {
       const element = this.selectedItems[index];
-      this.authorization(element);
+      this.authExit(element);
     }
   }
-  public async authorization(vehicle: VehicleEntry) {
+  public async authExit(vehicle: VehicleEntry) {
+
     if (vehicle.statusAuthExit != this.authorized) {
-      var result = await this.addAuthorization(vehicle);
+      var result = await this.addAuthExit(vehicle);
 
       if (result.status == 200) {
         if (vehicle.statusAuthExit == this.notAuth) {
@@ -232,33 +216,36 @@ export default class VeiculosComponent implements OnInit, OnDestroy {
       this.messageService.add({ severity: 'info', summary: 'Veículo', detail: "Já liberado" });
     }
   }
-  private async addAuthorization(vehicle: VehicleEntry): Promise<HttpResponse<VehicleEntryAuth>> {
+  private async addAuthExit(vehicle: VehicleEntry): Promise<HttpResponse<VehicleEntryAuth>> {
     var auth = new VehicleEntryAuth();
     auth.idVehicle = vehicle.id;
-    auth.idUserExitAuth = this.user.id;
-    auth.nameUserExitAuth = this.user.name;
+    auth.idUserExitAuth = this.storageService.id;
+    auth.nameUserExitAuth = this.storageService.name;
 
     try {
       return await lastValueFrom(this.vehicleService.entryAddAuth(auth));
     } catch (error) {
-      const CLIENTCOMPANY = "ClientCompany not informed.";
-      const ATTENDANT = "Attendant not informed.";
-      const DRIVEREXIT = "DriverExit not informed.";
-
-      if (error.status == 401) {
-        if (error.error.messageError == CLIENTCOMPANY) {
-          this.messageService.add({ severity: 'error', summary: 'Empresa', detail: "Não informada", icon: 'pi pi-times' });
-        }
-        if (error.error.messageError == ATTENDANT) {
-          this.messageService.add({ severity: 'error', summary: 'Consultor', detail: "Não informado", icon: 'pi pi-times' });
-        }
-        if (error.error.messageError == DRIVEREXIT) {
-          this.messageService.add({ severity: 'error', summary: 'Motorista Saída', detail: "Não informado", icon: 'pi pi-times' });
-        }
+     
+      if (error.error.message == MESSAGE_RESPONSE_NOT_CLIENT) {
+        this.messageService.add({ severity: 'error', summary: 'Empresa', detail: "Não informada", icon: 'pi pi-times' });
+      } else if (error.error.message == MESSAGE_RESPONSE_NOT_ATTENDANT) {
+        this.messageService.add({ severity: 'error', summary: 'Consultor', detail: "Não informado", icon: 'pi pi-times' });
+      } else if (error.error.message == MESSAGE_RESPONSE_NOT_DRIVEREXIT) {
+        this.messageService.add({ severity: 'error', summary: 'Motorista Saída', detail: "Não informado", icon: 'pi pi-times' });
+      } else if (error.error.message == "Permission not informed.") {
+        this.permissionNot();
+      }else{
+        this.messageService.add({ severity: 'error', summary: 'Erro', detail: "Não autorizado", icon: 'pi pi-times' });
       }
+
       return error;
     }
 
+  }
+
+   //Permission Not
+   private permissionNot() {
+    this.messageService.add({ severity: 'error', summary: 'Permissão', detail: "Você não tem permissão", icon: 'pi pi-times' });
   }
 
 

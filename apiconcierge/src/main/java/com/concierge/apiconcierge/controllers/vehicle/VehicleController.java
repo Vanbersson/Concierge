@@ -1,4 +1,4 @@
-package com.concierge.apiconcierge.controllers.version1.vehicle;
+package com.concierge.apiconcierge.controllers.vehicle;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;

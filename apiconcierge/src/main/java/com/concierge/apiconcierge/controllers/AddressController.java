@@ -1,4 +1,4 @@
-package com.concierge.apiconcierge.controllers.version1;
+package com.concierge.apiconcierge.controllers;
 
 import com.concierge.apiconcierge.dtos.AddressDto;
 import com.concierge.apiconcierge.models.address.Address;

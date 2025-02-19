@@ -4,15 +4,15 @@
             <div class="flex justify-content-between mb-3">
                 <div>
                     <span class="block text-500 font-medium mb-3">Atendimento</span>
-                    <div class="text-900 font-medium text-xl">152</div>
+                    <div class="text-900 font-medium text-xl">{{qtdVehicleEntry()}}</div>
                 </div>
                 <div class="flex align-items-center justify-content-center bg-blue-100 border-round"
                     [ngStyle]="{width: '2.5rem', height: '2.5rem'}">
-                    <i class="pi pi-truck text-blue-500 text-xl"></i>
+                    <i class="pi pi-car text-blue-500 text-xl"></i>
                 </div>
             </div>
-            <span class="text-green-500 font-medium">24 new </span>
-            <span class="text-500">since last visit</span>
+            <span class="text-green-500 font-medium">Veículos </span>
+            <span class="text-500">em atendimento</span>
         </div>
     </div>
     <div class="col-12 lg:col-6 xl:col-3">
@@ -20,15 +20,15 @@
             <div class="flex justify-content-between mb-3">
                 <div>
                     <span class="block text-500 font-medium mb-3">Saída autorizada</span>
-                    <div class="text-900 font-medium text-xl">$2.100</div>
+                    <div class="text-900 font-medium text-xl">{{qtdVehicleExit()}}</div>
                 </div>
                 <div class="flex align-items-center justify-content-center bg-orange-100 border-round"
                     [ngStyle]="{width: '2.5rem', height: '2.5rem'}">
                     <i class="pi pi-sign-out text-orange-500 text-xl"></i>
                 </div>
             </div>
-            <span class="text-green-500 font-medium">%52+ </span>
-            <span class="text-500">since last week</span>
+            <span class="text-green-500 font-medium">Veículos </span>
+            <span class="text-500">com saída autorizada</span>
         </div>
     </div>
     <div class="col-12 lg:col-6 xl:col-3">
@@ -36,31 +36,31 @@
             <div class="flex justify-content-between mb-3">
                 <div>
                     <span class="block text-500 font-medium mb-3">Orçamento</span>
-                    <div class="text-900 font-medium text-xl">28441</div>
+                    <div class="text-900 font-medium text-xl">{{qtdVehicleBudgetWith()}}</div>
                 </div>
                 <div class="flex align-items-center justify-content-center bg-cyan-100 border-round"
                     [ngStyle]="{width: '2.5rem', height: '2.5rem'}">
                     <i class="pi pi-verified text-cyan-500 text-xl"></i>
                 </div>
             </div>
-            <span class="text-green-500 font-medium">520 </span>
-            <span class="text-500">newly registered</span>
+            <span class="text-green-500 font-medium">Orçamentos </span>
+            <span class="text-500">gerados</span>
         </div>
     </div>
     <div class="col-12 lg:col-6 xl:col-3">
         <div class="card mb-0">
             <div class="flex justify-content-between mb-3">
                 <div>
-                    <span class="block text-500 font-medium mb-3">Pedente de orçamento</span>
-                    <div class="text-900 font-medium text-xl">152 Unread</div>
+                    <span class="block text-500 font-medium mb-3">Orçamento</span>
+                    <div class="text-900 font-medium text-xl">{{qtdVehicleBudgetWithout()}}</div>
                 </div>
                 <div class="flex align-items-center justify-content-center bg-purple-100 border-round"
                     [ngStyle]="{width: '2.5rem', height: '2.5rem'}">
                     <i class="pi pi-bookmark     text-purple-500 text-xl"></i>
                 </div>
             </div>
-            <span class="text-green-500 font-medium">85 </span>
-            <span class="text-500">responded</span>
+            <span class="text-green-500 font-medium">Orçamentos </span>
+            <span class="text-500">Pedentes</span>
         </div>
     </div>
 </div>

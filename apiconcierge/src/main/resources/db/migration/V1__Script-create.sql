@@ -14,6 +14,11 @@
      description varchar(255) not null,
      PRIMARY KEY(id)
  );
+ CREATE TABLE tb_menu(
+      id varchar(10) not null,
+      description varchar(100) not null,
+      PRIMARY KEY(id)
+  );
 
  CREATE TABLE tb_company(
     id int not null AUTO_INCREMENT,
@@ -97,6 +102,19 @@
      FOREIGN KEY(permission_id) REFERENCES tb_permission(id),
      PRIMARY KEY(id)
  );
+
+ create table tb_user_menu(
+      company_id int not null,
+      resale_id int not null,
+      id binary(16) unique,
+      user_id int not null,
+      menu_id varchar(10) not null,
+      FOREIGN KEY(company_id) REFERENCES tb_company(id),
+      FOREIGN KEY(resale_id) REFERENCES tb_resale(id),
+      FOREIGN KEY(user_id) REFERENCES tb_user(id),
+      FOREIGN KEY(menu_id) REFERENCES tb_menu(id),
+      PRIMARY KEY(id)
+  );
 
  CREATE TABLE tb_client_company_type(
      company_id int not null,
@@ -341,7 +359,7 @@
       ordem int not null,
       code varchar(20) not null,
       description varchar(100) not null,
-      quantity int not null,
+      quantity float not null,
       discount float not null,
       price float not null,
       FOREIGN KEY(company_id) REFERENCES tb_company(id),

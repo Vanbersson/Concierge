@@ -1,7 +1,7 @@
-package com.concierge.apiconcierge.controllers.version1.permission;
+package com.concierge.apiconcierge.controllers.permission;
 
-import com.concierge.apiconcierge.models.permissions.Permission;
-import com.concierge.apiconcierge.repositories.permission.PermissionIRepository;
+import com.concierge.apiconcierge.models.permission.Permission;
+import com.concierge.apiconcierge.repositories.permission.IPermissionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,11 +15,11 @@ import java.util.List;
 public class PermissionController {
 
     @Autowired
-    private PermissionIRepository permissionIRepository;
+    private IPermissionRepository IPermissionRepository;
 
     @GetMapping("/all")
     public ResponseEntity<List<Permission>> allPermission() {
-        return ResponseEntity.ok(this.permissionIRepository.findAll());
+        return ResponseEntity.ok(this.IPermissionRepository.findAll());
     }
 
 }

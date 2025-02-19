@@ -1,7 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControl, FormsModule, ReactiveFormsModule, FormGroup, Validators } from '@angular/forms';
-
 
 //PrimeNG
 import { TableModule } from 'primeng/table'
@@ -12,14 +11,12 @@ import { ButtonModule } from 'primeng/button';
 import { InputMaskModule } from 'primeng/inputmask';
 import { RadioButtonModule } from 'primeng/radiobutton';
 import { ToastModule } from 'primeng/toast';
-import { MessageService } from 'primeng/api';
-import { IconFieldModule } from 'primeng/iconfield';
-import { InputIconModule } from 'primeng/inputicon';
+import { MessageService, TreeNode } from 'primeng/api';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { AvatarModule } from 'primeng/avatar';
 import { ImageModule } from 'primeng/image';
 import { DialogModule } from 'primeng/dialog';
-
+import { TreeModule } from 'primeng/tree';
 
 //Service
 import { UserService } from '../../../services/user/user.service';
@@ -28,22 +25,29 @@ import { UserRoleService } from '../../../services/user-role/user-role.service';
 //Class
 import { User } from '../../../models/user/user';
 import { UserRole } from '../../../models/user-role/user-role';
-import { error } from 'console';
 import { Permission } from '../../../models/permission/permission';
 import { PermissionService } from '../../../services/permission/permission.service';
 import { PermissionUser } from '../../../models/permission/permission-user';
+import { MenuUserService } from '../../../services/menu/menu-user.service';
+import { lastValueFrom } from 'rxjs';
+import { MenuUser } from '../../../models/menu/menu-user';
+import { HttpResponse } from '@angular/common/http';
+import { MessageResponse } from '../../../models/message/message-response';
+import { IMAGE_MAX_SIZE, MESSAGE_RESPONSE_SUCCESS } from '../../../util/constants';
+import { NgxImageCompressService } from 'ngx-image-compress';
+import { StorageService } from '../../../services/storage/storage.service';
 
 @Component({
   selector: 'app-user',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule, TableModule, InputTextModule, InputNumberModule, InputMaskModule, MultiSelectModule, ToastModule, DialogModule, PasswordModule, ImageModule, ButtonModule, AvatarModule, RadioButtonModule],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, TableModule, InputTextModule, TreeModule, InputNumberModule, InputMaskModule, MultiSelectModule, ToastModule, DialogModule, PasswordModule, ImageModule, ButtonModule, AvatarModule, RadioButtonModule],
   templateUrl: './user.component.html',
   styleUrl: './user.component.scss',
   providers: [MessageService]
 })
-export default class UserComponent {
+export default class UserComponent implements OnInit {
 
-  private user: User;
+
   private userSelect: User;
   users: User[] = [];
   roles: UserRole[] = [];
@@ -60,12 +64,12 @@ export default class UserComponent {
     status: new FormControl<string>({ value: 'ativo', disabled: false }),
     name: new FormControl<string>('', Validators.required),
     email: new FormControl<string>('', Validators.required),
-    password: new FormControl<string>('', Validators.required),
-    passwordValid: new FormControl<string>('', Validators.required),
-    cellphone: new FormControl<string>('', Validators.required),
+    password: new FormControl<string>(''),
+    passwordValid: new FormControl<string>(''),
+    cellphone: new FormControl<string>(''),
     roleDesc: new FormControl<UserRole[] | null>([], Validators.required),
     roleFunc: new FormControl<string>('USER', Validators.required),
-    limitDiscount: new FormControl<number | null>(null),
+    limitDiscount: new FormControl<number>(0),
   });
 
   //Dialog Func
@@ -74,20 +78,84 @@ export default class UserComponent {
   permissionsSelect: Permission[] = [];
   permissionUser: Permission[] = [];
 
+  //Dialog Menus
+  visibleDialogMenu: boolean = false;
+  menus: TreeNode[] = [];
+  menuSelect: TreeNode[] = [];
+
+
   constructor(
     private userService: UserService,
+    private storageService: StorageService,
     private userRoleService: UserRoleService,
     private permissionService: PermissionService,
-    private messageService: MessageService) {
-    this.userService.getUser$().subscribe(data => {
-      this.user = data;
-      this.getUsers();
-      this.getRoles();
-      this.getPermissions();
-    });
+    private menuUserService: MenuUserService,
+    private messageService: MessageService,
+    private ngxImageCompressService: NgxImageCompressService) { }
 
+  ngOnInit(): void {
+    this.menus = [
+      { key: '0_0', label: 'Dashboard', icon: 'pi pi-home' },
+      {
+        key: '1_0', label: 'Portaria', children: [
+          { key: '1_1', label: 'Atendimento', },
+          { key: '1_2', label: 'Veículos' },
+          { key: '1_3', label: 'Manutenção' },
+          {
+            key: '1_4', label: 'Cadastros', children: [
+              { key: '1_4_0', label: 'Modelo' },
+              { key: '1_4_1', label: 'Veículo' },
+            ]
+          },
+        ]
+      },
+      {
+        key: '2_0', label: 'Peças', children: [
+          { key: '2_1', label: 'Consulta peças' },
+        ]
+      },
+      {
+        key: '4_0', label: 'Faturamento', children: [
+          { key: '4_1', label: 'Manutenção Clientes' },
+        ]
+      },
+      {
+        key: '100_0', label: 'Relatório', children: [
+          { key: '100_1', label: 'Portaria' },
+        ]
+      },
+      {
+        key: '999_0', label: 'Configurações', children: [
+          { key: '999_1', label: 'Empresa', icon: 'pi pi-building' },
+          { key: '999_2', label: 'Cadastro Usuários', icon: 'pi pi-users' },
+        ]
+      },
+
+    ];
+
+    this.getUsers();
+    this.getRoles();
+    this.getPermissions();
   }
-  public getUsers() {
+  //Password
+  private addRequirePass() {
+    this.formUser.controls['password'].addValidators([Validators.minLength(8), Validators.required]);
+    this.formUser.controls['password'].updateValueAndValidity();
+  }
+  private deleteRequirePass() {
+    this.formUser.controls['password'].removeValidators([Validators.minLength(8), Validators.required]);
+    this.formUser.controls['password'].updateValueAndValidity();
+  }
+  //Password Valid
+  private addRequirePassValid() {
+    this.formUser.controls['passwordValid'].addValidators([Validators.minLength(8), Validators.required]);
+    this.formUser.controls['passwordValid'].updateValueAndValidity();
+  }
+  private deleteRequirePassValid() {
+    this.formUser.controls['passwordValid'].removeValidators([Validators.minLength(8), Validators.required]);
+    this.formUser.controls['passwordValid'].updateValueAndValidity();
+  }
+  private getUsers() {
     this.userService.getAll$().subscribe(data => {
       this.users = data;
     });
@@ -97,95 +165,28 @@ export default class UserComponent {
       this.roles = data;
     })
   }
-
-  private getPermissions() {
-    this.permissionService.getAll$().subscribe(data => {
-      this.permissions = data;
-    });
-  }
   public firstLetter(user: User): string {
     return user.name.substring(0, 1);
   }
-  public showDialogUser() {
+  public showDialogSave() {
     this.formUser.controls.id.disable();
     this.userSelect = null;
     this.cleanForm();
     this.visibleDialogUser = true;
+    this.menuSelect = [];
+    this.addRequirePass();
+    this.addRequirePassValid();
   }
-  public hideDialogUser() {
-    this.visibleDialogUser = false;
-  }
-  private cleanForm() {
-    this.userPhoto = '';
-    this.formUser.patchValue({
-      id: null,
-      name: '',
-      email: '',
-      cellphone: '',
-      limitDiscount: null,
-      password: '',
-      passwordValid: '',
-      roleDesc: null,
-      roleFunc: 'USER',
-      status: 'ativo'
-    });
-  }
-  public selectPhoto(event: any) {
-    var file = event.target.files[0];
+  public showDialogEdit(user: User) {
 
-    if (file) {
-      var reader = new FileReader();
-      reader.readAsDataURL(file);
-
-      reader.onload = (event2: any) => {
-
-        //image byte
-        const byteImg = event2.target.result.split('base64,')[1];
-        this.userPhoto = byteImg;
-
-      };
-    }
-  }
-  public deletePhoto() {
-    this.userPhoto = "";
-  }
-  private validationForm(): boolean {
-    const { value } = this.formUser;
-
-    if (value.name.trim() == '') {
-      this.messageService.add({ severity: 'error', summary: 'Nome', detail: 'Campo inválido', icon: 'pi pi-times' });
-      return false
-    }
-    if (value.cellphone.trim() == '') {
-      this.messageService.add({ severity: 'error', summary: 'Celular', detail: 'Campo inválido', icon: 'pi pi-times' });
-      return false
-    }
-    if (value.email.trim() == '') {
-      this.messageService.add({ severity: 'error', summary: 'Email', detail: 'Campo inválido', icon: 'pi pi-times' });
-      return false
-    }
-
-    if (value.password.trim() != value.passwordValid.trim()) {
-      this.messageService.add({ severity: 'error', summary: 'Senha', detail: 'Campo inválido', icon: 'pi pi-times' });
-      return false
-    }
-
-    if (value.password == '' || value.passwordValid == '') {
-      this.messageService.add({ severity: 'error', summary: 'Senha', detail: 'Campo obrigatório', icon: 'pi pi-times' });
-      return false
-    }
-
-    if (value.roleDesc.at(0) == null) {
-      this.messageService.add({ severity: 'error', summary: 'Cargo', detail: 'Não selecionado', icon: 'pi pi-times' });
-      return false
-    }
-    return true;
-  }
-  public editUser(user: User) {
+    this.deleteRequirePass();
+    this.deleteRequirePassValid();
 
     this.visibleDialogUser = true;
     this.formUser.controls.id.enable();
+
     this.userSelect = user;
+
     var roleSelect: UserRole;
     this.userPhoto = user.photo;
 
@@ -206,36 +207,115 @@ export default class UserComponent {
       status: user.status
     });
 
+    //Menus
+    this.getMenusUser();
+    //Functions
+    this.getPermissionUser();
+
+  }
+
+  private getPermissionUser() {
     this.permissionsSelect = [];
 
-    this.permissionService.getAllUser$(user.id).subscribe(data => {
+    //Permission user selected
+    this.permissionService.getAllUser$(this.userSelect.id).subscribe(data => {
 
       if (data.length > 0) {
         var perTemp: Permission[] = [];
+
         for (var item of data) {
-          for (var permission of this.permissions) {
-            if (item.permissionId == permission.id) {
-              perTemp.push(permission);
+          for (var per of this.permissions) {
+
+            if (item.permissionId == per.id) {
+              perTemp.push(per);
             }
+
           }
         }
         this.permissionsSelect = perTemp;
       }
     });
   }
+  public hideDialogUser() {
+    this.visibleDialogUser = false;
+  }
+  private cleanForm() {
+    this.userPhoto = '';
+    this.formUser.patchValue({
+      id: null,
+      name: '',
+      email: '',
+      cellphone: '',
+      limitDiscount: 0,
+      password: '',
+      passwordValid: '',
+      roleDesc: null,
+      roleFunc: 'USER',
+      status: 'ativo'
+    });
+  }
+  public async selectPhoto() {
+    this.ngxImageCompressService.uploadFile().then(({ image, orientation }) => {
 
+      if (this.ngxImageCompressService.byteCount(image) > IMAGE_MAX_SIZE) {
+        this.messageService.add({ severity: 'error', summary: 'Imagem', detail: 'Tamanha máximo 3MB', icon: 'pi pi-times', life: 3000 });
+      } else {
+        this.ngxImageCompressService.compressFile(image, orientation, 50, 40).then((compressedImage) => {
+
+          // Remover o prefixo "data:image/jpeg;base64," se existir
+          const base64Data = compressedImage.split(',')[1];
+          this.userPhoto = base64Data;
+
+        });
+      }
+    });
+  }
+  public deletePhoto() {
+    this.userPhoto = "";
+  }
+  private validationForm(): boolean {
+    const { value } = this.formUser;
+
+    if (value.name.trim() == '') {
+      this.messageService.add({ severity: 'error', summary: 'Nome', detail: 'Campo inválido', icon: 'pi pi-times' });
+      return false
+    }
+    if (value.email.trim() == '') {
+      this.messageService.add({ severity: 'error', summary: 'Email', detail: 'Campo inválido', icon: 'pi pi-times' });
+      return false
+    }
+    if (value.password.trim() != value.passwordValid.trim()) {
+      this.messageService.add({ severity: 'error', summary: 'Senha', detail: 'Campo inválido', icon: 'pi pi-times' });
+      return false
+    }
+    if (value.roleDesc == null) {
+      this.messageService.add({ severity: 'error', summary: 'Cargo', detail: 'Não selecionado', icon: 'pi pi-times' });
+      return false
+    }
+    return true;
+  }
+  public save() {
+
+    if (this.validationForm()) {
+      if (this.formUser.controls.id.disabled) {
+        this.saveUser();
+      } else {
+        this.updateUser();
+      }
+    }
+  }
   private saveUser() {
 
     const { value } = this.formUser;
     var userNew = new User();
 
     userNew.photo = this.userPhoto;
-    userNew.companyId = this.user.companyId;
-    userNew.resaleId = this.user.resaleId;
+    userNew.companyId = this.storageService.companyId;
+    userNew.resaleId = this.storageService.resaleId;
     userNew.name = value.name;
     userNew.email = value.email;
-    userNew.cellphone = value.cellphone;
-    userNew.limitDiscount = value.limitDiscount;
+    userNew.cellphone = value.cellphone ?? "";
+    userNew.limitDiscount = value.limitDiscount ?? 0;
     userNew.password = value.password;
     userNew.roleId = value.roleDesc.at(0).id;
     userNew.roleDesc = value.roleDesc.at(0).description;
@@ -247,9 +327,8 @@ export default class UserComponent {
       if (data.status == 201) {
         this.getUsers();
         this.alertUserSave();
+        this.visibleDialogUser = false;
       }
-
-    }, error => {
 
     });
 
@@ -265,7 +344,7 @@ export default class UserComponent {
       this.userSelect.email = value.email;
       this.userSelect.cellphone = value.cellphone;
       this.userSelect.limitDiscount = value.limitDiscount;
-      this.userSelect.password = value.password;
+      this.userSelect.password = "";
       this.userSelect.roleId = value.roleDesc.at(0).id;
       this.userSelect.roleDesc = value.roleDesc.at(0).description;
       this.userSelect.roleFunc = value.roleFunc;
@@ -282,17 +361,6 @@ export default class UserComponent {
       });
     }
   }
-  public save() {
-
-    if (this.validationForm()) {
-      if (this.formUser.controls.id.disabled) {
-        this.saveUser();
-      } else {
-        this.updateUser();
-      }
-    }
-
-  }
 
   //Dialog Func
   public showDialogFunc() {
@@ -305,43 +373,128 @@ export default class UserComponent {
   public hideDialogFunc() {
     this.visibleDialogFunc = false;
   }
-  public savePermission() {
-    var pUser = new PermissionUser();
-    pUser.companyId = this.userSelect.companyId;
-    pUser.resaleId = this.userSelect.resaleId;
-    pUser.userId = this.userSelect.id;
-    pUser.permissionId = 100;
+  private getPermissions() {
+    this.permissionService.getAll$().subscribe(data => {
+      this.permissions = data;
+    });
+  }
+  public async savePermissions() {
 
-    if (this.permissionsSelect.length == 0) {
-      this.deletePermissionUser(pUser);
-    } else {
+    var responseDelete = await this.deletePermissionUser(this.userSelect.id);
+    if (responseDelete.body.message == MESSAGE_RESPONSE_SUCCESS) {
+
+      var pUser = new PermissionUser();
+      pUser.companyId = this.userSelect.companyId;
+      pUser.resaleId = this.userSelect.resaleId;
+      pUser.userId = this.userSelect.id;
 
       for (let i = 0; i < this.permissionsSelect.length; i++) {
         const per = this.permissionsSelect[i];
 
         pUser.permissionId = per.id;
 
-        this.permissionService.saveUser(pUser).subscribe(data => {
+        const responseSave = await this.savePermission(pUser);
+
+        if (responseSave.status == 201) {
           if (i == (this.permissionsSelect.length - 1)) {
             this.alertPermisionSave();
             this.hideDialogFunc();
           }
+        }
 
-        }, error => {
-
-        });
       }
+
+    }
+
+  }
+
+  private async savePermission(per: PermissionUser): Promise<HttpResponse<PermissionUser>> {
+    try {
+      return lastValueFrom(this.permissionService.saveUser(per));
+    } catch (error) {
+      return error;
+    }
+  }
+
+  private async deletePermissionUser(userId: number): Promise<HttpResponse<MessageResponse>> {
+
+    try {
+      return lastValueFrom(this.permissionService.deleteUser(userId));
+    } catch (error) {
+      return error;
     }
 
 
-  }
-  private deletePermissionUser(user: PermissionUser) {
-    this.permissionService.deleteUser(user).subscribe(data => {
+    /* this.permissionService.deleteUser(userId).subscribe(data => {
       this.alertPermisionSave();
       this.hideDialogFunc();
-    }, error => {
+    }); */
+  }
 
+  //Dialog Menu
+  public showDialogMenu() {
+    if (this.userSelect) {
+      this.visibleDialogMenu = true;
+
+    } else {
+      this.messageService.add({ severity: 'info', summary: 'Seleção', detail: 'Selecione um usuário', icon: 'pi pi-info-circle' });
+    }
+  }
+  private getMenusUser() {
+    this.menuSelect = [];
+    this.menuUserService.getFilterMenuUser$(this.userSelect.companyId, this.userSelect.resaleId, this.userSelect.id).subscribe(data => {
+      this.menuSelect = data;
     });
+  }
+  public hideDialogMenu() {
+    this.visibleDialogMenu = false;
+  }
+  public async saveMenus() {
+
+    var menu: MenuUser = new MenuUser();
+    menu.userId = this.userSelect.id;
+    const responseDelete = await this.deleteMenus(menu);
+    if (responseDelete.body.message == MESSAGE_RESPONSE_SUCCESS) {
+
+      for (let index = 0; index < this.menuSelect.length; index++) {
+        const menu = this.menuSelect[index];
+        const responseSave = await this.saveMenu(menu.key!);
+        if (responseSave.status == 201) {
+          if (index == this.menuSelect.length - 1) {
+            this.alertMenusSave();
+          }
+        }
+      }
+
+      //Close Dialog
+      this.visibleDialogMenu = false;
+
+    } else {
+      this.messageService.add({ severity: 'error', summary: 'Menu', detail: 'Erro na atualização dos menus.', icon: 'pi pi-times' });
+    }
+
+  }
+  private async saveMenu(key: string): Promise<HttpResponse<MessageResponse>> {
+
+    try {
+      var menu: MenuUser = new MenuUser();
+      menu.companyId = this.userSelect.companyId;
+      menu.resaleId = this.userSelect.resaleId;
+      menu.userId = this.userSelect.id;
+      menu.menuId = key;
+
+      return await lastValueFrom(this.menuUserService.saveMenu(menu));
+    } catch (error) {
+      return error;
+    }
+
+  }
+  private async deleteMenus(menu: MenuUser): Promise<HttpResponse<MessageResponse>> {
+    try {
+      return await lastValueFrom(this.menuUserService.deleteMenu(menu));
+    } catch (error) {
+      return error;
+    }
   }
 
   //Alert
@@ -356,6 +509,9 @@ export default class UserComponent {
   }
   private alertPermisionSave() {
     this.messageService.add({ severity: 'success', summary: 'Permissões', detail: 'Salvo com sucesso', icon: 'pi pi-check', life: 3000 });
+  }
+  private alertMenusSave() {
+    this.messageService.add({ severity: 'success', summary: 'Menus', detail: 'Salvo com sucesso', icon: 'pi pi-check', life: 3000 });
   }
 
 

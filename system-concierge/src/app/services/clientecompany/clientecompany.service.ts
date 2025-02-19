@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
-import { HttpClient, HttpHeaders, HttpResponse } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpResponse, HttpResponseBase } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { StorageService } from '../storage/storage.service';
 import { ClientCompany } from '../../models/clientcompany/client-company';
@@ -10,7 +10,7 @@ import { ClientCompany } from '../../models/clientcompany/client-company';
 })
 export class ClientecompanyService {
 
-  private urlBaseV1 = "http://10.0.0.20:8080/api/v1/fatclient/filter";
+  private urlBaseV1 = "http://10.0.0.26:8080/apiapollo/api/v1/fatclient/filter";
 
 
 
@@ -25,8 +25,8 @@ export class ClientecompanyService {
   getAll$(): Observable<ClientCompany[]> {
     return this.http.get<ClientCompany[]>(environment.apiuUrl + "/clientcompany/filter/all", { headers: this.myHeaders(), responseType: 'json' });
   }
-  getId$(id: Number): Observable<ClientCompany> {
-    return this.http.get<ClientCompany>(environment.apiuUrl + "/clientcompany/filter/id/" + id, { headers: this.myHeaders(), responseType: 'json' });
+  getId$(id: Number): Observable<HttpResponse<ClientCompany> > {
+    return this.http.get<ClientCompany>(environment.apiuUrl + "/clientcompany/filter/id/" + id, { headers: this.myHeaders(), observe:'response' });
   }
 
   //Externa

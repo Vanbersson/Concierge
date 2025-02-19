@@ -12,7 +12,7 @@ import java.util.List;
 
 @Service
 public class PartsService implements IPartsService {
-    private static final String SUCCESS = "success.";
+    private static final String SUCCESS = "Success.";
     @Autowired
     private IPartsRepository repository;
 

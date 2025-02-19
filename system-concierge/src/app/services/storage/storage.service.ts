@@ -10,11 +10,25 @@ export class StorageService {
 
   constructor() { }
 
-  set photo(photo: string) {
-      sessionStorage.setItem('photo', photo);
+  set companyId(companyId: string) {
+    sessionStorage.setItem('companyId', companyId);
   }
-  get photo(): string {
-    return sessionStorage.getItem("photo");
+  get companyId(): number {
+    return Number.parseInt(sessionStorage.getItem("companyId"));
+  }
+
+  set resaleId(resaleId: string) {
+    sessionStorage.setItem('resaleId', resaleId);
+  }
+  get resaleId(): number {
+    return Number.parseInt(sessionStorage.getItem("resaleId"));
+  }
+
+  set id(id: string) {
+    sessionStorage.setItem('id', id);
+  }
+  get id(): number {
+    return Number.parseInt(sessionStorage.getItem("id"));
   }
 
   set name(name: string) {
@@ -22,6 +36,34 @@ export class StorageService {
   }
   get name(): string {
     return sessionStorage.getItem("name");
+  }
+
+  set email(email: string) {
+    sessionStorage.setItem('email', email);
+  }
+  get email(): string {
+    return sessionStorage.getItem("email");
+  }
+
+  set cellphone(cellphone: string) {
+    sessionStorage.setItem('cellphone', cellphone);
+  }
+  get cellphone(): string {
+    return sessionStorage.getItem("cellphone");
+  }
+
+  set limitDiscount(limitDiscount: string) {
+    sessionStorage.setItem('limitDiscount', limitDiscount);
+  }
+  get limitDiscount(): number {
+    return Number.parseInt(sessionStorage.getItem("limitDiscount"));
+  }
+
+  set photo(photo: string) {
+    sessionStorage.setItem('photo', photo);
+  }
+  get photo(): string {
+    return sessionStorage.getItem("photo");
   }
 
   set roleDesc(roleDesc: string) {
@@ -36,6 +78,13 @@ export class StorageService {
   }
   get token(): string {
     return sessionStorage.getItem("token");
+  }
+
+  set menus(menus: string) {
+    sessionStorage.setItem('menus', menus);
+  }
+  get menus(): string {
+    return sessionStorage.getItem("menus");
   }
 
   public deleteStorage() {

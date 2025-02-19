@@ -1,4 +1,4 @@
-package com.concierge.apiconcierge.controllers.version1.vehicle;
+package com.concierge.apiconcierge.controllers.vehicle;
 
 import com.concierge.apiconcierge.dtos.UpdateStatusDto;
 import com.concierge.apiconcierge.dtos.vehicle.VehicleModelDto;

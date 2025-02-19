@@ -5,10 +5,9 @@ import jakarta.validation.constraints.NotNull;
 import java.util.UUID;
 
 public record PermissionUserDto(
-
-        @NotNull Integer companyId,
-        @NotNull Integer resaleId,
-        @NotNull UUID id,
-        @NotNull Integer userId,
-        @NotNull Integer permissionId) {
+        Integer companyId,
+        Integer resaleId,
+        UUID id,
+        Integer userId,
+        Integer permissionId) {
 }

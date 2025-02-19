@@ -1,8 +1,10 @@
 package com.concierge.apiconcierge.services.permission;
 
+import com.concierge.apiconcierge.models.permission.PermissionUser;
+
 import java.util.List;
 
-public interface IPermissionUser {
+public interface IPermissionUserService {
 
     String save(PermissionUser permission);
 

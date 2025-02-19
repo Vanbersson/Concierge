@@ -1,6 +1,6 @@
 package com.concierge.apiconcierge.repositories.permission;
 
-import com.concierge.apiconcierge.models.permissions.PermissionUser;
+import com.concierge.apiconcierge.models.permission.PermissionUser;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -12,12 +12,11 @@ import java.util.List;
 import java.util.UUID;
 
 @Repository
-public interface PermissionUserIRepository extends JpaRepository<PermissionUser, UUID> {
+public interface IPermissionUserRepository extends JpaRepository<PermissionUser, UUID> {
 
     List<PermissionUser> findByUserId(Integer userId);
 
     PermissionUser findByUserIdAndPermissionId(Integer userId, Integer permissionId);
-
 
     @Transactional
     @Modifying

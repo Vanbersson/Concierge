@@ -2,7 +2,7 @@ package com.concierge.apiconcierge.config.security;
 
 
 import com.concierge.apiconcierge.models.user.User;
-import com.concierge.apiconcierge.repositories.UserRepository;
+import com.concierge.apiconcierge.repositories.user.IUserRepository;
 import com.concierge.apiconcierge.services.auth.TokenService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -23,7 +23,7 @@ public class SecurityFilter extends OncePerRequestFilter {
     TokenService tokenService;
 
     @Autowired
-    UserRepository userRepository;
+    IUserRepository IUserRepository;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -31,7 +31,7 @@ public class SecurityFilter extends OncePerRequestFilter {
         if (token != null) {
             String email = tokenService.validToken(token);
             if (email != "") {
-                User user = userRepository.findByEmail(email);
+                User user = IUserRepository.findByEmail(email);
                 var authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }

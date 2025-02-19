@@ -1,4 +1,4 @@
-package com.concierge.apiconcierge.controllers.version1.clientcompany;
+package com.concierge.apiconcierge.controllers.clientcompany;
 
 import com.concierge.apiconcierge.dtos.clientcompany.ClientCompanyTypeDto;
 import com.concierge.apiconcierge.models.clientcompany.ClientCompanyType;

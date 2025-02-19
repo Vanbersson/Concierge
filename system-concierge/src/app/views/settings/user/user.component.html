@@ -1,13 +1,11 @@
 <div class="layout-card">
-
     <!-- Info -->
     <p-toast />
     <div class="layout-card-title">
         <span>Usuários</span>
 
         <div class="flex gap-2">
-            <p-button icon="pi pi-plus" label="Usuário" [outlined]="true" (onClick)="showDialogUser()"></p-button>
-            <p-button icon="pi pi-refresh" (onClick)="getUsers()" />
+            <p-button icon="pi pi-plus" label="Usuário" [outlined]="true" (onClick)="showDialogSave()"></p-button>
         </div>
     </div>
     <p-table [value]="users">
@@ -18,6 +16,7 @@
                 <th>Cargo</th>
                 <th>Ativo</th>
                 <th>Editar</th>
+                <th>Senha</th>
             </tr>
         </ng-template>
         <ng-template pTemplate="body" let-user>
@@ -41,7 +40,10 @@
                     }
                 </td>
                 <td>
-                    <button pButton type="button" icon="pi pi-pencil" [text]="true" (click)="editUser(user)"></button>
+                    <button pButton type="button" icon="pi pi-pencil" [text]="true" (click)="showDialogEdit(user)"></button>
+                </td>
+                <td>
+                    <button pButton type="button" icon="pi pi-shield" severity="danger" [text]="true"></button>
                 </td>
 
             </tr>
@@ -56,25 +58,21 @@
         <div class="p-fluid p-formgrid grid">
 
             <div class="field col-12 flex align-items-center justify-content-center ">
-
-                <div class="layout-photo-person mb-5">
-
+                <div class="layout-photo-person">
                     @if(userPhoto){
                     <p-image [imageStyle]="{'border-radius':'100%','object-fit':'cover'}"
-                        src="data:image/png;base64,{{userPhoto}}" alt="imagem motorista" height="80" width="80"
-                        [preview]="true" />
+                        src="data:image/png;base64,{{userPhoto}}" alt="imagem motorista" height="80"
+                        width="80" [preview]="true" />
 
-                    <button pButton severity="danger" [text]="true" label="Remover" (click)="deletePhoto()"></button>
+                    <button pButton severity="danger" [text]="true" label="Remover"
+                        (click)="deletePhoto()"></button>
                     }@else{
                     <div class="layout-photo-person-label">
-                        <label for="userPhoto">Foto</label>
-                        <input type="file" id="userPhoto" (change)="selectPhoto($event)"
-                            accept="image/png, image/jpeg" />
+                        <button pButton type="button" label="Foto" [rounded]="true" [text]="true"
+                            size="small" (click)="selectPhoto()"></button>
                     </div>
                     }
-
                 </div>
-
             </div>
 
             <div class="field col-12 md:col-2">
@@ -87,12 +85,10 @@
                 <small class="p-error block" *ngIf="formUser.get('name')?.invalid && formUser.get('name')?.dirty">
                     Campo obrigatório</small>
             </div>
-
             <div class="field col-12 md:col-6">
                 <label for="emailid">Email</label>
                 <input pInputText id="emailid" type="email" formControlName="email" />
             </div>
-
             <div class="field col-12 md:col-4">
                 <label for="cellphoneid">Celular</label>
                 <p-inputMask id="cellphoneid" mask="(99) 9 9999-9999" formControlName="cellphone" unmask="true" />
@@ -101,7 +97,6 @@
                 <label for="discountid">Desconto</label>
                 <p-inputNumber suffix="%" formControlName="limitDiscount" />
             </div>
-
             <div class="field col-12 md:col-4">
                 <label for="passwordid">Senha</label>
                 <p-password id="passwordid" formControlName="password" [feedback]="false" [toggleMask]="true" />
@@ -109,7 +104,6 @@
                     *ngIf="formUser.get('password')?.invalid && formUser.get('password')?.dirty">
                     Campo obrigatório</small>
             </div>
-
             <div class="field col-12 md:col-4">
                 <label for="passwordvalidid">Repetir senha</label>
                 <p-password id="passwordvalidid" formControlName="passwordValid" [feedback]="false"
@@ -118,13 +112,11 @@
                     *ngIf="formUser.get('passwordValid')?.invalid && formUser.get('passwordValid')?.dirty">
                     Campo Obrigatório</small>
             </div>
-
             <div class="field col-12 md:col-4">
                 <label for="userrole">Cargo</label>
                 <p-multiSelect id="userrole" [options]="roles" optionLabel="description" display="chip"
                     [selectionLimit]="1" placeholder="Selecione" formControlName="roleDesc" />
             </div>
-
             <div class="field col-12 md:col-5 ">
                 <div class="layout-card-status">
                     <span>Perfil</span>
@@ -132,7 +124,6 @@
                         <p-radioButton inputId="ADMIN" value="ADMIN" formControlName="roleFunc"></p-radioButton>
                         <label for="ADMIN" class="ml-2">Administrador</label>
                     </div>
-
                     <div class="flex align-items-center">
                         <p-radioButton inputId="USER" value="USER" formControlName="roleFunc"></p-radioButton>
                         <label for="USER" class="ml-2">Usuário</label>
@@ -155,13 +146,18 @@
                 </div>
             </div>
             <div class="field col-12 md:col-4">
+                <button pButton type="button" label="Menus" (click)="showDialogMenu()"></button>
+
+            </div>
+            <div class="field col-12 md:col-4">
                 <button pButton type="button" label="Funções" (click)="showDialogFunc()"></button>
+
             </div>
 
 
         </div>
         <div class="flex justify-content-end gap-2 mt-3">
-            <button pButton type="button" pRipple label="Cancelar" icon="pi pi-times" class="p-button-text"
+            <button pButton type="button" pRipple label="Fechar" icon="pi pi-times" class="p-button-text"
                 (click)="hideDialogUser()"></button>
             <button pButton type="submit" pRipple label="Salvar" icon="pi pi-check" class="p-button-text"></button>
         </div>
@@ -169,6 +165,7 @@
     </form>
 </p-dialog>
 
+<!-- Funções -->
 <p-dialog [(visible)]="visibleDialogFunc" [modal]="true" [style]="{ width: '40rem' }"
     [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }">
     <p-table [value]="permissions" [(selection)]="permissionsSelect" dataKey="id" styleClass="p-datatable-sm">
@@ -192,7 +189,27 @@
 
     </p-table>
     <div class="flex justify-content-end gap-2 mt-3">
-        <button pButton type="button" pRipple label="Cancelar" icon="pi pi-times" class="p-button-text" (click)="hideDialogFunc()"></button>
-        <button pButton type="button" pRipple label="Salvar" icon="pi pi-check" class="p-button-text" (click)="savePermission()"></button>
+        <button pButton type="button" pRipple label="Fechar" icon="pi pi-times" class="p-button-text"
+            (click)="hideDialogFunc()"></button>
+        <button pButton type="button" pRipple label="Salvar" icon="pi pi-check" class="p-button-text"
+            (click)="savePermissions()"></button>
+    </div>
+</p-dialog>
+
+<!-- Menu -->
+<p-dialog [(visible)]="visibleDialogMenu" [modal]="true" [style]="{ width: '40rem'}"
+    [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }">
+
+    <p-tree [value]="menus" 
+     selectionMode="checkbox" 
+     [(selection)]="menuSelect"
+     [propagateSelectionDown]="false"
+     [propagateSelectionUp]="false"/>
+
+    <div class="flex justify-content-end gap-2 mt-3">
+        <button pButton type="button" pRipple label="Fechar" icon="pi pi-times" class="p-button-text"
+            (click)="hideDialogMenu()"></button>
+        <button pButton type="button" pRipple label="Salvar" icon="pi pi-check" class="p-button-text"
+            (click)="saveMenus()"></button>
     </div>
 </p-dialog>

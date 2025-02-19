@@ -45,7 +45,7 @@
                     <input pInputText type="text" (input)="tableFilter.filterGlobal($any($event.target).value, 'contains')"
                         placeholder="Pesquisar" />
                 </p-iconField>
-                <p-button type="button" icon="pi pi-refresh" size="small" (click)="listVehicles()"></p-button>
+                <p-button type="button" icon="pi pi-refresh" size="small" (onClick)="listVehicles()"></p-button>
                 @if(selectedVehicle.length > 0){
                 <p-button label="Saída" icon="pi pi-sign-out" severity="danger" size="small" class="ml-2"
                     (click)="confirm()"></p-button>

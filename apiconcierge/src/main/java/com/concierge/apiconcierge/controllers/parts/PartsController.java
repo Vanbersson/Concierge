@@ -1,4 +1,4 @@
-package com.concierge.apiconcierge.controllers.version1.parts;
+package com.concierge.apiconcierge.controllers.parts;
 
 
 import com.concierge.apiconcierge.dtos.message.MessageResponseDto;

@@ -5,8 +5,6 @@ import { Router } from '@angular/router';
 import { lastValueFrom } from 'rxjs';
 import { HttpResponse } from '@angular/common/http';
 
-
-
 //PrimeNg
 import { StepperModule } from 'primeng/stepper';
 import { TabViewModule } from 'primeng/tabview';
@@ -48,6 +46,7 @@ import { User } from '../../../models/user/user';
 import { ClientCompany } from '../../../models/clientcompany/client-company';
 import { VehicleEntry } from '../../../models/vehicle/vehicle-entry';
 import { IColor } from '../../../interfaces/icolor';
+import { MESSAGE_RESPONSE_NOT_COLOR, MESSAGE_RESPONSE_NOT_MODEL, MESSAGE_RESPONSE_NOT_PLACA, MESSAGE_RESPONSE_PLACAEXISTS } from '../../../util/constants';
 
 @Component({
   selector: 'app-vehicle.entry',
@@ -67,7 +66,6 @@ import { IColor } from '../../../interfaces/icolor';
 })
 export default class VehicleEntryComponent implements OnInit, OnDestroy {
   IMAGE_MAX_SIZE: number = 4243795;
-  private user: User = null;
   private vehicleEntry: VehicleEntry;
 
   activeStepper: number | undefined = 0;
@@ -153,41 +151,33 @@ export default class VehicleEntryComponent implements OnInit, OnDestroy {
   listVehicleEntry: VehicleEntry[] = [];
   constructor(
     private router: Router,
-    private layoutService: LayoutService,
     private storageService: StorageService,
     private vehicleModelService: VehicleModelService,
     private vehicleService: VehicleService,
     private userService: UserService,
     private messageService: MessageService,
     private serviceClienteCompany: ClientecompanyService,
-    private ngxImageCompressService: NgxImageCompressService) { 
-      this.userService.getUser$().subscribe(data => {
-        this.user = data;
-      });
-  
-      this.cores = [
-        { color: 'Branco' },
-        { color: 'Preto' },
-        { color: 'Azul' },
-        { color: 'Verde' },
-        { color: 'Cinza' },
-        { color: 'Vermelho' },
-        { color: 'Amarelo' },
-        { color: 'Rosa' },
-        { color: 'Roxo' },
-        { color: 'Outro' }
-      ];
-  
-      this.addRequireInit();
-    }
+    private ngxImageCompressService: NgxImageCompressService) {  }
 
   ngOnInit(): void {
+    this.cores = [
+      { color: 'Branco' },
+      { color: 'Preto' },
+      { color: 'Azul' },
+      { color: 'Verde' },
+      { color: 'Cinza' },
+      { color: 'Vermelho' },
+      { color: 'Amarelo' },
+      { color: 'Rosa' },
+      { color: 'Roxo' },
+      { color: 'Outro' }
+    ];
 
+    this.addRequireInit();
   }
   ngOnDestroy(): void {
 
   }
-
   private addRequireInit() {
     this.addValidClientCompanyId();
     this.addValidClientCompanyName();
@@ -196,7 +186,6 @@ export default class VehicleEntryComponent implements OnInit, OnDestroy {
 
     this.addRequirePlaca();
   }
-
   //ClientCompany
   //Valid Id
   private addValidClientCompanyId() {
@@ -534,10 +523,6 @@ export default class VehicleEntryComponent implements OnInit, OnDestroy {
 
   }
   public async photoFile2Vehicle() {
-    /*  const image = this.openCamera();
-     this.photoVehicle2 = (await image).base64String;
-     this.formVehicle.patchValue({ photo2: this.photoVehicle2 }); */
-
     this.ngxImageCompressService.uploadFile().then(({ image, orientation }) => {
       if (this.ngxImageCompressService.byteCount(image) > this.IMAGE_MAX_SIZE) {
         this.messageService.add({ severity: 'error', summary: 'Imagem', detail: 'Tamanha máximo 3MB', icon: 'pi pi-times', life: 3000 });
@@ -553,10 +538,6 @@ export default class VehicleEntryComponent implements OnInit, OnDestroy {
     });
   }
   public async photoFile3Vehicle() {
-    /* const image = this.openCamera();
-    this.photoVehicle3 = (await image).base64String;
-    this.formVehicle.patchValue({ photo3: this.photoVehicle3 }); */
-
     this.ngxImageCompressService.uploadFile().then(({ image, orientation }) => {
       if (this.ngxImageCompressService.byteCount(image) > this.IMAGE_MAX_SIZE) {
         this.messageService.add({ severity: 'error', summary: 'Imagem', detail: 'Tamanha máximo 3MB', icon: 'pi pi-times', life: 3000 });
@@ -688,7 +669,6 @@ export default class VehicleEntryComponent implements OnInit, OnDestroy {
     }
 
   }
-
   private existsVehicle() {
     this.vehicleService.notExistsVehicle(this.formVehicle.value.placa).subscribe(data => {
       if (data.status == 200) {
@@ -700,7 +680,6 @@ export default class VehicleEntryComponent implements OnInit, OnDestroy {
       }
     });
   }
-
   //Add or Delete Vehicle entry
   public addVehicleEntry() {
     if (this.validVehicleEntry()) {
@@ -742,10 +721,10 @@ export default class VehicleEntryComponent implements OnInit, OnDestroy {
     const vehicleValue = this.formVehicle.value;
 
     this.vehicleEntry = new VehicleEntry();
-    this.vehicleEntry.companyId = this.user.companyId;
-    this.vehicleEntry.resaleId = this.user.resaleId;
-    this.vehicleEntry.idUserEntry = this.user.id;
-    this.vehicleEntry.nameUserEntry = this.user.name;
+    this.vehicleEntry.companyId = this.storageService.companyId;
+    this.vehicleEntry.resaleId = this.storageService.resaleId;
+    this.vehicleEntry.idUserEntry = this.storageService.id;
+    this.vehicleEntry.nameUserEntry = this.storageService.name;
 
     if (clientValue.clientCompanyNot.length == 0) {
       this.vehicleEntry.clientCompanyId = clientValue.clientCompanyId;
@@ -827,10 +806,6 @@ export default class VehicleEntryComponent implements OnInit, OnDestroy {
 
   private async saveVehicle(vehicle: VehicleEntry): Promise<HttpResponse<VehicleEntry>> {
 
-    const PLACA: string = "Placa not informed.";
-    const PLACAEXISTS: string = "Placa already exists.";
-    const VEHICLEMODEL: string = "Model not informed.";
-    const COLOR: string = "Color not informed.";
     const RG: string = "Invalid RG.";
 
     try {
@@ -838,15 +813,15 @@ export default class VehicleEntryComponent implements OnInit, OnDestroy {
     } catch (error) {
 
       if (error.status == 401) {
-        if (error.error.messageError == PLACA) {
+        if (error.error.message == MESSAGE_RESPONSE_NOT_PLACA) {
           this.messageService.add({ severity: 'error', summary: 'Erro', detail: "Placa não informada", icon: 'pi pi-times' });
-        } else if (error.error.messageError == PLACAEXISTS) {
+        } else if (error.error.message == MESSAGE_RESPONSE_PLACAEXISTS) {
           this.messageService.add({ severity: 'error', summary: 'Erro', detail: "Já se encontra na empresa", icon: 'pi pi-times' });
-        } else if (error.error.messageError == VEHICLEMODEL) {
+        } else if (error.error.message == MESSAGE_RESPONSE_NOT_MODEL) {
           this.messageService.add({ severity: 'error', summary: 'Erro', detail: "Modelo não informado", icon: 'pi pi-times' });
-        } else if (error.error.messageError == COLOR) {
+        } else if (error.error.message == MESSAGE_RESPONSE_NOT_COLOR) {
           this.messageService.add({ severity: 'error', summary: 'Erro', detail: "Cor não informada", icon: 'pi pi-times' });
-        } else if (error.error.messageError == RG) {
+        } else if (error.error.message == RG) {
           this.messageService.add({ severity: 'error', summary: 'Erro', detail: "Rg inválido", icon: 'pi pi-times' });
         }
       }

@@ -47,19 +47,18 @@ export class UserProfileComponent implements OnInit, OnDestroy {
   userFormView = new FormGroup({
     status: new FormControl<string>({ value: '', disabled: true }),
     name: new FormControl<string>('', Validators.required),
-    password: new FormControl<string>('', Validators.required),
-    passwordValid: new FormControl<string>('', Validators.required),
-    cellphone: new FormControl<string>('', Validators.required),
-
+    password: new FormControl<string>(''),
+    passwordValid: new FormControl<string>(''),
+    cellphone: new FormControl<string>(''),
   });
 
   userForm = new FormGroup({
     status: new FormControl<string>('', Validators.required),
     name: new FormControl<string>('', Validators.required),
     email: new FormControl<string>('', Validators.required),
-    password: new FormControl<string>('', Validators.required),
-    passwordValid: new FormControl<string>('', Validators.required),
-    cellphone: new FormControl<string>('', Validators.required),
+    password: new FormControl<string>(''),
+    passwordValid: new FormControl<string>(''),
+    cellphone: new FormControl<string>(''),
     photo: new FormControl<string | null>(null),
     roleDesc: new FormControl<string>('', Validators.required),
   });
@@ -76,20 +75,20 @@ export class UserProfileComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
 
   }
-
   showDialogUser() {
     this.busyService.busy();
     this.searchUser();
   }
   private searchUser() {
-    this.userService.getUser$().subscribe((data) => {
-      this.user = data;
+    this.userService.getUserFilterEmail$(this.storageService.email).subscribe((data) => {
+      this.user = data.body;
       this.busyService.idle();
       this.dataViewUser();
       this.visibleDialogUser = true;
     }, (error) => {
       this.busyService.idle();
     });
+
   }
   hideDialogUser() {
     this.visibleDialogUser = false;
@@ -128,25 +127,6 @@ export class UserProfileComponent implements OnInit, OnDestroy {
     });
 
   }
-  validationPass(): boolean {
-    const { value } = this.userFormView;
-
-    if (value.name == '' || value.cellphone == '') {
-      this.messageService.add({ severity: 'error', summary: 'Campo', detail: 'Campo inválido', icon: 'pi pi-times' });
-      return false
-    }
-
-    if (value.password != value.passwordValid) {
-      this.alertErroPassword();
-      return false
-    }
-
-    if (value.password == '' || value.passwordValid == '') {
-      this.alertErroPassword();
-      return false
-    }
-    return true;
-  }
   dataUpdateUser() {
     const { value } = this.userFormView;
     this.user.name = value.name;
@@ -155,27 +135,19 @@ export class UserProfileComponent implements OnInit, OnDestroy {
     this.user.password = value.password;
   }
   updateUser() {
+    this.dataUpdateUser();
 
-    if (this.validationPass()) {
-
-      this.dataUpdateUser();
-      this.userService.updateUser(this.user).subscribe((data) => {
-        if (data.status == 200) {
-          this.messageService.add({ severity: 'success', summary: 'Usuário', detail: 'Atualizado com sucesso', icon: 'pi pi-check' });
-          this.saveStorage(this.user);
-          this.hideDialogUser();
-        }
-      }, (error) => {
-        this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Não autorizado', icon: 'pi pi-times' });
-      });
-    }
+    this.userService.updateUser(this.user).subscribe((data) => {
+      if (data.status == 200) {
+        this.messageService.add({ severity: 'success', summary: 'Usuário', detail: 'Atualizado com sucesso', icon: 'pi pi-check' });
+        this.hideDialogUser();
+      }
+    }, (error) => {
+      this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Não autorizado', icon: 'pi pi-times' });
+    });
 
   }
-
-  private saveStorage(user: User) {
-    this.storageService.photo = user.photo;
-    this.storageService.name = user.name;
-  }
+  
   alertErroPassword() {
     this.messageService.add({ severity: 'error', summary: 'Senha', detail: 'Senha não conferir', icon: 'pi pi-times' });
   }

@@ -1,15 +1,14 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { Component, OnDestroy, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 //PrimeNg
 import { ButtonModule } from 'primeng/button';
 import { CalendarModule } from 'primeng/calendar';
-import { LayoutService } from '../../layouts/layout/service/layout.service';
 import { Router } from '@angular/router';
-import { StorageService } from '../../services/storage/storage.service';
-import { ValidToken } from '../../services/login/validtoken';
 
+
+import { VehicleService } from '../../services/vehicle/vehicle.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -19,10 +18,45 @@ import { ValidToken } from '../../services/login/validtoken';
   styleUrl: './dashboard.component.scss',
   providers: []
 })
-export default class DashboardComponent {
+export default class DashboardComponent implements OnInit, OnDestroy {
 
+  qtdVehicleEntry = signal<number>(0);
+  qtdVehicleExit = signal<number>(0);
 
-  constructor(public layoutService: LayoutService, private router: Router, private storageService: StorageService, private valid: ValidToken) {
+  qtdVehicleBudgetWith = signal<number>(0);
+  qtdVehicleBudgetWithout = signal<number>(0);
+
+  constructor(private router: Router, private vehicleService: VehicleService) {
+  }
+  ngOnInit(): void {
+    this.qtdVehicles();
+  }
+  ngOnDestroy(): void {
+
+  }
+
+  qtdVehicles() {
+    var qtdBudgetWith = 0;
+    var qtdBudgetWithOut = 0;
+    this.vehicleService.allPendingAuthorization$().subscribe((data) => {
+      this.qtdVehicleEntry.set(data.length);
+
+      for (let index = 0; index < data.length; index++) {
+        const element = data[index];
+        if (element.budgetStatus != 'semOrcamento') {
+          qtdBudgetWith += 1;
+          this.qtdVehicleBudgetWith.set(qtdBudgetWith);
+        }else{
+          qtdBudgetWithOut +=1;
+          this.qtdVehicleBudgetWithout.set(qtdBudgetWithOut);
+        }
+
+      }
+    });
+
+    this.vehicleService.allAuthorized$().subscribe((data) => {
+      this.qtdVehicleExit.set(data.length);
+    });
   }
 
 

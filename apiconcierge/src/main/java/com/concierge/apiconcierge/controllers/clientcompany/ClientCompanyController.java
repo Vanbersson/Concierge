@@ -1,4 +1,4 @@
-package com.concierge.apiconcierge.controllers.version1.clientcompany;
+package com.concierge.apiconcierge.controllers.clientcompany;
 
 import com.concierge.apiconcierge.dtos.message.MessageResponseDto;
 import com.concierge.apiconcierge.dtos.clientcompany.ClientCompanyDto;
@@ -27,7 +27,6 @@ public class ClientCompanyController {
 
     @PostMapping("/save")
     public ResponseEntity<Object> save(@RequestBody ClientCompanyDto data) {
-
         try {
             ClientCompany clientCompany = new ClientCompany();
             BeanUtils.copyProperties(data, clientCompany);
@@ -48,8 +47,8 @@ public class ClientCompanyController {
             ClientCompany clientCompany = new ClientCompany();
             BeanUtils.copyProperties(data, clientCompany);
 
-            boolean result = this.service.update(clientCompany);
-            return ResponseEntity.status(HttpStatus.OK).build();
+            String message = this.service.update(clientCompany);
+            return ResponseEntity.status(HttpStatus.OK).body(new MessageResponseDto(message));
 
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
@@ -57,18 +56,25 @@ public class ClientCompanyController {
     }
 
     @GetMapping("/filter/all")
-    public ResponseEntity<List<ClientCompany>> all() {
-        return ResponseEntity.ok(this.service.listAllLocal());
+    public ResponseEntity<Object> all() {
+        try {
+            return ResponseEntity.status(HttpStatus.OK).body(this.service.listAll());
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
+        }
     }
 
     @GetMapping("/filter/id/{id}")
     public ResponseEntity<Object> filterId(@PathVariable(name = "id") Integer id) {
-        ClientCompany client = this.service.filterIdLocal(id);
-        if (client == null)
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        try {
+            ClientCompany client = this.service.filterId(id);
+            if (client == null)
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 
-        return ResponseEntity.ok().body(client);
-
+            return ResponseEntity.status(HttpStatus.OK).body(client);
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
+        }
     }
 
 
