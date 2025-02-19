@@ -2,8 +2,7 @@
 INSERT INTO `tb_address`
 (`zip_code`, `state`, `city`, `neighborhood`, `address`)
 VALUES
-('54590000','PE','Cabo de Santo Agostinho','Distrito DIPER','Via pedro rossi'),
-('54330183','PE','Jaboatão dos Guararapes','Cajueiro Seco','Rua Pastos Bons');
+('54590000','PE','Cabo de Santo Agostinho','Distrito DIPER','Via pedro rossi');
 
 INSERT INTO tb_permission
     (id,description)
@@ -42,12 +41,9 @@ VALUES
 (1,1,0,'Recursos Humanos');
 
 INSERT INTO `tb_user`
-(`company_id`, `resale_id`, `status`, `name`,`email`, `password`, `cellphone`, `role_id`,`role_desc`,`role_func`,`limit_discount`)
+(`company_id`, `resale_id`,`status`, `name`, `email`, `password`, `cellphone`, `limit_discount`, `role_id`, `role_desc`, `role_func`, `photo`,)
 VALUES
-(1,1,0,'Administrador','vambersson@gmail.com','$2a$10$9EKoKdyZdu.iFS8QnBykoOCW1Gix0PB/k6PN5L5t7URoddZ.wsu9i','81982158862',1,'TI',0,100),
-(1,1,0,'Daniela Batista','servicos1@nativarossi.com.br','$2a$12$9ikssJkNBTMRacAricc9/uCJkj1LE7bL8jdYN6QtLb7AkpRthLUai','81996660114',2,'Vendedor',1,10),
-(1,1,0,'Allyson Rogerio','servicos2@nativarossi.com.br','$2a$12$9ikssJkNBTMRacAricc9/uCJkj1LE7bL8jdYN6QtLb7AkpRthLUai','81996670018',2,'Vendedor',1,10),
-(1,1,0,'Alef Fernando','servicos3@nativarossi.com.br','$2a$12$9ikssJkNBTMRacAricc9/uCJkj1LE7bL8jdYN6QtLb7AkpRthLUai','8196670017',2,'Vendedor',1,10);
+(1,1,0,'Administrador','vambersson@gmail.com','$2a$10$9EKoKdyZdu.iFS8QnBykoOCW1Gix0PB/k6PN5L5t7URoddZ.wsu9i','81982158862',100,1,'TI',0,'');
 
 INSERT INTO tb_vehicle_model
 (company_id, resale_id, status, description)
