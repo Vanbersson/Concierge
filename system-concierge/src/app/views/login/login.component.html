@@ -1,5 +1,24 @@
+<p-toast />
+<p-confirmDialog #cd>
+  <ng-template pTemplate="headless" let-message>
+    <div class="flex flex-column align-items-center p-5 surface-overlay border-round">
+      <div class="border-circle bg-primary inline-flex justify-content-center align-items-center h-6rem w-6rem">
+        <i class="pi pi-question text-5xl"></i>
+      </div>
+      <span class="font-bold text-2xl block mb-2 mt-4">
+        {{ message.header }}
+      </span>
+      <p class="mb-0">{{ message.message }}</p>
+      <div class="flex align-items-center gap-2 mt-4">
+        <button pButton label="Entendi" (click)="cd.accept()" class="w-8rem">
+        </button>
+
+      </div>
+    </div>
+  </ng-template>
+</p-confirmDialog>
+
 <div class="login-container">
-  <p-toast/>
   <div class="card-login">
     <div class="card-login-title">
       <span>Conecte-se</span>
@@ -20,16 +39,17 @@
             <label for="idsenha">Digite sua senha</label>
           </p-floatLabel>
         </div>
-
       </div>
-      <div class="card-login-button">
-        <div class="card-login-button-submit">
-          <button pButton type="submit" label="Entrar"></button>
+      <div class="grid p-fluid p-formgrid">
+        <div class="field col-5">
+          <p-button type="submit" label="Entrar" />
         </div>
-        <div class="card-login-button-esqueceu">
-          <button pButton type="button" label="Esqueceu sua senha?" [text]="true" (click)="forgetPass()"></button>
+        <div class="field col-7">
+          <p-button type="button" label="Esqueceu a senha?" [text]="true" severity="secondary"
+            (onClick)="forgetPass()" />
         </div>
       </div>
+      
     </form>
   </div>
 

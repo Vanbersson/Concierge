@@ -230,12 +230,9 @@ export class SidebarComponent implements OnInit {
       }
     ];
 
-    const storageKeys = this.storageService.menus;
     // Converte a string em um array de keys
-    const keysToShow = storageKeys.split(','); 
-
+    const keysToShow = this.storageService.menus.split(',');
     this.menuItem = this.menuItem.map(item => this.updateVisibility(item, keysToShow));
-
   }
 
   updateVisibility(item: MenuItem, keys: string[]): MenuItem {
