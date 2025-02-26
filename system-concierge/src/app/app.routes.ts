@@ -34,7 +34,7 @@ export const routes: Routes = [
                     {
                         path: 'lista-entrada-veiculo',
                         title: 'Lista Veículos',
-                        loadComponent: () => import('./views/concierge/veiculos/veiculos.component')
+                        loadComponent: () => import('./views/concierge/vehicle/vehicle.component')
                     },
                     {
                         path: 'mannutencao-entrada-veiculo/:id',

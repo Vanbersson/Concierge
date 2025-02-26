@@ -34,8 +34,8 @@ import { TaskService } from '../../../services/task/task.service';
   selector: 'app-veiculos',
   standalone: true,
   imports: [CommonModule, FormsModule, RouterModule, ToastModule, DropdownModule, TableModule, InputIconModule, IconFieldModule, TagModule, MultiSelectModule, ButtonModule, InputTextModule],
-  templateUrl: './veiculos.component.html',
-  styleUrl: './veiculos.component.scss',
+  templateUrl: './vehicle.component.html',
+  styleUrl: './vehicle.component.scss',
   providers: [MessageService, DatePipe]
 })
 export default class VeiculosComponent implements OnInit, OnDestroy {
