@@ -409,12 +409,11 @@
                     </p-table>
 
                     <div class="flex justify-content-end gap-2 mt-3">
-                        <button pButton type="button" pRipple label="Cancelar" icon="pi pi-times" class="p-button-text"
+                        <button pButton type="button" pRipple label="Fechar" icon="pi pi-times" class="p-button-text"
                             (click)="hideDialogFilterClientCompany()"></button>
                         <button pButton type="submit" pRipple label="Confirmar" icon="pi pi-check" class="p-button-text"
                             (click)="selectClientCompany()"></button>
                     </div>
-
                 </p-dialog>
                 <form [formGroup]="formClientCompany">
 
@@ -439,7 +438,7 @@
                             <p-inputGroup>
                                 <input pInputText id="clientCompanyName" type="text"
                                     formControlName="clientCompanyName" />
-                                <button pButton type="button" icon="pi pi-search" class="p-button-warning"
+                                <button pButton type="button" icon="pi pi-filter" class="p-button-warning"
                                     (click)="showDialogClientCompany()"></button>
                             </p-inputGroup>
                             <small class="p-error block" *ngIf="formClientCompany.get('clientCompanyName')?.invalid">

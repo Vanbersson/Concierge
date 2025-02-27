@@ -50,7 +50,7 @@
                                 <p-inputGroup>
                                     <input pInputText id="clientCompanyName" type="text"
                                         formControlName="clientCompanyName" [style]="{'text-transform':'uppercase'}" />
-                                    <button pButton type="button" icon="pi pi-search" class="p-button-warning"
+                                    <button pButton type="button" icon="pi pi-filter" class="p-button-warning"
                                         (click)="showDialogFilterClientCompany()"></button>
                                 </p-inputGroup>
 
@@ -243,10 +243,10 @@
                                         <div class="inline-flex align-items-center gap-2"
                                             *ngFor="let model of value">
                                             @if(model.photo){
-                                                <p-image [src]="'data:image/png;base64,'+model.photo" alt="" height="18"
-                                                width="18" [preview]="false" />
+                                                <p-image [src]="'data:image/png;base64,'+model.photo" alt="" height="22"
+                                                width="22" [preview]="false" />
                                             }
-                                            <div>{{ model.description }}</div>
+                                            <div style="margin: 0.42rem;">{{ model.description }}</div>
                                         </div>
                                         <div *ngIf="!value || value.length === 0">Selecione</div>
                                     </ng-template>

@@ -201,6 +201,8 @@ export class SidebarComponent implements OnInit {
                 key: '100_1_0',
                 label: 'Veículos',
                 visible: false,
+                icon:'pi pi-car',
+                routerLink:'relatorio/portaria/veiculo'
               }
 
             ]
