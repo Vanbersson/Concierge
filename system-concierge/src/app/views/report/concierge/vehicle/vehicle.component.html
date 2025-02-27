@@ -1,1 +1,183 @@
-<p>vehicle works!</p>
+<div class="layout-card">
+    <p-toast />
+    <div class="layout-card-title">
+        <span class="text-500 font-medium">Veículos</span>
+        <div class="flex gap-2">
+
+            <p-button icon="pi pi-refresh" />
+        </div>
+    </div>
+    <p-table #dt1 dataKey="id" [value]="listVehicleEntry" [rowHover]="true" [showCurrentPageReport]="true"
+        currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} entradas"
+        [globalFilterFields]="['id', 'placa', 'modelDescription', 'frota', 'dateEntry','dateExit','clientCompanyName','nameUserAttendant','budgetStatus']"
+        [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 25, 50]" styleClass="p-datatable-sm">
+        <ng-template pTemplate="caption">
+            <div class="flex justify-content-between">
+                <p-iconField iconPosition="left">
+                    <p-inputIcon>
+                        <i class="pi pi-search"></i>
+                    </p-inputIcon>
+                    <input pInputText type="text" (input)="dt1.filterGlobal($event.target.value, 'contains')"
+                        placeholder="Pesquisar" />
+                </p-iconField>
+                <p-button icon="pi pi-filter" label="Filtro" [outlined]="true" severity="warning"
+                    (onClick)="showDialog()" />
+            </div>
+        </ng-template>
+        <ng-template pTemplate="header">
+            <tr>
+                <th class="font-normal" pSortableColumn="id" style="width:10%">
+                    Código <p-sortIcon field="id" />
+                </th>
+                <th class="font-normal" pSortableColumn="placa" style="width:10%">
+                    Placa <p-sortIcon field="placa" />
+                </th>
+                <th class="font-normal" pSortableColumn="modelDescription" style="width:10%">
+                    Modelo <p-sortIcon field="modelDescription" />
+                </th>
+                <th class="font-normal" pSortableColumn="frota" style="width:10%">
+                    Frota <p-sortIcon field="frota" />
+                </th>
+                <th class="font-normal" pSortableColumn="dateEntry" style="width:10%">
+                    Entrada <p-sortIcon field="dateEntry" />
+                </th>
+                <th class="font-normal" pSortableColumn="dateExit" style="width:10%">
+                    Saída <p-sortIcon field="dateExit" />
+                </th>
+                <th class="font-normal" pSortableColumn="clientCompanyName">
+                    Empresa <p-sortIcon field="clientCompanyName" />
+                </th>
+                <th class="font-normal" pSortableColumn="nameUserAttendant">
+                    Consultor <p-sortIcon field="nameUserAttendant" />
+                </th>
+                <th class="font-normal" pSortableColumn="budgetStatus">
+                    Orçamento <p-sortIcon field="budgetStatus" />
+                </th>
+                <th class="font-normal">
+                    Visualizar
+                </th>
+
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-vehicle>
+            <tr>
+                <td><span class="text-500">{{ vehicle.id }}</span></td>
+                <td>
+                    @if(vehicle.placa == "NOVO"){
+                    <div class="flex align-items-center justify-content-center bg-blue-100 border-round"
+                        [ngStyle]="{width: '3.5rem', height: '2.5rem'}">
+                        <span class="text-500">NOVO</span>
+                    </div>
+                    }@else {
+                    <span class="text-500">{{vehicle.placa | uppercase}}</span>
+                    }
+                </td>
+                <td><span class="text-500">{{ vehicle.modelDescription | uppercase }}</span>
+                </td>
+                <td><span class="text-500">{{ vehicle.frota | uppercase }}</span></td>
+                <td><span class="text-500">{{ vehicle.dateEntry }}</span></td>
+                <td><span class="text-500">29/02/2027 11:22</span></td>
+                <td>
+                    <span class="text-500">{{ vehicle.clientCompanyName | uppercase }}</span>
+                </td>
+                <td>
+                    <span class="text-500">{{ vehicle.nameUserAttendant | uppercase }}</span>
+                </td>
+                <td><p-tag [value]="vehicle.budgetStatus" [severity]="getSeverity(vehicle.budgetStatus)"></p-tag></td>
+                <td>
+                    <p-button icon="pi pi-eye" severity="success" [text]="true" size="large" />
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
+</div>
+
+<p-dialog [(visible)]="dialogVisible" header="Filtro" [modal]="true" [style]="{ width: '70rem',height:'60rem' }"
+    [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }" [maximizable]="true">
+
+    <form [formGroup]="formFilter" (ngSubmit)="filterClient()">
+        <div class="p-fluid p-formgrid grid">
+
+            <div class="field col-12 md:col-4">
+                <label for="dateIniId">Período inicial</label>
+                <p-calendar dateFormat="dd/mm/yy" [showIcon]="true" [showOnFocus]="false" inputId="buttondisplay"
+                    formControlName="dateInit" />
+                <small class="p-error block" *ngIf="formFilter.get('dateInit')?.invalid">
+                    Campo obrigatório</small>
+            </div>
+            <div class="field col-12 md:col-4">
+                <label for="dateIniId">Período final</label>
+                <p-calendar dateFormat="dd/mm/yy" [showIcon]="true" [showOnFocus]="false" inputId="buttondisplay"
+                    formControlName="dateFinal" />
+                <small class="p-error block" *ngIf="formFilter.get('dateFinal')?.invalid">
+                    Campo obrigatório</small>
+            </div>
+            <div class="md:col-4">
+            </div>
+            <div class="col-12 md:col-6">
+                <app-filterclient (outputClient)="selectClientCompany.set($event)" />
+            </div>
+            <div class="field col-12 md:col-4">
+                <label for="vehiclemodelid">Modelos</label>
+                <p-multiSelect [options]="vehicleModels$ | async" display="chip" [selectionLimit]="1"
+                    placeholder="Selecione" optionLabel="description">
+                    <ng-template let-value pTemplate="selectedItems">
+                        <div class="inline-flex align-items-center gap-2" *ngFor="let model of value">
+                            @if(model.photo){
+                            <p-image [src]="'data:image/png;base64,'+model.photo" alt="" height="22" width="22"
+                                [preview]="false" />
+                            }
+                            <div style="margin: 0.42rem;">{{ model.description }}</div>
+                        </div>
+                        <div *ngIf="!value || value.length === 0">Selecione</div>
+                    </ng-template>
+                    <ng-template let-model pTemplate="item">
+                        <div class="flex align-items-center gap-2">
+                            @if(model.photo){
+                            <p-image [src]="'data:image/png;base64,'+model.photo" alt="" height="18" width="18"
+                                [preview]="false" />
+                            }
+                            <div>{{ model.description }}</div>
+                        </div>
+                    </ng-template>
+                </p-multiSelect>
+            </div>
+            <div class="md:col-2">
+            </div>
+            <div class=" field col-12 md:col-2">
+                <label for="codeId">Código</label>
+                <p-inputNumber inputId="codeId" />
+            </div>
+            <div class=" field col-12 md:col-4">
+                <label for="placaId">Placa</label>
+                <p-inputNumber inputId="placaId" />
+            </div>
+            <div class=" field col-12 md:col-2">
+                <label for="frotaId">Frota</label>
+                <p-inputNumber inputId="frotaId" />
+            </div>
+            <div class="md:col-4">
+            </div>
+            <div class="md:col-12">
+            </div>
+            <div class="md:col-12">
+            </div>
+            <div class="md:col-4">
+            </div>
+            <div class="md:col-12">
+            </div>
+            <div class="md:col-12">
+            </div>
+            <div class="md:col-4">
+            </div>
+            <div class="md:col-12">
+            </div>
+        </div>
+    </form>
+
+    <div class="flex justify-content-end gap-2 mt-5">
+        <button pButton type="button" pRipple label="Fechar" icon="pi pi-times" class="p-button-text"
+            (click)="hideDialog()"></button>
+        <button pButton type="submit" pRipple label="Confirmar" icon="pi pi-check" class="p-button-text"></button>
+    </div>
+</p-dialog>
