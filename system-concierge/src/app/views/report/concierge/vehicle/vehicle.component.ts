@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, signal } from '@angular/core';
+import { Component, DoCheck, OnChanges, signal, SimpleChanges } from '@angular/core';
 import { FormGroup, FormControl, ReactiveFormsModule, FormsModule, Validators } from '@angular/forms'
 
 //PrimeNG
@@ -17,15 +17,18 @@ import { InputNumberModule } from 'primeng/inputnumber';
 import { CalendarModule } from 'primeng/calendar';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { ImageModule } from 'primeng/image';
-
+import { InputMaskModule } from 'primeng/inputmask';
 
 //Class
 import { VehicleEntry } from '../../../../models/vehicle/vehicle-entry';
 import { ClientCompany } from '../../../../models/clientcompany/client-company';
+import { ModelVehicle } from '../../../../models/vehicle-model/model-vehicle';
 
 //Service
 import { VehicleService } from '../../../../services/vehicle/vehicle.service';
 import { VehicleModelService } from '../../../../services/vehicle-model/vehicle-model.service';
+
+//Components
 import { FilterClientComponent } from '../../../../components/filter.client/filter.client.component';
 
 
@@ -36,29 +39,31 @@ import { FilterClientComponent } from '../../../../components/filter.client/filt
   imports: [CommonModule, FilterClientComponent, ToastModule, ButtonModule, TableModule,
     InputTextModule, IconFieldModule, InputIconModule, TagModule,
     DialogModule, ReactiveFormsModule, FormsModule, InputNumberModule,
-    CalendarModule, InputGroupModule, MultiSelectModule, ImageModule],
+    CalendarModule, InputGroupModule, MultiSelectModule, ImageModule,
+    InputMaskModule],
   templateUrl: './vehicle.component.html',
   styleUrl: './vehicle.component.scss',
   providers: [MessageService]
 })
-export default class VehicleComponent {
+export default class VehicleComponent implements DoCheck {
 
   dialogVisible: boolean = false;
   listVehicleEntry: VehicleEntry[] = [];
+
+  selectClientCompany = signal<ClientCompany>(new ClientCompany());
 
   vehicleModels$ = this.vehicleModelService.getAllEnabled$();
 
   formFilter = new FormGroup({
     dateInit: new FormControl<Date | string>('', Validators.required),
     dateFinal: new FormControl<Date | string>('', Validators.required),
-    id: new FormControl<number | null>(null),
+    clientCompanyId: new FormControl<number | null>(null),
+    clientCompanyName: new FormControl<string>(''),
+    modelVehicle: new FormControl<ModelVehicle[]>([]),
+    codeId: new FormControl<number | null>(null),
     placa: new FormControl<string>(''),
+    frota: new FormControl<string>(''),
   });
-
-  selectClientCompany = signal<ClientCompany>(null);
-
-
-
 
   constructor(private vehicleService: VehicleService, private vehicleModelService: VehicleModelService) {
     this.vehicleService.allPendingAuthorization$().subscribe(data => {
@@ -67,6 +72,15 @@ export default class VehicleComponent {
         data[index] = this.preList(data[index]);
       }
       this.listVehicleEntry = data;
+    });
+
+
+
+  }
+  ngDoCheck(): void {
+    this.formFilter.patchValue({
+      clientCompanyId: this.selectClientCompany().id,
+      clientCompanyName: this.selectClientCompany().name
     });
   }
 
@@ -114,6 +128,20 @@ export default class VehicleComponent {
     return 'warning';
   }
 
+  public cleanform() {
+    this.formFilter.patchValue({
+      dateInit: '',
+      dateFinal: '',
+      clientCompanyId: null,
+      clientCompanyName: '',
+      modelVehicle:[],
+      codeId: null,
+      placa: '',
+      frota: ''
+    });
+
+    this.selectClientCompany.set(new ClientCompany());
+  }
   public showDialog() {
     this.dialogVisible = true;
   }
@@ -122,8 +150,10 @@ export default class VehicleComponent {
     this.dialogVisible = false;
   }
 
-  filterClient(){
-    //console.log(this.selectClientCompany().name);
+  filterClient() {
+    console.log("Confirme");
+    
+    console.log(this.formFilter.value);
   }
 
 

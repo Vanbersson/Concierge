@@ -150,7 +150,6 @@ export default class VehicleEntryComponent implements OnInit, OnDestroy {
   dialogVehicleVisible: boolean = false;
   listVehicleEntry: VehicleEntry[] = [];
   constructor(
-    private router: Router,
     private storageService: StorageService,
     private vehicleModelService: VehicleModelService,
     private vehicleService: VehicleService,

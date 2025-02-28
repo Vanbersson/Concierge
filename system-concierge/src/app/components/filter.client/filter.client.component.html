@@ -1,18 +1,9 @@
-<div class="p-fluid p-formgrid grid">
-    <div class="field col-12">
-        <label for="clientCompanyNameId">Empresa</label>
-        <p-inputGroup>
-            <input  [ngModel]="clientName()" pInputText id="clientCompanyNameId" type="text" />
-            <button pButton type="button" icon="pi pi-filter" class="p-button-warning"
-                (click)="showDialogFilterClientCompany()"></button>
-        </p-inputGroup>
-    </div>
-</div>
+<button pButton type="button" icon="pi pi-filter" class="p-button-warning"
+    (click)="showDialogFilterClientCompany()"></button>
 
 <!-- Filter ClientCompany -->
 <p-dialog [(visible)]="dialogVisibleClientCompany" header="Empresas" [modal]="true" [style]="{ width: '70rem'}"
-    [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }" [draggable]="false" 
-    [resizable]="false">
+    [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }" [draggable]="false" [resizable]="false">
 
     <form [formGroup]="formClientCompanyFilter" (ngSubmit)="filterClientCompany()">
         <div class="p-fluid p-formgrid grid">

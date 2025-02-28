@@ -3,9 +3,8 @@
     <div class="layout-card-title">
         <span class="text-500 font-medium">Veículos</span>
         <div class="flex gap-2">
-            <p-button icon="pi pi-plus" label="Atendimento" [outlined]="true"
-                routerLink="/portaria/atendimento-veiculo"></p-button>
-            <p-button icon="pi pi-refresh" (onClick)="listVehicles()" />
+            <p-button icon="pi pi-car" [text]="true" label="Atendimento" routerLink="/portaria/atendimento-veiculo"/> 
+            <p-button icon="pi pi-refresh" [text]="true" label="Recarregar" (onClick)="listVehicles()"/>
         </div>
     </div>
 

@@ -4,12 +4,11 @@
         <span>Manutenção de veículos</span>
 
         <div class="layourt-button-back">
-            <button pButton [text]="true" severity="contrast" icon="pi pi-sign-out"
-                routerLink="/portaria/lista-entrada-veiculo"></button>
+            <p-button icon="pi pi-arrow-right" [text]="true" label="Voltar" routerLink="/portaria/lista-entrada-veiculo"/>
         </div>
     </div>
 
-    <div class="mobile-visible-none" >
+    <div class="mobile-visible-none">
         <p-timeline [value]="stepEntry" layout="horizontal">
             <ng-template pTemplate="marker" let-event>
                 <span

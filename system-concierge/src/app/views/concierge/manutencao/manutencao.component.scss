@@ -161,6 +161,10 @@
     }
 
     ::ng-deep {
+        .p-button-label {
+            font-weight: 400;
+        }
+        
         .p-timeline-horizontal{
             width: 70rem;
         }
