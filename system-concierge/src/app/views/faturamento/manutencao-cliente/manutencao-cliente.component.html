@@ -2,6 +2,7 @@
 
     <div class="layout-card-title">
         <span>Manutenção de clientes</span>
+        <p-button icon="pi pi-user-plus" [text]="true" label="Cliente" (onClick)="showDialog()"/>
     </div>
     <p-table #dt1 dataKey="id" [value]="clients" 
     [rowHover]="true" 
@@ -21,8 +22,7 @@
                     <input pInputText type="text" (input)="dt1.filterGlobal($event.target.value, 'contains')"
                         placeholder="Pesquisar" />
                 </p-iconField>
-                <button pButton label="Cliente" [outlined]="true" icon="pi pi-user-plus"
-                    (click)="showDialog()"></button>
+               
             </div>
         </ng-template>
         <ng-template pTemplate="header">

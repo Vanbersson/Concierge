@@ -3,7 +3,7 @@
 
     <div class="layout-card-title">
         <span>Modelos de veículos</span>
-        <p-button icon="pi pi-plus" (click)="showDialog()" label="Adicionar" [outlined]="true"></p-button>
+        <p-button icon="pi pi-plus" [text]="true"  label="Adicionar" (onClick)="showDialog()"/>
     </div>
 
     <p-dialog header="Modelo" [(visible)]="dialogVisible" [style]="{width: '450px'}">

@@ -2,10 +2,7 @@
     <p-toast />
     <div class="layout-card-title">
         <span class="text-500 font-medium">Veículos</span>
-        <div class="flex gap-2">
-
-            <p-button icon="pi pi-refresh" [text]="true" label="Limpar" />
-        </div>
+        <p-button icon="pi pi-refresh" [text]="true" label="Limpar" />
     </div>
     <p-table #dt1 dataKey="id" [value]="listVehicleEntry" [rowHover]="true" [showCurrentPageReport]="true"
         currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} entradas"
@@ -100,11 +97,9 @@
         <div class="p-fluid p-formgrid grid">
             <div class="md:col-12">
             </div>
-            <div class="field col-12 flex justify-content-end">
+            <div class="field col-12 flex justify-content-end mt-2">
                 <p-button icon="pi pi-refresh" [text]="true" label="Limpar" (onClick)="cleanform()" />
             </div>
-
-
             <div class="field col-12 md:col-3">
                 <label for="dateIniId">Período inicial</label>
                 <p-calendar dateFormat="dd/mm/yy" [iconDisplay]="'input'" [showIcon]="true" inputId="buttondisplay"

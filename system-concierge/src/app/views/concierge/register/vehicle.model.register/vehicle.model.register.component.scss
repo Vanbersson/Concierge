@@ -9,13 +9,16 @@
     .layout-card-title {
         display: flex;
         justify-content: space-between;
-        margin-bottom: 2rem;
+        margin-bottom: 0.5rem;
 
         span {
+            display: flex;
+            align-items: center;
             font-size: 1.25rem;
             font-weight: 400;
             color: #64748b;
         }
+
     }
 
     .layout-dialog-img {
@@ -48,6 +51,12 @@
         span {
             font-weight: 400;
 
+        }
+    }
+
+    ::ng-deep{
+        .p-button-label {
+            font-weight: 400;
         }
     }
 
