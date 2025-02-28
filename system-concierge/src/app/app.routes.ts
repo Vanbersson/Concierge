@@ -99,6 +99,15 @@ export const routes: Routes = [
 
             },
             {
+                path:'relatorio',
+                children:[
+                    {
+                        path:'portaria/veiculo',
+                        loadComponent: () => import('./views/report/concierge/vehicle/vehicle.component')
+                    }
+                ]
+            },
+            {
                 path: '**',
                 loadComponent: () => import('./views/not-found/not-found.component')
             }
