@@ -41,11 +41,13 @@
                             <div class="field col-12 md:col-1">
                                 <label for="clientCompanyId">Codígo</label>
                                 <p-inputNumber inputId="clientCompanyId" [useGrouping]="false" formControlName="clientCompanyId" />
+                                <small class="p-error block" *ngIf="formClientCompany.get('clientCompanyId')?.invalid">Campo obrigatório</small>
                             </div>
                             <div class="md:col-11"></div>
                             <div class="field col-10 md:col-6">
                                 <label for="clientCompanyName">Empresa</label>
                                 <input pInputText id="clientCompanyName" type="text" formControlName="clientCompanyName" [style]="{'text-transform':'uppercase'}" />
+                                <small class="p-error block" *ngIf="formClientCompany.get('clientCompanyName')?.invalid">Campo obrigatório</small>
                             </div>
                             <div class="field col-2 md:col-1 flex flex-column">
                                 <label for="">Filtro</label>
@@ -55,10 +57,12 @@
                             <div class="field col-12 md:col-2">
                                 <label for="clientCompanyCnpj">CNPJ</label>
                                 <p-inputMask id="clientCompanyCnpj" mask="99.999.999/9999-99" formControlName="clientCompanyCnpj" />
+                                <small class="p-error block" *ngIf="formClientCompany.get('clientCompanyCnpj')?.invalid">Campo obrigatório</small>
                             </div>
                             <div class="field col-12 md:col-2">
                                 <label for="clientCompanyCpf">CPF</label>
                                 <p-inputMask id="clientCompanyCpf" mask="999.999.999-99" formControlName="clientCompanyCpf" />
+                                <small class="p-error block" *ngIf="formClientCompany.get('clientCompanyCpf')?.invalid">Campo obrigatório</small>
                             </div>
                             <div class="field col-12 md:col-2">
                                 <label for="clientCompanyRg">RG</label>

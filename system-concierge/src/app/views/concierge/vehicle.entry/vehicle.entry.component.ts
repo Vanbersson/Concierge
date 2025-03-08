@@ -182,6 +182,9 @@ export default class VehicleEntryComponent implements OnInit, OnDestroy, DoCheck
   private addRequireInit() {
     this.addValidClientCompanyId();
     this.addValidClientCompanyName();
+    this.addValidClientCompanyCnpj();
+    this.addValidClientCompanyCpf();
+
     this.addRequireDriverCpf();
     this.addRequireDriverRg();
 
@@ -226,7 +229,6 @@ export default class VehicleEntryComponent implements OnInit, OnDestroy, DoCheck
   }
   
   public validationClientCompany() {
-
     if (this.formClientCompany.value.clientCompanyNot.length == 0) {
       this.removeValidClientCompanyId();
       this.removeValidClientCompanyName();
@@ -234,14 +236,14 @@ export default class VehicleEntryComponent implements OnInit, OnDestroy, DoCheck
       this.removeValidClientCompanyCpf();
 
       this.cleanFormClientCompany();
-
     } else {
       this.addValidClientCompanyId();
       this.addValidClientCompanyName();
+      this.addValidClientCompanyCnpj();
+      this.addValidClientCompanyCpf();
     }
   }
   public nextStepperClientCompany() {
-
     if (this.formClientCompany.valid) {
       this.activeStepper = 1;
     } else {
@@ -334,33 +336,38 @@ export default class VehicleEntryComponent implements OnInit, OnDestroy, DoCheck
     return this.formDriver.get('driverEntryRg');
   }
   private addRequireDriverRg() {
-    this.formDriver.controls['driverEntryRg'].addValidators(Validators.required);
+    this.formDriver.controls['driverEntryRg'].addValidators([Validators.required,Validators.maxLength(11)]);
     this.formDriver.controls['driverEntryRg'].updateValueAndValidity();
   }
   private deleteRequireRg() {
-    this.formDriver.controls['driverEntryRg'].removeValidators(Validators.required);
+    this.formDriver.controls['driverEntryRg'].removeValidators([Validators.required,Validators.maxLength(11)]);
     this.formDriver.controls['driverEntryRg'].updateValueAndValidity();
   }
   private addFormValidatorsDriver() {
     this.addRequireDriverCpf();
     this.addRequireDriverRg();
-    if (this.formDriver.value.driverEntryCpf != "" && this.formDriver.value.driverEntryRg == null) {
+
+    const driver = this.formDriver.value;
+
+    
+    if (driver.driverEntryCpf != "" && driver.driverEntryRg == null) {
       this.deleteRequireRg();
     }
-    if (this.formDriver.value.driverEntryCpf == "" && this.formDriver.value.driverEntryRg != null) {
+    if (driver.driverEntryCpf == "" && driver.driverEntryRg != null && driver.driverEntryRg.toString().length <= 11) {
       this.deleteRequireCpf();
-    }
+    }else if(driver.driverEntryRg.toString().length > 11){
+      this.messageService.add({ severity: 'info', summary: 'Atenção', detail: 'RG inválido', icon: 'pi pi-info-circle' });
+    }    
   }
   public nextSterpperDriver() {
 
     this.addFormValidatorsDriver();
 
-    if (this.formDriver.valid) {
+   if (this.formDriver.valid) {
       this.activeStepper = 2;
     } else {
       this.messageService.add({ severity: 'info', summary: 'Atenção', detail: 'Motorista não informado', icon: 'pi pi-info-circle' });
-    }
-
+    } 
   }
   public stepperDriver() {
     if (this.formClientCompany.valid) {
