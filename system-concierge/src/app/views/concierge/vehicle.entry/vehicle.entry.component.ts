@@ -1,7 +1,6 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, DoCheck, OnDestroy, OnInit, signal } from '@angular/core';
 import { CommonModule, UpperCasePipe } from '@angular/common';
 import { Validators, FormsModule, ReactiveFormsModule, FormGroup, FormControl } from '@angular/forms';
-import { Router } from '@angular/router';
 import { lastValueFrom } from 'rxjs';
 import { HttpResponse } from '@angular/common/http';
 
@@ -37,7 +36,6 @@ import { UserService } from '../../../services/user/user.service';
 import { VehicleService } from '../../../services/vehicle/vehicle.service';
 
 //Interface
-import { LayoutService } from '../../../layouts/layout/service/layout.service';
 import { StorageService } from '../../../services/storage/storage.service';
 import { IModelVehicle } from '../../../interfaces/vehicle-model/imodel-vehicle';
 
@@ -48,11 +46,15 @@ import { VehicleEntry } from '../../../models/vehicle/vehicle-entry';
 import { IColor } from '../../../interfaces/icolor';
 import { MESSAGE_RESPONSE_NOT_COLOR, MESSAGE_RESPONSE_NOT_MODEL, MESSAGE_RESPONSE_NOT_PLACA, MESSAGE_RESPONSE_PLACAEXISTS } from '../../../util/constants';
 
+
+//Components
+import { FilterClientComponent } from '../../../components/filter.client/filter.client.component';
+
 @Component({
   selector: 'app-vehicle.entry',
   standalone: true,
   imports: [
-    CommonModule, FormsModule, ReactiveFormsModule,
+    CommonModule, FilterClientComponent,FormsModule, ReactiveFormsModule,
     StepperModule, ImageModule, ToastModule,
     CheckboxModule, TagModule, DialogModule,
     BadgeModule, TabViewModule, TableModule,
@@ -64,7 +66,7 @@ import { MESSAGE_RESPONSE_NOT_COLOR, MESSAGE_RESPONSE_NOT_MODEL, MESSAGE_RESPONS
   templateUrl: './vehicle.entry.component.html',
   styleUrl: './vehicle.entry.component.scss'
 })
-export default class VehicleEntryComponent implements OnInit, OnDestroy {
+export default class VehicleEntryComponent implements OnInit, OnDestroy, DoCheck {
   IMAGE_MAX_SIZE: number = 4243795;
   private vehicleEntry: VehicleEntry;
 
@@ -72,22 +74,8 @@ export default class VehicleEntryComponent implements OnInit, OnDestroy {
   private upperCasePipe = new UpperCasePipe();
 
   //ClientCompany
+  selectClientCompany = signal<ClientCompany>(new ClientCompany());
 
-  clientCompany: ClientCompany;
-  dialogVisibleClientCompany: boolean = false;
-  dialogListClientCompany: ClientCompany[] = [];
-  dialogSelectClientCompany!: ClientCompany;
-  dialogloadingClientCompany: boolean = false;
-
-  formClientCompanyFilter = new FormGroup({
-    clientCompanyId: new FormControl<Number | null>(null),
-    clientCompanyFantasia: new FormControl<string>(''),
-    clientCompanyName: new FormControl<string>(''),
-    clientCompanyCnpj: new FormControl<string>(''),
-    clientCompanyCpf: new FormControl<string>(''),
-    clientCompanyRg: new FormControl<string | null>(null),
-    clientCompanyTipo: new FormControl<string>('j'),
-  });
   formClientCompany = new FormGroup({
     clientCompanyNot: new FormControl<string[]>([]),
     clientCompanyId: new FormControl<number | null>(null),
@@ -157,6 +145,7 @@ export default class VehicleEntryComponent implements OnInit, OnDestroy {
     private messageService: MessageService,
     private serviceClienteCompany: ClientecompanyService,
     private ngxImageCompressService: NgxImageCompressService) {  }
+ 
 
   ngOnInit(): void {
     this.cores = [
@@ -176,6 +165,19 @@ export default class VehicleEntryComponent implements OnInit, OnDestroy {
   }
   ngOnDestroy(): void {
 
+  }
+  ngDoCheck(): void {
+    if(this.selectClientCompany().id != 0){
+      this.formClientCompany.patchValue({
+        clientCompanyNot:[],
+        clientCompanyId: this.selectClientCompany().id,
+        clientCompanyName: this.selectClientCompany().name,
+        clientCompanyCnpj: this.selectClientCompany().cnpj,
+        clientCompanyCpf: this.selectClientCompany().cpf,
+        clientCompanyRg: this.selectClientCompany().rg
+      });
+    }
+    
   }
   private addRequireInit() {
     this.addValidClientCompanyId();
@@ -222,119 +224,7 @@ export default class VehicleEntryComponent implements OnInit, OnDestroy {
     this.formClientCompany.controls['clientCompanyCpf'].removeValidators(Validators.required);
     this.formClientCompany.controls['clientCompanyCpf'].updateValueAndValidity();
   }
-  public showDialogFilterClientCompany() {
-    this.dialogVisibleClientCompany = true;
-  }
-  public hideDialogFilterClientCompany() {
-    this.dialogVisibleClientCompany = false;
-  }
-  public selectClientCompany() {
-
-    if (this.dialogSelectClientCompany) {
-      this.dialogVisibleClientCompany = false;
-
-      this.clientCompany = new ClientCompany();
-      this.clientCompany = this.dialogSelectClientCompany;
-
-      this.formClientCompany.patchValue({
-        clientCompanyId: this.dialogSelectClientCompany.id,
-        clientCompanyName: this.dialogSelectClientCompany.name,
-        clientCompanyCnpj: this.dialogSelectClientCompany.cnpj,
-        clientCompanyCpf: this.dialogSelectClientCompany.cpf,
-        clientCompanyRg: this.dialogSelectClientCompany.rg
-      });
-
-      if (this.clientCompany.fisjur == "Juridica") {
-        this.addValidClientCompanyCnpj();
-        this.removeValidClientCompanyCpf();
-
-      } else {
-        this.addValidClientCompanyCpf();
-        this.removeValidClientCompanyCnpj();
-      }
-    }
-
-  }
-  public filterClientCompany() {
-
-    this.dialogloadingClientCompany = true;
-    const { value } = this.formClientCompanyFilter;
-
-    if (value.clientCompanyTipo == "j") {
-
-      if (value.clientCompanyId) {
-        this.serviceClienteCompany.getIdExternal$(value.clientCompanyId).subscribe((data) => {
-          this.dialogListClientCompany = data;
-          this.dialogloadingClientCompany = false;
-        }, (error) => {
-          this.dialogloadingClientCompany = false;
-        });
-      } else if (value.clientCompanyFantasia) {
-        this.serviceClienteCompany.getFantasiaJ$(value.clientCompanyFantasia).subscribe((data) => {
-          this.dialogListClientCompany = data;
-          this.dialogloadingClientCompany = false;
-        });
-      } else if (value.clientCompanyName) {
-        this.serviceClienteCompany.getNameJ$(value.clientCompanyName).subscribe((data) => {
-          this.dialogListClientCompany = data;
-          this.dialogloadingClientCompany = false;
-        });
-      } else if (value.clientCompanyCnpj) {
-        this.serviceClienteCompany.getCnpj$(value.clientCompanyCnpj).subscribe((data) => {
-          this.dialogListClientCompany = data;
-          this.dialogloadingClientCompany = false;
-        }, (error) => {
-          this.dialogloadingClientCompany = false;
-        });
-      }
-      else if (value.clientCompanyCpf || value.clientCompanyRg) {
-        this.dialogloadingClientCompany = false;
-      } else if (value.clientCompanyTipo) {
-        this.serviceClienteCompany.getTipo$(value.clientCompanyTipo).subscribe((data) => {
-          this.dialogListClientCompany = data;
-          this.dialogloadingClientCompany = false;
-        });
-      }
-
-    } else {
-      // P/Física
-
-      if (value.clientCompanyId) {
-        this.serviceClienteCompany.getIdExternal$(value.clientCompanyId).subscribe((data) => {
-          this.dialogListClientCompany = data;
-          this.dialogloadingClientCompany = false;
-        }, (error) => {
-          this.dialogloadingClientCompany = false;
-        });
-      } else if (value.clientCompanyFantasia) {
-        this.serviceClienteCompany.getFantasiaF$(value.clientCompanyFantasia).subscribe((data) => {
-          this.dialogListClientCompany = data;
-          this.dialogloadingClientCompany = false;
-        });
-      } else if (value.clientCompanyName) {
-        this.serviceClienteCompany.getNameF$(value.clientCompanyName).subscribe((data) => {
-          this.dialogListClientCompany = data;
-          this.dialogloadingClientCompany = false;
-        });
-      } else if (value.clientCompanyCnpj) {
-        this.dialogloadingClientCompany = false;
-      } else if (value.clientCompanyCpf) {
-        this.serviceClienteCompany.getCpf$(value.clientCompanyCpf).subscribe((data) => {
-          this.dialogListClientCompany = data;
-          this.dialogloadingClientCompany = false;
-        }, (error) => {
-          this.dialogloadingClientCompany = false;
-        });
-      } else if (value.clientCompanyTipo) {
-        this.serviceClienteCompany.getTipo$(value.clientCompanyTipo).subscribe((data) => {
-          this.dialogListClientCompany = data;
-          this.dialogloadingClientCompany = false;
-        });
-      }
-
-    }
-
-  }
+  
   public validationClientCompany() {
 
     if (this.formClientCompany.value.clientCompanyNot.length == 0) {
@@ -344,6 +234,7 @@ export default class VehicleEntryComponent implements OnInit, OnDestroy {
       this.removeValidClientCompanyCpf();
 
       this.cleanFormClientCompany();
+
     } else {
       this.addValidClientCompanyId();
       this.addValidClientCompanyName();
@@ -361,12 +252,13 @@ export default class VehicleEntryComponent implements OnInit, OnDestroy {
     this.activeStepper = 0;
   }
   private cleanFormClientCompany() {
+    this.selectClientCompany.set(new ClientCompany());
     this.formClientCompany.patchValue({
       clientCompanyNot: [],
       clientCompanyId: null,
-      clientCompanyName: null,
-      clientCompanyCnpj: null,
-      clientCompanyCpf: null,
+      clientCompanyName: '',
+      clientCompanyCnpj: '',
+      clientCompanyCpf: '',
       clientCompanyRg: null
     });
   }

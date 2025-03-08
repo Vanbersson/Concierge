@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, DoCheck, OnInit, signal } from '@angular/core';
 import { CommonModule, UpperCasePipe } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { Validators, FormsModule, ReactiveFormsModule, FormGroup, FormControl } from '@angular/forms';
@@ -56,6 +56,9 @@ import { lastValueFrom } from 'rxjs';
 import { HttpResponse } from '@angular/common/http';
 import { IBudget } from '../../../interfaces/budget/ibudget';
 
+//Components
+import { FilterClientComponent } from '../../../components/filter.client/filter.client.component';
+
 interface EventItem {
   description?: string;
   icon?: string;
@@ -69,12 +72,19 @@ interface IModel {
 @Component({
   selector: 'app-manutencao',
   standalone: true,
-  imports: [CommonModule, RouterModule, TabViewModule, FormsModule, IconFieldModule, CheckboxModule, TimelineModule, SpeedDialModule, ConfirmDialogModule, InputIconModule, ImageModule, DialogModule, ToastModule, TableModule, ReactiveFormsModule, InputTextareaModule, InputNumberModule, InputTextModule, ButtonModule, InputMaskModule, MultiSelectModule, InputGroupModule, RadioButtonModule, CalendarModule],
+  imports: [CommonModule, FilterClientComponent, RouterModule, 
+    TabViewModule, FormsModule, IconFieldModule, 
+    CheckboxModule, TimelineModule, SpeedDialModule, 
+    ConfirmDialogModule, InputIconModule, ImageModule, 
+    DialogModule, ToastModule, TableModule, ReactiveFormsModule, 
+    InputTextareaModule, InputNumberModule, InputTextModule, 
+    ButtonModule, InputMaskModule, MultiSelectModule, 
+    InputGroupModule, RadioButtonModule, CalendarModule],
   templateUrl: './manutencao.component.html',
   styleUrl: './manutencao.component.scss',
   providers: [ConfirmationService, MessageService]
 })
-export default class ManutencaoComponent implements OnInit {
+export default class ManutencaoComponent implements OnInit, DoCheck {
 
   RESPONSE_SUCCESS: string = "Success.";
   IMAGE_MAX_SIZE: number = 4243795;
@@ -142,7 +152,9 @@ export default class ManutencaoComponent implements OnInit {
   proteiroId: number = 0;
   porteiroName: string = '';
   porteiroInfo: String = '';
+  
   //ClientCompany
+  selectClientCompany = signal<ClientCompany>(new ClientCompany());
   formClientCompany = new FormGroup({
     clientCompanyNot: new FormControl<string[]>([]),
     clientCompanyId: new FormControl<number | null>(null),
@@ -151,21 +163,7 @@ export default class ManutencaoComponent implements OnInit {
     clientCompanyCpf: new FormControl<string>(''),
     clientCompanyRg: new FormControl<string | null>(null),
   });
-  formClientCompanyFilter = new FormGroup({
-    clientCompanyId: new FormControl<number | null>(null),
-    clientCompanyFantasia: new FormControl<string>(''),
-    clientCompanyName: new FormControl<string>(''),
-    clientCompanyCnpj: new FormControl<string>(''),
-    clientCompanyCpf: new FormControl<string>(''),
-    clientCompanyRg: new FormControl<string | null>(null),
-    clientCompanyTipo: new FormControl<string>('j'),
-  });
-
-  dialogListClientCompany: ClientCompany[] = [];
-  dialogSelectClientCompany!: ClientCompany;
-  dialogVisibleClientCompany: boolean = false;
-  dialogloadingClientCompany: boolean = false;
-
+  
   //Driver
   formDriver = new FormGroup({
     driverEntryName: new FormControl<string>('', Validators.required),
@@ -217,7 +215,6 @@ export default class ManutencaoComponent implements OnInit {
   ) {
 
   }
-
   ngOnInit(): void {
 
     //Id vehicle entry
@@ -270,6 +267,26 @@ export default class ManutencaoComponent implements OnInit {
     ];
 
     this.disableInput();
+  }
+  ngDoCheck(): void {
+    if(this.selectClientCompany().id != 0){
+      this.formClientCompany.patchValue({
+        clientCompanyNot:[],
+        clientCompanyId: this.selectClientCompany().id,
+        clientCompanyName: this.selectClientCompany().name,
+        clientCompanyCnpj: this.selectClientCompany().cnpj,
+        clientCompanyCpf: this.selectClientCompany().cpf,
+        clientCompanyRg: this.selectClientCompany().rg
+      });
+
+      if (this.selectClientCompany().fisjur == "Juridica") {
+        this.deleteRequireClientCompanyCpf();
+        this.addRequireClientCompanyCnpj();
+      } else {
+        this.deleteRequireClientCompanyCnpj();
+        this.addRequireClientCompanyCpf();
+      }
+    }
   }
 
   private async init() {
@@ -859,7 +876,6 @@ export default class ManutencaoComponent implements OnInit {
   private showClientCompany() {
     this.messageService.add({ severity: 'error', summary: 'Empresa', detail: "Não informada", icon: 'pi pi-times' });
   }
-
   //Porteiro
 
   //Proprietario
@@ -915,6 +931,7 @@ export default class ManutencaoComponent implements OnInit {
     }
   }
   private cleanFormClientCompany() {
+    this.selectClientCompany.set(new ClientCompany());
     this.formClientCompany.patchValue({
       clientCompanyId: null,
       clientCompanyName: '',
@@ -924,116 +941,7 @@ export default class ManutencaoComponent implements OnInit {
     });
 
   }
-  public selectClientCompany() {
-
-    if (this.dialogSelectClientCompany) {
-      this.dialogVisibleClientCompany = false;
-    }
-    this.formClientCompany.patchValue({
-      clientCompanyId: this.dialogSelectClientCompany.id,
-      clientCompanyName: this.dialogSelectClientCompany.name,
-      clientCompanyCnpj: this.dialogSelectClientCompany.cnpj,
-      clientCompanyCpf: this.dialogSelectClientCompany.cpf,
-      clientCompanyRg: this.dialogSelectClientCompany.rg
-    });
-
-    this.formClientCompany.patchValue({
-      clientCompanyNot: []
-    })
-
-    if (this.dialogSelectClientCompany.cnpj == "") {
-      this.deleteRequireClientCompanyCnpj();
-      this.addRequireClientCompanyCpf();
-    } else {
-      this.deleteRequireClientCompanyCpf();
-      this.addRequireClientCompanyCnpj();
-    }
-
-
-  }
-  public hideDialogFilterClientCompany() {
-    this.dialogVisibleClientCompany = false;
-  }
-  public filterClientCompany() {
-
-    this.dialogloadingClientCompany = true;
-
-    const { value } = this.formClientCompanyFilter;
-
-    if (value.clientCompanyTipo == "j") {
-
-      if (value.clientCompanyId) {
-        this.serviceClienteCompany.getIdExternal$(value.clientCompanyId).subscribe((data) => {
-          this.dialogListClientCompany = data;
-          this.dialogloadingClientCompany = false;
-        }, (error) => {
-          this.dialogloadingClientCompany = false;
-        });
-      } else if (value.clientCompanyFantasia) {
-        this.serviceClienteCompany.getFantasiaJ$(value.clientCompanyFantasia).subscribe((data) => {
-          this.dialogListClientCompany = data;
-          this.dialogloadingClientCompany = false;
-        });
-      } else if (value.clientCompanyName) {
-        this.serviceClienteCompany.getNameJ$(value.clientCompanyName).subscribe((data) => {
-          this.dialogListClientCompany = data;
-          this.dialogloadingClientCompany = false;
-        });
-      } else if (value.clientCompanyCnpj) {
-        this.serviceClienteCompany.getCnpj$(value.clientCompanyCnpj).subscribe((data) => {
-          this.dialogListClientCompany = data;
-          this.dialogloadingClientCompany = false;
-        }, (error) => {
-          this.dialogloadingClientCompany = false;
-        });
-      }
-      else if (value.clientCompanyCpf || value.clientCompanyRg) {
-        this.dialogloadingClientCompany = false;
-      } else if (value.clientCompanyTipo) {
-        this.serviceClienteCompany.getTipo$(value.clientCompanyTipo).subscribe((data) => {
-          this.dialogListClientCompany = data;
-          this.dialogloadingClientCompany = false;
-        });
-      }
-
-
-    } else {
-      // P/Física
-
-      if (value.clientCompanyId) {
-        this.serviceClienteCompany.getIdExternal$(value.clientCompanyId).subscribe((data) => {
-          this.dialogListClientCompany = data;
-          this.dialogloadingClientCompany = false;
-        }, (error) => {
-          this.dialogloadingClientCompany = false;
-        });
-      } else if (value.clientCompanyName) {
-        this.serviceClienteCompany.getNameF$(value.clientCompanyName).subscribe((data) => {
-          this.dialogListClientCompany = data;
-          this.dialogloadingClientCompany = false;
-        });
-      } else if (value.clientCompanyCnpj) {
-        this.dialogloadingClientCompany = false;
-      } else if (value.clientCompanyCpf) {
-        this.serviceClienteCompany.getCpf$(value.clientCompanyCpf).subscribe((data) => {
-          this.dialogListClientCompany = data;
-          this.dialogloadingClientCompany = false;
-        }, (error) => {
-          this.dialogloadingClientCompany = false;
-        });
-      } else if (value.clientCompanyTipo) {
-        this.serviceClienteCompany.getTipo$(value.clientCompanyTipo).subscribe((data) => {
-          this.dialogListClientCompany = data;
-          this.dialogloadingClientCompany = false;
-        });
-      }
-
-    }
-
-  }
-  public showDialogClientCompany() {
-    this.dialogVisibleClientCompany = true;
-  }
+   
   //Driver
   public async photoEntryDriver() {
     this.ngxImageCompressService.uploadFile().then(({ image, orientation }) => {
