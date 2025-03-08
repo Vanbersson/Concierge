@@ -125,7 +125,7 @@
                 <label for="clientCompanyNameId">Empresa</label>
                 <input pInputText id="clientCompanyNameId" type="text" formControlName="clientCompanyName" />
             </div>
-            <div class="field col-2 md:col-1 flex flex-column">
+            <div class="field col-2 md:col-1">
                 <label for="">Filtro</label>
                 <app-filterclient (outputClient)="selectClientCompany.set($event)" />
             </div>

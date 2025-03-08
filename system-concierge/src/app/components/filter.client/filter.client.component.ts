@@ -19,6 +19,7 @@ import { ClientCompany } from '../../models/clientcompany/client-company';
 
 //Service
 import { ClientecompanyService } from '../../services/clientecompany/clientecompany.service';
+import { StorageService } from '../../services/storage/storage.service';
 
 @Component({
   selector: 'app-filterclient',
@@ -51,7 +52,7 @@ export class FilterClientComponent {
     clientCompanyTipo: new FormControl<string>('j'),
   });
 
-  constructor(private serviceClienteCompany: ClientecompanyService) { }
+  constructor(private serviceClienteCompany: ClientecompanyService,private storageService: StorageService) { }
 
   //Filter Client
   public showDialogFilterClientCompany() {
@@ -64,6 +65,8 @@ export class FilterClientComponent {
   public selectClientCompany() {
     if (this.dialogSelectClientCompany) {
       //Emit 
+      this.dialogSelectClientCompany.companyId = this.storageService.companyId;
+      this.dialogSelectClientCompany.resaleId = this.storageService.resaleId;
       this.outputClient.emit(this.dialogSelectClientCompany);
 
       this.clientName.set(this.dialogSelectClientCompany.name);

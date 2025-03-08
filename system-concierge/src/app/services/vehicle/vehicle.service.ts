@@ -20,7 +20,7 @@ export class VehicleService {
     return this.http.post<VehicleEntry>(environment.apiuUrl + "/vehicle/entry/save", vehicle, { headers: this.myHeaders(), observe: 'response' });
   }
 
-  entryUpdate$(vehicle: VehicleEntry): Observable<HttpResponse<VehicleEntry>> {
+  entryUpdate(vehicle: VehicleEntry): Observable<HttpResponse<VehicleEntry>> {
     return this.http.post<VehicleEntry>(environment.apiuUrl + "/vehicle/entry/update", vehicle, { headers: this.myHeaders(), observe: 'response' });
   }
 

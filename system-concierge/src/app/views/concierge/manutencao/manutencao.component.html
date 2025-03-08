@@ -524,7 +524,7 @@
         <div class="flex justify-content-between">
             <div class="layourt-button-action gap-2">
                 <button pButton type="button" label="Salvar" icon="pi pi-check" size="small" [raised]="true"
-                    severity="secondary-custom" (click)="saveVehicle()"></button>
+                    severity="secondary-custom" (click)="save()"></button>
                 <button pButton type="button" label="Orçamento" icon="pi pi-file" size="small" [raised]="true"
                     severity="secondary-custom" (click)="confirmGerarOrcamento()"></button>
                 <button pButton type="button" label="Imprimir" icon="pi pi-print" size="small" [raised]="true"
@@ -534,6 +534,7 @@
             </div>
         </div>
 
+        <!-- Mobile -->
         <div class="layourt-button-action-speedDial">
             <p-speedDial [model]="itemsButtonMenu" direction="up" />
         </div>

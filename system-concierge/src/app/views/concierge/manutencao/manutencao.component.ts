@@ -181,7 +181,6 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
     driverExitPhotoDoc1: new FormControl<string | null>(null),
     driverExitPhotoDoc2: new FormControl<string | null>(null),
   });
-
   driverEntryPhoto!: string;
   driverEntryPhotoDoc1!: string;
   driverEntryPhotoDoc2!: string;
@@ -211,7 +210,6 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
     private messageService: MessageService,
     private busyService: BusyService,
     private ngxImageCompressService: NgxImageCompressService
-
   ) {
 
   }
@@ -261,7 +259,7 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
         icon: 'pi pi-upload',
         tooltipOptions: { tooltipLabel: 'Salvar' },
         command: () => {
-          this.saveVehicle();
+          this.save();
         }
       }
     ];
@@ -288,7 +286,6 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
       }
     }
   }
-
   private async init() {
     //Show load
     this.busyService.busy();
@@ -407,7 +404,6 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
     this.formVehicle.get('nameUserExitAuth2').enable();
 
   }
-
   private loadForms() {
 
     this.stepEvent(this.vehicleEntry.stepEntry);
@@ -833,7 +829,6 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
       return error;
     }
   }
-
   public async deleteAuth2() {
     if (this.formVehicle.value.idUserExitAuth2 != 0) {
       var auth = new VehicleEntryAuth();
@@ -869,7 +864,6 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
       return error;
     }
   }
-
   private showUserAttendant() {
     this.messageService.add({ severity: 'error', summary: 'Consultor', detail: "Não informado", icon: 'pi pi-times' });
   }
@@ -941,7 +935,6 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
     });
 
   }
-   
   //Driver
   public async photoEntryDriver() {
     this.ngxImageCompressService.uploadFile().then(({ image, orientation }) => {
@@ -1105,12 +1098,11 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
     this.formDriver.controls['driverExitRg'].removeValidators(Validators.required);
     this.formDriver.controls['driverExitRg'].updateValueAndValidity();
   }
-
   showPlacaExist(placa: string) {
     const uppercase = new UpperCasePipe();
     this.messageService.add({ severity: 'error', summary: 'Placa ' + uppercase.transform(placa), detail: "Vaículo já se encontra na empresa", icon: 'pi pi-truck' });
   }
-  //Orçamento
+  //Budget
   public confirmGerarOrcamento() {
 
     if (this.vehicleEntry.budgetStatus != "semOrcamento") {
@@ -1146,7 +1138,6 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
       });
     }
   }
-
   private async saveBudget(budget: IBudgetNew): Promise<HttpResponse<IBudget>> {
     try {
       return await lastValueFrom(this.budgetService.addBudget$(this.budget));
@@ -1165,7 +1156,6 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
       return error;
     }
   }
-
   //Save Vehicle Entry
   private validForms(): boolean {
     const vehicleValue = this.formVehicle.value;
@@ -1199,20 +1189,14 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
       return false;
     }
 
-
     if (vehicleValue.serviceOrder == "yes") {
-
       if (vehicleValue.statusAuthExit != this.notAuth) {
         if (vehicleValue.userAttendant.length == 0) {
           this.messageService.add({ severity: 'error', summary: 'Consultor', detail: "Não informado", icon: 'pi pi-times' });
           return false;
         }
       }
-
-    } else {
-
-
-    }
+    } 
 
     if (clientCompanyValue.clientCompanyNot.length == 0) {
       if (clientCompanyValue.clientCompanyId == null || clientCompanyValue.clientCompanyName == "") {
@@ -1240,7 +1224,6 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
     }
 
     this.enableInput();
-
     return true;
   }
   private loadingVehicle() {
@@ -1318,44 +1301,59 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
     this.vehicleEntry.driverExitPhotoDoc2 = driverValue.driverExitPhotoDoc2 ?? "";
 
   }
-  public saveVehicle() {
+  public async save() {
+    this.busyService.busy();
+    
     if (this.validForms()) {
       //Loading data
       this.loadingVehicle();
 
-      this.vehicleService.entryUpdate$(this.vehicleEntry).subscribe((data) => {
-        if (data.status == 200) {
-          this.messageService.add({ severity: 'success', summary: 'Veículo', detail: 'Atualizado com sucesso', icon: 'pi pi-check' });
-          this.disableInput();
-        }
-      }, (error) => {
+      if(this.selectClientCompany().id != 0){
+        const resultClient = await this.saveClient(this.selectClientCompany());
+      }
+      
+      const resultVehicle = await this.updateVehicle(this.vehicleEntry);
 
-        const BUDGET_ATTENDANT = "BUDGET-Attendant not informed.";
-        const BUDGET_CLIENTCOMPANY = "BUDGET-ClientCompany not informed.";
-        if (error.status == 401) {
-          if (error.error.message == MESSAGE_RESPONSE_NOT_ATTENDANT) {
-            this.showUserAttendant();
-          }
-          if (error.error.message == MESSAGE_RESPONSE_NOT_CLIENT) {
-            this.showClientCompany();
-          }
-          if (error.error.message == BUDGET_ATTENDANT) {
-            this.messageService.add({ severity: 'info', summary: 'Informação', detail: "Véiculo possui orçamento" });
-            this.showUserAttendant();
-          }
-          if (error.error.message == BUDGET_CLIENTCOMPANY) {
-            this.messageService.add({ severity: 'info', summary: 'Informação', detail: "Véiculo possui orçamento" });
-            this.showClientCompany();
+      if (resultVehicle.status == 200) {
+        this.messageService.add({ severity: 'success', summary: 'Veículo', detail: 'Atualizado com sucesso', icon: 'pi pi-check' });
+        this.disableInput();
+        this.selectClientCompany.set(new ClientCompany());
+      }
+    }
 
-          }
-        }
-
-      });
-
+    this.busyService.idle();
+  }
+  private async updateVehicle(vehicle: VehicleEntry):Promise<HttpResponse<VehicleEntry>>{
+    try {
+      return await lastValueFrom(this.vehicleService.entryUpdate(vehicle));
+    } catch (error) {
+      const BUDGET_ATTENDANT = "BUDGET-Attendant not informed.";
+      const BUDGET_CLIENTCOMPANY = "BUDGET-ClientCompany not informed.";
+      if (error.error.message == MESSAGE_RESPONSE_NOT_ATTENDANT) {
+        this.showUserAttendant();
+      }
+      if (error.error.message == MESSAGE_RESPONSE_NOT_CLIENT) {
+        this.showClientCompany();
+      }
+      if (error.error.message == BUDGET_ATTENDANT) {
+        this.messageService.add({ severity: 'info', summary: 'Informação', detail: "Véiculo possui orçamento" });
+        this.showUserAttendant();
+      }
+      if (error.error.message == BUDGET_CLIENTCOMPANY) {
+        this.messageService.add({ severity: 'info', summary: 'Informação', detail: "Véiculo possui orçamento" });
+        this.showClientCompany();
+      }
+      return error;
     }
 
   }
-
+  private async saveClient(client: ClientCompany): Promise<HttpResponse<ClientCompany>> {
+    try {
+      return await lastValueFrom(this.serviceClienteCompany.save(client));
+    } catch (error) {
+      return error;
+    }
+  }
   //Permission Not
   private permissionNot() {
     this.messageService.add({ severity: 'error', summary: 'Permissão', detail: "Você não tem permissão", icon: 'pi pi-times' });
