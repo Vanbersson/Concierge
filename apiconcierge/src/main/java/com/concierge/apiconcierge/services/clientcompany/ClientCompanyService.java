@@ -25,9 +25,6 @@ public class ClientCompanyService implements IClientCompanyService {
     @Autowired
     private ClientCompanyValidation validation;
 
-    @Autowired
-    RestTemplate restTemplate;
-
     @SneakyThrows
     @Override
     public Integer save(ClientCompany client) {
@@ -88,19 +85,19 @@ public class ClientCompanyService implements IClientCompanyService {
 
     }
 
-    @SneakyThrows
-    public ClientCompany filterIdRemote(Integer id) {
-
-        try{
-            ClientCompany[] client = this.restTemplate.getForObject(ConstantsUrls.URL_SEARCH_APOLLO_FILTER_CODE + id, ClientCompany[].class);
-            if (client.length == 0)
-                return null;
-            return client[0];
-        }catch (Exception ex){
-            throw new ClientCompanyException(ex.getMessage());
-        }
-
-    }
+//    @SneakyThrows
+//    public ClientCompany filterIdRemote(Integer id) {
+//
+//        try{
+//            ClientCompany[] client = this.restTemplate.getForObject(ConstantsUrls.URL_SEARCH_APOLLO_FILTER_CODE + id, ClientCompany[].class);
+//            if (client.length == 0)
+//                return null;
+//            return client[0];
+//        }catch (Exception ex){
+//            throw new ClientCompanyException(ex.getMessage());
+//        }
+//
+//    }
 
     @SneakyThrows
     @Override

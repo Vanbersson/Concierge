@@ -39,43 +39,16 @@ public class VehicleEntryService implements IVehicleEntryService {
     private VehicleEntryValidation validation;
 
     @Autowired
-    private ClientCompanyService clientCompanyService;
-
-    @Autowired
     BudgetService budgetService;
 
     @SneakyThrows
     @Override
     public Integer save(VehicleEntry vehicle) {
-
         try {
             vehicle.setId(null);
             VehicleEntry vehicleEntry = this.loadVehicle(vehicle);
             String message = this.validation.save(vehicleEntry);
             if (message.equals(ConstantsMessage.SUCCESS)) {
-
-                if (vehicleEntry.getClientCompanyId() != null) {
-                    //Consulta local o cliente
-                    ClientCompany clientLocal = this.clientCompanyService.filterId(vehicleEntry.getClientCompanyId());
-                    if (clientLocal == null) {
-
-                        //Consulta Remoto e salva localmente o cliente
-                        ClientCompany clientNew = this.clientCompanyService.filterIdRemote(vehicleEntry.getClientCompanyId());
-
-                        //Save local
-                        clientNew.setCompanyId(vehicleEntry.getCompanyId());
-                        clientNew.setResaleId(vehicleEntry.getResaleId());
-                        clientNew.setStatus(StatusEnableDisable.ativo);
-                        clientNew.setContactName("");
-                        clientNew.setContactEmail("");
-                        clientNew.setContactDDDPhone("");
-                        clientNew.setContactPhone("");
-                        clientNew.setContactDDDCellphone("");
-                        clientNew.setContactCellphone("");
-
-                        Integer resultClientNew = this.clientCompanyService.save(clientNew);
-                    }
-                }
                 VehicleEntry result = this.repository.save(vehicleEntry);
                 return result.getId();
             } else {
@@ -84,46 +57,20 @@ public class VehicleEntryService implements IVehicleEntryService {
         } catch (Exception ex) {
             throw new VehicleEntryException(ex.getMessage());
         }
-
     }
 
     @SneakyThrows
     @Override
     public String update(VehicleEntry vehicle) {
-
         try {
             VehicleEntry vehicleEntry = this.loadVehicle(vehicle);
             String message = this.validation.update(vehicleEntry);
             if (message.equals(ConstantsMessage.SUCCESS)) {
-
                 if (vehicleEntry.getClientCompanyId() != null) {
-                    //Consulta local o cliente
-                    ClientCompany clientLocal = this.clientCompanyService.filterId(vehicleEntry.getClientCompanyId());
-                    //Consulta Remoto e salva localmente o cliente
-                    if (clientLocal == null) {
-                        //Consulta Remoto
-                        ClientCompany clientNew = this.clientCompanyService.filterIdRemote(vehicleEntry.getClientCompanyId());
-
-                        //Save local
-                        clientNew.setCompanyId(vehicleEntry.getCompanyId());
-                        clientNew.setResaleId(vehicleEntry.getResaleId());
-                        clientNew.setStatus(StatusEnableDisable.ativo);
-                        clientNew.setContactName("");
-                        clientNew.setContactEmail("");
-                        clientNew.setContactDDDPhone("");
-                        clientNew.setContactPhone("");
-                        clientNew.setContactDDDCellphone("");
-                        clientNew.setContactCellphone("");
-
-                        Integer resultClientNew = this.clientCompanyService.save(clientNew);
-                    }
-
                     if (vehicle.getBudgetStatus() != StatusBudgetEnum.semOrcamento) {
                         this.updateBudget(vehicleEntry);
                     }
-
                 }
-
                 this.repository.save(vehicleEntry);
                 return ConstantsMessage.SUCCESS;
             } else {
@@ -132,7 +79,6 @@ public class VehicleEntryService implements IVehicleEntryService {
         } catch (Exception ex) {
             throw new VehicleEntryException(ex.getMessage());
         }
-
     }
 
     private void updateBudget(VehicleEntry vehicle) {

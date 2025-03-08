@@ -10,6 +10,9 @@ public class ConstantsMessage {
     public static final String ERROR_MENU_ID = "Menu Id not informed.";
     public static final String ERROR_PERMISSION_ID = "Permission Id not informed.";
     public static final String ERROR_USER_EXISTS = "User already exists.";
+    public static final String ERROR_CLIENT_EXISTS = "Client already exists.";
+
+
 
 
     public static final String ERROR_COMPANY = "Company not informed.";

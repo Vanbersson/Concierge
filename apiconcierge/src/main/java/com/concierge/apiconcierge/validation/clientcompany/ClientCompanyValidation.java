@@ -2,11 +2,18 @@ package com.concierge.apiconcierge.validation.clientcompany;
 
 import com.concierge.apiconcierge.models.clientcompany.ClientCompany;
 import com.concierge.apiconcierge.models.clientcompany.FisJurEnum;
+import com.concierge.apiconcierge.repositories.clientcompany.IClientCompanyRepository;
 import com.concierge.apiconcierge.util.ConstantsMessage;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 public class ClientCompanyValidation implements IClientCompanyValidation {
+
+    @Autowired
+    private IClientCompanyRepository repository;
 
     @Override
     public String save(ClientCompany client) {
@@ -24,6 +31,11 @@ public class ClientCompanyValidation implements IClientCompanyValidation {
             if (client.getCnpj().isBlank())
                 return ConstantsMessage.ERROR_CNPJ;
         }
+
+        Optional<ClientCompany> clientResult = this.repository.findById(client.getId());
+        if(!clientResult.isEmpty())
+            return ConstantsMessage.ERROR_CLIENT_EXISTS;
+
         return ConstantsMessage.SUCCESS;
     }
 
