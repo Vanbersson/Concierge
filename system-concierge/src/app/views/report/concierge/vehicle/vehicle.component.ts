@@ -1,6 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component, DoCheck, OnChanges, signal, SimpleChanges } from '@angular/core';
+import { Component, DoCheck, signal } from '@angular/core';
 import { FormGroup, FormControl, ReactiveFormsModule, FormsModule, Validators } from '@angular/forms'
+import { HttpResponse } from '@angular/common/http';
+import { lastValueFrom } from 'rxjs';
 
 //PrimeNG
 import { ButtonModule } from 'primeng/button';
@@ -18,6 +20,8 @@ import { CalendarModule } from 'primeng/calendar';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { ImageModule } from 'primeng/image';
 import { InputMaskModule } from 'primeng/inputmask';
+import { RadioButtonModule } from 'primeng/radiobutton';
+import { CheckboxModule } from 'primeng/checkbox';
 
 //Class
 import { VehicleEntry } from '../../../../models/vehicle/vehicle-entry';
@@ -25,13 +29,28 @@ import { ClientCompany } from '../../../../models/clientcompany/client-company';
 import { ModelVehicle } from '../../../../models/vehicle-model/model-vehicle';
 
 //Service
-import { VehicleService } from '../../../../services/vehicle/vehicle.service';
+import { VehicleReportService } from '../../../../services/reports/concierge/vehicle-report.service';
 import { VehicleModelService } from '../../../../services/vehicle-model/vehicle-model.service';
 
 //Components
 import { FilterClientComponent } from '../../../../components/filter.client/filter.client.component';
+import { BusyService } from '../../../../components/loading/busy.service';
+import { StorageService } from '../../../../services/storage/storage.service';
 
-
+export interface IFilterVehicles {
+  type: string;
+  vehicleNew?: string;
+  companyId: number;
+  resaleId: number;
+  dateInit: Date | string;
+  dateFinal: Date | string;
+  clientId?: number;
+  modelId?: number;
+  vehicleId?: number;
+  placa?: string;
+  frota?: string;
+ 
+}
 
 @Component({
   selector: 'app-vehicle',
@@ -40,7 +59,7 @@ import { FilterClientComponent } from '../../../../components/filter.client/filt
     InputTextModule, IconFieldModule, InputIconModule, TagModule,
     DialogModule, ReactiveFormsModule, FormsModule, InputNumberModule,
     CalendarModule, InputGroupModule, MultiSelectModule, ImageModule,
-    InputMaskModule],
+    InputMaskModule,RadioButtonModule, CheckboxModule],
   templateUrl: './vehicle.component.html',
   styleUrl: './vehicle.component.scss',
   providers: [MessageService]
@@ -55,27 +74,22 @@ export default class VehicleComponent implements DoCheck {
   vehicleModels$ = this.vehicleModelService.getAllEnabled$();
 
   formFilter = new FormGroup({
+    type: new FormControl<string>('E'),
+    vehicleNew: new FormControl<string | null>(null),
     dateInit: new FormControl<Date | string>('', Validators.required),
     dateFinal: new FormControl<Date | string>('', Validators.required),
-    clientCompanyId: new FormControl<number | null>(null),
+    clientCompanyId: new FormControl<number>(0),
     clientCompanyName: new FormControl<string>(''),
     modelVehicle: new FormControl<ModelVehicle[]>([]),
-    codeId: new FormControl<number | null>(null),
+    vehicleId: new FormControl<number>(0),
     placa: new FormControl<string>(''),
-    frota: new FormControl<string>(''),
+    frota: new FormControl<string>('')
   });
 
-  constructor(private vehicleService: VehicleService, private vehicleModelService: VehicleModelService) {
-    this.vehicleService.allPendingAuthorization$().subscribe(data => {
-
-      for (let index = 0; index < data.length; index++) {
-        data[index] = this.preList(data[index]);
-      }
-      this.listVehicleEntry = data;
-    });
-
-
-
+  constructor(private reportService: VehicleReportService,
+    private vehicleModelService: VehicleModelService,
+    private busyService: BusyService,
+    private storageService: StorageService) {
   }
   ngDoCheck(): void {
     this.formFilter.patchValue({
@@ -83,15 +97,18 @@ export default class VehicleComponent implements DoCheck {
       clientCompanyName: this.selectClientCompany().name
     });
   }
-
   private preList(vehicle: VehicleEntry): VehicleEntry {
     if (vehicle.vehicleNew == "yes") {
       vehicle.placa = "NOVO";
     }
-    if (vehicle.clientCompanyName == "") {
-    } else {
-      var nome = vehicle.clientCompanyName.split(' ');
-      vehicle.clientCompanyName = nome[0] + " " + nome[1];
+    if (vehicle.clientCompanyName != "") {
+      var names = vehicle.clientCompanyName.split(' ');
+      if (names.length >= 2) {
+        vehicle.clientCompanyName = names[0] + " " + names[1];
+      } else {
+        vehicle.clientCompanyName = names[0];
+      }
+
     }
     switch (vehicle.budgetStatus) {
       case 'pendenteAprovacao':
@@ -111,7 +128,6 @@ export default class VehicleComponent implements DoCheck {
     }
     return vehicle;
   }
-
   public getSeverity(value: string): any {
     switch (value) {
       case 'Pendente Aprovação':
@@ -127,36 +143,72 @@ export default class VehicleComponent implements DoCheck {
     }
     return 'warning';
   }
-
   public cleanform() {
     this.formFilter.patchValue({
+      type:'E',
+      vehicleNew:null,
       dateInit: '',
       dateFinal: '',
-      clientCompanyId: null,
+      clientCompanyId: 0,
       clientCompanyName: '',
-      modelVehicle:[],
-      codeId: null,
+      modelVehicle: [],
+      vehicleId: 0,
       placa: '',
       frota: ''
     });
 
     this.selectClientCompany.set(new ClientCompany());
   }
+  public cleanList() {
+    this.listVehicleEntry = [];
+    this.cleanform();
+  }
   public showDialog() {
     this.dialogVisible = true;
   }
-
   public hideDialog() {
     this.dialogVisible = false;
   }
 
-  filterClient() {
-    console.log("Confirme");
-    
-    console.log(this.formFilter.value);
+  public async filterClient() {
+    this.hideDialog();
+
+    this.busyService.busy();
+
+    const { value, valid } = this.formFilter;
+
+    const filters: IFilterVehicles = {
+      type: value.type,
+      companyId: this.storageService.companyId,
+      resaleId: this.storageService.resaleId,
+      dateInit: value.dateInit,
+      dateFinal: value.dateFinal,
+      clientId: value?.clientCompanyId ?? 0,
+      modelId: value.modelVehicle.at(0)?.id ?? 0,
+      vehicleId: value?.vehicleId ?? 0,
+      placa: value.placa,
+      frota:value.frota,
+      vehicleNew: value.vehicleNew?.at(0) ?? "not"       
+    }
+    const resultFilter = await this.filterVehicles(filters);
+
+    if (resultFilter.status == 200) {
+      for (let index = 0; index < resultFilter.body.length; index++) {
+        const element = resultFilter.body[index];
+        resultFilter.body[index] = this.preList(element);
+      }
+      this.listVehicleEntry = resultFilter.body;
+    }
+
+    this.busyService.idle();
   }
 
-
-
+  private async filterVehicles(filters: any): Promise<HttpResponse<VehicleEntry[]>> {
+    try {
+      return await lastValueFrom(this.reportService.filterVehicle(filters));
+    } catch (error) {
+      return error;
+    }
+  }
 
 }

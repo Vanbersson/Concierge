@@ -2,7 +2,7 @@
     <p-toast />
     <div class="layout-card-title">
         <span class="text-500 font-medium">Veículos</span>
-        <p-button icon="pi pi-refresh" [text]="true" label="Limpar" />
+        <p-button icon="pi pi-refresh" [text]="true" label="Limpar" (onClick)="cleanList()" />
     </div>
     <p-table #dt1 dataKey="id" [value]="listVehicleEntry" [rowHover]="true" [showCurrentPageReport]="true"
         currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} entradas"
@@ -17,8 +17,14 @@
                     <input pInputText type="text" (input)="dt1.filterGlobal($event.target.value, 'contains')"
                         placeholder="Pesquisar" />
                 </p-iconField>
+                <div class="gap-2">
+                    <p-button icon="pi pi-print" severity="secondary" [text]="true" />
+                    <p-button icon="pi pi-file-excel" severity="success" [text]="true" />
+                    <p-button icon="pi pi-filter" severity="warning" [text]="true" (onClick)="showDialog()" />
+                </div>
 
-                <p-button icon="pi pi-filter" severity="warning" [text]="true" (onClick)="showDialog()" />
+
+                
 
             </div>
         </ng-template>
@@ -74,7 +80,7 @@
                 </td>
                 <td><span class="text-500">{{ vehicle.frota | uppercase }}</span></td>
                 <td><span class="text-500">{{ vehicle.dateEntry }}</span></td>
-                <td><span class="text-500">29/02/2027 11:22</span></td>
+                <td><span class="text-500">{{ vehicle.dateExit }}</span></td>
                 <td>
                     <span class="text-500">{{ vehicle.clientCompanyName | uppercase }}</span>
                 </td>
@@ -104,17 +110,34 @@
                 <label for="dateIniId">Período inicial</label>
                 <p-calendar dateFormat="dd/mm/yy" [iconDisplay]="'input'" [showIcon]="true" inputId="buttondisplay"
                     formControlName="dateInit" />
-                <small class="p-error block" *ngIf="formFilter.get('dateInit')?.invalid">
-                    Campo obrigatório</small>
             </div>
             <div class="field col-12 md:col-3">
                 <label for="dateIniId">Período final</label>
                 <p-calendar dateFormat="dd/mm/yy" [iconDisplay]="'input'" [showIcon]="true" inputId="buttondisplay"
                     formControlName="dateFinal" />
-                <small class="p-error block" *ngIf="formFilter.get('dateFinal')?.invalid">
-                    Campo obrigatório</small>
             </div>
-            <div class="md:col-6">
+            <div class="field col-12 md:col-6 ">
+                <label for="">Tipo</label>
+                <div class="flex align-items-center gap-2 mt-2">
+                    <div class="flex align-items-center">
+                        <p-radioButton value="E" inputId="type1" formControlName="type"></p-radioButton>
+                        <label for="type1" class="ml-2">
+                            Entrada
+                        </label>
+                    </div>
+                    <div class="flex align-items-center">
+                        <p-radioButton value="S" inputId="type2" formControlName="type"></p-radioButton>
+                        <label for="type2" class="ml-2">
+                            Saída
+                        </label>
+                    </div>
+                    <div class="flex align-items-center">
+                        <p-radioButton value="A" inputId="type3" formControlName="type"></p-radioButton>
+                        <label for="type3" class="ml-2">
+                            Ambos
+                        </label>
+                    </div>
+                </div>
             </div>
             <div class="field col-12 md:col-2">
                 <label for="clientCompanyCodeId">Código</label>
@@ -158,11 +181,19 @@
                     </ng-template>
                 </p-multiSelect>
             </div>
-            <div class="md:col-8"></div>
+            <div class="field col-12 md:col-3">
+                <label>Selecionar</label>
+                <div class="flex align-items-center gap-2 mt-2">
+                    <p-checkbox formControlName="vehicleNew" value="yes" inputId="vehicleNewId" />
+                    <label for="vehicleNewId">Veículos novos</label>
+                </div>
+                
+            </div>
+            <div class="md:col-5"></div>
 
             <div class=" field col-12 md:col-2">
                 <label for="codeId">Código</label>
-                <p-inputNumber inputId="codeId" mode="decimal" [useGrouping]="false" formControlName="codeId" />
+                <p-inputNumber inputId="codeId" mode="decimal" [useGrouping]="false" formControlName="vehicleId" />
             </div>
             <div class="md:col-10"></div>
 
