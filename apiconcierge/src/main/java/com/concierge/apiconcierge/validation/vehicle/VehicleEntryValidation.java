@@ -7,7 +7,7 @@ import com.concierge.apiconcierge.models.vehicle.VehicleEntry;
 import com.concierge.apiconcierge.models.vehicle.enums.StatusAuthExitEnum;
 import com.concierge.apiconcierge.models.vehicle.enums.VehicleYesNotEnum;
 import com.concierge.apiconcierge.repositories.permission.IPermissionUserRepository;
-import com.concierge.apiconcierge.repositories.vehicle.IVehicleEntryRepository;
+import com.concierge.apiconcierge.repositories.vehicle.entry.IVehicleEntryRepository;
 import com.concierge.apiconcierge.util.ConstantsMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

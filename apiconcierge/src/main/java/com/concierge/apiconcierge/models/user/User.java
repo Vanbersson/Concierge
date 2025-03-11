@@ -1,6 +1,5 @@
 package com.concierge.apiconcierge.models.user;
 
-import com.concierge.apiconcierge.models.role.UserRole;
 import com.concierge.apiconcierge.models.status.StatusEnableDisable;
 import jakarta.persistence.*;
 import lombok.*;
@@ -12,7 +11,6 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 
 @Getter
 @Setter

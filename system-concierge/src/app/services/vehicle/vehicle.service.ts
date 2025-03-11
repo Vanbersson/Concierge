@@ -71,8 +71,4 @@ export class VehicleService {
     return httpOptions;
   }
 
-
-
-
-
 }

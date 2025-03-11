@@ -6,22 +6,16 @@ import com.concierge.apiconcierge.exceptions.vehicle.VehicleEntryException;
 
 import com.concierge.apiconcierge.models.budget.Budget;
 import com.concierge.apiconcierge.models.budget.enums.StatusBudgetEnum;
-import com.concierge.apiconcierge.models.clientcompany.ClientCompany;
-import com.concierge.apiconcierge.models.status.StatusEnableDisable;
 import com.concierge.apiconcierge.models.vehicle.VehicleEntry;
 import com.concierge.apiconcierge.models.vehicle.enums.StatusAuthExitEnum;
 import com.concierge.apiconcierge.models.vehicle.enums.StatusVehicleEnum;
 import com.concierge.apiconcierge.models.vehicle.enums.StepVehicleEnum;
-import com.concierge.apiconcierge.repositories.permission.IPermissionUserRepository;
-import com.concierge.apiconcierge.repositories.vehicle.IVehicleEntryRepository;
+import com.concierge.apiconcierge.repositories.vehicle.entry.IVehicleEntryRepository;
 import com.concierge.apiconcierge.services.budget.BudgetService;
-import com.concierge.apiconcierge.services.clientcompany.ClientCompanyService;
 import com.concierge.apiconcierge.util.ConstantsMessage;
 import com.concierge.apiconcierge.validation.vehicle.VehicleEntryValidation;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;

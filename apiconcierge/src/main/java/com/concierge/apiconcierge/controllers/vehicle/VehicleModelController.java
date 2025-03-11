@@ -4,7 +4,7 @@ import com.concierge.apiconcierge.dtos.UpdateStatusDto;
 import com.concierge.apiconcierge.dtos.vehicle.VehicleModelDto;
 import com.concierge.apiconcierge.models.status.StatusEnableDisable;
 import com.concierge.apiconcierge.models.vehicle.VehicleModel;
-import com.concierge.apiconcierge.repositories.vehicle.VehicleModelIRepository;
+import com.concierge.apiconcierge.repositories.vehicle.model.IVehicleModelRepository;
 import jakarta.validation.Valid;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +20,7 @@ import java.util.Optional;
 public class VehicleModelController {
 
     @Autowired
-    VehicleModelIRepository vehicleModelIRepository;
+    IVehicleModelRepository IVehicleModelRepository;
 
     @PostMapping("/save")
     public ResponseEntity<Object> saveModel(@RequestBody @Valid VehicleModelDto data) {
@@ -28,7 +28,7 @@ public class VehicleModelController {
         VehicleModel model = new VehicleModel();
         BeanUtils.copyProperties(data, model);
 
-        this.vehicleModelIRepository.save(model);
+        this.IVehicleModelRepository.save(model);
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
@@ -36,14 +36,14 @@ public class VehicleModelController {
     @PostMapping("/update")
     public ResponseEntity<Object> updateModel(@RequestBody @Valid VehicleModelDto data) {
 
-        Optional<VehicleModel> model0 = this.vehicleModelIRepository.findById(data.id());
+        Optional<VehicleModel> model0 = this.IVehicleModelRepository.findById(data.id());
 
         if (model0.isEmpty()) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 
         VehicleModel model = new VehicleModel();
         BeanUtils.copyProperties(data, model);
 
-        this.vehicleModelIRepository.save(model);
+        this.IVehicleModelRepository.save(model);
 
         return ResponseEntity.ok().build();
 
@@ -52,7 +52,7 @@ public class VehicleModelController {
     @PostMapping("/update/status")
     public ResponseEntity<Object> updateStatus(@RequestBody @Valid UpdateStatusDto data) {
 
-        Optional<VehicleModel> model0 = vehicleModelIRepository.findById(data.id());
+        Optional<VehicleModel> model0 = IVehicleModelRepository.findById(data.id());
         if (model0.isEmpty()) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 
         VehicleModel model = model0.get();
@@ -63,7 +63,7 @@ public class VehicleModelController {
             model.setStatus(StatusEnableDisable.ativo);
         }
 
-        this.vehicleModelIRepository.save(model);
+        this.IVehicleModelRepository.save(model);
 
         return ResponseEntity.ok().build();
 
@@ -71,14 +71,14 @@ public class VehicleModelController {
 
     @GetMapping("/all")
     public ResponseEntity<List<VehicleModel>> getAll() {
-        List<VehicleModel> list = this.vehicleModelIRepository.findAll();
+        List<VehicleModel> list = this.IVehicleModelRepository.findAll();
         return ResponseEntity.ok(list);
     }
 
     @GetMapping("/all/enabled")
     public ResponseEntity<List<VehicleModel>> getAllEnabled() {
 
-        List<VehicleModel> list = this.vehicleModelIRepository.listAllEnabled();
+        List<VehicleModel> list = this.IVehicleModelRepository.listAllEnabled();
 
         return ResponseEntity.ok(list);
 

@@ -6,7 +6,7 @@ import com.concierge.apiconcierge.models.budget.enums.StatusBudgetEnum;
 import com.concierge.apiconcierge.models.vehicle.VehicleEntry;
 import com.concierge.apiconcierge.models.vehicle.enums.StepVehicleEnum;
 import com.concierge.apiconcierge.repositories.budget.IBudgetRepository;
-import com.concierge.apiconcierge.repositories.vehicle.IVehicleEntryRepository;
+import com.concierge.apiconcierge.repositories.vehicle.entry.IVehicleEntryRepository;
 import com.concierge.apiconcierge.util.ConstantsMessage;
 import com.concierge.apiconcierge.validation.budget.BudgetValidation;
 import lombok.SneakyThrows;
