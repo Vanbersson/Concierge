@@ -390,6 +390,7 @@ public class VehicleEntryService implements IVehicleEntryService {
             vehicle.setStepEntry(StepVehicleEnum.Attendant);
             vehicle.setBudgetStatus(StatusBudgetEnum.semOrcamento);
             vehicle.setStatusAuthExit(StatusAuthExitEnum.NotAuth);
+            vehicle.setUserNameExit("");
         }
 
         return vehicle;

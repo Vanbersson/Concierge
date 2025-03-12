@@ -236,7 +236,6 @@ export default class VehicleEntryComponent implements OnInit, OnDestroy, DoCheck
     this.formClientCompany.controls['clientCompanyCpf'].removeValidators(Validators.required);
     this.formClientCompany.controls['clientCompanyCpf'].updateValueAndValidity();
   }
-
   public validationClientCompany() {
     if (this.formClientCompany.value.clientCompanyNot.length == 0) {
       this.removeValidClientCompanyId();
@@ -274,7 +273,7 @@ export default class VehicleEntryComponent implements OnInit, OnDestroy, DoCheck
       clientCompanyRg: null
     });
   }
-
+  
   //Driver
   public async photoPersonDriver() {
     this.ngxImageCompressService.uploadFile().then(({ image, orientation }) => {

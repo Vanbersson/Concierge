@@ -67,6 +67,13 @@ export class FilterClientComponent {
       //Emit 
       this.dialogSelectClientCompany.companyId = this.storageService.companyId;
       this.dialogSelectClientCompany.resaleId = this.storageService.resaleId;
+      this.dialogSelectClientCompany.contactName ="";
+      this.dialogSelectClientCompany.contactEmail="";
+      this.dialogSelectClientCompany.contactDDDPhone="";
+      this.dialogSelectClientCompany.contactPhone="";
+      this.dialogSelectClientCompany.contactDDDCellphone="";
+      this.dialogSelectClientCompany.contactCellphone="";
+      
       this.outputClient.emit(this.dialogSelectClientCompany);
 
       this.clientName.set(this.dialogSelectClientCompany.name);

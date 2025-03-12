@@ -166,9 +166,6 @@ export default class BudgetComponent implements OnInit, OnDestroy {
     private activatedRoute: ActivatedRoute,
     private cdr: ChangeDetectorRef,
     private busyService: BusyService) {
-
-
-
     this.budgetServiceItem = new BudgetServiceItem();
     this.vehicleId.set(Number.parseInt(this.activatedRoute.snapshot.params['vehicleid']));
   }
