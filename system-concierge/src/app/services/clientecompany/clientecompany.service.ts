@@ -27,28 +27,28 @@ export class ClientecompanyService {
 
   //Externa
   getIdExternal$(id: Number): Observable<ClientCompany[]> {
-    return this.http.get<ClientCompany[]>(environment.apiApollo + "/code/" + id, { responseType: 'json' });
+    return this.http.get<ClientCompany[]>(environment.apiApollo + "/fatclient/filter/code/" + id, { responseType: 'json' });
   }
   getFantasiaJ$(name: string): Observable<ClientCompany[]> {
-    return this.http.get<ClientCompany[]>(environment.apiApollo + "/j/fantasia/" + name, { headers: this.myHeaders(), responseType: 'json' });
+    return this.http.get<ClientCompany[]>(environment.apiApollo + "/fatclient/filter/j/fantasia/" + name, { headers: this.myHeaders(), responseType: 'json' });
   }
   getFantasiaF$(name: string): Observable<ClientCompany[]> {
-    return this.http.get<ClientCompany[]>(environment.apiApollo + "/f/fantasia/" + name, { headers: this.myHeaders(), responseType: 'json' });
+    return this.http.get<ClientCompany[]>(environment.apiApollo + "/fatclient/filter/f/fantasia/" + name, { headers: this.myHeaders(), responseType: 'json' });
   }
   getNameJ$(name: string): Observable<ClientCompany[]> {
-    return this.http.get<ClientCompany[]>(environment.apiApollo + "/j/name/" + name, { headers: this.myHeaders(), responseType: 'json' });
+    return this.http.get<ClientCompany[]>(environment.apiApollo + "/fatclient/filter/j/name/" + name, { headers: this.myHeaders(), responseType: 'json' });
   }
   getNameF$(name: string): Observable<ClientCompany[]> {
-    return this.http.get<ClientCompany[]>(environment.apiApollo + "/f/name/" + name, { headers: this.myHeaders(), responseType: 'json' });
+    return this.http.get<ClientCompany[]>(environment.apiApollo + "/fatclient/filter/f/name/" + name, { headers: this.myHeaders(), responseType: 'json' });
   }
   getCnpj$(cnpj: string): Observable<ClientCompany[]> {
-    return this.http.get<ClientCompany[]>(environment.apiApollo + "/cnpj/" + cnpj, { headers: this.myHeaders(), responseType: 'json' });
+    return this.http.get<ClientCompany[]>(environment.apiApollo + "/fatclient/filter/cnpj/" + cnpj, { headers: this.myHeaders(), responseType: 'json' });
   }
   getCpf$(cpf: string): Observable<ClientCompany[]> {
-    return this.http.get<ClientCompany[]>(environment.apiApollo + "/cpf/" + cpf, { headers: this.myHeaders(), responseType: 'json' });
+    return this.http.get<ClientCompany[]>(environment.apiApollo + "/fatclient/filter/cpf/" + cpf, { headers: this.myHeaders(), responseType: 'json' });
   }
   getTipo$(tipo: string): Observable<ClientCompany[]> {
-    return this.http.get<ClientCompany[]>(environment.apiApollo + "/tipo/" + tipo, { headers: this.myHeaders(), responseType: 'json' });
+    return this.http.get<ClientCompany[]>(environment.apiApollo + "/fatclient/filter/tipo/" + tipo, { headers: this.myHeaders(), responseType: 'json' });
   }
 
   private myHeaders(): HttpHeaders {

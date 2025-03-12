@@ -9,7 +9,7 @@ import { Parts } from '../../models/parts/Parts';
   providedIn: 'root'
 })
 export class PartsService {
-  private urlBaseV1 = "http://10.0.0.26:8080/apiapollo/api/v1/pecitem/filter";
+ // private urlBaseV1 = "http://10.0.0.26:8080/apiapollo/api/v1";
 
   constructor(private http: HttpClient, private storage: StorageService) { }
 
@@ -28,14 +28,14 @@ export class PartsService {
 
   //External
   getExternalFilterId$(id: number): Observable<Parts[]> {
-    return this.http.get<Parts[]>(this.urlBaseV1 + "/item/" + id, { responseType: 'json' });
+    return this.http.get<Parts[]>(environment.apiApollo  + "/pecitem/filter/item/" + id, { responseType: 'json' });
   }
 
   getExternalFilterCode$(code: string): Observable<HttpResponse<Parts[]>> {
-    return this.http.get<Parts[]>(this.urlBaseV1 + "/code/" + code, { observe: 'response', responseType: 'json' });
+    return this.http.get<Parts[]>(environment.apiApollo  + "/pecitem/filter/code/" + code, { observe: 'response', responseType: 'json' });
   }
   getExternalFilterDesc$(desc: string): Observable<HttpResponse<Parts[]>> {
-    return this.http.get<Parts[]>(this.urlBaseV1 + "/desc/" + desc, { observe: 'response', responseType: 'json' });
+    return this.http.get<Parts[]>(environment.apiApollo  + "/pecitem/filter/desc/" + desc, { observe: 'response', responseType: 'json' });
   }
 
 
