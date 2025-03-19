@@ -33,17 +33,16 @@ VALUES
 INSERT INTO `tb_user`
 (`company_id`, `resale_id`,`status`, `name`, `email`, `password`, `cellphone`, `limit_discount`, `role_id`, `role_desc`, `role_func`, `photo`)
 VALUES
-(1,1,0,'Administrador','vambersson@gmail.com','$2a$10$9EKoKdyZdu.iFS8QnBykoOCW1Gix0PB/k6PN5L5t7URoddZ.wsu9i','81982158862',100,1,'TI',0,'');
+(1,1,0,'Administrador','vambersson@gmail.com','$2a$10$9EKoKdyZdu.iFS8QnBykoOCW1Gix0PB/k6PN5L5t7URoddZ.wsu9i','81982158862',10,1,'TI',0,'');
 
 INSERT INTO tb_vehicle_model
 (company_id, resale_id, status, description,photo)
 VALUES
-(1,1,0,'Outro',''),
+(1,1,0,'Cavalo Mecânico',''),
 (1,1,0,'Graneleiro',''),
 (1,1,0,'Basculante',''),
 (1,1,0,'Tanque',''),
 (1,1,0,'Carrega Tudo',''),
-(1,1,0,'Cavalo Mecânico',''),
 (1,1,0,'Dolly',''),
 (1,1,0,'Carroceria',''),
 (1,1,0,'Porta Contêiner',''),
@@ -52,7 +51,8 @@ VALUES
 (1,1,0,'Veículo Empresa',''),
 (1,1,0,'Veículo Passeio',''),
 (1,1,0,'Entrega Material',''),
-(1,1,0,'Coleta Material','');
+(1,1,0,'Coleta Material',''),
+(1,1,0,'Outro','');
 
 INSERT INTO `tb_client_company_type`
 (`company_id`, `resale_id`, `status`,`description`)

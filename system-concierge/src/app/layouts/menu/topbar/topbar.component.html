@@ -1,7 +1,7 @@
 <div class="layout-topbar">
     <a class="layout-topbar-logo" routerLink="/">
         <img src="assets/layout/images/logo-light.png" alt="logo">
-        <span>AUTOPOINT</span>
+        <span class="font-bold text-xl text-blue-500">ATENATRUCK</span>
     </a>
 
     <button #menubutton class="p-link layout-menu-button layout-topbar-button" (click)="layoutService.onMenuToggle()">
@@ -32,28 +32,25 @@
 
 <p-sidebar #sidebarRef [(visible)]="visibleSideBarRight" position="right" styleClass="w-20rem">
     <ng-template pTemplate="headless">
-
         <div class="layout-sidebar-header">
             <div class="layout-sidebar-header-close">
                 <p-button type="button" (click)="closeSideBarCallback($event)" icon="pi pi-times" [rounded]="true"
                     [text]="true" size="large" severity="secondary"></p-button>
             </div>
-
-            <div class="layout-sidebar-header-main">
+            <div class="flex flex-row gap-2 mt-5">
                 <div class="layout-side-header-photo">
                     @if(userPhoto){
                     <p-image [imageStyle]="{'border-radius':'100%','object-fit':'cover'}"
-                        src="data:image/png;base64,{{userPhoto}}" alt="imagem motorista" height="56" width="56" />
+                        src="data:image/png;base64,{{userPhoto}}" alt="imagem usuário" height="56" width="56" />
                     }@else {
                     <p-avatar [label]="firstLetter" size="xlarge" shape="circle" [style]="{ 'background-color': '#dee9fc' }"></p-avatar>
                     }
                 </div>
-                <div class="layout-sidebar-header-title">
-                    <span class="layout-sidebar-header-name">{{userName | titlecase}}</span>
-                    <span class="layout-sidebar-header-role">{{userRoleDescription | uppercase}}</span>
+                <div class="flex flex-column gap-2">
+                    <span class="font-semibold text-xl text-black-alpha-60">Olá, {{userName | titlecase}}</span>
+                    <span class="text-xl text-black-alpha-60">{{userRoleDescription | titlecase}}</span>
                 </div>
             </div>
-
         </div>
         <div class="layout-sidebar-content">
 

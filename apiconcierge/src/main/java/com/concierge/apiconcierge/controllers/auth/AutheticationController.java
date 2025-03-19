@@ -15,6 +15,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -44,21 +48,22 @@ public class AutheticationController {
 
         //Last Session
         user.setLastSession(new Date());
+
         this.IUserRepository.save(user);
         Map<String, Object> map = new HashMap<>();
 
-        map.put("companyId",user.getCompanyId());
-        map.put("resaleId",user.getResaleId());
-        map.put("id",user.getId());
-        map.put("name",user.getName());
-        map.put("roleDesc",user.getRoleDesc());
-        map.put("cellphone",user.getCellphone());
-        map.put("limitDiscount",user.getLimitDiscount());
-        map.put("token",token);
-        if(user.getPhoto() == null){
-            map.put("photo","");
-        }else{
-            map.put("photo",user.getPhoto());
+        map.put("companyId", user.getCompanyId());
+        map.put("resaleId", user.getResaleId());
+        map.put("id", user.getId());
+        map.put("name", user.getName());
+        map.put("roleDesc", user.getRoleDesc());
+        map.put("cellphone", user.getCellphone());
+        map.put("limitDiscount", user.getLimitDiscount());
+        map.put("token", token);
+        if (user.getPhoto() == null) {
+            map.put("photo", "");
+        } else {
+            map.put("photo", user.getPhoto());
         }
 
         return ResponseEntity.status(HttpStatus.OK).body(map);

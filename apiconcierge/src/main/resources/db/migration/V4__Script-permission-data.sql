@@ -10,4 +10,5 @@ VALUES
 (106,'Autorizar saída de veículo sem O.S.'),
 (107,'Manutenção entrada de veículo'),
 (150,'Gerar orçamento'),
-(151,'Manutenção orçamento');
+(151,'Manutenção orçamento'),
+(152,'Visualizar orçamento');
