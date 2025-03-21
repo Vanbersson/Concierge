@@ -58,6 +58,10 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
         if (!vehicle.getDriverEntryRg().isBlank())
             if (vehicle.getDriverEntryRg().length() > 11)
                 return RG;
+        if (vehicle.getVehicleNew().equals(VehicleYesNotEnum.not)) {
+            if(vehicle.getPlaca().length() != 7)
+                return ERROR_PLACA;
+        }
         return ConstantsMessage.SUCCESS;
     }
 
