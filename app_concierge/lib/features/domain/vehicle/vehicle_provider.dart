@@ -4,7 +4,7 @@ import 'package:app_concierge/features/domain/vehicle/vehicle.dart';
 import 'package:flutter/material.dart';
 
 class VehicleProvider extends ChangeNotifier {
-  final List<Vehicle> _listVehicle = [];
+  List<Vehicle> _listVehicle = [];
 
   List<Vehicle> get items => _listVehicle;
 
@@ -15,6 +15,11 @@ class VehicleProvider extends ChangeNotifier {
 
   void removeAll() {
     _listVehicle.clear();
+    notifyListeners();
+  }
+
+  void removeItem(int index) {
+    _listVehicle.removeAt(index);
     notifyListeners();
   }
 }

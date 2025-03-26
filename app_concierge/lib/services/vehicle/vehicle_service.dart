@@ -1,6 +1,7 @@
 import 'package:app_concierge/features/data/domain/user_login_sqlite_service.dart';
 import 'package:app_concierge/features/domain/vehicle/vehicle.dart';
 import 'package:app_concierge/features/domain/vehicle/vehicle_entry.dart';
+import 'package:app_concierge/features/domain/vehicle/vehicle_exit.dart';
 import 'package:app_concierge/features/domain/vehicle/vehicle_model.dart';
 import 'package:dio/dio.dart';
 import 'package:app_concierge/core/constants/url_constants.dart';
@@ -95,6 +96,53 @@ class VehicleService {
       return Vehicle.fromJson(response.data);
     } on DioException catch (e) {
       return Vehicle();
+    }
+  }
+
+  Future<String> save(Vehicle vehicle) async {
+    final dio = Dio();
+
+    try {
+      final token = await userStorange();
+
+      final response = await dio.post(
+        kURL_VEHICLE_SAVE,
+        data: vehicle.toJson(),
+        options: Options(headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token'
+        }, responseType: ResponseType.json),
+      );
+      if (response.statusCode == 201) {
+        vehicle.id = response.data['id'];
+        return "Success.";
+      }
+      return "Error.";
+    } on DioException catch (e) {
+      return "Error.";
+    }
+  }
+
+   Future<String> Exit(VehicleExit vehicle) async {
+    final dio = Dio();
+
+    try {
+      final token = await userStorange();
+
+      final response = await dio.post(
+        kURL_VEHICLE_SAVE_EXIT,
+        data: vehicle.toJson(),
+        options: Options(headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token'
+        }, responseType: ResponseType.json),
+      );
+      if (response.statusCode == 200) {
+        return "Success.";
+      }
+      return "Error.";
+    } on DioException catch (e) {
+      return "Error.";
     }
   }
 

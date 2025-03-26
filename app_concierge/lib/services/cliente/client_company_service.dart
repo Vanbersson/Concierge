@@ -1,3 +1,4 @@
+import 'package:app_concierge/features/data/domain/user_login_sqlite_service.dart';
 import 'package:app_concierge/features/domain/client/client_company.dart';
 import 'package:dio/dio.dart';
 import 'package:app_concierge/core/constants/url_constants.dart';
@@ -20,6 +21,7 @@ class ClientCompanyService {
     }
     return List.empty();
   }
+
   Future<List<ClientCompany>> filterFName(String name) async {
     final dio = Dio();
 
@@ -36,5 +38,34 @@ class ClientCompanyService {
       print('Erro: $e');
     }
     return List.empty();
+  }
+
+  Future<String> save(ClientCompany client) async {
+    final dio = Dio();
+
+    try {
+      final token = await userStorange();
+
+      final response = await dio.post(
+        kURL_CLIENTCOMPANY_SAVE,
+        data: client.toJson(),
+        options: Options(headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token'
+        }, responseType: ResponseType.json),
+      );
+      if (response.statusCode == 201) {
+        return "Success.";
+      }
+      return "Error.";
+    } on DioException catch (e) {
+      return "Error.";
+    }
+  }
+
+  Future<String> userStorange() async {
+    UserLoginSqliteService service = UserLoginSqliteService();
+    var login = await service.userLogin();
+    return login.token!;
   }
 }

@@ -1,4 +1,6 @@
 class ClientCompany {
+  int? _companyId;
+  int? _resaleId;
   String? _zipCode;
   String? _addressComplement;
   String? _address;
@@ -21,9 +23,17 @@ class ClientCompany {
   String? _neighborhood;
   String? _fisjur;
   String? _status;
+  String? _contactName;
+  String? _contactEmail;
+  String? _contactDDDPhone;
+  String? _contactPhone;
+  String? _contactDDDCellphone;
+  String? _contactCellphone;
 
   ClientCompany(
-      {String? zipCode,
+      {int? companyId,
+      int? resaleId,
+      String? zipCode,
       String? addressComplement,
       String? address,
       String? city,
@@ -44,7 +54,19 @@ class ClientCompany {
       String? state,
       String? neighborhood,
       String? fisjur,
-      String? status}) {
+      String? status,
+      String? contactName,
+      String? contactEmail,
+      String? contactDDDPhone,
+      String? contactPhone,
+      String? contactDDDCellphone,
+      String? contactCellphone}) {
+    if (companyId != null) {
+      this._companyId = companyId;
+    }
+    if (resaleId != null) {
+      this._resaleId = resaleId;
+    }
     if (zipCode != null) {
       this._zipCode = zipCode;
     }
@@ -111,8 +133,30 @@ class ClientCompany {
     if (status != null) {
       this._status = status;
     }
+    if (contactName != null) {
+      this._contactName = contactName;
+    }
+    if (contactEmail != null) {
+      this._contactEmail = contactEmail;
+    }
+    if (contactDDDPhone != null) {
+      this._contactDDDPhone = contactDDDPhone;
+    }
+    if (contactPhone != null) {
+      this._contactPhone = contactPhone;
+    }
+    if (contactDDDCellphone != null) {
+      this._contactDDDCellphone = contactDDDCellphone;
+    }
+    if (contactCellphone != null) {
+      this._contactCellphone = contactCellphone;
+    }
   }
 
+  int? get companyId => _companyId;
+  set companyId(int? companyId) => _companyId = companyId;
+  int? get resaleId => _resaleId;
+  set resaleId(int? resaleId) => _resaleId = resaleId;
   String? get zipCode => _zipCode;
   set zipCode(String? zipCode) => _zipCode = zipCode;
   String? get addressComplement => _addressComplement;
@@ -158,8 +202,25 @@ class ClientCompany {
   set fisjur(String? fisjur) => _fisjur = fisjur;
   String? get status => _status;
   set status(String? status) => _status = status;
+  String? get contactName => _contactName;
+  set contactName(String? contactName) => _contactName = contactName;
+  String? get contactEmail => _contactEmail;
+  set contactEmail(String? contactEmail) => _contactEmail = contactEmail;
+  String? get contactDDDPhone => _contactDDDPhone;
+  set contactDDDPhone(String? contactDDDPhone) =>
+      _contactDDDPhone = contactDDDPhone;
+  String? get contactPhone => _contactPhone;
+  set contactPhone(String? contactPhone) => _contactPhone = contactPhone;
+  String? get contactDDDCellphone => _contactDDDCellphone;
+  set contactDDDCellphone(String? contactDDDCellphone) =>
+      _contactDDDCellphone = contactDDDCellphone;
+  String? get contactCellphone => _contactCellphone;
+  set contactCellphone(String? contactCellphone) =>
+      _contactCellphone = contactCellphone;
 
   ClientCompany.fromJson(Map<String, dynamic> json) {
+    _companyId = json['companyId'];
+    _resaleId = json['resaleId'];
     _zipCode = json['zipCode'];
     _addressComplement = json['addressComplement'];
     _address = json['address'];
@@ -182,10 +243,18 @@ class ClientCompany {
     _neighborhood = json['neighborhood'];
     _fisjur = json['fisjur'];
     _status = json['status'];
+    _contactName = json['contactName'];
+    _contactEmail = json['contactEmail'];
+    _contactDDDPhone = json['contactDDDPhone'];
+    _contactPhone = json['contactPhone'];
+    _contactDDDCellphone = json['contactDDDCellphone'];
+    _contactCellphone = json['contactCellphone'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['companyId'] = this._companyId;
+    data['resaleId'] = this._resaleId;
     data['zipCode'] = this._zipCode;
     data['addressComplement'] = this._addressComplement;
     data['address'] = this._address;
@@ -208,6 +277,12 @@ class ClientCompany {
     data['neighborhood'] = this._neighborhood;
     data['fisjur'] = this._fisjur;
     data['status'] = this._status;
+    data['contactName'] = this._contactName;
+    data['contactEmail'] = this._contactEmail;
+    data['contactDDDPhone'] = this._contactDDDPhone;
+    data['contactPhone'] = this._contactPhone;
+    data['contactDDDCellphone'] = this._contactDDDCellphone;
+    data['contactCellphone'] = this._contactCellphone;
     return data;
   }
 }

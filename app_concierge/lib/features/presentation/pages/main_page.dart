@@ -26,6 +26,7 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
+  double sizeScreen = 0;
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
   final searchController = TextEditingController();
   final VehicleService _vehicleService = VehicleService();
@@ -54,40 +55,21 @@ class _MainPageState extends State<MainPage> {
   }
 
   void verifyVehicleAllAuthorized() async {
-    timer = Timer.periodic(const Duration(seconds: 30), (timer) async {
+    timer = Timer.periodic(const Duration(seconds: 60), (timer) async {
       try {
-        // Obter as listas de veículos
+        // Obter as listas de veículos autorizados
         List<VehicleEntry> auth1 = await _vehicleService.allAuthorized();
 
         //Total de veículos autorizados
         _allAuthorizedTotal.value = auth1.length;
 
-        List<VehicleEntry> auth2 = await _listVehicleEntry.value;
-
-        // Criar um mapa para facilitar a atualização
-        Map<int, VehicleEntry> auth1Map = {
-          for (var vehicle in auth1) vehicle.id!: vehicle
-        };
-
-        // Atualizar a lista auth2 com base nos elementos de auth1
-        List<VehicleEntry> updatedAuth2 = auth2.map((vehicle) {
-          return auth1Map[vehicle.id] ?? vehicle;
-        }).toList();
-
-        // Atualizar a variável com a nova lista
-        _listVehicleEntry.value = Future.value(updatedAuth2);
-
-        print("Consultou e atualizou a lista.");
+        // Obter as listas de veículos pendente de autorização
+        _listVehicleEntry.value = _vehicleService.allPendingAuthorization();
       } catch (e) {
-        print("Erro ao consultar e atualizar a lista: $e");
+        // print("Erro ao consultar e atualizar a lista: $e");
       }
     });
   }
-
-  /* userStorange() async {
-    UserLoginSqliteService service = UserLoginSqliteService();
-    service.userLogin();
-  } */
 
   Future<List<VehicleEntry>> filterSearchResults(String searchString) async {
     List<VehicleEntry> temp1 = [];
@@ -123,6 +105,8 @@ class _MainPageState extends State<MainPage> {
     var myWidth = MediaQuery.of(context).size.width;
     var myHeight = MediaQuery.of(context).size.height;
 
+    sizeScreen = MediaQuery.of(context).size.shortestSide;
+
     return Scaffold(
       key: scaffoldKey,
       appBar: AppBar(
@@ -147,7 +131,7 @@ class _MainPageState extends State<MainPage> {
                   ),
                 ),
               ),
-        title: Text("Óla, ${widget.userLogin.name.toString().split(' ')[0]}"),
+        title: Text("Olá, ${widget.userLogin.name.toString().split(' ')[0]}"),
         backgroundColor: Colors.grey.shade100,
         scrolledUnderElevation: 4.0,
         shadowColor: Theme.of(context).colorScheme.shadow,
@@ -191,13 +175,14 @@ class _MainPageState extends State<MainPage> {
                     );
             },
           ),
+          //Exit
           Padding(
             padding: const EdgeInsets.only(right: 24.0),
             child: IconButton(
               onPressed: () {
                 final snackBar = SnackBar(
                   backgroundColor: Colors.white,
-                  duration: Duration(minutes: 1),
+                  duration: const Duration(minutes: 1),
                   content: Column(
                     children: [
                       const Align(
@@ -210,39 +195,24 @@ class _MainPageState extends State<MainPage> {
                       const SizedBox(
                         height: 10,
                       ),
-                      FilledButton(
-                        onPressed: () {
-                          ScaffoldMessenger.of(context).clearSnackBars();
-                          deletestorage();
-                          Navigator.pop(context, false);
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const SplashPage(),
-                              ));
-                        },
-                        style: ButtonStyle(
-                          padding:
-                              const WidgetStatePropertyAll<EdgeInsetsGeometry>(
-                                  EdgeInsets.symmetric(horizontal: 176.0)),
-                          backgroundColor:
-                              const WidgetStatePropertyAll<Color>(Colors.blue),
-                          shape: WidgetStatePropertyAll<RoundedRectangleBorder>(
-                            RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8.0),
-                            ),
-                          ),
-                        ),
-                        child: const Text("Sim"),
-                      ),
-                      OutlinedButton(
+                      SizedBox(
+                        width: myWidth - sizeScreen * 0.04,
+                        height: 50,
+                        child: FilledButton(
                           onPressed: () {
                             ScaffoldMessenger.of(context).clearSnackBars();
+                            deletestorage();
+                            Navigator.pop(context, false);
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const SplashPage(),
+                                ));
                           },
                           style: ButtonStyle(
-                            padding: const WidgetStatePropertyAll<
-                                    EdgeInsetsGeometry>(
-                                EdgeInsets.symmetric(horizontal: 176.0)),
+                            backgroundColor:
+                                const WidgetStatePropertyAll<Color>(
+                                    Colors.blue),
                             shape:
                                 WidgetStatePropertyAll<RoundedRectangleBorder>(
                               RoundedRectangleBorder(
@@ -250,7 +220,29 @@ class _MainPageState extends State<MainPage> {
                               ),
                             ),
                           ),
-                          child: Text("Não"))
+                          child: const Text("Sim"),
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 8,
+                      ),
+                      SizedBox(
+                        width: myWidth - sizeScreen * 0.04,
+                        height: 50,
+                        child: OutlinedButton(
+                            onPressed: () {
+                              ScaffoldMessenger.of(context).clearSnackBars();
+                            },
+                            style: ButtonStyle(
+                              shape: WidgetStatePropertyAll<
+                                  RoundedRectangleBorder>(
+                                RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                              ),
+                            ),
+                            child: Text("Não")),
+                      )
                     ],
                   ),
                 );
@@ -355,7 +347,7 @@ class _MainPageState extends State<MainPage> {
               //List vehicles
               Expanded(
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                  padding: EdgeInsets.symmetric(horizontal: sizeScreen * 0.02),
                   decoration: BoxDecoration(
                       color: Colors.grey.shade200,
                       borderRadius:
@@ -474,7 +466,7 @@ class _MainPageState extends State<MainPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Container(
-                  width: 342,
+                  width: sizeScreen * 0.8,
                   height: 60,
                   decoration: BoxDecoration(
                     color: vei.statusAuthExit == "Authorized"
@@ -488,7 +480,7 @@ class _MainPageState extends State<MainPage> {
                   child: Row(
                     children: [
                       SizedBox(
-                        width: 200,
+                        width: sizeScreen * 0.4,
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -515,7 +507,7 @@ class _MainPageState extends State<MainPage> {
                         width: 2,
                       ),
                       SizedBox(
-                        width: 140,
+                        width: sizeScreen * 0.3,
                         child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -538,7 +530,7 @@ class _MainPageState extends State<MainPage> {
                   ),
                 ),
                 Ink(
-                  width: 50,
+                  width: sizeScreen * 0.12,
                   height: 60,
                   child: InkWell(
                     onTap: () {
@@ -583,6 +575,7 @@ class _MainPageState extends State<MainPage> {
     return PageRouteBuilder(
         pageBuilder: (context, animation, secondaryAnimation) => VehicleDetails(
               vehicleEntry: vehicle,
+              userLogin: widget.userLogin,
             ),
         transitionDuration: const Duration(milliseconds: 600),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {

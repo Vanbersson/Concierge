@@ -1,68 +1,93 @@
 class Vehicle {
-  String? _clientCompanyRg;
-  String? _frota;
-  int? _modelId;
-  String? _vehicleNew;
-  String? _nameUserAttendant;
-  String? _numNfse;
-  String? _statusAuthExit;
-  String? _serviceOrder;
-  String? _budgetStatus;
-  String? _kmEntry;
-  String? _driverExitPhoto;
-  String? _datePrevisionExit;
-  String? _driverExitName;
-  int? _idUserAttendant;
-  String? _kmExit;
-  int? _id;
-  String? _numNfe;
-  String? _nameUserExitAuth2;
-  String? _driverEntrySignature;
-  String? _nameUserExitAuth1;
-  String? _nameUserEntry;
-  int? _idUserExitAuth1;
-  String? _driverExitSignature;
-  int? _quantityToolBox;
-  int? _idUserExitAuth2;
-  String? _modelDescription;
-  String? _driverEntryName;
   int? _companyId;
-  String? _photo1;
-  int? _quantityTrafficCone;
+  int? _resaleId;
+  int? _id;
+  String? _status;
+
   int? _idUserEntry;
-  String? _driverEntryPhotoDoc2;
-  String? _driverEntryPhotoDoc1;
+  String? _nameUserEntry;
+  String? _dateEntry;
+
+  int? _userIdExit;
+  String? _userNameExit;
+  String? _dateExit;
+
+  String? _datePrevisionExit;
+
   String? _stepEntry;
+  String? _budgetStatus;
+
+  int? _idUserAttendant;
+  String? _nameUserAttendant;
+
+  int? _idUserExitAuth1;
+  String? _nameUserExitAuth1;
+
+  int? _idUserExitAuth2;
+  String? _nameUserExitAuth2;
+
+  String? _driverEntryName;
+
   String? _dateExitAuth2;
   String? _dateExitAuth1;
-  String? _status;
-  String? _clientCompanyName;
-  String? _color;
-  String? _driverExitPhotoDoc1;
+
+  String? _driverEntryPhoto;
+  String? _driverEntryRg;
   String? _driverEntryCpf;
+  String? _driverEntryPhotoDoc2;
+  String? _driverEntryPhotoDoc1;
+  String? _driverEntrySignature;
+
+  String? _driverExitPhoto;
+  String? _driverExitName;
+  String? _driverExitCpf;
+  String? _driverExitRg;
+  String? _driverExitPhotoDoc1;
   String? _driverExitPhotoDoc2;
+  String? _driverExitSignature;
+
+  String? _statusAuthExit;
+
+  int? _modelId;
+  String? _modelDescription;
+
+  String? _photo1;
   String? _photo2;
   String? _photo3;
   String? _photo4;
-  int? _resaleId;
-  String? _driverExitCpf;
-  String? _dateEntry;
+
+  String? _color;
   String? _placa;
-  String? _clientCompanyCpf;
-  String? _driverEntryPhoto;
+  String? _frota;
+  String? _kmEntry;
+  String? _kmExit;
+
   int? _clientCompanyId;
-  String? _driverEntryRg;
+  String? _clientCompanyName;
   String? _clientCompanyCnpj;
+  String? _clientCompanyCpf;
+  String? _clientCompanyRg;
+
   int? _quantityExtinguisher;
   int? _quantityTireComplete;
-  String? _numServiceOrder;
-  String? _driverExitRg;
   int? _quantityTire;
+  int? _quantityTrafficCone;
+  int? _quantityToolBox;
+
+  String? _vehicleNew;
+  String? _serviceOrder;
+  String? _numServiceOrder;
+  String? _numNfe;
+  String? _numNfse;
+
   String? _information;
   String? _informationConcierge;
 
   Vehicle(
-      {String? clientCompanyRg,
+      {int? userIdExit,
+      String? userNameExit,
+      String? dateExit,
+      String? clientCompanyRg,
       String? frota,
       int? modelId,
       String? vehicleNew,
@@ -123,6 +148,15 @@ class Vehicle {
       int? quantityTire,
       String? information,
       String? informationConcierge}) {
+    if (userIdExit != null) {
+      this._userIdExit = userIdExit;
+    }
+    if (userNameExit != null) {
+      this._userNameExit = userNameExit;
+    }
+    if (dateExit != null) {
+      this._dateExit = dateExit;
+    }
     if (clientCompanyRg != null) {
       this._clientCompanyRg = clientCompanyRg;
     }
@@ -307,7 +341,12 @@ class Vehicle {
       this._informationConcierge = informationConcierge;
     }
   }
-
+  int? get userIdExit => _userIdExit;
+  set userIdExit(int? userIdExit) => _userIdExit = userIdExit;
+  String? get userNameExit => _userNameExit;
+  set userNameExit(String? userNameExit) => _userNameExit = userNameExit;
+  String? get dateExit => _dateExit;
+  set dateExit(String? dateExit) => _dateExit = dateExit;
   String? get clientCompanyRg => _clientCompanyRg;
   set clientCompanyRg(String? clientCompanyRg) =>
       _clientCompanyRg = clientCompanyRg;
@@ -463,6 +502,9 @@ class Vehicle {
       _informationConcierge = informationConcierge;
 
   Vehicle.fromJson(Map<String, dynamic> json) {
+    _userIdExit = json['userIdExit'];
+    _userNameExit = json['userNameExit'];
+    _dateExit = json['dateExit'];
     _clientCompanyRg = json['clientCompanyRg'];
     _frota = json['frota'];
     _modelId = json['modelId'];
@@ -528,6 +570,10 @@ class Vehicle {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
+
+    data['userIdExit'] = this._userIdExit;
+    data['userNameExit'] = this._userNameExit;
+    data['dateExit'] = this._dateExit;
     data['clientCompanyRg'] = this._clientCompanyRg;
     data['frota'] = this._frota;
     data['modelId'] = this._modelId;

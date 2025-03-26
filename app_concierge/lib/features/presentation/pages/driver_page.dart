@@ -13,6 +13,7 @@ import 'package:app_concierge/features/presentation/widgets/mytextfield.dart';
 import 'package:app_concierge/services/attendant/attendant_service.dart';
 import 'package:app_concierge/services/vehicle/vehicle_service.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 
 import 'package:camera_camera/camera_camera.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
@@ -31,6 +32,7 @@ class DriverPage extends StatefulWidget {
 }
 
 class _DriverPageState extends State<DriverPage> {
+  double sizeScreen = 0;
   late UserDriver _userDriver;
 
   final nameKey = GlobalKey<FormFieldState>();
@@ -48,13 +50,6 @@ class _DriverPageState extends State<DriverPage> {
   late ValueNotifier<Uint8List> doc1Driver;
   late ValueNotifier<Uint8List> doc2Driver;
 
-  final VehicleService _vehicleService = VehicleService();
-  List<VehicleModel> _models = [];
-  ValueNotifier<bool> loadModels = ValueNotifier(true);
-
-  final AttendantService _attendantService = AttendantService();
-  List<UserAttendant> _attendants = [];
-
   @override
   void initState() {
     _userDriver = UserDriver();
@@ -63,21 +58,14 @@ class _DriverPageState extends State<DriverPage> {
     doc1Driver = ValueNotifier<Uint8List>(Uint8List(0));
     doc2Driver = ValueNotifier<Uint8List>(Uint8List(0));
 
-    listModels();
-
     super.initState();
-  }
-
-  listModels() async {
-    _attendants = await _attendantService.attendants();
-    _models = await _vehicleService.vehicleModels();
-    loadModels.value = false;
   }
 
   @override
   Widget build(BuildContext context) {
     final widght = MediaQuery.of(context).size.width;
     final height = MediaQuery.of(context).size.height;
+     sizeScreen = MediaQuery.of(context).size.shortestSide;
 
     return Scaffold(
       backgroundColor: Colors.grey.shade100,
@@ -306,42 +294,43 @@ class _DriverPageState extends State<DriverPage> {
                       ],
                     ),
                     const Expanded(flex: 1, child: SizedBox()),
-                    ElevatedButton(
-                      onPressed: () {
-                        if (nameControler.text.isNotEmpty &&
-                                cpfControler.text.isNotEmpty ||
-                            rgControler.text.isNotEmpty) {
-                          _userDriver.name = nameControler.text;
-                          _userDriver.cpf = cpfControler.text;
-                          _userDriver.rg = rgControler.text;
-
-                          Navigator.of(context).push(_createRouteDriver());
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Motorista não informado.'),
-                              backgroundColor: Colors.red,
+                    SizedBox(
+                      width: widght - sizeScreen * 0.04,
+                      height: 50,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          if (nameControler.text.isNotEmpty &&
+                                  cpfControler.text.isNotEmpty ||
+                              rgControler.text.isNotEmpty) {
+                            _userDriver.name = nameControler.text;
+                            _userDriver.cpf = _removerMaskCpf(cpfControler.text);
+                            _userDriver.rg = rgControler.text;
+                      
+                            Navigator.of(context).push(_createRouteDriver());
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Motorista não informado.'),
+                                backgroundColor: Colors.red,
+                              ),
+                            );
+                          }
+                        },
+                        style: ButtonStyle(
+                          elevation: const WidgetStatePropertyAll<double>(8.0),
+                          backgroundColor:
+                              WidgetStatePropertyAll<Color>(Colors.blue.shade300),
+                         
+                          shape: WidgetStatePropertyAll<RoundedRectangleBorder>(
+                            RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8.0),
                             ),
-                          );
-                        }
-                      },
-                      style: ButtonStyle(
-                        elevation: const WidgetStatePropertyAll<double>(8.0),
-                        backgroundColor:
-                            WidgetStatePropertyAll<Color>(Colors.blue.shade300),
-                        padding:
-                            const WidgetStatePropertyAll<EdgeInsetsGeometry>(
-                                EdgeInsets.symmetric(
-                                    horizontal: 160.0, vertical: 16.0)),
-                        shape: WidgetStatePropertyAll<RoundedRectangleBorder>(
-                          RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8.0),
                           ),
                         ),
-                      ),
-                      child: const Text(
-                        "Continuar",
-                        style: TextStyle(color: Colors.black87),
+                        child: const Text(
+                          "Continuar",
+                          style: TextStyle(color: Colors.black87),
+                        ),
                       ),
                     ),
                     const SizedBox(height: 20.0),
@@ -349,29 +338,18 @@ class _DriverPageState extends State<DriverPage> {
                 ),
               ),
             ),
-          ),
-          ValueListenableBuilder(
-            valueListenable: loadModels,
-            builder: (context, value, child) {
-              return value
-                  ? Container(
-                      width: widght,
-                      height: height,
-                      decoration: const BoxDecoration(
-                          color: Color.fromARGB(103, 190, 190, 190)),
-                      child: const Center(
-                        child: CircularProgressIndicator(
-                          color: Colors.blue,
-                          strokeWidth: 2,
-                        ),
-                      ),
-                    )
-                  : const SizedBox();
-            },
-          ),
+          )
         ],
       ),
     );
+  }
+
+  Future<Uint8List?> compressFile(File file) async {
+    var result = await FlutterImageCompress.compressWithFile(
+      file.absolute.path,
+      quality: 68,
+    );
+    return result;
   }
 
   void openCamera1(BuildContext context) async {
@@ -390,7 +368,7 @@ class _DriverPageState extends State<DriverPage> {
 
   void fileToBase64Photo(String filePath) async {
     File file = File(filePath);
-    photoDriver.value = await file.readAsBytes();
+    photoDriver.value = (await compressFile(file))!;
     _userDriver.photo = base64Encode(photoDriver.value);
   }
 
@@ -410,7 +388,7 @@ class _DriverPageState extends State<DriverPage> {
 
   void fileToBase64PDoc1(String filePath) async {
     File file = File(filePath);
-    doc1Driver.value = await file.readAsBytes();
+    doc1Driver.value = (await compressFile(file))!;
     _userDriver.doc1 = base64Encode(doc1Driver.value);
   }
 
@@ -430,7 +408,7 @@ class _DriverPageState extends State<DriverPage> {
 
   void fileToBase64PDoc2(String filePath) async {
     File file = File(filePath);
-    doc2Driver.value = await file.readAsBytes();
+    doc2Driver.value = (await compressFile(file))!;
     _userDriver.doc2 = base64Encode(doc2Driver.value);
   }
 
@@ -440,8 +418,6 @@ class _DriverPageState extends State<DriverPage> {
               userLogin: widget.userLogin,
               clientCompany: widget.clientCompany,
               userDriver: _userDriver,
-              model: _models,
-              attendants: _attendants,
             ),
         transitionDuration: const Duration(milliseconds: 600),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
@@ -459,5 +435,16 @@ class _DriverPageState extends State<DriverPage> {
             child: child,
           );
         });
+  }
+
+  String _removerMaskCpf(String cpf) {
+    var mask;
+    try {
+      var mask = MaskTextInputFormatter(
+          mask: "###########", filter: {"#": RegExp(r'[0-9]')});
+      return mask.maskText(cpf);
+    } catch (e) {
+      return "";
+    }
   }
 }

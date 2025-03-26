@@ -15,6 +15,7 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  double sizeScreen = 0;
   final userController = TextEditingController();
   final userKey = GlobalKey<FormFieldState>();
   final passwordController = TextEditingController();
@@ -31,6 +32,7 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     var myWidth = MediaQuery.of(context).size.width;
     var myHeight = MediaQuery.of(context).size.height;
+    sizeScreen = MediaQuery.of(context).size.shortestSide;
 
     return Scaffold(
       backgroundColor: Colors.grey.shade100,
@@ -43,13 +45,11 @@ class _LoginPageState extends State<LoginPage> {
               children: [
                 const Expanded(
                   flex: 1,
-                  child: SizedBox(
-                    height: 25,
-                  ),
+                  child: SizedBox(),
                 ),
-                const Icon(
+                 Icon(
                   Icons.lock,
-                  size: 100,
+                  size: sizeScreen * 0.2,
                 ),
                 const SizedBox(
                   height: 50,
@@ -60,7 +60,7 @@ class _LoginPageState extends State<LoginPage> {
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Colors.grey.shade700,
-                    fontSize: 16,
+                    fontSize: sizeScreen * 0.04,
                   ),
                 ),
                 const SizedBox(
@@ -200,9 +200,9 @@ class _LoginPageState extends State<LoginPage> {
                       elevation: const WidgetStatePropertyAll<double>(8.0),
                       backgroundColor:
                           const WidgetStatePropertyAll<Color>(Colors.blue),
-                      padding: const WidgetStatePropertyAll<EdgeInsetsGeometry>(
+                      padding:  WidgetStatePropertyAll<EdgeInsetsGeometry>(
                           EdgeInsets.symmetric(
-                              horizontal: 162.0, vertical: 16.0)),
+                              horizontal: sizeScreen * 0.36, vertical: 16.0)),
                       shape: WidgetStatePropertyAll<RoundedRectangleBorder>(
                         RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8.0),
@@ -235,15 +235,14 @@ class _LoginPageState extends State<LoginPage> {
                         width: myWidth,
                         height: myHeight,
                         decoration: const BoxDecoration(
-                          color:  Color.fromARGB(103, 190, 190, 190)
-                        ),
-                        child:const Center(
+                            color: Color.fromARGB(103, 190, 190, 190)),
+                        child: const Center(
                           child: CircularProgressIndicator(
                             color: Colors.blue,
                             strokeWidth: 2,
                           ),
                         ))
-                    :const SizedBox();
+                    : const SizedBox();
               },
             ),
           ],
