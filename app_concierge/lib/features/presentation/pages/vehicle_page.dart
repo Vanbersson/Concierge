@@ -8,11 +8,13 @@ import 'package:app_concierge/features/domain/user/user_attendant.dart';
 import 'package:app_concierge/features/domain/user/user_attendant_provider.dart';
 import 'package:app_concierge/features/domain/user/user_driver.dart';
 import 'package:app_concierge/features/domain/user/user_login.dart';
+import 'package:app_concierge/features/domain/vehicle/exists_placa.dart';
 import 'package:app_concierge/features/domain/vehicle/vehicle.dart';
 import 'package:app_concierge/features/domain/vehicle/vehicle_model.dart';
 import 'package:app_concierge/features/domain/vehicle/vehicle_model_provider.dart';
 import 'package:app_concierge/features/domain/vehicle/vehicle_provider.dart';
 import 'package:app_concierge/features/presentation/widgets/mytextfield.dart';
+import 'package:app_concierge/services/vehicle/vehicle_service.dart';
 import 'package:camera_camera/camera_camera.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -36,6 +38,7 @@ class VehiclePage extends StatefulWidget {
 }
 
 class _VehiclePageState extends State<VehiclePage> {
+  final VehicleService _vehicleService = VehicleService();
   double sizeScreen = 0;
   late Vehicle _vehicle;
 
@@ -797,7 +800,7 @@ class _VehiclePageState extends State<VehiclePage> {
           );
   }
 
-  bool validVehicle() {
+  Future<bool> validVehicle() async {
     if (_vehicle.modelId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -842,13 +845,30 @@ class _VehiclePageState extends State<VehiclePage> {
 
         return false;
       }
+
+      ExistsPlaca existsPlaca = ExistsPlaca();
+      existsPlaca.companyId = widget.userLogin.companyId;
+      existsPlaca.resaleId = widget.userLogin.resaleId;
+      existsPlaca.placa = this._removerMaskPlaca(placaControler.text.trim());
+
+      //Placa exists
+      String resultPlaca = await this._vehicleService.existsPlaca(existsPlaca);
+      if (resultPlaca == "yes") {
+         ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Veículo já se encontra na empresa.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return false;
+      }
     }
 
     return true;
   }
 
-  void addVehicle() {
-    if (validVehicle()) {
+  void addVehicle() async {
+    if (await validVehicle()) {
       _vehicle.companyId = widget.userLogin.companyId;
       _vehicle.resaleId = widget.userLogin.resaleId;
 

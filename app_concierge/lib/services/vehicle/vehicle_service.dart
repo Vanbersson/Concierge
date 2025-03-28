@@ -1,4 +1,5 @@
 import 'package:app_concierge/features/data/domain/user_login_sqlite_service.dart';
+import 'package:app_concierge/features/domain/vehicle/exists_placa.dart';
 import 'package:app_concierge/features/domain/vehicle/vehicle.dart';
 import 'package:app_concierge/features/domain/vehicle/vehicle_entry.dart';
 import 'package:app_concierge/features/domain/vehicle/vehicle_exit.dart';
@@ -123,7 +124,7 @@ class VehicleService {
     }
   }
 
-   Future<String> Exit(VehicleExit vehicle) async {
+  Future<String> Exit(VehicleExit vehicle) async {
     final dio = Dio();
 
     try {
@@ -139,6 +140,29 @@ class VehicleService {
       );
       if (response.statusCode == 200) {
         return "Success.";
+      }
+      return "Error.";
+    } on DioException catch (e) {
+      return "Error.";
+    }
+  }
+
+  Future<String> existsPlaca(ExistsPlaca vehicle) async {
+    final dio = Dio();
+
+    try {
+      final token = await userStorange();
+
+      final response = await dio.post(
+        kURL_EXISTS_PLACA,
+        data: vehicle.toJson(),
+        options: Options(headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token'
+        }, responseType: ResponseType.json),
+      );
+      if (response.statusCode == 200) {
+        return response.data['message'];
       }
       return "Error.";
     } on DioException catch (e) {

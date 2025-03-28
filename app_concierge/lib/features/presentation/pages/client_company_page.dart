@@ -70,6 +70,14 @@ class _ClienteCompanyPageState extends State<ClienteCompanyPage> {
     }
   }
 
+  String abreviaNameSearch(String name) {
+    if (name.length < 16) {
+      return name;
+    } else {
+      return name.substring(0, 16);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final widght = MediaQuery.of(context).size.width;
@@ -81,7 +89,7 @@ class _ClienteCompanyPageState extends State<ClienteCompanyPage> {
       body: Stack(
         children: [
           Padding(
-            padding: const EdgeInsets.only( right: 24.0, left: 24.0),
+            padding: const EdgeInsets.only(right: 24.0, left: 24.0),
             child: SingleChildScrollView(
               child: SizedBox(
                 width: widght,
@@ -147,7 +155,9 @@ class _ClienteCompanyPageState extends State<ClienteCompanyPage> {
                           elevation: const WidgetStatePropertyAll<double>(8.0),
                           backgroundColor: WidgetStatePropertyAll<Color>(
                               Colors.deepOrange.shade300),
-                          shape: WidgetStatePropertyAll<RoundedRectangleBorder>(RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0),
+                          shape: WidgetStatePropertyAll<RoundedRectangleBorder>(
+                            RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8.0),
                             ),
                           ),
                         ),
@@ -173,7 +183,7 @@ class _ClienteCompanyPageState extends State<ClienteCompanyPage> {
                             );
                           },
                         ),
-                         SizedBox(width: sizeScreen * 0.02),
+                        SizedBox(width: sizeScreen * 0.02),
                         ValueListenableBuilder(
                           valueListenable: selectClient,
                           builder: (context, value, child) {
@@ -242,9 +252,9 @@ class _ClienteCompanyPageState extends State<ClienteCompanyPage> {
                         },
                         style: ButtonStyle(
                           elevation: const WidgetStatePropertyAll<double>(8.0),
-                          backgroundColor:
-                              WidgetStatePropertyAll<Color>(Colors.blue.shade300),
-                         /*  padding: WidgetStatePropertyAll<EdgeInsetsGeometry>(EdgeInsets.symmetric(horizontal: sizeScreen * 0.35, vertical: 16.0)), */
+                          backgroundColor: WidgetStatePropertyAll<Color>(
+                              Colors.blue.shade300),
+                          /*  padding: WidgetStatePropertyAll<EdgeInsetsGeometry>(EdgeInsets.symmetric(horizontal: sizeScreen * 0.35, vertical: 16.0)), */
                           shape: WidgetStatePropertyAll<RoundedRectangleBorder>(
                             RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8.0),
@@ -323,7 +333,7 @@ class _ClienteCompanyPageState extends State<ClienteCompanyPage> {
               width: sizeScreen * 1,
               height: sizeScreen * 1.8,
               child: Padding(
-                padding:  EdgeInsets.all(sizeScreen * 0.02),
+                padding: EdgeInsets.all(sizeScreen * 0.02),
                 child: Column(
                   children: [
                     const Text(
@@ -449,10 +459,12 @@ class _ClienteCompanyPageState extends State<ClienteCompanyPage> {
                             }
                           },
                           style: ButtonStyle(
-                            elevation: const WidgetStatePropertyAll<double>(8.0),
+                            elevation:
+                                const WidgetStatePropertyAll<double>(8.0),
                             backgroundColor: WidgetStatePropertyAll<Color>(
                                 Colors.deepOrange.shade300),
-                            shape: WidgetStatePropertyAll<RoundedRectangleBorder>(
+                            shape:
+                                WidgetStatePropertyAll<RoundedRectangleBorder>(
                               RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8.0),
                               ),
@@ -511,7 +523,9 @@ class _ClienteCompanyPageState extends State<ClienteCompanyPage> {
                                             child: Text(
                                           cli.name!.substring(0, 1),
                                         )),
-                                        title: Text(cli.name!.substring(0, 16)),
+                                        title: Text(
+                                          abreviaNameSearch(cli.name.toString()),
+                                        ),
                                         subtitle: cli.fisjur == "Juridica"
                                             ? Text(cli.cnpj!)
                                             : Text(cli.cpf!),

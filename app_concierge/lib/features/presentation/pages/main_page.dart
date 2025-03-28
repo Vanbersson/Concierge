@@ -99,6 +99,14 @@ class _MainPageState extends State<MainPage> {
     }
   }
 
+abreviaName(String name){
+  if(name.length <= 17){
+    return name;
+  }else{
+    return name.substring(0, 17);
+  }
+
+}
   @override
   Widget build(BuildContext context) {
     Uint8List userPhoto = base64Decode(widget.userLogin.photo!);
@@ -492,9 +500,7 @@ class _MainPageState extends State<MainPage> {
                             ),
                             Text(
                               vei.clientCompanyName != ""
-                                  ? vei.clientCompanyName
-                                      .toString()
-                                      .substring(0, 17)
+                                  ? abreviaName(vei.clientCompanyName.toString()) 
                                   : "FALTA",
                               style: const TextStyle(
                                   color: Colors.black87,

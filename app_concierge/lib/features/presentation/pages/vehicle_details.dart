@@ -498,7 +498,7 @@ class _VehicleDetailsState extends State<VehicleDetails> {
     try {
       var mask = MaskTextInputFormatter(
         mask: "###-####",
-        filter: {"#": RegExp(r'[0-9 a-z]')},
+        filter: {"#": RegExp(r'[0-9 A-Z a-z]')},
       );
       return mask.maskText(placa).toUpperCase();
     } catch (e) {
@@ -512,7 +512,7 @@ class _VehicleDetailsState extends State<VehicleDetails> {
         "Empresa nome: ${vehicle.clientCompanyName}\n"
         "Modelo: ${vehicle.modelDescription}\nCor: ${vehicle.color} \n"
         "Placa: ${maskPlaca(vehicle.placa!)}\nFrota: ${vehicle.frota}\nKM: ${vehicle.kmEntry}\n"
-        "Data entrada: ${vehicle.dateEntry}\nPorteiro entrada:${vehicle.nameUserEntry}\n"
+        "Data entrada: ${vehicle.dateEntry}\nPorteiro entrada: ${vehicle.nameUserEntry}\n"
         "Data saída: ${vehicle.dateExit == null ? '' : getFormatDataHora(vehicle.dateExit.toString())}\nPorteiro saída: ${vehicle.userNameExit ?? ''}\n"
         "Consultor: ${vehicle.nameUserAttendant ?? ''}\n"
         "O.S.: ${vehicle.numServiceOrder != 0 ? vehicle.numServiceOrder : ''}\n"
