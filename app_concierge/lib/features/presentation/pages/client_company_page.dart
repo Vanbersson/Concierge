@@ -28,6 +28,8 @@ class _ClienteCompanyPageState extends State<ClienteCompanyPage> {
   ValueNotifier<ClientCompany> selectClient =
       ValueNotifier<ClientCompany>(ClientCompany());
 
+  final TextEditingController clientCodeFilter = TextEditingController();
+  final TextEditingController clientFantasiaFilter = TextEditingController();
   final TextEditingController clientNameFilter = TextEditingController();
   ValueNotifier<bool> isChecked = ValueNotifier(false);
 
@@ -331,7 +333,7 @@ class _ClienteCompanyPageState extends State<ClienteCompanyPage> {
           child: Dialog(
             child: SizedBox(
               width: sizeScreen * 1,
-              height: sizeScreen * 1.8,
+              height: sizeScreen * 2,
               child: Padding(
                 padding: EdgeInsets.all(sizeScreen * 0.02),
                 child: Column(
@@ -349,40 +351,136 @@ class _ClienteCompanyPageState extends State<ClienteCompanyPage> {
                     const SizedBox(
                       height: 10,
                     ),
-                    //Textfield search
-                    TextFormField(
-                      controller: clientNameFilter,
-                      textInputAction: TextInputAction.done,
-                      validator: (text) {
-                        if (text == null || text.trim().isEmpty) {
-                          return "Inválido!";
-                        }
-                        return null;
-                      },
-                      style: const TextStyle(
-                        color: Colors.black87,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
-                      decoration: InputDecoration(
-                        fillColor: Colors.grey.shade200,
-                        filled: true,
-                        labelText: "Nome",
-                        labelStyle: const TextStyle(
-                          fontWeight: FontWeight.w300,
-                          fontSize: 16,
-                          color: Colors.black87,
-                        ),
-                        enabledBorder: const OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.grey),
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(10.0),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SizedBox(
+                          width: sizeScreen * 0.2,
+                          child: TextFormField(
+                            controller: clientCodeFilter,
+                            keyboardType: TextInputType.number,
+                            textInputAction: TextInputAction.search,
+                            validator: (text) {
+                              if (text == null || text.trim().isEmpty) {
+                                return "Inválido!";
+                              }
+                              return null;
+                            },
+                            style: const TextStyle(
+                              color: Colors.black87,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                            decoration: InputDecoration(
+                              fillColor: Colors.grey.shade200,
+                              filled: true,
+                              labelText: "Código",
+                              labelStyle: const TextStyle(
+                                fontWeight: FontWeight.w300,
+                                fontSize: 16,
+                                color: Colors.black87,
+                              ),
+                              enabledBorder: const OutlineInputBorder(
+                                borderSide: BorderSide(color: Colors.grey),
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(10.0),
+                                ),
+                              ),
+                              focusedBorder: const OutlineInputBorder(
+                                borderSide: BorderSide(color: Colors.grey),
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(10.0),
+                                ),
+                              ),
+                            ),
                           ),
                         ),
-                        focusedBorder: const OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.grey),
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(10.0),
+                        SizedBox(
+                          width: sizeScreen * 0.02,
+                        ),
+                        SizedBox(
+                          width: sizeScreen * 0.5,
+                          child: TextFormField(
+                            controller: clientFantasiaFilter,
+                            keyboardType: TextInputType.text,
+                            textInputAction: TextInputAction.search,
+                            validator: (text) {
+                              if (text == null || text.trim().isEmpty) {
+                                return "Inválido!";
+                              }
+                              return null;
+                            },
+                            style: const TextStyle(
+                              color: Colors.black87,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                            decoration: InputDecoration(
+                              fillColor: Colors.grey.shade200,
+                              filled: true,
+                              labelText: "Fantasia",
+                              labelStyle: const TextStyle(
+                                fontWeight: FontWeight.w300,
+                                fontSize: 16,
+                                color: Colors.black87,
+                              ),
+                              enabledBorder: const OutlineInputBorder(
+                                borderSide: BorderSide(color: Colors.grey),
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(10.0),
+                                ),
+                              ),
+                              focusedBorder: const OutlineInputBorder(
+                                borderSide: BorderSide(color: Colors.grey),
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(10.0),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(
+                      height: sizeScreen * 0.02,
+                    ),
+                    //Textfield search
+                    SizedBox(
+                      width: sizeScreen * 0.72,
+                      child: TextFormField(
+                        controller: clientNameFilter,
+                        textInputAction: TextInputAction.search,
+                        validator: (text) {
+                          if (text == null || text.trim().isEmpty) {
+                            return "Inválido!";
+                          }
+                          return null;
+                        },
+                        style: const TextStyle(
+                          color: Colors.black87,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                        decoration: InputDecoration(
+                          fillColor: Colors.grey.shade200,
+                          filled: true,
+                          labelText: "Nome",
+                          labelStyle: const TextStyle(
+                            fontWeight: FontWeight.w300,
+                            fontSize: 16,
+                            color: Colors.black87,
+                          ),
+                          enabledBorder: const OutlineInputBorder(
+                            borderSide: BorderSide(color: Colors.grey),
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(10.0),
+                            ),
+                          ),
+                          focusedBorder: const OutlineInputBorder(
+                            borderSide: BorderSide(color: Colors.grey),
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(10.0),
+                            ),
                           ),
                         ),
                       ),
@@ -392,59 +490,87 @@ class _ClienteCompanyPageState extends State<ClienteCompanyPage> {
                     ),
                     //Check
                     Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         ValueListenableBuilder(
-                            valueListenable: isCheckedJ,
-                            builder: (BuildContext context, bool value,
-                                Widget? child) {
-                              return Row(
-                                children: [
-                                  Checkbox(
-                                    value: value,
-                                    checkColor: Colors.black54,
-                                    activeColor: Colors.green.shade300,
-                                    onChanged: (bool? sele) {
+                          valueListenable: isCheckedJ,
+                          builder: (BuildContext context, bool value,
+                              Widget? child) {
+                            return Row(
+                              children: [
+                                Checkbox(
+                                  value: value,
+                                  checkColor: Colors.black54,
+                                  activeColor: Colors.green.shade300,
+                                  onChanged: (bool? sele) {
+                                    isCheckedJ.value = true;
+                                    isCheckedF.value = false;
+                                  },
+                                ),
+                                GestureDetector(
+                                    onTap: () {
                                       isCheckedJ.value = true;
                                       isCheckedF.value = false;
                                     },
-                                  ),
-                                  GestureDetector(
-                                      onTap: () {
-                                        isCheckedJ.value = true;
-                                        isCheckedF.value = false;
-                                      },
-                                      child: const Text("Jurídica")),
-                                ],
-                              );
-                            }),
-                        const SizedBox(
-                          width: 10,
+                                    child: const Text("Jurídica")),
+                              ],
+                            );
+                          },
                         ),
+                        SizedBox(width: sizeScreen * 0.02),
                         ValueListenableBuilder(
-                            valueListenable: isCheckedF,
-                            builder: (BuildContext context, bool value,
-                                Widget? child) {
-                              return Row(
-                                children: [
-                                  Checkbox(
-                                    value: value,
-                                    checkColor: Colors.black54,
-                                    activeColor: Colors.green.shade300,
-                                    onChanged: (bool? sele) {
+                          valueListenable: isCheckedF,
+                          builder: (BuildContext context, bool value,
+                              Widget? child) {
+                            return Row(
+                              children: [
+                                Checkbox(
+                                  value: value,
+                                  checkColor: Colors.black54,
+                                  activeColor: Colors.green.shade300,
+                                  onChanged: (bool? sele) {
+                                    isCheckedJ.value = false;
+                                    isCheckedF.value = true;
+                                  },
+                                ),
+                                GestureDetector(
+                                    onTap: () {
                                       isCheckedJ.value = false;
                                       isCheckedF.value = true;
                                     },
-                                  ),
-                                  GestureDetector(
-                                      onTap: () {
-                                        isCheckedJ.value = false;
-                                        isCheckedF.value = true;
-                                      },
-                                      child: const Text("Física")),
-                                ],
-                              );
-                            }),
+                                    child: const Text("Física")),
+                              ],
+                            );
+                          },
+                        ),
+                        SizedBox(width: sizeScreen * 0.02),
+                        ElevatedButton(
+                          onPressed: () {
+                            isCheckedJ.value = true;
+                            isCheckedF.value = false;
+                            clients.value = Future.value([]);
+                            filterClean();
+                          },
+                          style: ButtonStyle(
+                            elevation:
+                                const WidgetStatePropertyAll<double>(8.0),
+                            backgroundColor: WidgetStatePropertyAll<Color>(
+                                Colors.blue.shade300),
+                            shape:
+                                WidgetStatePropertyAll<RoundedRectangleBorder>(
+                                    RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(8.0))),
+                          ),
+                          child: const Text(
+                            "Limpar",
+                            style: TextStyle(color: Colors.black),
+                          ),
+                        )
                       ],
+                    ),
+                    const SizedBox(
+                      height: 10,
                     ),
                     //Filter
                     SizedBox(
@@ -465,10 +591,9 @@ class _ClienteCompanyPageState extends State<ClienteCompanyPage> {
                                 Colors.deepOrange.shade300),
                             shape:
                                 WidgetStatePropertyAll<RoundedRectangleBorder>(
-                              RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8.0),
-                              ),
-                            ),
+                                    RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(8.0))),
                           ),
                           child: const Text(
                             "Pesquisar",
@@ -484,7 +609,6 @@ class _ClienteCompanyPageState extends State<ClienteCompanyPage> {
                             future: value,
                             builder: (context, snapshot) {
                               final status = snapshot.connectionState;
-
                               //Erro
                               if (snapshot.hasError) {
                                 return const Center(
@@ -524,7 +648,8 @@ class _ClienteCompanyPageState extends State<ClienteCompanyPage> {
                                           cli.name!.substring(0, 1),
                                         )),
                                         title: Text(
-                                          abreviaNameSearch(cli.name.toString()),
+                                          abreviaNameSearch(
+                                              cli.name.toString()),
                                         ),
                                         subtitle: cli.fisjur == "Juridica"
                                             ? Text(cli.cnpj!)
@@ -546,7 +671,7 @@ class _ClienteCompanyPageState extends State<ClienteCompanyPage> {
                                   );
                                 }
                               }
-                              //
+                              //default
                               return const Center(
                                 child: Text(
                                   'Empresa não encontrada',
@@ -580,12 +705,22 @@ class _ClienteCompanyPageState extends State<ClienteCompanyPage> {
                         ),
                         FilledButton(
                             onPressed: () {
-                              Navigator.pop(context);
-                              isChecked.value = false;
+                              if (selectClient.value.id != null) {
+                                Navigator.pop(context);
+                                isChecked.value = false;
+                              }
                             },
                             style: ButtonStyle(
-                                backgroundColor: WidgetStatePropertyAll<Color>(
-                                    Colors.blue.shade300)),
+                              elevation:
+                                  const WidgetStatePropertyAll<double>(8.0),
+                              backgroundColor: WidgetStatePropertyAll<Color>(
+                                  Colors.blue.shade300),
+                              shape: WidgetStatePropertyAll<
+                                      RoundedRectangleBorder>(
+                                  RoundedRectangleBorder(
+                                      borderRadius:
+                                          BorderRadius.circular(8.0))),
+                            ),
                             child: const Text(
                               "Confirmar",
                               style: TextStyle(color: Colors.black87),
@@ -602,13 +737,34 @@ class _ClienteCompanyPageState extends State<ClienteCompanyPage> {
     );
   }
 
+  void filterClean(){
+    clientCodeFilter.text = "";
+    clientFantasiaFilter.text= "";
+    clientNameFilter.text = "";
+  }
+
   void filterJClient() {
     ClientCompanyService service = ClientCompanyService();
-    clients.value = service.filterJName(clientNameFilter.text.trim());
+  
+     if(clientCodeFilter.text.trim() != ""){
+      clients.value = service.filterCode(clientCodeFilter.text.trim());
+    } else if(clientFantasiaFilter.text.trim() != "") {
+      clients.value = service.filterJFantasia(clientFantasiaFilter.text.trim());
+    }else if(clientNameFilter.text.trim() != "") {
+      clients.value = service.filterJName(clientNameFilter.text.trim());
+    }
   }
 
   void filterFClient() {
     ClientCompanyService service = ClientCompanyService();
-    clients.value = service.filterFName(clientNameFilter.text.trim());
+
+    if(clientCodeFilter.text.trim() != ""){
+      clients.value = service.filterCode(clientCodeFilter.text.trim());
+    } else if(clientFantasiaFilter.text.trim() != "") {
+      clients.value = service.filterFFantasia(clientFantasiaFilter.text.trim());
+    }else if(clientNameFilter.text.trim() != "") {
+      clients.value = service.filterFName(clientNameFilter.text.trim());
+    }
+    
   }
 }
