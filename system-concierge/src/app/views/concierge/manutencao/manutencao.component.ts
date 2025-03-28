@@ -1,5 +1,5 @@
 import { Component, DoCheck, OnInit, signal } from '@angular/core';
-import { CommonModule, UpperCasePipe } from '@angular/common';
+import { CommonModule, DatePipe, UpperCasePipe } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { Validators, FormsModule, ReactiveFormsModule, FormGroup, FormControl } from '@angular/forms';
 import { NgxImageCompressService } from 'ngx-image-compress';
@@ -72,13 +72,13 @@ interface IModel {
 @Component({
   selector: 'app-manutencao',
   standalone: true,
-  imports: [CommonModule, FilterClientComponent, RouterModule, 
-    TabViewModule, FormsModule, IconFieldModule, 
-    CheckboxModule, TimelineModule, SpeedDialModule, 
-    ConfirmDialogModule, InputIconModule, ImageModule, 
-    DialogModule, ToastModule, TableModule, ReactiveFormsModule, 
-    InputTextareaModule, InputNumberModule, InputTextModule, 
-    ButtonModule, InputMaskModule, MultiSelectModule, 
+  imports: [CommonModule, FilterClientComponent, RouterModule,
+    TabViewModule, FormsModule, IconFieldModule,
+    CheckboxModule, TimelineModule, SpeedDialModule,
+    ConfirmDialogModule, InputIconModule, ImageModule,
+    DialogModule, ToastModule, TableModule, ReactiveFormsModule,
+    InputTextareaModule, InputNumberModule, InputTextModule,
+    ButtonModule, InputMaskModule, MultiSelectModule,
     InputGroupModule, RadioButtonModule, CalendarModule],
   templateUrl: './manutencao.component.html',
   styleUrl: './manutencao.component.scss',
@@ -152,7 +152,7 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
   proteiroId: number = 0;
   porteiroName: string = '';
   porteiroInfo: String = '';
-  
+
   //ClientCompany
   selectClientCompany = signal<ClientCompany>(new ClientCompany());
   formClientCompany = new FormGroup({
@@ -163,7 +163,7 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
     clientCompanyCpf: new FormControl<string>(''),
     clientCompanyRg: new FormControl<string | null>(null),
   });
-  
+
   //Driver
   formDriver = new FormGroup({
     driverEntryName: new FormControl<string>('', Validators.required),
@@ -267,9 +267,9 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
     this.disableInput();
   }
   ngDoCheck(): void {
-    if(this.selectClientCompany().id != 0){
+    if (this.selectClientCompany().id != 0) {
       this.formClientCompany.patchValue({
-        clientCompanyNot:[],
+        clientCompanyNot: [],
         clientCompanyId: this.selectClientCompany().id,
         clientCompanyName: this.selectClientCompany().name,
         clientCompanyCnpj: this.selectClientCompany().cnpj,
@@ -1196,7 +1196,7 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
           return false;
         }
       }
-    } 
+    }
 
     if (clientCompanyValue.clientCompanyNot.length == 0) {
       if (clientCompanyValue.clientCompanyId == null || clientCompanyValue.clientCompanyName == "") {
@@ -1226,13 +1226,17 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
     this.enableInput();
     return true;
   }
+  formatDateTime(date: Date): string {
+    var pipe = new DatePipe('pt-BR');
+    return pipe.transform(date, "yyyy-MM-ddTHH:mm:ss");
+  }
   private loadingVehicle() {
     const vehicleValue = this.formVehicle.value;
     const clientCompanyValue = this.formClientCompany.value;
     const driverValue = this.formDriver.value;
 
-    this.vehicleEntry.dateEntry = vehicleValue.dateEntry;
-    this.vehicleEntry.datePrevisionExit = vehicleValue?.datePrevisionExit ?? "";
+    this.vehicleEntry.dateEntry = this.formatDateTime(vehicleValue.dateEntry);
+    this.vehicleEntry.datePrevisionExit = vehicleValue?.datePrevisionExit == null ? "":  this.formatDateTime(vehicleValue.datePrevisionExit);
     this.vehicleEntry.placa = vehicleValue.placa;
     this.vehicleEntry.placasJunto = "";
     this.vehicleEntry.frota = vehicleValue.frota;
@@ -1303,15 +1307,15 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
   }
   public async save() {
     this.busyService.busy();
-    
+
     if (this.validForms()) {
       //Loading data
       this.loadingVehicle();
 
-      if(this.selectClientCompany().id != 0){
+      if (this.selectClientCompany().id != 0) {
         const resultClient = await this.saveClient(this.selectClientCompany());
       }
-      
+
       const resultVehicle = await this.updateVehicle(this.vehicleEntry);
 
       if (resultVehicle.status == 200) {
@@ -1323,7 +1327,7 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
 
     this.busyService.idle();
   }
-  private async updateVehicle(vehicle: VehicleEntry):Promise<HttpResponse<VehicleEntry>>{
+  private async updateVehicle(vehicle: VehicleEntry): Promise<HttpResponse<VehicleEntry>> {
     try {
       return await lastValueFrom(this.vehicleService.entryUpdate(vehicle));
     } catch (error) {

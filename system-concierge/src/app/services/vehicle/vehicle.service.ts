@@ -8,6 +8,8 @@ import { StorageService } from '../storage/storage.service';
 import { VehicleEntry } from '../../models/vehicle/vehicle-entry';
 import { VehicleEntryAuth } from '../../models/vehicle/vehicle-entry-auth';
 import { VehicleExit } from '../../models/vehicle/vehicle-exit';
+import { MessageResponse } from '../../models/message/message-response';
+import { ExistsPlaca } from '../../models/vehicle/exists-placa';
 
 @Injectable({
   providedIn: 'root'
@@ -44,8 +46,8 @@ export class VehicleService {
     return this.http.get<VehicleEntry>(environment.apiuUrl + "/vehicle/entry/filter/placa/" + placa, { headers: this.myHeaders(), observe: 'response' });
   }
 
-  notExistsVehicle(placa: string) {
-    return this.http.get(environment.apiuUrl + "/vehicle/entry/filter/notexists/placa/" + placa, { headers: this.myHeaders(), observe: 'response', responseType: 'text' });
+  existsPlaca(existsPlaca: ExistsPlaca): Observable<HttpResponse<MessageResponse>> {
+    return this.http.post<MessageResponse>(environment.apiuUrl + "/vehicle/entry/filter/exists/placa", existsPlaca, { headers: this.myHeaders(), observe: 'response' });
   }
 
 

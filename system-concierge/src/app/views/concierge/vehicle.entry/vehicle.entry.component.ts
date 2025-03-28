@@ -1,5 +1,5 @@
-import { Component, DoCheck, OnDestroy, OnInit, signal } from '@angular/core';
-import { CommonModule, UpperCasePipe } from '@angular/common';
+import { Component, DoCheck, OnDestroy, OnInit, signal, ɵgenerateStandaloneInDeclarationsError } from '@angular/core';
+import { CommonModule, DatePipe, UpperCasePipe } from '@angular/common';
 import { Validators, FormsModule, ReactiveFormsModule, FormGroup, FormControl } from '@angular/forms';
 import { lastValueFrom } from 'rxjs';
 import { HttpResponse } from '@angular/common/http';
@@ -49,6 +49,9 @@ import { MESSAGE_RESPONSE_NOT_COLOR, MESSAGE_RESPONSE_NOT_MODEL, MESSAGE_RESPONS
 
 //Components
 import { FilterClientComponent } from '../../../components/filter.client/filter.client.component';
+import { MessageResponse } from '../../../models/message/message-response';
+import { ExistsPlaca } from '../../../models/vehicle/exists-placa';
+
 
 @Component({
   selector: 'app-vehicle.entry',
@@ -273,7 +276,7 @@ export default class VehicleEntryComponent implements OnInit, OnDestroy, DoCheck
       clientCompanyRg: null
     });
   }
-  
+
   //Driver
   public async photoPersonDriver() {
     this.ngxImageCompressService.uploadFile().then(({ image, orientation }) => {
@@ -379,18 +382,18 @@ export default class VehicleEntryComponent implements OnInit, OnDestroy, DoCheck
     if (driver.driverEntryCpf == "" && driver.driverEntryRg != null && driver.driverEntryRg.toString().length <= 11) {
       this.deleteRequireCpf();
       return true;
-    } 
-    
+    }
+
     if (driver.driverEntryRg.toString().length > 11) {
       this.messageService.add({ severity: 'info', summary: 'Atenção', detail: 'RG inválido', icon: 'pi pi-info-circle' });
       return false;
-    } 
+    }
     return true;
   }
   public nextSterpperDriver() {
     if (this.addFormValidatorsDriver()) {
       this.activeStepper = 2;
-    } 
+    }
   }
   public stepperDriver() {
     if (this.formClientCompany.valid) {
@@ -415,7 +418,7 @@ export default class VehicleEntryComponent implements OnInit, OnDestroy, DoCheck
     if (this.formClientCompany.valid) {
       if (this.addFormValidatorsDriver()) {
         this.activeStepper = 2;
-      } 
+      }
     } else {
       this.messageService.add({ severity: 'info', summary: 'Atenção', detail: 'Empresa não selecionada', icon: 'pi pi-info-circle' });
     }
@@ -584,23 +587,37 @@ export default class VehicleEntryComponent implements OnInit, OnDestroy, DoCheck
     }
 
   }
-  private existsVehicle() {
-    this.vehicleService.notExistsVehicle(this.formVehicle.value.placa).subscribe(data => {
-      if (data.status == 200) {
-        this.loadVehicleEntry();
-      }
-    }, error => {
-      if (error.status == 401) {
-        this.messageService.add({ severity: 'error', summary: 'Veículo ' + this.upperCasePipe.transform(this.formVehicle.value.placa), detail: "Já se encontra na empresa", icon: 'pi pi-truck', life: 10000 });
-      }
-    });
+  private async existsPlaca(): Promise<HttpResponse<MessageResponse>> {
+
+    try {
+      const existsPlaca: ExistsPlaca = {
+        companyId: this.storageService.companyId,
+        resaleId: this.storageService.resaleId,
+        placa: this.formVehicle.value.placa
+      };
+
+      return await lastValueFrom(this.vehicleService.existsPlaca(existsPlaca));
+    } catch (error) {
+      return error;
+    }
+    
   }
+
+
   //Add or Delete Vehicle entry
-  public addVehicleEntry() {
+  public async addVehicleEntry() {
+
     if (this.validVehicleEntry()) {
 
       if (this.formVehicle.value.vehicleNew == "not") {
-        this.existsVehicle();
+
+        const resultPlaca = await this.existsPlaca();
+        if(resultPlaca.body.message == "yes"){
+          this.messageService.add({ severity: 'error', summary: 'Veículo ' + this.upperCasePipe.transform(this.formVehicle.value.placa), detail: "Já se encontra na empresa", icon: 'pi pi-truck', life: 10000 });
+        }else{
+          this.loadVehicleEntry();
+        }
+
       } else {
         this.loadVehicleEntry();
       }
@@ -628,6 +645,10 @@ export default class VehicleEntryComponent implements OnInit, OnDestroy, DoCheck
       this.dialogVehicleVisible = false;
     }
 
+  }
+  formatDateTime(date: Date): string {
+    var pipe = new DatePipe('pt-BR');
+    return pipe.transform(date, "yyyy-MM-ddTHH:mm:ss");
   }
   //save
   private loadVehicleEntry() {
@@ -663,8 +684,8 @@ export default class VehicleEntryComponent implements OnInit, OnDestroy, DoCheck
     this.vehicleEntry.frota = vehicleValue?.frota ?? "";
     this.vehicleEntry.modelId = vehicleValue.modelVehicle.at(0).id;
     this.vehicleEntry.modelDescription = vehicleValue.modelVehicle.at(0).description;
-    this.vehicleEntry.dateEntry = vehicleValue.dateEntry;
-    this.vehicleEntry.datePrevisionExit = vehicleValue?.datePrevisionExit ?? "";
+    this.vehicleEntry.dateEntry = this.formatDateTime(vehicleValue.dateEntry);
+    this.vehicleEntry.datePrevisionExit = vehicleValue.datePrevisionExit == null ? "" : this.formatDateTime(vehicleValue.datePrevisionExit);
     this.vehicleEntry.color = vehicleValue.color.at(0).color;
     this.vehicleEntry.kmEntry = vehicleValue?.kmEntry ?? "";
     this.vehicleEntry.quantityTrafficCone = vehicleValue?.quantityTrafficCone ?? 0;

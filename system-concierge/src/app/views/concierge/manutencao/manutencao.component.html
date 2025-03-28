@@ -34,8 +34,13 @@
                         </div>
                         <div class="field col-12 md:col-2">
                             <label for="dateEntry">Data Entrada</label>
-                            <p-calendar [iconDisplay]="'input'" [showIcon]="true" [showTime]="true"
-                                dateFormat="dd/mm/yy" formControlName="dateEntry" />
+
+                            <p-calendar [iconDisplay]="'input'" 
+                            [showIcon]="true" 
+                            [showTime]="true"
+                            dateFormat="dd/mm/yy " 
+                            formControlName="dateEntry" />
+
                             <small class="p-error block" *ngIf="formVehicle.get('dateEntry')?.invalid">
                                 Campo obrigatório</small>
                         </div>
