@@ -1,6 +1,7 @@
 package com.concierge.apiconcierge.services.vehicle;
 
 import com.concierge.apiconcierge.dtos.vehicle.AuthExit;
+import com.concierge.apiconcierge.dtos.vehicle.ExistsPlacaDto;
 import com.concierge.apiconcierge.dtos.vehicle.VehicleExitSaveDto;
 import com.concierge.apiconcierge.exceptions.vehicle.VehicleEntryException;
 
@@ -40,6 +41,12 @@ public class VehicleEntryService implements IVehicleEntryService {
     public Integer save(VehicleEntry vehicle) {
         try {
             vehicle.setId(null);
+            vehicle.setStatus(StatusVehicleEnum.entradaAutorizada);
+            vehicle.setStepEntry(StepVehicleEnum.Attendant);
+            vehicle.setBudgetStatus(StatusBudgetEnum.semOrcamento);
+            vehicle.setStatusAuthExit(StatusAuthExitEnum.NotAuth);
+            vehicle.setUserNameExit("");
+
             VehicleEntry vehicleEntry = this.loadVehicle(vehicle);
             String message = this.validation.save(vehicleEntry);
             if (message.equals(ConstantsMessage.SUCCESS)) {
@@ -91,6 +98,7 @@ public class VehicleEntryService implements IVehicleEntryService {
             Optional<VehicleEntry> optional = this.repository.findById(dataExit.vehicleId());
             VehicleEntry vehicleEntry = optional.get();
 
+            vehicleEntry.setStatus(StatusVehicleEnum.saidaAutorizada);
             vehicleEntry.setStepEntry(StepVehicleEnum.Exit);
             vehicleEntry.setUserIdExit(dataExit.userId());
             vehicleEntry.setUserNameExit(dataExit.userName());
@@ -249,12 +257,22 @@ public class VehicleEntryService implements IVehicleEntryService {
 
     @SneakyThrows
     @Override
-    public String NotExistsVehicle(String placa) {
+    public String existsPlaca(ExistsPlacaDto placa) {
         try {
-            VehicleEntry vehicle = repository.findByNotExistsVehicle(placa);
-            if (vehicle == null)
-                return ConstantsMessage.SUCCESS;
-            throw new VehicleEntryException("Placa exists.");
+            String message =  this.validation.existsPlaca(placa);
+
+            if(ConstantsMessage.SUCCESS.equals(message)){
+
+                VehicleEntry vehicle = repository.findByExistsPlaca(placa.companyId(),placa.resaleId(),placa.placa());
+                if (vehicle != null){
+                    return "yes";
+                }else {
+                    return "not";
+                }
+
+            }else{
+                throw new VehicleEntryException(message);
+            }
         } catch (Exception ex) {
             throw new VehicleEntryException(ex.getMessage());
         }
@@ -385,13 +403,6 @@ public class VehicleEntryService implements IVehicleEntryService {
             vehicle.setNameUserExitAuth2("");
             vehicle.setDateExitAuth2(null);
         }
-        if (vehicle.getId() == null || vehicle.getId() == 0) {
-            vehicle.setStatus(StatusVehicleEnum.entradaAutorizada);
-            vehicle.setStepEntry(StepVehicleEnum.Attendant);
-            vehicle.setBudgetStatus(StatusBudgetEnum.semOrcamento);
-            vehicle.setStatusAuthExit(StatusAuthExitEnum.NotAuth);
-            vehicle.setUserNameExit("");
-        }
 
         return vehicle;
     }
@@ -416,6 +427,9 @@ public class VehicleEntryService implements IVehicleEntryService {
     }
 
     private Map<String, Object> loadObject(VehicleEntry vehicle) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
+
         Map<String, Object> map = new HashMap<>();
 
         map.put("companyId", vehicle.getCompanyId());
@@ -426,11 +440,13 @@ public class VehicleEntryService implements IVehicleEntryService {
         map.put("budgetStatus", vehicle.getBudgetStatus());
         map.put("idUserEntry", vehicle.getIdUserEntry());
         map.put("nameUserEntry", vehicle.getNameUserEntry());
-        map.put("dateEntry", vehicle.getDateEntry());
+
+        map.put("dateEntry", dateFormat.format(vehicle.getDateEntry()) + "T" + timeFormat.format(vehicle.getDateEntry()));
+
         if (vehicle.getDatePrevisionExit() == null) {
             map.put("datePrevisionExit", "");
         } else {
-            map.put("datePrevisionExit", vehicle.getDatePrevisionExit());
+            map.put("datePrevisionExit", dateFormat.format(vehicle.getDatePrevisionExit()) + "T" + timeFormat.format(vehicle.getDatePrevisionExit()));
         }
         if (vehicle.getIdUserAttendant() == null) {
             map.put("idUserAttendant", 0);

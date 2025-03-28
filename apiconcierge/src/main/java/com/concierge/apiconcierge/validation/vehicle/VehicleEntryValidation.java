@@ -1,10 +1,12 @@
 package com.concierge.apiconcierge.validation.vehicle;
 
 import com.concierge.apiconcierge.dtos.vehicle.AuthExit;
+import com.concierge.apiconcierge.dtos.vehicle.ExistsPlacaDto;
 import com.concierge.apiconcierge.models.budget.enums.StatusBudgetEnum;
 import com.concierge.apiconcierge.models.permission.PermissionUser;
 import com.concierge.apiconcierge.models.vehicle.VehicleEntry;
 import com.concierge.apiconcierge.models.vehicle.enums.StatusAuthExitEnum;
+import com.concierge.apiconcierge.models.vehicle.enums.StatusVehicleEnum;
 import com.concierge.apiconcierge.models.vehicle.enums.VehicleYesNotEnum;
 import com.concierge.apiconcierge.repositories.permission.IPermissionUserRepository;
 import com.concierge.apiconcierge.repositories.vehicle.entry.IVehicleEntryRepository;
@@ -46,10 +48,14 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
         if (vehicle.getVehicleNew() == VehicleYesNotEnum.not) {
             if (vehicle.getPlaca().isBlank())
                 return ERROR_PLACA;
+            if (vehicle.getPlaca().length() != 7)
+                return ERROR_PLACA;
 
-            VehicleEntry vehicleEntry = this.repository.findByPlaca(vehicle.getPlaca());
-            if (vehicleEntry != null)
+            VehicleEntry vehicleEntry = this.repository.findByExistsPlaca(vehicle.getCompanyId(), vehicle.getResaleId(), vehicle.getPlaca());
+            if (vehicleEntry != null){
                 return ERROR_PLACA_EXISTS;
+            }
+
         }
         if (vehicle.getModelId() == null || vehicle.getModelDescription().isBlank())
             return VEHICLEMODEL;
@@ -58,10 +64,7 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
         if (!vehicle.getDriverEntryRg().isBlank())
             if (vehicle.getDriverEntryRg().length() > 11)
                 return RG;
-        if (vehicle.getVehicleNew().equals(VehicleYesNotEnum.not)) {
-            if(vehicle.getPlaca().length() != 7)
-                return ERROR_PLACA;
-        }
+
         return ConstantsMessage.SUCCESS;
     }
 
@@ -309,6 +312,17 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
                     return ERROR_PERMISSION_ANOTHER_USER;
             }
         }
+        return ConstantsMessage.SUCCESS;
+    }
+
+    @Override
+    public String existsPlaca(ExistsPlacaDto placa){
+        if(placa.companyId() == null || placa.companyId() == 0)
+            return ConstantsMessage.ERROR_COMPANY;
+        if(placa.resaleId() == null || placa.resaleId() == 0)
+            return ConstantsMessage.ERROR_RESALE;
+        if(placa.placa().isBlank())
+            return  ConstantsMessage.ERROR_PLACA;
         return ConstantsMessage.SUCCESS;
     }
 }

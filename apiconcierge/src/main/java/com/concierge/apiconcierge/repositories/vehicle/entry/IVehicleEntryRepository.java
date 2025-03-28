@@ -13,8 +13,8 @@ public interface IVehicleEntryRepository extends JpaRepository<VehicleEntry, Int
 
     VehicleEntry findByPlaca(String placa);
 
-    @Query(value ="SELECT * FROM `tb_vehicle_entry` WHERE step_entry != 4 and placa = ?1" ,nativeQuery = true)
-    VehicleEntry findByNotExistsVehicle(String placa);
+    @Query(value ="SELECT * FROM `tb_vehicle_entry` WHERE company_id = ?1 and resale_id = ?2 and status = 0 and placa = ?3" ,nativeQuery = true)
+    VehicleEntry findByExistsPlaca(Integer companyId,Integer resaleId, String placa);
 
     VehicleEntry findByClientCompanyCnpj(String cnpj);
 

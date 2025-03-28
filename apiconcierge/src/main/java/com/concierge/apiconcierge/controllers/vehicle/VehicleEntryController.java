@@ -100,11 +100,11 @@ public class VehicleEntryController {
         }
     }
 
-    @GetMapping("/filter/notexists/placa/{placa}")
-    public ResponseEntity<Object> notExistsVehicle(@PathVariable(name = "placa") String placa) {
+    @PostMapping("/filter/exists/placa")
+    public ResponseEntity<Object> existsPlaca(@RequestBody ExistsPlacaDto data) {
         try {
-            String message = this.service.NotExistsVehicle(placa);
-            return ResponseEntity.ok(message);
+            String message = this.service.existsPlaca(data);
+            return ResponseEntity.status(HttpStatus.OK).body(new MessageResponseDto(message));
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
         }

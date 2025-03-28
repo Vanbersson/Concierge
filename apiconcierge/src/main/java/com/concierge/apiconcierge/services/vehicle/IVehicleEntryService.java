@@ -1,6 +1,7 @@
 package com.concierge.apiconcierge.services.vehicle;
 
 import com.concierge.apiconcierge.dtos.vehicle.AuthExit;
+import com.concierge.apiconcierge.dtos.vehicle.ExistsPlacaDto;
 import com.concierge.apiconcierge.dtos.vehicle.VehicleExitSaveDto;
 import com.concierge.apiconcierge.models.vehicle.VehicleEntry;
 
@@ -25,7 +26,7 @@ public interface IVehicleEntryService {
 
     public  Map<String, Object> filterPlaca(String placa);
 
-    public String NotExistsVehicle(String placa);
+    public String existsPlaca(ExistsPlacaDto placa);
 
     public Map<String, Object> addAuthExit(AuthExit authExit);
 
