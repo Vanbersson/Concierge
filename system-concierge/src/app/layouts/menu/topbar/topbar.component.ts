@@ -1,4 +1,4 @@
-import { Component, signal, ViewChild, ElementRef, OnInit, OnDestroy } from '@angular/core';
+import { Component, signal, ViewChild, ElementRef, OnInit, OnDestroy, DoCheck } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 
@@ -14,6 +14,7 @@ import { StorageService } from '../../../services/storage/storage.service';
 //component
 import { VehicleExitComponent } from '../../../views/concierge/vehicle.exit/vehicle.exit.component';
 import { UserProfileComponent } from '../../../components/user.profile/user.profile.component';
+import { User } from '../../../models/user/user';
 
 @Component({
   selector: 'app-topbar',
@@ -25,7 +26,7 @@ import { UserProfileComponent } from '../../../components/user.profile/user.prof
   styleUrl: './topbar.component.scss',
   providers: []
 })
-export class TopbarComponent implements OnInit, OnDestroy {
+export class TopbarComponent implements OnInit, OnDestroy, DoCheck {
 
   /* Menu Bar */
 
@@ -38,8 +39,9 @@ export class TopbarComponent implements OnInit, OnDestroy {
   @ViewChild('topbarmenu') menu!: ElementRef;
 
   /* Sider Bar */
-  userPhoto: string = "";
-  userName: string = "";
+  updateUser = signal<User>(new User());
+  showUserPhoto: string = "";
+  showUserName: string = "";
   userRoleDescription: string = "";
 
   visibleSideBarRight: boolean = false;
@@ -51,12 +53,27 @@ export class TopbarComponent implements OnInit, OnDestroy {
     private storageService: StorageService,
     private router: Router
   ) { }
+
   ngOnInit(): void {
     this.getPhotoUser();
     this.getNameUser();
     this.getRoleUser();
   }
   ngOnDestroy(): void {
+
+  }
+  ngDoCheck(): void {
+
+    if (this.updateUser().id != 0) {
+      this.showUserPhoto = this.updateUser().photo;
+      this.showUserName = this.updateUser().name.split(' ')[0];
+
+      this.storageService.photo = this.updateUser().photo;
+      this.storageService.name = this.updateUser().name;
+      this.storageService.cellphone = this.updateUser().cellphone;
+      //Limpa o usuário
+      this.updateUser.set(new User());
+    }
 
   }
   closeSession() {
@@ -77,11 +94,11 @@ export class TopbarComponent implements OnInit, OnDestroy {
   }
 
   getNameUser() {
-    this.userName = this.storageService.name;
+    this.showUserName = this.storageService.name.split(' ')[0];
   }
 
   getPhotoUser() {
-    this.userPhoto = this.storageService.photo;
+    this.showUserPhoto = this.storageService.photo;
   }
 
   getRoleUser() {
@@ -89,7 +106,7 @@ export class TopbarComponent implements OnInit, OnDestroy {
   }
 
   get firstLetter(): string {
-    return this.userName.substring(0, 1);
+    return this.showUserName.substring(0, 1);
   }
 
 

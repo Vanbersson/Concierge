@@ -51,40 +51,26 @@
                     <span class="text-500 font-medium"><strong>{{limitDiscount()}}%</strong></span>
                 </div>
             </div>
-            <div class="field col-12 md:col-4">
-                <label for="passwordid">Senha</label>
-                <p-password id="passwordid" formControlName="password" [feedback]="false" [toggleMask]="true" />
-                <small class="p-error block"
-                    *ngIf="userFormView.get('password')?.invalid && userFormView.get('password')?.dirty">
-                    Campo obrigatório</small>
-            </div>
-            <div class="field col-12 md:col-4">
-                <label for="passwordvalidid">Repetir senha</label>
-                <p-password id="passwordvalidid" formControlName="passwordValid" [feedback]="false"
-                    [toggleMask]="true" />
-                <small class="p-error block"
-                    *ngIf="userFormView.get('passwordValid')?.invalid && userFormView.get('passwordValid')?.dirty">
-                    Campo Obrigatório</small>
-            </div>
-            <div class="field col-12 md:col-4">
+            
+            <div class="field col-12 md:col-6">
                 <label for="">Cargo</label>
                 <div class="layout-input-disabled">
                     <span class="text-500 font-medium"><strong>{{userRoleDescription | uppercase}}</strong></span>
                 </div>
             </div>
-            <div class="field col-12">
-                <div class="layout-card-option">
-
-                    <div class="layout-card-option-title">Situação</div>
-                    <div class="flex align-items-center">
-                        <p-radioButton inputId="ativo" value="ativo" formControlName="status"></p-radioButton>
-                        <label for="ativo" class="ml-2">Ativado</label>
+            <div class="field col-12 md:col-6">
+                <div class="flex flex-column gap-2">
+                    <div class="">Situação</div>
+                    <div class="flex gap-2 mt-2 " >
+                        <div class="flex align-items-center mb-1">
+                            <p-radioButton inputId="ativo" value="ativo" formControlName="status"></p-radioButton>
+                            <label for="ativo" class="ml-2">Ativado</label>
+                        </div>
+                        <div class="flex align-items-center">
+                            <p-radioButton inputId="inativo" value="inativo" formControlName="status"></p-radioButton>
+                            <label for="inativo" class="ml-2">Desativado</label>
+                        </div>
                     </div>
-                    <div class="flex align-items-center">
-                        <p-radioButton inputId="inativo" value="inativo" formControlName="status"></p-radioButton>
-                        <label for="inativo" class="ml-2">Desativado</label>
-                    </div>
-
                 </div>
             </div>
         </div>

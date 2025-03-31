@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, signal } from '@angular/core';
+import { Component, EventEmitter, OnDestroy, OnInit, Output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControl, FormsModule, ReactiveFormsModule, FormGroup, Validators } from '@angular/forms';
 import { NgxImageCompressService } from 'ngx-image-compress';
@@ -13,13 +13,13 @@ import { PasswordModule } from 'primeng/password';
 import { ImageModule } from 'primeng/image';
 import { MessageService } from 'primeng/api';
 
-
 import { StorageService } from '../../services/storage/storage.service';
 import { UserService } from '../../services/user/user.service';
 import { BusyService } from '../loading/busy.service';
 import { User } from '../../models/user/user';
-
-
+import { lastValueFrom } from 'rxjs';
+import { HttpResponse } from '@angular/common/http';
+import { IMAGE_MAX_SIZE } from '../../util/constants';
 
 @Component({
   selector: 'app-userprofile',
@@ -33,9 +33,10 @@ import { User } from '../../models/user/user';
   styleUrl: './user.profile.component.scss',
   providers: [MessageService],
 })
-export class UserProfileComponent implements OnInit, OnDestroy {
+export class UserProfileComponent {
   private user: User;
-  IMAGE_MAX_SIZE: number = 4243795;
+  @Output() public outputUser = new EventEmitter<User>();
+
 
   visibleDialogUser: boolean = false;
 
@@ -69,12 +70,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
     private userService: UserService,
     private busyService: BusyService,
     private ngxImageCompressService: NgxImageCompressService) { }
-  ngOnInit(): void {
 
-  }
-  ngOnDestroy(): void {
-
-  }
   showDialogUser() {
     this.busyService.busy();
     this.searchUser();
@@ -113,7 +109,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
   }
   selectPhoto() {
     this.ngxImageCompressService.uploadFile().then(({ image, orientation }) => {
-      if (this.ngxImageCompressService.byteCount(image) > this.IMAGE_MAX_SIZE) {
+      if (this.ngxImageCompressService.byteCount(image) > IMAGE_MAX_SIZE) {
         this.messageService.add({ severity: 'error', summary: 'Imagem', detail: 'Tamanha máximo 3MB', icon: 'pi pi-times', life: 3000 });
       } else {
         this.ngxImageCompressService.compressFile(image, orientation, 50, 40).then((compressedImage) => {
@@ -134,20 +130,42 @@ export class UserProfileComponent implements OnInit, OnDestroy {
     this.user.photo = this.userPhoto != "" ? this.userPhoto : "";
     this.user.password = value.password;
   }
-  updateUser() {
+
+  private validUser(): boolean {
+    const { value } = this.userFormView;
+    if (value.name == "") {
+      this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Nome não informado', icon: 'pi pi-times' });
+      return false;
+    }
+
+    return true;
+  }
+  async updateUser() {
     this.dataUpdateUser();
 
-    this.userService.updateUser(this.user).subscribe((data) => {
-      if (data.status == 200) {
+    if (this.validUser()) {
+      const resultUser = await this.saveUser(this.user);
+
+      if (resultUser.status == 200) {
         this.messageService.add({ severity: 'success', summary: 'Usuário', detail: 'Atualizado com sucesso', icon: 'pi pi-check' });
+        this.outputUser.emit(this.user);
         this.hideDialogUser();
       }
-    }, (error) => {
-      this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Não autorizado', icon: 'pi pi-times' });
-    });
+    }
+
+
 
   }
-  
+
+  private async saveUser(user: User): Promise<HttpResponse<User>> {
+    try {
+      return await lastValueFrom(this.userService.updateUser(user));
+    } catch (error) {
+      this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Não autorizado', icon: 'pi pi-times' });
+      return error;
+    }
+  }
+
   alertErroPassword() {
     this.messageService.add({ severity: 'error', summary: 'Senha', detail: 'Senha não conferir', icon: 'pi pi-times' });
   }

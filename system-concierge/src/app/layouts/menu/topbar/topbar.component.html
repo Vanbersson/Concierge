@@ -39,22 +39,22 @@
             </div>
             <div class="flex flex-row gap-2 mt-5">
                 <div class="layout-side-header-photo">
-                    @if(userPhoto){
+                    @if(showUserPhoto){
                     <p-image [imageStyle]="{'border-radius':'100%','object-fit':'cover'}"
-                        src="data:image/png;base64,{{userPhoto}}" alt="imagem usuário" height="56" width="56" />
+                        src="data:image/png;base64,{{showUserPhoto}}" alt="imagem usuário" height="56" width="56" />
                     }@else {
                     <p-avatar [label]="firstLetter" size="xlarge" shape="circle" [style]="{ 'background-color': '#dee9fc' }"></p-avatar>
                     }
                 </div>
                 <div class="flex flex-column gap-2">
-                    <span class="font-semibold text-xl text-black-alpha-60">Olá, {{userName | titlecase}}</span>
+                    <span class="font-semibold text-xl text-black-alpha-60">Olá, {{showUserName | titlecase}}</span>
                     <span class="text-xl text-black-alpha-60">{{userRoleDescription | titlecase}}</span>
                 </div>
             </div>
         </div>
         <div class="layout-sidebar-content">
 
-            <app-userprofile />
+            <app-userprofile (outputUser)="updateUser.set($event)"/>
 
             <a class="layout-sidebar-content-card">
                 <i class="pi pi-cog"></i>
