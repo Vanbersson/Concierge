@@ -38,6 +38,8 @@ public class ConstantsMessage {
 
     public static final String ERROR_PERMISSION_ANOTHER_USER = "Authorization of another user.";
 
+    public static final String ERROR_AUTH_EXIT = "Delete exit authorization.";
+
 
 
 

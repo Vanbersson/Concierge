@@ -6,9 +6,11 @@ import jakarta.validation.constraints.NotNull;
 import java.util.Date;
 
 public record AuthExit(
-        @NotNull Integer idVehicle,
-        @NotNull Integer idUserExitAuth,
-        @NotBlank String nameUserExitAuth,
+        Integer companyId,
+        Integer resaleId,
+        Integer idVehicle,
+        Integer idUserExitAuth,
+        String nameUserExitAuth,
         Date dateExitAuth) {
 
 }

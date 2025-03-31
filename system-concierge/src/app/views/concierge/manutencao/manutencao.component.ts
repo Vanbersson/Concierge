@@ -38,7 +38,7 @@ import { IBudgetNew } from '../../../interfaces/budget/ibudget-new';
 import { IColor } from '../../../interfaces/icolor';
 
 //Constants
-import { STATUS_VEHICLE_ENTRY_NOTAUTH, STATUS_VEHICLE_ENTRY_FIRSTAUTH, STATUS_VEHICLE_ENTRY_AUTHORIZED, MESSAGE_RESPONSE_NOT_CLIENT, MESSAGE_RESPONSE_NOT_ATTENDANT, MESSAGE_RESPONSE_NOT_DRIVEREXIT } from '../../../util/constants';
+import { STATUS_VEHICLE_ENTRY_NOTAUTH, STATUS_VEHICLE_ENTRY_FIRSTAUTH, STATUS_VEHICLE_ENTRY_AUTHORIZED, MESSAGE_RESPONSE_NOT_CLIENT, MESSAGE_RESPONSE_NOT_ATTENDANT, MESSAGE_RESPONSE_NOT_DRIVEREXIT, MESSAGE_RESPONSE_ERROR_AUTH_EXIT } from '../../../util/constants';
 
 //Class
 import { User } from '../../../models/user/user';
@@ -1346,6 +1346,9 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
       if (error.error.message == BUDGET_CLIENTCOMPANY) {
         this.messageService.add({ severity: 'info', summary: 'Informação', detail: "Véiculo possui orçamento" });
         this.showClientCompany();
+      }
+      if (error.error.message == MESSAGE_RESPONSE_ERROR_AUTH_EXIT) {
+        this.messageService.add({ severity: 'info', summary: 'Informação', detail: "Remova autorização de saída" });
       }
       return error;
     }

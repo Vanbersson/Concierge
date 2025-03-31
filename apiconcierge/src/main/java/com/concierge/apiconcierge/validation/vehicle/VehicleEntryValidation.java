@@ -14,6 +14,8 @@ import com.concierge.apiconcierge.util.ConstantsMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 import static com.concierge.apiconcierge.util.ConstantsMessage.*;
 import static com.concierge.apiconcierge.util.ConstantsPermission.*;
 
@@ -52,7 +54,7 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
                 return ERROR_PLACA;
 
             VehicleEntry vehicleEntry = this.repository.findByExistsPlaca(vehicle.getCompanyId(), vehicle.getResaleId(), vehicle.getPlaca());
-            if (vehicleEntry != null){
+            if (vehicleEntry != null) {
                 return ERROR_PLACA_EXISTS;
             }
 
@@ -70,6 +72,7 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
 
     @Override
     public String update(VehicleEntry vehicle) {
+
         if (vehicle.getId() == null || vehicle.getId() == 0)
             return ERROR_ID;
         if (vehicle.getDateEntry() == null)
@@ -156,6 +159,20 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
             }
         }
 
+        if (vehicle.getServiceOrder().equals(VehicleYesNotEnum.yes)) {
+
+            Optional<VehicleEntry> resultVehicle = this.repository.findById(vehicle.getId());
+            VehicleEntry ve = resultVehicle.get();
+
+            if (ve.getServiceOrder() == VehicleYesNotEnum.not) {
+                if (ve.getStatusAuthExit() != StatusAuthExitEnum.NotAuth )
+                    return ConstantsMessage.ERROR_AUTH_EXIT;
+            }
+
+        }
+        if (vehicle.getServiceOrder().equals(VehicleYesNotEnum.not)) {
+
+        }
         return ConstantsMessage.SUCCESS;
     }
 
@@ -247,15 +264,28 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
 
         }
 
-        if (vehicle.getIdUserExitAuth1() == null) {
-            if (authExit.idUserExitAuth() != 1) {
-                PermissionUser permission = this.permissionUser.findByUserIdAndPermissionId(authExit.idUserExitAuth(), ADD_AUTH_EXIT_VEHICLE_1);
-                if (permission == null)
-                    return ERROR_PERMISSION;
+        if (vehicle.getServiceOrder().equals(VehicleYesNotEnum.yes)) {
+
+            if (vehicle.getIdUserExitAuth1() == null) {
+                if (authExit.idUserExitAuth() != 1) {
+                    PermissionUser permission = this.permissionUser.findByUserIdAndPermissionId(authExit.idUserExitAuth(), ADD_AUTH_EXIT_VEHICLE_1);
+                    if (permission == null)
+                        return ERROR_PERMISSION;
+                }
+            } else if (vehicle.getIdUserExitAuth2() == null) {
+                if (authExit.idUserExitAuth() != 1) {
+                    PermissionUser permission = this.permissionUser.findByUserIdAndPermissionId(authExit.idUserExitAuth(), ADD_AUTH_EXIT_VEHICLE_2);
+                    if (permission == null)
+                        return ERROR_PERMISSION;
+                }
             }
-        } else if (vehicle.getIdUserExitAuth2() == null) {
+
+        }
+
+        if (vehicle.getServiceOrder().equals(VehicleYesNotEnum.not)) {
+
             if (authExit.idUserExitAuth() != 1) {
-                PermissionUser permission = this.permissionUser.findByUserIdAndPermissionId(authExit.idUserExitAuth(), ADD_AUTH_EXIT_VEHICLE_2);
+                PermissionUser permission = this.permissionUser.findByUserIdAndPermissionId(authExit.idUserExitAuth(), ADD_AUTH_EXIT_VEHICLE_WITHOUT_O_S);
                 if (permission == null)
                     return ERROR_PERMISSION;
             }
@@ -276,17 +306,30 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
         if (vehicle.getDateExitAuth1() == null)
             return NOTAUTHEXIT;
 
-        if (authExit.idUserExitAuth() != 1) {
-            if (vehicle.getIdUserExitAuth1() != null) {
+
+        if (vehicle.getServiceOrder().equals(VehicleYesNotEnum.yes)) {
+
+            if (authExit.idUserExitAuth() != 1) {
+                if (vehicle.getIdUserExitAuth1() != authExit.idUserExitAuth())
+                    return ERROR_PERMISSION_ANOTHER_USER;
+
                 PermissionUser permission = this.permissionUser.findByUserIdAndPermissionId(authExit.idUserExitAuth(), DEL_AUTH_EXIT_VEHICLE_1);
                 if (permission == null)
                     return ERROR_PERMISSION;
-
-                if (vehicle.getIdUserExitAuth1() != authExit.idUserExitAuth())
-                    return ERROR_PERMISSION_ANOTHER_USER;
             }
         }
 
+        if (vehicle.getServiceOrder().equals(VehicleYesNotEnum.not)) {
+
+            if (authExit.idUserExitAuth() != 1) {
+                if (vehicle.getIdUserExitAuth1() != authExit.idUserExitAuth())
+                    return ERROR_PERMISSION_ANOTHER_USER;
+
+                PermissionUser permission = this.permissionUser.findByUserIdAndPermissionId(authExit.idUserExitAuth(), DEL_AUTH_EXIT_VEHICLE_WITHOUT_O_S);
+                if (permission == null)
+                    return ERROR_PERMISSION;
+            }
+        }
 
         return ConstantsMessage.SUCCESS;
     }
@@ -302,27 +345,41 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
         if (vehicle.getDateExitAuth2() == null)
             return NOTAUTHEXIT;
 
-        if (authExit.idUserExitAuth() != 1) {
-            if (vehicle.getIdUserExitAuth2() != null) {
-                PermissionUser permission = this.permissionUser.findByUserIdAndPermissionId(authExit.idUserExitAuth(), DEL_AUTH_EXIT_VEHICLE_2);
-                if (permission == null)
-                    return ERROR_PERMISSION;
+        if (vehicle.getServiceOrder().equals(VehicleYesNotEnum.yes)) {
+            if (authExit.idUserExitAuth() != 1) {
 
                 if (vehicle.getIdUserExitAuth2() != authExit.idUserExitAuth())
                     return ERROR_PERMISSION_ANOTHER_USER;
+
+                PermissionUser permission = this.permissionUser.findByUserIdAndPermissionId(authExit.idUserExitAuth(), DEL_AUTH_EXIT_VEHICLE_2);
+                if (permission == null)
+                    return ERROR_PERMISSION;
             }
         }
+
+        if (vehicle.getServiceOrder().equals(VehicleYesNotEnum.not)) {
+
+            if (authExit.idUserExitAuth() != 1) {
+                if (vehicle.getIdUserExitAuth2() != authExit.idUserExitAuth())
+                    return ERROR_PERMISSION_ANOTHER_USER;
+
+                PermissionUser permission = this.permissionUser.findByUserIdAndPermissionId(authExit.idUserExitAuth(), DEL_AUTH_EXIT_VEHICLE_WITHOUT_O_S);
+                if (permission == null)
+                    return ERROR_PERMISSION;
+            }
+        }
+
         return ConstantsMessage.SUCCESS;
     }
 
     @Override
-    public String existsPlaca(ExistsPlacaDto placa){
-        if(placa.companyId() == null || placa.companyId() == 0)
+    public String existsPlaca(ExistsPlacaDto placa) {
+        if (placa.companyId() == null || placa.companyId() == 0)
             return ConstantsMessage.ERROR_COMPANY;
-        if(placa.resaleId() == null || placa.resaleId() == 0)
+        if (placa.resaleId() == null || placa.resaleId() == 0)
             return ConstantsMessage.ERROR_RESALE;
-        if(placa.placa().isBlank())
-            return  ConstantsMessage.ERROR_PLACA;
+        if (placa.placa().isBlank())
+            return ConstantsMessage.ERROR_PLACA;
         return ConstantsMessage.SUCCESS;
     }
 }

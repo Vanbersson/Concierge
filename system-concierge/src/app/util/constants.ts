@@ -18,6 +18,7 @@ export const MESSAGE_RESPONSE_NOT_PLACA = "Placa not informed.";
 export const MESSAGE_RESPONSE_PLACAEXISTS = "Placa already exists.";
 export const MESSAGE_RESPONSE_NOT_MODEL = "Model not informed.";
 export const MESSAGE_RESPONSE_NOT_COLOR = "Model not informed.";
+export const MESSAGE_RESPONSE_ERROR_AUTH_EXIT = "Delete exit authorization."
 
 
 
