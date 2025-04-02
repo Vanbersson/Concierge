@@ -58,19 +58,21 @@ public class VehicleEntryController {
         }
     }
 
-    @GetMapping("/allAuthorized")
-    public ResponseEntity<Object> allAuthorized() {
+    @GetMapping("{companyId}/{resaleId}/allAuthorized")
+    public ResponseEntity<Object> allAuthorized(@PathVariable(name = "companyId") Integer companyId,
+                                                @PathVariable(name = "resaleId") Integer resaleId) {
         try {
-            return ResponseEntity.ok(this.service.allAuthorized());
+            return ResponseEntity.ok(this.service.allAuthorized(companyId, resaleId));
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
         }
     }
 
-    @GetMapping("/allPendingAuthorization")
-    public ResponseEntity<Object> allPendingAuthorization() {
+    @GetMapping("{companyId}/{resaleId}/allPendingAuthorization")
+    public ResponseEntity<Object> allPendingAuthorization(@PathVariable(name = "companyId") Integer companyId,
+                                                          @PathVariable(name = "resaleId") Integer resaleId) {
         try {
-            return ResponseEntity.ok(this.service.allPendingAuthorization());
+            return ResponseEntity.ok(this.service.allPendingAuthorization(companyId, resaleId));
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
         }
@@ -88,10 +90,12 @@ public class VehicleEntryController {
         }
     }
 
-    @GetMapping("/filter/placa/{placa}")
-    public ResponseEntity<Object> getPlaca(@PathVariable(name = "placa") String placa) {
+    @GetMapping("{companyId}/{resaleId}/filter/placa/{placa}")
+    public ResponseEntity<Object> getPlaca(@PathVariable(name = "companyId") Integer companyId,
+                                           @PathVariable(name = "resaleId") Integer resaleId,
+                                           @PathVariable(name = "placa") String placa) {
         try {
-            Map<String, Object> vehicle = this.service.filterPlaca(placa);
+            Map<String, Object> vehicle = this.service.filterPlaca(companyId, resaleId, placa);
             if (vehicle == null)
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
             return ResponseEntity.ok(vehicle);

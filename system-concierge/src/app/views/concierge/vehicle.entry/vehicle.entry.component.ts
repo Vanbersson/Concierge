@@ -647,8 +647,17 @@ export default class VehicleEntryComponent implements OnInit, OnDestroy, DoCheck
 
   }
   formatDateTime(date: Date): string {
-    var pipe = new DatePipe('pt-BR');
-    return pipe.transform(date, "yyyy-MM-ddTHH:mm:ss");
+    const datePipe = new DatePipe('en-US');
+
+    // Obtém o fuso horário local no formato ±hh:mm
+    const tzOffset = -date.getTimezoneOffset();
+    const sign = tzOffset >= 0 ? '+' : '-';
+    const hours = Math.floor(Math.abs(tzOffset) / 60).toString().padStart(2, '0');
+    const minutes = (Math.abs(tzOffset) % 60).toString().padStart(2, '0');
+    const timezone = `${sign}${hours}:${minutes}`;
+
+    // Formata a data e adiciona o fuso horário
+    return datePipe.transform(date, "yyyy-MM-dd'T'HH:mm:ss.SSS") + timezone;
   }
   //save
   private loadVehicleEntry() {

@@ -111,11 +111,11 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
 
     idUserExitAuth1: new FormControl<number>(0),
     nameUserExitAuth1: new FormControl<string>(''),
-    dateExitAuth1: new FormControl<Date | string | null>(null),
+    dateExitAuth1: new FormControl<Date | null>(null),
 
     idUserExitAuth2: new FormControl<number>(0),
     nameUserExitAuth2: new FormControl<string>(''),
-    dateExitAuth2: new FormControl<Date | string | null>(null),
+    dateExitAuth2: new FormControl<Date | null>(null),
 
     statusAuthExit: new FormControl<string>(''),
     quantityExtinguisher: new FormControl<number | null>(null),
@@ -145,8 +145,8 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
   photoVehicle2!: string;
   photoVehicle3!: string;
   photoVehicle4!: string;
-  public dateExitAuth1!: Date | string;
-  public dateExitAuth2!: Date | string;
+  public dateExitAuth1 = signal<string>('');
+  public dateExitAuth2 = signal<string>('');
 
   //Porteiro
   proteiroId: number = 0;
@@ -428,10 +428,10 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
       vehicleNew: this.vehicleEntry.vehicleNew,
       idUserExitAuth1: this.vehicleEntry.idUserExitAuth1,
       nameUserExitAuth1: this.vehicleEntry.nameUserExitAuth1,
-      dateExitAuth1: this.vehicleEntry.dateExitAuth1,
+      dateExitAuth1: this.vehicleEntry.dateExitAuth1 == "" ? null : new Date(this.vehicleEntry.dateExitAuth1),
       idUserExitAuth2: this.vehicleEntry.idUserExitAuth2,
       nameUserExitAuth2: this.vehicleEntry.nameUserExitAuth2,
-      dateExitAuth2: this.vehicleEntry.dateExitAuth2,
+      dateExitAuth2: this.vehicleEntry.dateExitAuth2 == "" ? null : new Date(this.vehicleEntry.dateExitAuth2),
       statusAuthExit: this.vehicleEntry.statusAuthExit,
       photo1: this.vehicleEntry.photo1,
       photo2: this.vehicleEntry.photo2,
@@ -454,10 +454,10 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
       this.addRequirePlaca();
     }
     if (this.vehicleEntry.dateExitAuth1) {
-      this.dateExitAuth1 = this.vehicleEntry.dateExitAuth1!.toString();
+      this.dateExitAuth1.set(this.vehicleEntry.dateExitAuth1!.toString());
     }
     if (this.vehicleEntry.dateExitAuth2) {
-      this.dateExitAuth2 = this.vehicleEntry.dateExitAuth2!.toString();
+      this.dateExitAuth2.set(this.vehicleEntry.dateExitAuth2!.toString());
     }
     this.photoVehicle1 = this.vehicleEntry.photo1!;
     this.photoVehicle2 = this.vehicleEntry.photo2!;
@@ -707,10 +707,12 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
       this.busyService.busy();
 
       var auth = new VehicleEntryAuth();
+      auth.companyId = this.storageService.companyId;
+      auth.resaleId = this.storageService.resaleId;
       auth.idVehicle = this.vehicleEntry.id;
       auth.idUserExitAuth = this.storageService.id;
       auth.nameUserExitAuth = this.storageService.name;
-      // auth.dateExitAuth = "";
+      auth.dateExitAuth = this.formatDateTime(new Date());
 
       const permissionResult = await this.addAuthExit(auth);
       if (permissionResult.status == 200) {
@@ -729,17 +731,17 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
           this.formVehicle.patchValue({
             idUserExitAuth1: permissionResult.body.idUserExitAuth,
             nameUserExitAuth1: permissionResult.body.nameUserExitAuth,
-            dateExitAuth1: permissionResult.body.dateExitAuth
+            dateExitAuth1: new Date(permissionResult.body.dateExitAuth)
           });
 
-          this.dateExitAuth1 = permissionResult.body.dateExitAuth;
+          this.dateExitAuth1.set(permissionResult.body.dateExitAuth.toString());
         } else {
           this.formVehicle.patchValue({
             idUserExitAuth2: permissionResult.body.idUserExitAuth,
             nameUserExitAuth2: permissionResult.body.nameUserExitAuth,
-            dateExitAuth2: permissionResult.body.dateExitAuth
+            dateExitAuth2: new Date(permissionResult.body.dateExitAuth)
           });
-          this.dateExitAuth2 = permissionResult.body.dateExitAuth;
+          this.dateExitAuth2.set(permissionResult.body.dateExitAuth.toString());
         }
         //Valid
         this.addRequireForms();
@@ -810,7 +812,7 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
           dateExitAuth1: null
         });
 
-        this.dateExitAuth1 = "";
+        this.dateExitAuth1.set('');
         this.updateAuthExitStatus();
       }
 
@@ -845,7 +847,7 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
           dateExitAuth2: null
         });
 
-        this.dateExitAuth2 = "";
+        this.dateExitAuth2.set('');
         this.updateAuthExitStatus();
       }
 
@@ -1227,16 +1229,26 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
     return true;
   }
   formatDateTime(date: Date): string {
-    var pipe = new DatePipe('pt-BR');
-    return pipe.transform(date, "yyyy-MM-ddTHH:mm:ss");
+    const datePipe = new DatePipe('en-US');
+
+    // Obtém o fuso horário local no formato ±hh:mm
+    const tzOffset = -date.getTimezoneOffset();
+    const sign = tzOffset >= 0 ? '+' : '-';
+    const hours = Math.floor(Math.abs(tzOffset) / 60).toString().padStart(2, '0');
+    const minutes = (Math.abs(tzOffset) % 60).toString().padStart(2, '0');
+    const timezone = `${sign}${hours}:${minutes}`;
+
+    // Formata a data e adiciona o fuso horário
+    return datePipe.transform(date, "yyyy-MM-dd'T'HH:mm:ss.SSS") + timezone;
   }
+
   private loadingVehicle() {
     const vehicleValue = this.formVehicle.value;
     const clientCompanyValue = this.formClientCompany.value;
     const driverValue = this.formDriver.value;
 
     this.vehicleEntry.dateEntry = this.formatDateTime(vehicleValue.dateEntry);
-    this.vehicleEntry.datePrevisionExit = vehicleValue?.datePrevisionExit == null ? "":  this.formatDateTime(vehicleValue.datePrevisionExit);
+    this.vehicleEntry.datePrevisionExit = vehicleValue?.datePrevisionExit == null ? "" : this.formatDateTime(vehicleValue.datePrevisionExit);
     this.vehicleEntry.placa = vehicleValue.placa;
     this.vehicleEntry.placasJunto = "";
     this.vehicleEntry.frota = vehicleValue.frota;
@@ -1252,10 +1264,10 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
 
     this.vehicleEntry.idUserExitAuth1 = vehicleValue?.idUserExitAuth1 ?? 0;
     this.vehicleEntry.nameUserExitAuth1 = vehicleValue?.nameUserExitAuth1 ?? "";
-    this.vehicleEntry.dateExitAuth1 = vehicleValue?.dateExitAuth1 ?? "";
+    this.vehicleEntry.dateExitAuth1 = vehicleValue?.dateExitAuth1 == null ? "" : this.formatDateTime(vehicleValue.dateExitAuth1);
     this.vehicleEntry.idUserExitAuth2 = vehicleValue?.idUserExitAuth2 ?? 0;
     this.vehicleEntry.nameUserExitAuth2 = vehicleValue?.nameUserExitAuth2 ?? "";
-    this.vehicleEntry.dateExitAuth2 = vehicleValue?.dateExitAuth2 ?? "";
+    this.vehicleEntry.dateExitAuth2 = vehicleValue?.dateExitAuth2 == null ? "" : this.formatDateTime(vehicleValue.dateExitAuth2);
     this.vehicleEntry.statusAuthExit = vehicleValue.statusAuthExit;
 
     this.vehicleEntry.quantityTrafficCone = vehicleValue?.quantityTrafficCone ?? 0;

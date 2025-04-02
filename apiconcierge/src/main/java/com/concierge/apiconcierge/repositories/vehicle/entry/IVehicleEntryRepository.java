@@ -11,18 +11,20 @@ import java.util.List;
 @Repository
 public interface IVehicleEntryRepository extends JpaRepository<VehicleEntry, Integer> {
 
-    VehicleEntry findByPlaca(String placa);
+    @Query(value = "SELECT * FROM `tb_vehicle_entry` WHERE company_id = ?1 and resale_id = ?2 and placa = ?3",
+            nativeQuery = true)
+    VehicleEntry findByPlaca(Integer companyId, Integer resaleId, String placa);
 
-    @Query(value ="SELECT * FROM `tb_vehicle_entry` WHERE company_id = ?1 and resale_id = ?2 and status = 0 and placa = ?3" ,nativeQuery = true)
-    VehicleEntry findByExistsPlaca(Integer companyId,Integer resaleId, String placa);
+    @Query(value = "SELECT * FROM `tb_vehicle_entry` WHERE company_id = ?1 and resale_id = ?2 and status = 0 and placa = ?3",
+            nativeQuery = true)
+    VehicleEntry findByExistsPlaca(Integer companyId, Integer resaleId, String placa);
 
-    VehicleEntry findByClientCompanyCnpj(String cnpj);
+    @Query(value = "select * from tb_vehicle_entry where company_id = ?1 and resale_id = ?2 and status_auth_exit = 2 and step_entry != 4;",
+            nativeQuery = true)
+    List<VehicleEntry> allAuthorized(Integer companyId, Integer resaleId);
 
-    VehicleEntry findByClientCompanyCpf(String cpf);
-
-    @Query(value ="select * from tb_vehicle_entry where status_auth_exit = 2 and step_entry != 4;" ,nativeQuery = true)
-    List<VehicleEntry> allAuthorized();
-    @Query(value ="select * from tb_vehicle_entry where step_entry != 4" ,nativeQuery = true)
-    List<VehicleEntry> allPendingAuthorization();
+    @Query(value = "select * from tb_vehicle_entry where company_id = ?1 and resale_id = ?2 and step_entry != 4",
+            nativeQuery = true)
+    List<VehicleEntry> allPendingAuthorization(Integer companyId, Integer resaleId);
 
 }

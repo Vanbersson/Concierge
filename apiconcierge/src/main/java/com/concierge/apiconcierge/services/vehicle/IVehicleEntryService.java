@@ -16,15 +16,15 @@ public interface IVehicleEntryService {
 
     public String exit(VehicleExitSaveDto dataExit);
 
-    public List<Object> allAuthorized();
+    public List<Object> allAuthorized(Integer companyId, Integer resaleId);
 
-    public List<Object> allPendingAuthorization();
+    public List<Object> allPendingAuthorization(Integer companyId, Integer resaleId);
 
     public List<Object> allEntry();
 
-    public  Map<String, Object> filterId(Integer id);
+    public Map<String, Object> filterId(Integer id);
 
-    public  Map<String, Object> filterPlaca(String placa);
+    public Map<String, Object> filterPlaca(Integer companyId, Integer resaleId, String placa);
 
     public String existsPlaca(ExistsPlacaDto placa);
 

@@ -13,8 +13,6 @@ public class ConstantsMessage {
     public static final String ERROR_CLIENT_EXISTS = "Client already exists.";
 
 
-
-
     public static final String ERROR_COMPANY = "Company not informed.";
     public static final String ERROR_RESALE = "Resale not informed.";
     public static final String ERROR_ID = "Id not informed.";
@@ -25,20 +23,30 @@ public class ConstantsMessage {
     public static final String ERROR_EMAIL = "Email not informed.";
     public static final String ERROR_CELLPHONE = "Cellphone not informed.";
     public static final String ERROR_ROLE = "Role not informed.";
-
     public static final String ERROR_CNPJ = "CNPJ not informed.";
     public static final String ERROR_CPF = "CPF not informed.";
+    public static final String ERROR_RG = "Invalid RG.";
 
 
-
+    public static final String ERROR_DATEENTRY = "DateEntry not informed.";
     public static final String ERROR_PLACA_EXISTS = "Placa already exists.";
     public static final String ERROR_PLACA = "Placa not informed.";
-
+    public static final String ERROR_COLOR = "Color not informed.";
+    public static final String ERROR_VEHICLE_MODEL = "Model not informed.";
     public static final String ERROR_PERMISSION = "Permission not informed.";
-
     public static final String ERROR_PERMISSION_ANOTHER_USER = "Authorization of another user.";
-
     public static final String ERROR_AUTH_EXIT = "Delete exit authorization.";
+
+    public static final String ERROR_NOTAUTHEXIT = "Unauthorized.";
+
+    public static final String ERROR_BUDGET_ATTENDANT = "BUDGET-Attendant not informed.";
+    public static final String ERROR_BUDGET_CLIENT_COMPANY = "BUDGET-ClientCompany not informed.";
+    public static final String ERROR_ATTENDANT = "Attendant not informed.";
+    public static final String ERROR_DRIVERENTRY = "DriverEntry not informed.";
+    public static final String ERROR_DRIVEREXIT = "DriverExit not informed.";
+
+
+    public static final String ERROR_CLIENTCOMPANY = "ClientCompany not informed.";
 
 
 

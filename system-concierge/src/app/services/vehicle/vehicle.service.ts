@@ -16,6 +16,8 @@ import { ExistsPlaca } from '../../models/vehicle/exists-placa';
 })
 export class VehicleService {
 
+  companyResale: string = this.storage.companyId + "/" + this.storage.resaleId;
+
   constructor(private http: HttpClient, private storage: StorageService) { }
 
   entrySave$(vehicle: VehicleEntry): Observable<HttpResponse<VehicleEntry>> {
@@ -31,11 +33,11 @@ export class VehicleService {
   }
 
   allAuthorized$(): Observable<VehicleEntry[]> {
-    return this.http.get<VehicleEntry[]>(environment.apiuUrl + "/vehicle/entry/allAuthorized", { headers: this.myHeaders() });
+    return this.http.get<VehicleEntry[]>(environment.apiuUrl + "/vehicle/entry/"+this.companyResale+"/allAuthorized"  , { headers: this.myHeaders() });
   }
 
   allPendingAuthorization$(): Observable<VehicleEntry[]> {
-    return this.http.get<VehicleEntry[]>(environment.apiuUrl + "/vehicle/entry/allPendingAuthorization", { headers: this.myHeaders() });
+    return this.http.get<VehicleEntry[]>(environment.apiuUrl + "/vehicle/entry/"+this.companyResale+"/allPendingAuthorization", { headers: this.myHeaders() });
   }
 
   entryFilterId$(id: number): Observable<HttpResponse<VehicleEntry>> {

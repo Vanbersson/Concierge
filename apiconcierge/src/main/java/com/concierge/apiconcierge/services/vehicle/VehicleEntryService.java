@@ -120,12 +120,12 @@ public class VehicleEntryService implements IVehicleEntryService {
 
     @SneakyThrows
     @Override
-    public List<Object> allAuthorized() {
+    public List<Object> allAuthorized(Integer companyId, Integer resaleId) {
 
         List<Object> list = new ArrayList();
 
         try {
-            List<VehicleEntry> vehicles = this.repository.allAuthorized();
+            List<VehicleEntry> vehicles = this.repository.allAuthorized(companyId, resaleId);
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
 
             for (VehicleEntry item : vehicles) {
@@ -157,11 +157,11 @@ public class VehicleEntryService implements IVehicleEntryService {
 
     @SneakyThrows
     @Override
-    public List<Object> allPendingAuthorization() {
+    public List<Object> allPendingAuthorization(Integer companyId, Integer resaleId) {
         List<Object> list = new ArrayList();
 
         try {
-            List<VehicleEntry> vehicles = this.repository.allPendingAuthorization();
+            List<VehicleEntry> vehicles = this.repository.allPendingAuthorization(companyId, resaleId);
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
 
             for (VehicleEntry item : vehicles) {
@@ -243,9 +243,9 @@ public class VehicleEntryService implements IVehicleEntryService {
 
     @SneakyThrows
     @Override
-    public Map<String, Object> filterPlaca(String placa) {
+    public Map<String, Object> filterPlaca(Integer companyId, Integer resaleId, String placa) {
         try {
-            VehicleEntry vehicle = repository.findByPlaca(placa);
+            VehicleEntry vehicle = repository.findByPlaca(companyId, resaleId, placa);
             if (vehicle == null)
                 return null;
 
@@ -259,18 +259,18 @@ public class VehicleEntryService implements IVehicleEntryService {
     @Override
     public String existsPlaca(ExistsPlacaDto placa) {
         try {
-            String message =  this.validation.existsPlaca(placa);
+            String message = this.validation.existsPlaca(placa);
 
-            if(ConstantsMessage.SUCCESS.equals(message)){
+            if (ConstantsMessage.SUCCESS.equals(message)) {
 
-                VehicleEntry vehicle = repository.findByExistsPlaca(placa.companyId(),placa.resaleId(),placa.placa());
-                if (vehicle != null){
+                VehicleEntry vehicle = repository.findByExistsPlaca(placa.companyId(), placa.resaleId(), placa.placa());
+                if (vehicle != null) {
                     return "yes";
-                }else {
+                } else {
                     return "not";
                 }
 
-            }else{
+            } else {
                 throw new VehicleEntryException(message);
             }
         } catch (Exception ex) {
@@ -295,7 +295,7 @@ public class VehicleEntryService implements IVehicleEntryService {
 
                     vehicle.setIdUserExitAuth1(authExit.idUserExitAuth());
                     vehicle.setNameUserExitAuth1(authExit.nameUserExitAuth());
-                    vehicle.setDateExitAuth1(new Date());
+                    vehicle.setDateExitAuth1(authExit.dateExitAuth());
                     vehicle.setStatusAuthExit(statusAuthorization(vehicle));
 
                     this.repository.save(vehicle);
@@ -308,7 +308,7 @@ public class VehicleEntryService implements IVehicleEntryService {
                 } else if (vehicle.getIdUserExitAuth2() == null) {
                     vehicle.setIdUserExitAuth2(authExit.idUserExitAuth());
                     vehicle.setNameUserExitAuth2(authExit.nameUserExitAuth());
-                    vehicle.setDateExitAuth2(new Date());
+                    vehicle.setDateExitAuth2(authExit.dateExitAuth());
                     vehicle.setStatusAuthExit(statusAuthorization(vehicle));
 
                     this.repository.save(vehicle);
@@ -427,8 +427,8 @@ public class VehicleEntryService implements IVehicleEntryService {
     }
 
     private Map<String, Object> loadObject(VehicleEntry vehicle) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
+        //SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        //SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
 
         Map<String, Object> map = new HashMap<>();
 
@@ -441,12 +441,12 @@ public class VehicleEntryService implements IVehicleEntryService {
         map.put("idUserEntry", vehicle.getIdUserEntry());
         map.put("nameUserEntry", vehicle.getNameUserEntry());
 
-        map.put("dateEntry", dateFormat.format(vehicle.getDateEntry()) + "T" + timeFormat.format(vehicle.getDateEntry()));
+        map.put("dateEntry", vehicle.getDateEntry());
 
         if (vehicle.getDatePrevisionExit() == null) {
             map.put("datePrevisionExit", "");
         } else {
-            map.put("datePrevisionExit", dateFormat.format(vehicle.getDatePrevisionExit()) + "T" + timeFormat.format(vehicle.getDatePrevisionExit()));
+            map.put("datePrevisionExit", vehicle.getDatePrevisionExit());
         }
         if (vehicle.getIdUserAttendant() == null) {
             map.put("idUserAttendant", 0);

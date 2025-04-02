@@ -25,69 +25,61 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
     @Autowired
     private IVehicleEntryRepository repository;
 
-    private final String DATEENTRY = "DateEntry not informed.";
-
-
-    private final String VEHICLEMODEL = "Model not informed.";
-    private final String COLOR = "Color not informed.";
-    private final String RG = "Invalid RG.";
-    private final String DRIVERENTRY = "DriverEntry not informed.";
-    private final String DRIVEREXIT = "DriverExit not informed.";
-    private final String ATTENDANT = "Attendant not informed.";
-    private final String CLIENTCOMPANY = "ClientCompany not informed.";
-    private final String BUDGET_ATTENDANT = "BUDGET-Attendant not informed.";
-    private final String BUDGET_CLIENTCOMPANY = "BUDGET-ClientCompany not informed.";
-    private final String NOTAUTHEXIT = "Unauthorized.";
-
     @Autowired
     IPermissionUserRepository permissionUser;
 
     @Override
     public String save(VehicleEntry vehicle) {
 
+        if(vehicle.getCompanyId() == null || vehicle.getCompanyId() == 0)
+            return ConstantsMessage.ERROR_COMPANY;
+        if(vehicle.getResaleId() == null || vehicle.getResaleId() == 0)
+            return ConstantsMessage.ERROR_RESALE;
         if (vehicle.getDateEntry() == null)
-            return DATEENTRY;
+            return ConstantsMessage.ERROR_DATEENTRY;
+        if (vehicle.getModelId() == null || vehicle.getModelId() == 0 || vehicle.getModelDescription().isBlank())
+            return ConstantsMessage.ERROR_VEHICLE_MODEL;
+        if (vehicle.getColor() == null)
+            return ConstantsMessage.ERROR_COLOR;
+        if (!vehicle.getDriverEntryRg().isBlank()){
+            if (vehicle.getDriverEntryRg().length() > 11)
+                return ConstantsMessage.ERROR_RG;
+        }
+
         if (vehicle.getVehicleNew() == VehicleYesNotEnum.not) {
             if (vehicle.getPlaca().isBlank())
-                return ERROR_PLACA;
+                return ConstantsMessage.ERROR_PLACA;
             if (vehicle.getPlaca().length() != 7)
-                return ERROR_PLACA;
+                return ConstantsMessage.ERROR_PLACA;
 
             VehicleEntry vehicleEntry = this.repository.findByExistsPlaca(vehicle.getCompanyId(), vehicle.getResaleId(), vehicle.getPlaca());
             if (vehicleEntry != null) {
-                return ERROR_PLACA_EXISTS;
+                return ConstantsMessage.ERROR_PLACA_EXISTS;
             }
 
         }
-        if (vehicle.getModelId() == null || vehicle.getModelDescription().isBlank())
-            return VEHICLEMODEL;
-        if (vehicle.getColor() == null)
-            return COLOR;
-        if (!vehicle.getDriverEntryRg().isBlank())
-            if (vehicle.getDriverEntryRg().length() > 11)
-                return RG;
 
         return ConstantsMessage.SUCCESS;
     }
 
     @Override
     public String update(VehicleEntry vehicle) {
-
+        if(vehicle.getCompanyId() == null || vehicle.getCompanyId() == 0)
+            return ConstantsMessage.ERROR_COMPANY;
+        if(vehicle.getResaleId() == null || vehicle.getResaleId() == 0)
+            return ConstantsMessage.ERROR_RESALE;
         if (vehicle.getId() == null || vehicle.getId() == 0)
-            return ERROR_ID;
+            return ConstantsMessage.ERROR_ID;
         if (vehicle.getDateEntry() == null)
-            return DATEENTRY;
-
+            return ConstantsMessage.ERROR_DATEENTRY;
         if (vehicle.getVehicleNew() == VehicleYesNotEnum.not) {
             if (vehicle.getPlaca().isBlank())
-                return ERROR_PLACA;
+                return ConstantsMessage.ERROR_PLACA;
         }
-
         if (vehicle.getColor() == null)
-            return COLOR;
-
-        if (vehicle.getModelId() == null || vehicle.getModelDescription().isBlank())
-            return VEHICLEMODEL;
+            return ConstantsMessage.ERROR_COLOR;
+        if (vehicle.getModelId() == null || vehicle.getModelId() == 0 || vehicle.getModelDescription().isBlank())
+            return ConstantsMessage.ERROR_VEHICLE_MODEL;
 
         int countDriver = 0;
         if (!vehicle.getDriverEntryName().isBlank()) {
@@ -100,26 +92,26 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
             countDriver++;
         }
         if (countDriver <= 1) {
-            return DRIVERENTRY;
+            return ConstantsMessage.ERROR_DRIVERENTRY;
         }
 
         if (vehicle.getServiceOrder() == VehicleYesNotEnum.yes) {
             if (vehicle.getBudgetStatus() != StatusBudgetEnum.semOrcamento) {
                 if (vehicle.getIdUserAttendant() == null || vehicle.getIdUserAttendant() == 0 || vehicle.getNameUserAttendant().isBlank())
-                    return BUDGET_ATTENDANT;
+                    return ConstantsMessage.ERROR_BUDGET_ATTENDANT;
 
                 if (vehicle.getClientCompanyId() == null || vehicle.getClientCompanyId() == 0 || vehicle.getClientCompanyName().isBlank())
-                    return BUDGET_CLIENTCOMPANY;
+                    return ConstantsMessage.ERROR_BUDGET_CLIENT_COMPANY;
             }
 
             //Verifica autorização de saída
             if (vehicle.getStatusAuthExit() != StatusAuthExitEnum.NotAuth) {
 
                 if (vehicle.getIdUserAttendant() == null || vehicle.getIdUserAttendant() == 0 || vehicle.getNameUserAttendant().isBlank())
-                    return ATTENDANT;
+                    return ConstantsMessage.ERROR_ATTENDANT;
 
                 if (vehicle.getClientCompanyId() == null || vehicle.getClientCompanyId() == 0 || vehicle.getClientCompanyName().isBlank())
-                    return CLIENTCOMPANY;
+                    return ConstantsMessage.ERROR_CLIENTCOMPANY;
                 countDriver = 0;
                 if (!vehicle.getDriverExitName().isBlank()) {
                     countDriver++;
@@ -131,7 +123,7 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
                     countDriver++;
                 }
                 if (countDriver <= 1)
-                    return DRIVEREXIT;
+                    return ConstantsMessage.ERROR_DRIVEREXIT;
             }
         }
 
@@ -143,7 +135,7 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
             if (vehicle.getStatusAuthExit() != StatusAuthExitEnum.NotAuth) {
 
                 if (vehicle.getClientCompanyId() == null || vehicle.getClientCompanyId() == 0 || vehicle.getClientCompanyName().isBlank())
-                    return CLIENTCOMPANY;
+                    return ConstantsMessage.ERROR_CLIENTCOMPANY;
                 countDriver = 0;
                 if (!vehicle.getDriverExitName().isBlank()) {
                     countDriver++;
@@ -155,7 +147,7 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
                     countDriver++;
                 }
                 if (countDriver <= 1)
-                    return DRIVEREXIT;
+                    return ConstantsMessage.ERROR_DRIVEREXIT;
             }
         }
 
@@ -170,21 +162,19 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
             }
 
         }
-        if (vehicle.getServiceOrder().equals(VehicleYesNotEnum.not)) {
 
-        }
         return ConstantsMessage.SUCCESS;
     }
 
     public String exit(VehicleEntry vehicle) {
         if (vehicle.getDateEntry() == null)
-            return DATEENTRY;
+            return ConstantsMessage.ERROR_DATEENTRY;
         if (vehicle.getModelId() == null || vehicle.getModelDescription().isBlank())
-            return VEHICLEMODEL;
+            return ConstantsMessage.ERROR_VEHICLE_MODEL;
         if (vehicle.getColor() == null)
-            return COLOR;
+            return ConstantsMessage.ERROR_COLOR;
         if (vehicle.getStatusAuthExit() != StatusAuthExitEnum.Authorized)
-            return NOTAUTHEXIT;
+            return ConstantsMessage.ERROR_NOTAUTHEXIT;
 
         int countDriver = 0;
         if (!vehicle.getDriverEntryName().isBlank()) {
@@ -197,7 +187,7 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
             countDriver++;
         }
         if (countDriver <= 1) {
-            return DRIVERENTRY;
+            return ConstantsMessage.ERROR_DRIVERENTRY;
         }
 
         countDriver = 0;
@@ -211,7 +201,7 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
             countDriver++;
         }
         if (countDriver <= 1)
-            return DRIVEREXIT;
+            return ConstantsMessage.ERROR_DRIVEREXIT;
 
 
         return ConstantsMessage.SUCCESS;
@@ -220,12 +210,17 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
     @Override
     public String addAuthExit(VehicleEntry vehicle, AuthExit authExit) {
 
+        if(authExit.companyId() == null || authExit.companyId() == 0)
+            return ConstantsMessage.ERROR_COMPANY;
+        if(authExit.resaleId() == null || authExit.resaleId() == 0)
+            return ConstantsMessage.ERROR_RESALE;
+
         if (vehicle.getServiceOrder().equals(VehicleYesNotEnum.yes)) {
             if (vehicle.getClientCompanyId() == null || vehicle.getClientCompanyId() == 0 || vehicle.getClientCompanyName().isBlank()) {
-                return CLIENTCOMPANY;
+                return ConstantsMessage.ERROR_CLIENTCOMPANY;
             }
             if (vehicle.getIdUserAttendant() == null || vehicle.getIdUserAttendant() == 0 || vehicle.getNameUserAttendant().isBlank()) {
-                return ATTENDANT;
+                return ConstantsMessage.ERROR_ATTENDANT;
             }
             int countDriver = 0;
             if (!vehicle.getDriverExitName().isBlank()) {
@@ -238,14 +233,14 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
                 countDriver++;
             }
             if (countDriver < 2) {
-                return DRIVEREXIT;
+                return ConstantsMessage.ERROR_DRIVEREXIT;
             }
         }
 
         if (vehicle.getServiceOrder().equals(VehicleYesNotEnum.not)) {
 
             if (vehicle.getClientCompanyId() == null || vehicle.getClientCompanyId() == 0 || vehicle.getClientCompanyName().isBlank()) {
-                return CLIENTCOMPANY;
+                return ConstantsMessage.ERROR_CLIENTCOMPANY;
             }
 
             int countDriver = 0;
@@ -259,7 +254,7 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
                 countDriver++;
             }
             if (countDriver < 2) {
-                return DRIVEREXIT;
+                return ConstantsMessage.ERROR_DRIVEREXIT;
             }
 
         }
@@ -291,20 +286,19 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
             }
         }
 
-
         return ConstantsMessage.SUCCESS;
     }
 
     @Override
     public String deleteAuthExit1(VehicleEntry vehicle, AuthExit authExit) {
         if (vehicle.getStatusAuthExit() == StatusAuthExitEnum.NotAuth)
-            return NOTAUTHEXIT;
+            return ConstantsMessage.ERROR_NOTAUTHEXIT;
         if (vehicle.getIdUserExitAuth1() == null)
-            return NOTAUTHEXIT;
+            return ConstantsMessage.ERROR_NOTAUTHEXIT;
         if (vehicle.getNameUserExitAuth1().isBlank())
-            return NOTAUTHEXIT;
+            return ConstantsMessage.ERROR_NOTAUTHEXIT;
         if (vehicle.getDateExitAuth1() == null)
-            return NOTAUTHEXIT;
+            return ConstantsMessage.ERROR_NOTAUTHEXIT;
 
 
         if (vehicle.getServiceOrder().equals(VehicleYesNotEnum.yes)) {
@@ -337,13 +331,13 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
     @Override
     public String deleteAuthExit2(VehicleEntry vehicle, AuthExit authExit) {
         if (vehicle.getStatusAuthExit() == StatusAuthExitEnum.NotAuth)
-            return NOTAUTHEXIT;
+            return ConstantsMessage.ERROR_NOTAUTHEXIT;
         if (vehicle.getIdUserExitAuth2() == null)
-            return NOTAUTHEXIT;
+            return ConstantsMessage.ERROR_NOTAUTHEXIT;
         if (vehicle.getNameUserExitAuth2().isBlank())
-            return NOTAUTHEXIT;
+            return ConstantsMessage.ERROR_NOTAUTHEXIT;
         if (vehicle.getDateExitAuth2() == null)
-            return NOTAUTHEXIT;
+            return ConstantsMessage.ERROR_NOTAUTHEXIT;
 
         if (vehicle.getServiceOrder().equals(VehicleYesNotEnum.yes)) {
             if (authExit.idUserExitAuth() != 1) {

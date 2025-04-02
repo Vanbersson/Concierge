@@ -104,7 +104,7 @@
                         <div class="field col-12 md:col-2">
                             <div class="flex justify-content-between mb-2">
                                 <label for="nameUserExitAuth1">1ª Auto</label>
-                                <small>{{dateExitAuth1 | date: 'dd/MM/yyyy HH:mm' }}</small>
+                                <small>{{dateExitAuth1() | date: 'dd/MM/yyyy HH:mm' }}</small>
                             </div>
                             <p-inputGroup>
                                 <input pInputText id="nameUserExitAuth1" type="text"
@@ -118,7 +118,7 @@
                         <div class="field col-12 md:col-2">
                             <div class="flex justify-content-between mb-2">
                                 <label for="nameUserExitAuth2">2ª Auto</label>
-                                <small>{{dateExitAuth2 | date: 'dd/MM/yyyy HH:mm' }}</small>
+                                <small>{{dateExitAuth2() | date: 'dd/MM/yyyy HH:mm' }}</small>
                             </div>
 
                             <p-inputGroup>
