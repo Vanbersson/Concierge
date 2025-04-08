@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component, OnDestroy, OnInit, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { Router, ActivatedRoute, RouterModule } from '@angular/router';
 import { FormControl, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 
@@ -35,7 +35,7 @@ import { lastValueFrom } from 'rxjs';
 import { Budget } from '../../../models/budget/budget';
 import { ClientecompanyService } from '../../../services/clientecompany/clientecompany.service';
 import { PartsService } from '../../../services/parts/parts.service';
-import { Parts } from '../../../models/parts/Parts';
+import { Part } from '../../../models/parts/Part';
 import { HttpResponse } from '@angular/common/http';
 import { ClientCompany } from '../../../models/clientcompany/client-company';
 import { User } from '../../../models/user/user';
@@ -81,7 +81,7 @@ export default class BudgetComponent implements OnInit, OnDestroy {
   private percentAletDiscount = 60;
 
   formBudget = new FormGroup({
-    dateValidation: new FormControl<Date | string>(""),
+    dateValidation: new FormControl<Date | null>(null),
     nameResponsible: new FormControl<string>(""),
     typePayment: new FormControl<IPayment[]>([]),
     information: new FormControl<string>(""),
@@ -141,17 +141,18 @@ export default class BudgetComponent implements OnInit, OnDestroy {
   visibleParts: boolean = false;
 
   partsDisabledButton = true;
-  listParts: Parts[] = [];
+  listParts: Part[] = [];
 
-  listBudgetParts: Parts[] = [];
+  listBudgetItem: BudgetItem[] = [];
 
-  selectedParts!: Parts;
+  selectedParts!: Part;
   formParts = new FormGroup({
-    code: new FormControl(''),
-    desc: new FormControl(''),
-    price: new FormControl<number>(0),
-    discount: new FormControl<number>(0),
-    qtdAvailable: new FormControl<number>(0)
+    filterCode: new FormControl(''),
+    filterDesc: new FormControl(''),
+    selecDesc: new FormControl(''),
+    selecPrice: new FormControl<number>(0),
+    selecDiscount: new FormControl<number>(0),
+    selecQtdAvailable: new FormControl<number>(0)
   });
 
 
@@ -189,6 +190,7 @@ export default class BudgetComponent implements OnInit, OnDestroy {
   private async init() {
     this.busyService.busy();
 
+    //Budget
     const bugetResult = await this.getBudget();
 
     if (bugetResult.status == 200) {
@@ -251,6 +253,7 @@ export default class BudgetComponent implements OnInit, OnDestroy {
 
       this.getListBudgetRequisition();
       this.getListBudgetSetvice();
+      this.getListBudgetItem();
 
       this.formBudget.patchValue({
         dateValidation: bugetResult.body.dateValidation != "" ? new Date(bugetResult.body.dateValidation) : null,
@@ -260,7 +263,10 @@ export default class BudgetComponent implements OnInit, OnDestroy {
       });
 
     } else {
-      this.router.navigateByUrl("/portaria/lista-entrada-veiculo");
+      setTimeout(() => {
+        this.router.navigateByUrl("/portaria/lista-entrada-veiculo");
+      }, 3000);
+
     }
     this.busyService.idle();
 
@@ -269,6 +275,10 @@ export default class BudgetComponent implements OnInit, OnDestroy {
     try {
       return await lastValueFrom(this.budgetService.getBudgetFilterVehicle$(this.vehicleId()));
     } catch (error) {
+      if (error.error.message == "Permission not informed.") {
+        this.permissionNot();
+      }
+
       return error;
     }
   }
@@ -293,14 +303,30 @@ export default class BudgetComponent implements OnInit, OnDestroy {
   closeDialogBudget() {
     this.visibleBudget = false;
   }
+
+  formatDateTime(date: Date): string {
+    const datePipe = new DatePipe('en-US');
+
+    // Obtém o fuso horário local no formato ±hh:mm
+    const tzOffset = -date.getTimezoneOffset();
+    const sign = tzOffset >= 0 ? '+' : '-';
+    const hours = Math.floor(Math.abs(tzOffset) / 60).toString().padStart(2, '0');
+    const minutes = (Math.abs(tzOffset) % 60).toString().padStart(2, '0');
+    const timezone = `${sign}${hours}:${minutes}`;
+
+    // Formata a data e adiciona o fuso horário
+    return datePipe.transform(date, "yyyy-MM-dd'T'HH:mm:ss.SSS") + timezone;
+  }
   saveBudget() {
 
     const { value } = this.formBudget;
 
-    this.budget.dateValidation = value?.dateValidation ?? "";
+    this.budget.dateValidation = value?.dateValidation == null ? "" : this.formatDateTime(value.dateValidation);
+    this.budget.dateGeneration = this.formatDateTime(new Date(this.budget.dateGeneration));
     this.budget.nameResponsible = value.nameResponsible;
     this.budget.typePayment = value.typePayment.at(0)?.payment ?? "";
     this.budget.information = value.information;
+
 
     this.budgetService.updateBudget$(this.budget).subscribe(data => {
       if (data.status == 200) {
@@ -308,8 +334,13 @@ export default class BudgetComponent implements OnInit, OnDestroy {
       }
 
     }, error => {
+
       const DATEVALIDATION = "Date validation not informed.";
       const NAMERESPONSIBLE = "Name responsible not informed.";
+
+      if (error.error.message == "Permission not informed.") {
+        this.permissionNot();
+      }
       if (error.status == 401) {
 
         if (error.error.message == DATEVALIDATION) {
@@ -466,14 +497,6 @@ export default class BudgetComponent implements OnInit, OnDestroy {
   //Service
 
   private async getListBudgetSetvice(): Promise<boolean> {
-
-    /* this.budgetService.getBudgetService$(this.budgetId).subscribe((data) => {
-      this.listBudgetService = data;
-      this.somaService();
-    }, (error) => {
-
-    }); */
-
     try {
       var data = await lastValueFrom(this.budgetService.getBudgetService$(this.budget.id));
 
@@ -494,7 +517,7 @@ export default class BudgetComponent implements OnInit, OnDestroy {
       this.budgetServiceItem.companyId = this.storageService.companyId;
       this.budgetServiceItem.resaleId = this.storageService.resaleId;
       this.budgetServiceItem.budgetId = this.budget.id;
-      this.budgetServiceItem.status = "NaoAprovado";
+      this.budgetServiceItem.status = "NotApproved";
 
       this.budgetServiceItem.ordem = this.getSizeListBudgetService() + 1;
       this.budgetServiceItem.description = value.description;
@@ -672,7 +695,6 @@ export default class BudgetComponent implements OnInit, OnDestroy {
 
     this.totalBudgetService.set(totalTemp);
     this.totalBudgetDiscountService.set(totalDescontoTemp);
-
   }
 
   removerBudgetService(ordem: number) {
@@ -724,7 +746,7 @@ export default class BudgetComponent implements OnInit, OnDestroy {
 
   deleteAllDiscountService() {
     if (this.totalBudgetDiscountService() > 0) {
-      this.budgetService.deleteDiscountAllService$(this.budget.id).subscribe((data) => {
+      this.budgetService.deleteDiscountAllService$(this.listBudgetService[0]).subscribe((data) => {
         if (data.status == 200) {
           this.getListBudgetSetvice();
           this.alertShowDiscount2();
@@ -853,83 +875,115 @@ export default class BudgetComponent implements OnInit, OnDestroy {
   }
 
   //Parts
+  private async getListBudgetItem(): Promise<boolean> {
+    try {
+      var data = await lastValueFrom(this.budgetService.getBudgetItem$(this.budget.id));
+
+      this.listBudgetItem = data;
+      this.somaBudgetItem();
+      return true;
+    } catch (error) {
+      this.getListBudgetItem();
+    }
+    return false;
+
+  }
+  private somaBudgetItem() {
+    this.totalBudgetParts.set(0);
+    var tempTotalParts = 0;
+
+    this.totalBudgetDiscountParts.set(0);
+    var tempTotalDiscount = 0;
+
+    for (let index = 0; index < this.listBudgetItem.length; index++) {
+      const element = this.listBudgetItem[index];
+      tempTotalParts += element.price;
+      tempTotalDiscount += element.discount;
+    }
+
+    this.totalBudgetParts.set(tempTotalParts);
+    this.totalBudgetDiscountParts.set(tempTotalDiscount);
+  }
   showDialogParts() {
     this.visibleParts = true;
   }
   hideDialogParts() {
     this.visibleParts = false;
   }
-  private PartsDisable(){
-    this.formParts.get('qtdAvailable').disable();
-    this.formParts.get('price').disable();
-    this.formParts.get('discount').disable();
+  private PartsDisable() {
+    this.formParts.get('selecQtdAvailable').disable();
+    this.formParts.get('selecPrice').disable();
+    this.formParts.get('selecDiscount').disable();
   }
-  private PartsEnable(){
-    this.formParts.get('qtdAvailable').enable();
-    this.formParts.get('price').enable();
-    this.formParts.get('discount').enable();
+  private PartsEnable() {
+    this.formParts.get('selecQtdAvailable').enable();
+    this.formParts.get('selecPrice').enable();
+    this.formParts.get('selecDiscount').enable();
   }
   onSelectEventParts(event: any) {
     this.formParts.patchValue({
-      qtdAvailable: 0,
-      discount:0,
-      price: this.selectedParts.price,
-  
+      selecDesc: this.selectedParts.description,
+      selecQtdAvailable: 0,
+      selecDiscount: 0,
+      selecPrice: this.selectedParts.price,
+
     });
     this.partsDisabledButton = false;
     this.PartsEnable();
   }
   onUnSelectEventParts(event: any) {
     this.formParts.patchValue({
-      qtdAvailable: 0,
-      price: 0,
-      discount:0
+      selecDesc:"",
+      selecQtdAvailable: 0,
+      selecPrice: 0,
+      selecDiscount: 0
     })
     this.partsDisabledButton = true;
-   
+
 
     this.PartsDisable();
-   
+
   }
   cleanParts() {
     this.formParts.patchValue({
-      code: "",
-      desc: "",
-      qtdAvailable: 0,
-      price: 0,
-      discount: 0
+      filterCode: "",
+      filterDesc: "",
+      selecDesc:"",
+      selecQtdAvailable: 0,
+      selecPrice: 0,
+      selecDiscount: 0
     })
     this.selectedParts = null;
     this.partsDisabledButton = true;
   }
   public async filterParts() {
+    this.busyService.busy();
+
     this.listParts = [];
-
     const { value } = this.formParts;
-    if (value.code != '') {
-      const partsResult = await this.getPartsFilterCode(value.code);
+
+    if (value.filterCode != '') {
+      const partsResult = await this.getPartsFilterCode(value.filterCode);
       if (partsResult.status == 200) {
         this.listParts = partsResult.body;
       }
 
-    } else if (value.desc != '') {
-      const partsResult = await this.getPartsFilterDesc(value.desc);
+    } else if (value.filterDesc != '') {
+      const partsResult = await this.getPartsFilterDesc(value.filterDesc);
       if (partsResult.status == 200) {
         this.listParts = partsResult.body;
       }
-
     }
-
+    this.busyService.idle();
   }
-
-  private async getPartsFilterCode(code: string): Promise<HttpResponse<Parts[]>> {
+  private async getPartsFilterCode(code: string): Promise<HttpResponse<Part[]>> {
     try {
       return await lastValueFrom(this.partsService.getExternalFilterCode$(code));
     } catch (error) {
       return error;
     }
   }
-  private async getPartsFilterDesc(desc: string): Promise<HttpResponse<Parts[]>> {
+  private async getPartsFilterDesc(desc: string): Promise<HttpResponse<Part[]>> {
     try {
       return await lastValueFrom(this.partsService.getExternalFilterDesc$(desc));
     } catch (error) {
@@ -937,36 +991,69 @@ export default class BudgetComponent implements OnInit, OnDestroy {
     }
   }
 
-  selectPartsConfirme() {
+  public async selectPartsConfirme() {
     const { value } = this.formParts;
 
     if (this.selectedParts == null) {
       this.messageService.add({ severity: 'error', summary: 'Peças', detail: 'Não selecionada', icon: 'pi pi-times' });
-    } else if (value.qtdAvailable <= 0) {
+    } else if (value.selecQtdAvailable <= 0) {
       this.messageService.add({ severity: 'info', summary: 'Quantidade', detail: 'Não informada' });
-    } else if (value.price <= 0) {
+    } else if (value.selecPrice <= 0) {
       this.messageService.add({ severity: 'info', summary: 'Preço', detail: 'Não informado' });
-    } else if (value.discount < 0) {
+    } else if (value.selecDiscount < 0) {
       this.messageService.add({ severity: 'error', summary: 'Disconto', detail: 'Inválido', icon: 'pi pi-times' });
-    } else if (value.discount > (value.qtdAvailable * value.price)) {
+    } else if (value.selecDiscount > (value.selecQtdAvailable * value.selecPrice)) {
       this.messageService.add({ severity: 'error', summary: 'Disconto', detail: 'Inválido', icon: 'pi pi-times' });
     } else {
-      this.hideDialogParts();
 
-      this.selectedParts.qtdAvailable = value.qtdAvailable;
-      this.selectedParts.discount = value.discount;
-      this.selectedParts.price = value.price;
+      this.selectedParts.companyId = this.storageService.companyId;
+      this.selectedParts.resaleId = this.storageService.resaleId;
+      this.selectedParts.status = "ativo";
+      const resultPart = await this.savePart(this.selectedParts);
 
-      const tempTotalParts = this.totalBudgetParts();
-      const tempTotalDiscount = this.totalBudgetDiscountParts();
+      this.selectedParts.qtdAvailable = value.selecQtdAvailable;
+      this.selectedParts.discount = value.selecDiscount;
+      this.selectedParts.price = value.selecPrice;
 
-      this.totalBudgetParts.set((value.qtdAvailable * value.price) + tempTotalParts);
-      this.totalBudgetDiscountParts.set(tempTotalDiscount + value.discount);
+      var budgetItem: BudgetItem = new BudgetItem();
+      budgetItem.companyId = this.selectedParts.companyId;
+      budgetItem.resaleId = this.selectedParts.resaleId;
+      budgetItem.partId = this.selectedParts.id;
+      budgetItem.budgetId = this.budget.id;
+      budgetItem.status = "Pending";
+      budgetItem.ordem = this.listBudgetItem.length + 1;
+      budgetItem.code = this.selectedParts.code;
+      budgetItem.description = value.selecDesc;
+      budgetItem.quantity =  value.selecQtdAvailable;
+      budgetItem.discount = value.selecDiscount;
+      budgetItem.price = value.selecPrice;
 
-      this.listBudgetParts.push(this.selectedParts);
-      this.cleanParts();
+      const resultItem = await this.saveBudgetItem(budgetItem);
+      if (resultItem.status == 201) {
+        this.hideDialogParts();
+        await this.getListBudgetItem();
+        this.cleanParts();
+      }
+
+
     }
 
+  }
+
+  private async savePart(part: Part): Promise<HttpResponse<Part>> {
+    try {
+      return await lastValueFrom(this.partsService.save(part))
+    } catch (error) {
+      return error;
+    }
+  }
+
+  private async saveBudgetItem(item: BudgetItem): Promise<HttpResponse<BudgetServiceItem>> {
+    try {
+      return await lastValueFrom(this.budgetService.saveBudgetItem(item));
+    } catch (error) {
+      return error;
+    }
   }
 
   alertShowDiscount2() {
@@ -995,6 +1082,11 @@ export default class BudgetComponent implements OnInit, OnDestroy {
 
   alertShowService1() {
     this.messageService.add({ severity: 'success', summary: 'Serviço', detail: 'Atualizado com sucesso', icon: 'pi pi-check' });
+  }
+
+  //Permission Not
+  private permissionNot() {
+    this.messageService.add({ severity: 'error', summary: 'Permissão', detail: "Você não tem permissão", icon: 'pi pi-times' });
   }
 
 

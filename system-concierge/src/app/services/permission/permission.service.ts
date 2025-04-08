@@ -13,25 +13,21 @@ import { MessageResponse } from '../../models/message/message-response';
 })
 export class PermissionService {
 
+    companyResale: string = this.storage.companyId + "/" + this.storage.resaleId;
+
     constructor(private http: HttpClient, private storage: StorageService) { }
+
     getAll$(): Observable<Permission[]> {
         return this.http.get<Permission[]>(environment.apiuUrl + "/permission/all", { headers: this.myHeaders() });
     }
-
-    //User
-
     saveUser(user: PermissionUser): Observable<HttpResponse<PermissionUser>> {
         return this.http.post<PermissionUser>(environment.apiuUrl + "/permission/user/save", user, { headers: this.myHeaders(), observe: 'response' });
     }
-
-    deleteUser(userId: number): Observable<HttpResponse<MessageResponse>> {
-        return this.http.post<MessageResponse>(environment.apiuUrl + "/permission/user/all/delete", {
-            "userId": userId
-        }, { headers: this.myHeaders(), observe: 'response' });
+    deleteUser(user: PermissionUser): Observable<HttpResponse<MessageResponse>> {
+        return this.http.post<MessageResponse>(environment.apiuUrl + "/permission/user/all/delete", user, { headers: this.myHeaders(), observe: 'response' });
     }
-
     getAllUser$(userId: number): Observable<PermissionUser[]> {
-        return this.http.get<PermissionUser[]>(environment.apiuUrl + "/permission/user/filter/user/" + userId, { headers: this.myHeaders() });
+        return this.http.get<PermissionUser[]>(environment.apiuUrl + "/permission/user/" + this.companyResale + "/filter/user/" + userId, { headers: this.myHeaders() });
     }
 
     private myHeaders(): HttpHeaders {

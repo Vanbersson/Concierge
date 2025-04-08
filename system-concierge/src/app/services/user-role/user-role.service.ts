@@ -12,16 +12,18 @@ import { UserRole } from '../../models/user-role/user-role';
 })
 export class UserRoleService {
 
+  companyResale: string = this.storage.companyId + "/" + this.storage.resaleId;
+
   constructor(private http: HttpClient, private storage: StorageService) { }
 
   getAll$(): Observable<UserRole[]> {
-    return this.http.get<UserRole[]>(environment.apiuUrl + "/user/role/all", { headers: this.myHeaders() });
+    return this.http.get<UserRole[]>(environment.apiuUrl + "/user/role/" + this.companyResale + "/all", { headers: this.myHeaders() });
   }
   getAllEnabled$(): Observable<UserRole[]> {
-    return this.http.get<UserRole[]>(environment.apiuUrl + "/user/role/all/enabled", { headers: this.myHeaders() });
+    return this.http.get<UserRole[]>(environment.apiuUrl + "/user/role/" + this.companyResale + "/all/enabled", { headers: this.myHeaders() });
   }
   getFilterId$(id: number): Observable<HttpResponse<UserRole>> {
-    return this.http.get<UserRole>(environment.apiuUrl + "/user/role/filter/code/" + id, { headers: this.myHeaders(), observe: 'response' });
+    return this.http.get<UserRole>(environment.apiuUrl + "/user/role/" + this.companyResale + "/filter/code/" + id, { headers: this.myHeaders(), observe: 'response' });
   }
 
   private myHeaders(): HttpHeaders {

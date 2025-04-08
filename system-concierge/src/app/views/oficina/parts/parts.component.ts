@@ -7,7 +7,7 @@ import { TableModule } from 'primeng/table';
 import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
 import { DialogModule } from 'primeng/dialog';
-import { Parts } from '../../../models/parts/Parts';
+import { Part } from '../../../models/parts/Part';
 
 @Component({
   selector: 'app-parts',
@@ -18,7 +18,7 @@ import { Parts } from '../../../models/parts/Parts';
 })
 export default class PartsComponent implements OnInit, OnDestroy {
 
-  parts: Parts[] = [];
+  parts: Part[] = [];
 
   constructor() { }
 

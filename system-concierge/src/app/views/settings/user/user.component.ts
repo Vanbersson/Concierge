@@ -383,14 +383,13 @@ export default class UserComponent implements OnInit {
     });
   }
   public async savePermissions() {
+    var pUser = new PermissionUser();
+    pUser.companyId = this.userSelect.companyId;
+    pUser.resaleId = this.userSelect.resaleId;
+    pUser.userId = this.userSelect.id;
 
-    var responseDelete = await this.deletePermissionUser(this.userSelect.id);
+    var responseDelete = await this.deletePermissionUser(pUser);
     if (responseDelete.body.message == MESSAGE_RESPONSE_SUCCESS) {
-
-      var pUser = new PermissionUser();
-      pUser.companyId = this.userSelect.companyId;
-      pUser.resaleId = this.userSelect.resaleId;
-      pUser.userId = this.userSelect.id;
 
       for (let i = 0; i < this.permissionsSelect.length; i++) {
         const per = this.permissionsSelect[i];
@@ -420,19 +419,12 @@ export default class UserComponent implements OnInit {
     }
   }
 
-  private async deletePermissionUser(userId: number): Promise<HttpResponse<MessageResponse>> {
-
+  private async deletePermissionUser(permissionUser: PermissionUser): Promise<HttpResponse<MessageResponse>> {
     try {
-      return lastValueFrom(this.permissionService.deleteUser(userId));
+      return lastValueFrom(this.permissionService.deleteUser(permissionUser));
     } catch (error) {
       return error;
     }
-
-
-    /* this.permissionService.deleteUser(userId).subscribe(data => {
-      this.alertPermisionSave();
-      this.hideDialogFunc();
-    }); */
   }
 
   //Dialog Menu
@@ -456,7 +448,10 @@ export default class UserComponent implements OnInit {
   public async saveMenus() {
 
     var menu: MenuUser = new MenuUser();
+    menu.companyId = this.userSelect.companyId;
+    menu.resaleId = this.userSelect.resaleId;
     menu.userId = this.userSelect.id;
+    
     const responseDelete = await this.deleteMenus(menu);
     if (responseDelete.body.message == MESSAGE_RESPONSE_SUCCESS) {
 

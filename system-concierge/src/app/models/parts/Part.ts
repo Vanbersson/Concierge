@@ -1,4 +1,4 @@
-export class Parts {
+export class Part {
     companyId: number = 0;
     resaleId: number = 0;
     id: number = 0;
@@ -13,4 +13,5 @@ export class Parts {
     locationStreet: string = "";
     locationBookcase: string = "";
     locationShelf: string = "";
+    dateLastEntry: Date | string = "";
 }

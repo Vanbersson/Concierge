@@ -41,7 +41,7 @@ export class VehicleService {
   }
 
   entryFilterId$(id: number): Observable<HttpResponse<VehicleEntry>> {
-    return this.http.get<VehicleEntry>(environment.apiuUrl + "/vehicle/entry/filter/id/" + id, { headers: this.myHeaders(), observe: 'response' });
+    return this.http.get<VehicleEntry>(environment.apiuUrl + "/vehicle/entry/"+this.companyResale+"/filter/id/" + id, { headers: this.myHeaders(), observe: 'response' });
   }
 
   entryFilterPlaca$(placa: string): Observable<HttpResponse<VehicleEntry>> {

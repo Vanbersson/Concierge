@@ -10,6 +10,8 @@ import { ClientCompany } from '../../models/clientcompany/client-company';
 })
 export class ClientecompanyService {
 
+  companyResale: string = this.storage.companyId + "/" + this.storage.resaleId;
+
   constructor(private http: HttpClient, private storage: StorageService) { }
 
   save(client: ClientCompany): Observable<HttpResponse<ClientCompany>> {
@@ -19,10 +21,10 @@ export class ClientecompanyService {
     return this.http.post<ClientCompany>(environment.apiuUrl + "/clientcompany/update", client, { headers: this.myHeaders(), observe: 'response' });
   }
   getAll$(): Observable<ClientCompany[]> {
-    return this.http.get<ClientCompany[]>(environment.apiuUrl + "/clientcompany/filter/all", { headers: this.myHeaders(), responseType: 'json' });
+    return this.http.get<ClientCompany[]>(environment.apiuUrl + "/clientcompany/" + this.companyResale + "/filter/all", { headers: this.myHeaders(), responseType: 'json' });
   }
-  getId$(id: Number): Observable<HttpResponse<ClientCompany> > {
-    return this.http.get<ClientCompany>(environment.apiuUrl + "/clientcompany/filter/id/" + id, { headers: this.myHeaders(), observe:'response' });
+  getId$(id: Number): Observable<HttpResponse<ClientCompany>> {
+    return this.http.get<ClientCompany>(environment.apiuUrl + "/clientcompany/" + this.companyResale + "/filter/id/" + id, { headers: this.myHeaders(), observe: 'response' });
   }
 
   //Externa

@@ -307,7 +307,6 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
       this.vehicleEntry = vehicleResult.body;
       this.loadForms();
     } else {
-      this.messageService.add({ severity: 'error', summary: 'Erro', detail: "Vaículo não encontrado", icon: 'pi pi-times' });
       setTimeout(() => {
         this.router.navigateByUrl("/portaria/lista-entrada-veiculo");
       }, 2000)
@@ -332,6 +331,7 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
     try {
       return await lastValueFrom(this.vehicleService.entryFilterId$(this.id));
     } catch (error) {
+      this.messageService.add({ severity: 'error', summary: 'Erro', detail: "Vaículo não encontrado", icon: 'pi pi-times' });
       return error;
     }
   }
@@ -798,6 +798,8 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
   public async deleteAuth1() {
     if (this.formVehicle.value.idUserExitAuth1 != 0) {
       var auth = new VehicleEntryAuth();
+      auth.companyId = this.storageService.companyId;
+      auth.resaleId = this.storageService.resaleId;
       auth.idVehicle = this.id;
       auth.idUserExitAuth = this.storageService.id;
       auth.nameUserExitAuth = this.storageService.name;
@@ -834,6 +836,8 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
   public async deleteAuth2() {
     if (this.formVehicle.value.idUserExitAuth2 != 0) {
       var auth = new VehicleEntryAuth();
+      auth.companyId = this.storageService.companyId;
+      auth.resaleId = this.storageService.resaleId;
       auth.idVehicle = this.id;
       auth.idUserExitAuth = this.storageService.id;
       auth.nameUserExitAuth = this.storageService.name;
@@ -1122,7 +1126,7 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
         acceptLabel: 'Sim',
         accept: async () => {
 
-          this.budget = { vehicleEntryId: this.formVehicle.value.id };
+          this.budget = { companyId: this.storageService.companyId, resaleId: this.storageService.resaleId, vehicleEntryId: this.formVehicle.value.id };
 
           const budgetResult = await this.saveBudget(this.budget);
           if (budgetResult.status == 201) {

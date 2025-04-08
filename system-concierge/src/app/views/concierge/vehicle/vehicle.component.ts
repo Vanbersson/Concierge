@@ -216,11 +216,27 @@ export default class VeiculosComponent implements OnInit, OnDestroy {
       this.messageService.add({ severity: 'info', summary: 'Veículo', detail: "Já liberado" });
     }
   }
+  formatDateTime(date: Date): string {
+    const datePipe = new DatePipe('en-US');
+
+    // Obtém o fuso horário local no formato ±hh:mm
+    const tzOffset = -date.getTimezoneOffset();
+    const sign = tzOffset >= 0 ? '+' : '-';
+    const hours = Math.floor(Math.abs(tzOffset) / 60).toString().padStart(2, '0');
+    const minutes = (Math.abs(tzOffset) % 60).toString().padStart(2, '0');
+    const timezone = `${sign}${hours}:${minutes}`;
+
+    // Formata a data e adiciona o fuso horário
+    return datePipe.transform(date, "yyyy-MM-dd'T'HH:mm:ss.SSS") + timezone;
+  }
   private async addAuthExit(vehicle: VehicleEntry): Promise<HttpResponse<VehicleEntryAuth>> {
     var auth = new VehicleEntryAuth();
+    auth.companyId = this.storageService.companyId;
+    auth.resaleId = this.storageService.resaleId;
     auth.idVehicle = vehicle.id;
     auth.idUserExitAuth = this.storageService.id;
     auth.nameUserExitAuth = this.storageService.name;
+    auth.dateExitAuth = this.formatDateTime(new Date());
 
     try {
       return await lastValueFrom(this.vehicleService.entryAddAuth(auth));

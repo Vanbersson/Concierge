@@ -23,7 +23,7 @@ export class MenuUserService {
   }
 
   getFilterMenuUser$(compamyId: number, resaleId: number, userId: number,): Observable<TreeNode[]> {
-    return this.http.get<TreeNode[]>(environment.apiuUrl + "/menu/user/filter/" + compamyId + "/" + resaleId + "/" + userId, { headers: this.myHeaders() });
+    return this.http.get<TreeNode[]>(environment.apiuUrl + "/menu/user/" + compamyId + "/" + resaleId + "/filter/user/" + userId, { headers: this.myHeaders() });
   }
 
   private myHeaders(): HttpHeaders {
