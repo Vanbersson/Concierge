@@ -12,11 +12,11 @@ public interface IUserService {
 
     String update(User user);
 
-    List<Map<String, Object>> listAll();
+    List<Map<String, Object>> listAll(Integer companyId, Integer resaleId);
 
-    Map<String, Object> filterId(Integer id);
+    Map<String, Object> filterId(Integer companyId, Integer resaleId,Integer id);
 
-    List<Map<String, Object>> filterRoleId(Integer roleId);
+    List<Map<String, Object>> filterRoleId(Integer companyId, Integer resaleId,Integer roleId);
 
-    Map<String, Object> filterEmail(String email);
+    Map<String, Object> filterEmail(Integer companyId, Integer resaleId,String email);
 }

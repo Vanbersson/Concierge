@@ -34,7 +34,7 @@ public class AutheticationController {
     private AuthenticationManager authenticationManager;
 
     @Autowired
-    private IUserRepository IUserRepository;
+    private IUserRepository repository;
 
     @PostMapping("/login")
     public ResponseEntity<Object> login(@RequestBody @Valid AuthenticationDto data) {
@@ -44,12 +44,12 @@ public class AutheticationController {
 
         var token = tokenService.generateToken((User) auth.getPrincipal());
 
-        User user = this.IUserRepository.findByEmail(data.email());
+        User user = this.repository.loginEmail(data.email());
 
         //Last Session
         user.setLastSession(new Date());
 
-        this.IUserRepository.save(user);
+        this.repository.save(user);
         Map<String, Object> map = new HashMap<>();
 
         map.put("companyId", user.getCompanyId());

@@ -9,11 +9,10 @@ import java.util.List;
 import java.util.UUID;
 
 @Repository
-public interface BudgetRequisitionIRepository extends JpaRepository<BudgetRequisition, UUID> {
+public interface IBudgetRequisitionRepository extends JpaRepository<BudgetRequisition, UUID> {
 
-    @Query(value = "SELECT `company_id`, `resale_id`, `id`, `budget_id`, `ordem`, `description` FROM `tb_budget_requisition` \n" +
-            "where budget_id = ?1 order by ordem",
+    @Query(value = "SELECT * FROM `tb_budget_requisition` WHERE company_id=?1 AND resale_id=?2 AND budget_id = ?3 order by ordem",
             nativeQuery = true)
-    List<BudgetRequisition> listRequisition(Integer budgetId);
+    List<BudgetRequisition> listAllRequisition(Integer companyId, Integer resaleId, Integer budgetId);
 
 }

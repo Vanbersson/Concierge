@@ -27,7 +27,7 @@ public class MenuUserValidation implements IMenuUserValidation {
             return ConstantsMessage.ERROR_USER_ID;
 
         MenuUser response = repository.findMenu(menu.getCompanyId(), menu.getResaleId(), menu.getUserId(), menu.getMenuId());
-        if(response != null )
+        if (response != null)
             return ConstantsMessage.ERROR;
 
         return ConstantsMessage.SUCCESS;
@@ -49,7 +49,25 @@ public class MenuUserValidation implements IMenuUserValidation {
     }
 
     @Override
-    public void filterMenus() {
+    public String filterMenus(MenuUser menu) {
+        if (menu.getCompanyId() == null || menu.getCompanyId() == 0)
+            return ConstantsMessage.ERROR_COMPANY;
+        if (menu.getResaleId() == null || menu.getResaleId() == 0)
+            return ConstantsMessage.ERROR_RESALE;
+        if (menu.getUserId() == null || menu.getUserId() == 0)
+            return ConstantsMessage.ERROR_USER_ID;
 
+        return ConstantsMessage.SUCCESS;
+    }
+    @Override
+    public String deleteMenus(MenuUser menu) {
+        if (menu.getCompanyId() == null || menu.getCompanyId() == 0)
+            return ConstantsMessage.ERROR_COMPANY;
+        if (menu.getResaleId() == null || menu.getResaleId() == 0)
+            return ConstantsMessage.ERROR_RESALE;
+        if (menu.getUserId() == null || menu.getUserId() == 0)
+            return ConstantsMessage.ERROR_USER_ID;
+
+        return ConstantsMessage.SUCCESS;
     }
 }

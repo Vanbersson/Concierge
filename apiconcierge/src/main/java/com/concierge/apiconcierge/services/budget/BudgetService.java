@@ -1,5 +1,6 @@
 package com.concierge.apiconcierge.services.budget;
 
+import com.concierge.apiconcierge.dtos.budget.BudgetNewDto;
 import com.concierge.apiconcierge.exceptions.budget.BudgetException;
 import com.concierge.apiconcierge.models.budget.Budget;
 import com.concierge.apiconcierge.models.budget.enums.StatusBudgetEnum;
@@ -20,8 +21,6 @@ import java.util.Optional;
 
 @Service
 public class BudgetService implements IBudgetService {
-    private static final String SUCCESS = "Success.";
-    private final String NOTFOUND = "Not Exists.";
 
     @Autowired
     private IBudgetRepository repository;
@@ -34,17 +33,20 @@ public class BudgetService implements IBudgetService {
 
     @SneakyThrows
     @Override
-    public Integer save(Integer vehicleEntryId, String userEmail) {
+    public Integer save(BudgetNewDto budgetNewDto, String userLoginEmail) {
         Budget result;
         try {
-            Optional<VehicleEntry> vehicle = this.repositoryVehicleEntry.findById(vehicleEntryId);
-            if (vehicle.isEmpty())
-                throw new BudgetException();
+            String message = this.validation.save(budgetNewDto, userLoginEmail);
+            if (!ConstantsMessage.SUCCESS.equals(message))
+                throw new BudgetException(message);
 
-            VehicleEntry vehicleEntry = vehicle.get();
-            String message = this.validation.save(vehicleEntry,userEmail);
+            VehicleEntry vehicleEntry = this.repositoryVehicleEntry.filterVehicleId(budgetNewDto.companyId(), budgetNewDto.resaleId(), budgetNewDto.vehicleEntryId());
+            if (vehicleEntry == null)
+                throw new BudgetException("Vehicle not found.");
 
-            if (message.equals(SUCCESS)) {
+            message = this.validation.save(vehicleEntry);
+
+            if (ConstantsMessage.SUCCESS.equals(message)) {
                 Budget budget = new Budget();
                 budget.setCompanyId(vehicleEntry.getCompanyId());
                 budget.setResaleId(vehicleEntry.getResaleId());
@@ -77,8 +79,8 @@ public class BudgetService implements IBudgetService {
     @Override
     public boolean update(Budget budget, String userEmail) {
         try {
-            String message = this.validation.update(budget,userEmail);
-            if (message.equals(SUCCESS)) {
+            String message = this.validation.update(budget, userEmail);
+            if (ConstantsMessage.SUCCESS.equals(message)) {
                 this.repository.save(budget);
                 return true;
             } else {
@@ -90,44 +92,34 @@ public class BudgetService implements IBudgetService {
     }
 
     @SneakyThrows
-    public String updateBudget(Budget budget) {
-        try {
-            this.repository.save(budget);
-            return ConstantsMessage.SUCCESS;
-        } catch (Exception ex) {
-            throw new BudgetException(ex.getMessage());
-        }
-    }
-
-    @SneakyThrows
     @Override
-    public Map<String, Object> filterVehicleId(Integer vehicleId) {
+    public Map<String, Object> filterVehicleId(Integer companyId, Integer resaleId, Integer vehicleId, String userLoginEmail) {
         try {
-            Budget budget = this.repository.findByVehicleEntryId(vehicleId);
 
-            if (budget == null)
-                throw new BudgetException(NOTFOUND);
+            String message = this.validation.filterVehicleId(companyId, resaleId, vehicleId, userLoginEmail);
+            if (ConstantsMessage.SUCCESS.equals(message)) {
 
-            Optional<VehicleEntry> optional = repositoryVehicleEntry.findById(budget.getVehicleEntryId());
-            VehicleEntry ve = optional.get();
+                Budget budget = this.repository.filterVehicleId(companyId, resaleId, vehicleId);
+                if (budget == null)
+                    throw new BudgetException("Budget not found.");
 
-            Map<String, Object> map = this.loadBudget(budget);
-            map.put("placa", ve.getPlaca());
-            map.put("frota", ve.getFrota());
-            map.put("modelDescription", ve.getModelDescription());
-            map.put("color", ve.getColor());
-            map.put("kmEntry", ve.getKmEntry());
+                VehicleEntry vehicle = this.repositoryVehicleEntry.filterVehicleId(companyId, resaleId, budget.getVehicleEntryId());
+                if (vehicle == null)
+                    throw new BudgetException("Vehicle not found.");
 
-            return map;
-        } catch (Exception ex) {
-            throw new BudgetException(ex.getMessage());
-        }
-    }
+                Map<String, Object> map = this.loadBudget(budget);
 
-    @SneakyThrows
-    public Budget filterBudgetVehicle(Integer vehicleId) {
-        try {
-            return this.repository.findByVehicleEntryId(vehicleId);
+                map.put("placa", vehicle.getPlaca());
+                map.put("frota", vehicle.getFrota());
+                map.put("modelDescription", vehicle.getModelDescription());
+                map.put("color", vehicle.getColor());
+                map.put("kmEntry", vehicle.getKmEntry());
+
+                return map;
+
+            } else {
+                throw new BudgetException(message);
+            }
         } catch (Exception ex) {
             throw new BudgetException(ex.getMessage());
         }

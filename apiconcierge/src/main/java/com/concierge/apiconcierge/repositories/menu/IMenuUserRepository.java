@@ -25,8 +25,9 @@ public interface IMenuUserRepository extends JpaRepository<MenuUser, UUID> {
 
     @Transactional
     @Modifying
-    @Query(value = "delete from tb_user_menu where user_id=?1 ",nativeQuery = true)
-    void deleteMenu(Integer userId);
+    @Query(value = "delete from tb_user_menu where `company_id` = ?1 and `resale_id`= ?2 and user_id=?3 ",
+            nativeQuery = true)
+    void deleteMenu(Integer companyId, Integer resaleId, Integer userId);
 
 
 }

@@ -13,6 +13,7 @@ import java.util.UUID;
 @SecondaryTable(name = "tb_company", pkJoinColumns = @PrimaryKeyJoinColumn(name = "id"))
 @SecondaryTable(name = "tb_resale", pkJoinColumns = @PrimaryKeyJoinColumn(name = "id"))
 @SecondaryTable(name = "tb_budget", pkJoinColumns = @PrimaryKeyJoinColumn(name = "id"))
+@SecondaryTable(name = "tb_part", pkJoinColumns = @PrimaryKeyJoinColumn(name = "id"))
 @Entity
 @Table(name = "tb_budget_item")
 public class BudgetItem {
@@ -29,6 +30,10 @@ public class BudgetItem {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
+    @JoinColumn(table = "tb_part", referencedColumnName = "id")
+    @Column(name = "part_id")
+    private Integer partId;
+
     @JoinColumn(table = "tb_budget", referencedColumnName = "id")
     @Column(name = "budget_id")
     private Integer budgetId;
@@ -37,14 +42,13 @@ public class BudgetItem {
 
     private Integer ordem;
 
-    @Column(name = "code_item")
     private String code;
 
     private String description;
 
-    private Integer quantity;
+    private float quantity;
 
-    private Double discount;
+    private float discount;
 
-    private Double price;
+    private float price;
 }

@@ -42,15 +42,14 @@ public class PermissionUserService implements IPermissionUserService {
 
     @SneakyThrows
     @Override
-    public List<PermissionUser> filterPermissionUser(Integer userId) {
+    public List<PermissionUser> filterPermissionUser(Integer companyId, Integer resaleId, Integer userId) {
         try {
-            String message = this.validation.filterPermissionUser(userId);
+            String message = this.validation.filterPermissionUser(companyId, resaleId, userId);
             if (ConstantsMessage.SUCCESS.equals(message)) {
-                return this.repository.findByUserId(userId);
+                return this.repository.listPermissionUser(companyId, resaleId, userId);
             } else {
                 throw new PermissionUserException(message);
             }
-
         } catch (Exception ex) {
             throw new PermissionUserException(ex.getMessage());
         }
@@ -58,11 +57,11 @@ public class PermissionUserService implements IPermissionUserService {
 
     @SneakyThrows
     @Override
-    public String deletePermissionsUser(Integer userId) {
+    public String deletePermissionsUser(Integer companyId, Integer resaleId, Integer userId) {
         try {
-            String message = this.validation.deletePermissionsUser(userId);
+            String message = this.validation.deletePermissionsUser(companyId, resaleId, userId);
             if (ConstantsMessage.SUCCESS.equals(message)) {
-                this.repository.deleteUser(userId);
+                this.repository.deleteUser(companyId, resaleId, userId);
                 return ConstantsMessage.SUCCESS;
             } else {
                 throw new PermissionUserException(message);

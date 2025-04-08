@@ -9,7 +9,9 @@ public interface IClientCompanyValidation {
 
     public String update(ClientCompany client);
 
-    public String filterId(Integer id);
+   public String listAll(Integer companyId,Integer resaleId);
+
+    public String filterId(Integer companyId,Integer resaleId, Integer clientId);
 
     public String filterJFantasia(String fantasia);
 

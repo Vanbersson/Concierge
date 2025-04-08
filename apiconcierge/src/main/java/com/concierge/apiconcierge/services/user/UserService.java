@@ -56,7 +56,7 @@ public class UserService implements IUserService {
             String message = this.validation.update(user);
             if (ConstantsMessage.SUCCESS.equals(message)) {
 
-                User userResult = this.repository.findByEmail(user.getEmail());
+                User userResult = this.repository.filterEmail(user.getCompanyId(), user.getResaleId(), user.getEmail());
                 user.setPassword(userResult.getPassword());
 
                 this.repository.save(user);
@@ -71,9 +71,10 @@ public class UserService implements IUserService {
 
     @SneakyThrows
     @Override
-    public List<Map<String, Object>> listAll() {
+    public List<Map<String, Object>> listAll(Integer companyId, Integer resaleId) {
         try {
-            List<User> usersResult = this.repository.findAll();
+            List<User> usersResult = this.repository.listAll(companyId, resaleId);
+
             List<Map<String, Object>> list = new ArrayList<>();
             for (User user : usersResult) {
                 list.add(this.loadUser(user));
@@ -87,12 +88,12 @@ public class UserService implements IUserService {
 
     @SneakyThrows
     @Override
-    public Map<String, Object> filterId(Integer id) {
+    public Map<String, Object> filterId(Integer companyId, Integer resaleId, Integer id) {
         try {
-            String message = this.validation.filterId(id);
+            String message = this.validation.filterId(companyId, resaleId, id);
 
             if (ConstantsMessage.SUCCESS.equals(message)) {
-                User user = this.repository.getReferenceById(id);
+                User user = this.repository.findById(companyId, resaleId, id);
                 return this.loadUser(user);
             } else {
                 throw new UserException(message);
@@ -105,13 +106,13 @@ public class UserService implements IUserService {
 
     @SneakyThrows
     @Override
-    public List<Map<String, Object>> filterRoleId(Integer roleId) {
+    public List<Map<String, Object>> filterRoleId(Integer companyId, Integer resaleId, Integer roleId) {
 
         try {
-            String message = this.validation.filterRoleId(roleId);
+            String message = this.validation.filterRoleId(companyId, resaleId, roleId);
             if (ConstantsMessage.SUCCESS.equals(message)) {
 
-                List<User> usersResult = this.repository.findByRoleId(roleId);
+                List<User> usersResult = this.repository.findByRoleId(companyId, resaleId, roleId);
 
                 List<Map<String, Object>> list = new ArrayList<>();
                 for (User user : usersResult) {
@@ -128,12 +129,12 @@ public class UserService implements IUserService {
 
     @SneakyThrows
     @Override
-    public Map<String, Object> filterEmail(String email) {
+    public Map<String, Object> filterEmail(Integer companyId, Integer resaleId, String email) {
 
         try {
-            String message = this.validation.filterEmail(email);
+            String message = this.validation.filterEmail(companyId, resaleId, email);
             if (ConstantsMessage.SUCCESS.equals(message)) {
-                User userResult = this.repository.findByEmail(email);
+                User userResult = this.repository.filterEmail(companyId, resaleId, email);
                 if (userResult == null) return new HashMap<>();
 
                 return this.loadUser(userResult);

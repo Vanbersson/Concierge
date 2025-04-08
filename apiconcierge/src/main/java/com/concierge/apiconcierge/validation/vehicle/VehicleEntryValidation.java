@@ -31,9 +31,9 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
     @Override
     public String save(VehicleEntry vehicle) {
 
-        if(vehicle.getCompanyId() == null || vehicle.getCompanyId() == 0)
+        if (vehicle.getCompanyId() == null || vehicle.getCompanyId() == 0)
             return ConstantsMessage.ERROR_COMPANY;
-        if(vehicle.getResaleId() == null || vehicle.getResaleId() == 0)
+        if (vehicle.getResaleId() == null || vehicle.getResaleId() == 0)
             return ConstantsMessage.ERROR_RESALE;
         if (vehicle.getDateEntry() == null)
             return ConstantsMessage.ERROR_DATEENTRY;
@@ -41,7 +41,7 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
             return ConstantsMessage.ERROR_VEHICLE_MODEL;
         if (vehicle.getColor() == null)
             return ConstantsMessage.ERROR_COLOR;
-        if (!vehicle.getDriverEntryRg().isBlank()){
+        if (!vehicle.getDriverEntryRg().isBlank()) {
             if (vehicle.getDriverEntryRg().length() > 11)
                 return ConstantsMessage.ERROR_RG;
         }
@@ -64,9 +64,9 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
 
     @Override
     public String update(VehicleEntry vehicle) {
-        if(vehicle.getCompanyId() == null || vehicle.getCompanyId() == 0)
+        if (vehicle.getCompanyId() == null || vehicle.getCompanyId() == 0)
             return ConstantsMessage.ERROR_COMPANY;
-        if(vehicle.getResaleId() == null || vehicle.getResaleId() == 0)
+        if (vehicle.getResaleId() == null || vehicle.getResaleId() == 0)
             return ConstantsMessage.ERROR_RESALE;
         if (vehicle.getId() == null || vehicle.getId() == 0)
             return ConstantsMessage.ERROR_ID;
@@ -157,7 +157,7 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
             VehicleEntry ve = resultVehicle.get();
 
             if (ve.getServiceOrder() == VehicleYesNotEnum.not) {
-                if (ve.getStatusAuthExit() != StatusAuthExitEnum.NotAuth )
+                if (ve.getStatusAuthExit() != StatusAuthExitEnum.NotAuth)
                     return ConstantsMessage.ERROR_AUTH_EXIT;
             }
 
@@ -210,9 +210,9 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
     @Override
     public String addAuthExit(VehicleEntry vehicle, AuthExit authExit) {
 
-        if(authExit.companyId() == null || authExit.companyId() == 0)
+        if (authExit.companyId() == null || authExit.companyId() == 0)
             return ConstantsMessage.ERROR_COMPANY;
-        if(authExit.resaleId() == null || authExit.resaleId() == 0)
+        if (authExit.resaleId() == null || authExit.resaleId() == 0)
             return ConstantsMessage.ERROR_RESALE;
 
         if (vehicle.getServiceOrder().equals(VehicleYesNotEnum.yes)) {
@@ -263,13 +263,13 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
 
             if (vehicle.getIdUserExitAuth1() == null) {
                 if (authExit.idUserExitAuth() != 1) {
-                    PermissionUser permission = this.permissionUser.findByUserIdAndPermissionId(authExit.idUserExitAuth(), ADD_AUTH_EXIT_VEHICLE_1);
+                    PermissionUser permission = this.permissionUser.findPermissionId(authExit.companyId(), authExit.resaleId(), authExit.idUserExitAuth(), ADD_AUTH_EXIT_VEHICLE_1);
                     if (permission == null)
                         return ERROR_PERMISSION;
                 }
             } else if (vehicle.getIdUserExitAuth2() == null) {
                 if (authExit.idUserExitAuth() != 1) {
-                    PermissionUser permission = this.permissionUser.findByUserIdAndPermissionId(authExit.idUserExitAuth(), ADD_AUTH_EXIT_VEHICLE_2);
+                    PermissionUser permission = this.permissionUser.findPermissionId(authExit.companyId(), authExit.resaleId(), authExit.idUserExitAuth(), ADD_AUTH_EXIT_VEHICLE_2);
                     if (permission == null)
                         return ERROR_PERMISSION;
                 }
@@ -280,7 +280,7 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
         if (vehicle.getServiceOrder().equals(VehicleYesNotEnum.not)) {
 
             if (authExit.idUserExitAuth() != 1) {
-                PermissionUser permission = this.permissionUser.findByUserIdAndPermissionId(authExit.idUserExitAuth(), ADD_AUTH_EXIT_VEHICLE_WITHOUT_O_S);
+                PermissionUser permission = this.permissionUser.findPermissionId(authExit.companyId(), authExit.resaleId(), authExit.idUserExitAuth(), ADD_AUTH_EXIT_VEHICLE_WITHOUT_O_S);
                 if (permission == null)
                     return ERROR_PERMISSION;
             }
@@ -300,14 +300,13 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
         if (vehicle.getDateExitAuth1() == null)
             return ConstantsMessage.ERROR_NOTAUTHEXIT;
 
-
         if (vehicle.getServiceOrder().equals(VehicleYesNotEnum.yes)) {
 
             if (authExit.idUserExitAuth() != 1) {
                 if (vehicle.getIdUserExitAuth1() != authExit.idUserExitAuth())
                     return ERROR_PERMISSION_ANOTHER_USER;
 
-                PermissionUser permission = this.permissionUser.findByUserIdAndPermissionId(authExit.idUserExitAuth(), DEL_AUTH_EXIT_VEHICLE_1);
+                PermissionUser permission = this.permissionUser.findPermissionId(authExit.companyId(), authExit.resaleId(), authExit.idUserExitAuth(), DEL_AUTH_EXIT_VEHICLE_1);
                 if (permission == null)
                     return ERROR_PERMISSION;
             }
@@ -319,7 +318,7 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
                 if (vehicle.getIdUserExitAuth1() != authExit.idUserExitAuth())
                     return ERROR_PERMISSION_ANOTHER_USER;
 
-                PermissionUser permission = this.permissionUser.findByUserIdAndPermissionId(authExit.idUserExitAuth(), DEL_AUTH_EXIT_VEHICLE_WITHOUT_O_S);
+                PermissionUser permission = this.permissionUser.findPermissionId(authExit.companyId(), authExit.resaleId(), authExit.idUserExitAuth(), DEL_AUTH_EXIT_VEHICLE_WITHOUT_O_S);
                 if (permission == null)
                     return ERROR_PERMISSION;
             }
@@ -345,7 +344,7 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
                 if (vehicle.getIdUserExitAuth2() != authExit.idUserExitAuth())
                     return ERROR_PERMISSION_ANOTHER_USER;
 
-                PermissionUser permission = this.permissionUser.findByUserIdAndPermissionId(authExit.idUserExitAuth(), DEL_AUTH_EXIT_VEHICLE_2);
+                PermissionUser permission = this.permissionUser.findPermissionId(authExit.companyId(), authExit.resaleId(), authExit.idUserExitAuth(), DEL_AUTH_EXIT_VEHICLE_2);
                 if (permission == null)
                     return ERROR_PERMISSION;
             }
@@ -357,7 +356,7 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
                 if (vehicle.getIdUserExitAuth2() != authExit.idUserExitAuth())
                     return ERROR_PERMISSION_ANOTHER_USER;
 
-                PermissionUser permission = this.permissionUser.findByUserIdAndPermissionId(authExit.idUserExitAuth(), DEL_AUTH_EXIT_VEHICLE_WITHOUT_O_S);
+                PermissionUser permission = this.permissionUser.findPermissionId(authExit.companyId(), authExit.resaleId(), authExit.idUserExitAuth(), DEL_AUTH_EXIT_VEHICLE_WITHOUT_O_S);
                 if (permission == null)
                     return ERROR_PERMISSION;
             }

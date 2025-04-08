@@ -49,19 +49,22 @@ public class UserController {
         }
     }
 
-    @GetMapping("/all")
-    public ResponseEntity<Object> listAll() {
+    @GetMapping("/{companyId}/{resaleId}/all")
+    public ResponseEntity<Object> listAll(@PathVariable(name = "companyId") Integer companyId,
+                                          @PathVariable(name = "resaleId") Integer resaleId) {
         try {
-            return ResponseEntity.status(HttpStatus.OK).body(this.service.listAll());
+            return ResponseEntity.status(HttpStatus.OK).body(this.service.listAll(companyId, resaleId));
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
         }
     }
 
-    @GetMapping("/filter/id/{id}")
-    public ResponseEntity<Object> filterEmail(@PathVariable(name = "id") Integer id) {
+    @GetMapping("/{companyId}/{resaleId}/filter/id/{id}")
+    public ResponseEntity<Object> filterEmail(@PathVariable(name = "companyId") Integer companyId,
+                                              @PathVariable(name = "resaleId") Integer resaleId,
+                                              @PathVariable(name = "id") Integer id) {
         try {
-            Map<String, Object> userResult = this.service.filterId(id);
+            Map<String, Object> userResult = this.service.filterId(companyId, resaleId, id);
             if (userResult.isEmpty()) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 
             return ResponseEntity.status(HttpStatus.OK).body(userResult);
@@ -70,10 +73,12 @@ public class UserController {
         }
     }
 
-    @GetMapping("/filter/email/{email}")
-    public ResponseEntity<Object> filterEmail(@PathVariable(name = "email") String email) {
+    @GetMapping("/{companyId}/{resaleId}/filter/email/{email}")
+    public ResponseEntity<Object> filterEmail(@PathVariable(name = "companyId") Integer companyId,
+                                              @PathVariable(name = "resaleId") Integer resaleId,
+                                              @PathVariable(name = "email") String email) {
         try {
-            Map<String, Object> userResult = this.service.filterEmail(email);
+            Map<String, Object> userResult = this.service.filterEmail(companyId, resaleId, email);
             if (userResult.isEmpty()) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 
             return ResponseEntity.status(HttpStatus.OK).body(userResult);
@@ -82,10 +87,12 @@ public class UserController {
         }
     }
 
-    @GetMapping("/filter/roleId/{roleId}")
-    public ResponseEntity<Object> filterRole(@PathVariable(name = "roleId") Integer roleId) {
+    @GetMapping("/{companyId}/{resaleId}/filter/roleId/{roleId}")
+    public ResponseEntity<Object> filterRole(@PathVariable(name = "companyId") Integer companyId,
+                                             @PathVariable(name = "resaleId") Integer resaleId,
+                                             @PathVariable(name = "roleId") Integer roleId) {
         try {
-            List<Map<String, Object>> list = this.service.filterRoleId(roleId);
+            List<Map<String, Object>> list = this.service.filterRoleId(companyId, resaleId, roleId);
             return ResponseEntity.status(HttpStatus.OK).body(list);
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));

@@ -2,9 +2,9 @@ package com.concierge.apiconcierge.controllers.parts;
 
 
 import com.concierge.apiconcierge.dtos.message.MessageResponseDto;
-import com.concierge.apiconcierge.dtos.parts.PartsDto;
-import com.concierge.apiconcierge.models.parts.Parts;
-import com.concierge.apiconcierge.services.parts.PartsService;
+import com.concierge.apiconcierge.dtos.parts.PartDto;
+import com.concierge.apiconcierge.models.part.Part;
+import com.concierge.apiconcierge.services.parts.PartService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,63 +16,50 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/parts")
-public class PartsController {
+@RequestMapping("/part")
+public class PartController {
 
     @Autowired
-    private PartsService service;
+    private PartService service;
 
     @PostMapping("/save")
-    public ResponseEntity<Object> save(@RequestBody PartsDto data) {
+    public ResponseEntity<Object> save(@RequestBody PartDto data) {
         try {
-            Parts parts = new Parts();
-            BeanUtils.copyProperties(data, parts);
-            Integer id = this.service.save(parts);
+            Part part = new Part();
+            BeanUtils.copyProperties(data, part);
+            Integer id = this.service.save(part);
 
             Map<String, Object> map = new HashMap<>();
             map.put("id", id);
-
             return ResponseEntity.status(HttpStatus.CREATED).body(map);
-
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
         }
     }
 
     @PostMapping("/update")
-    public ResponseEntity<Object> update(@RequestBody PartsDto data) {
+    public ResponseEntity<Object> update(@RequestBody PartDto data) {
         try {
-            Parts parts = new Parts();
+            Part parts = new Part();
             BeanUtils.copyProperties(data, parts);
-            Object ob = this.service.update(parts);
+            String message = this.service.update(parts);
 
-            return ResponseEntity.status(HttpStatus.OK).body(ob);
-
+            return ResponseEntity.status(HttpStatus.OK).body(new MessageResponseDto(message));
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
         }
     }
 
-    @GetMapping("/filter/all")
-    public ResponseEntity<Object> all() {
+    @GetMapping("/{companyId}/{resaleId}/filter/all")
+    public ResponseEntity<Object> listAll(@PathVariable(name = "companyId") Integer companyId,
+                                          @PathVariable(name = "resaleId") Integer resaleId) {
         try {
-            List<Parts> parts = this.service.filterAll();
+            List<Part> parts = this.service.listAll(companyId, resaleId);
             return ResponseEntity.status(HttpStatus.OK).body(parts);
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
         }
     }
-
-    @GetMapping("/filter/budget/{id}")
-    public ResponseEntity<Object> budgetAll(@PathVariable(name = "id") Integer id) {
-        try {
-            List<Parts> parts = this.service.filterAll();
-            return ResponseEntity.status(HttpStatus.OK).body(parts);
-        } catch (Exception ex) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
-        }
-    }
-
 
 
 }

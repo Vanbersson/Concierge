@@ -38,7 +38,6 @@ public class ClientCompanyController {
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
         }
-
     }
 
     @PostMapping("/update")
@@ -49,25 +48,27 @@ public class ClientCompanyController {
 
             String message = this.service.update(clientCompany);
             return ResponseEntity.status(HttpStatus.OK).body(new MessageResponseDto(message));
-
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
         }
     }
 
-    @GetMapping("/filter/all")
-    public ResponseEntity<Object> all() {
+    @GetMapping("/{companyId}/{resaleId}/filter/all")
+    public ResponseEntity<Object> all(@PathVariable(name = "companyId") Integer companyId,
+                                      @PathVariable(name = "resaleId") Integer resaleId) {
         try {
-            return ResponseEntity.status(HttpStatus.OK).body(this.service.listAll());
+            return ResponseEntity.status(HttpStatus.OK).body(this.service.listAll(companyId, resaleId));
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
         }
     }
 
-    @GetMapping("/filter/id/{id}")
-    public ResponseEntity<Object> filterId(@PathVariable(name = "id") Integer id) {
+    @GetMapping("/{companyId}/{resaleId}/filter/id/{id}")
+    public ResponseEntity<Object> filterId(@PathVariable(name = "companyId") Integer companyId,
+                                           @PathVariable(name = "resaleId") Integer resaleId,
+                                           @PathVariable(name = "id") Integer clientId) {
         try {
-            ClientCompany client = this.service.filterId(id);
+            ClientCompany client = this.service.filterId(companyId, resaleId, clientId);
             if (client == null)
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 

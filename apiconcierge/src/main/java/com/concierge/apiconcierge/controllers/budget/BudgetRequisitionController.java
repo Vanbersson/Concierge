@@ -1,10 +1,9 @@
 package com.concierge.apiconcierge.controllers.budget;
 
-import com.concierge.apiconcierge.dtos.budget.BudgetRequisitionSaveDto;
-import com.concierge.apiconcierge.dtos.budget.BudgetRequisitionUpdateDto;
+import com.concierge.apiconcierge.dtos.budget.BudgetRequisitionDto;
+import com.concierge.apiconcierge.dtos.message.MessageResponseDto;
 import com.concierge.apiconcierge.models.budget.BudgetRequisition;
-import com.concierge.apiconcierge.repositories.budget.BudgetRequisitionIRepository;
-import jakarta.validation.Valid;
+import com.concierge.apiconcierge.services.budget.requisition.IBudgetRequisitionService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,39 +17,58 @@ import java.util.List;
 public class BudgetRequisitionController {
 
     @Autowired
-    private BudgetRequisitionIRepository requisitionIRepository;
+    private IBudgetRequisitionService service;
 
     @PostMapping("/save")
-    public ResponseEntity<Object> saveReq(@RequestBody @Valid BudgetRequisitionSaveDto data) {
-        BudgetRequisition requisition = new BudgetRequisition();
-        BeanUtils.copyProperties(data, requisition);
-        requisition.setId(null);
-        this.requisitionIRepository.save(requisition);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+    public ResponseEntity<Object> save(@RequestBody BudgetRequisitionDto data) {
+        try {
+            BudgetRequisition requisition = new BudgetRequisition();
+            BeanUtils.copyProperties(data, requisition);
+
+            String message = this.service.save(requisition);
+            return ResponseEntity.status(HttpStatus.CREATED).body(new MessageResponseDto(message));
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
+        }
     }
 
     @PostMapping("/update")
-    public ResponseEntity<Object> updateReq(@RequestBody @Valid BudgetRequisitionUpdateDto data) {
-        BudgetRequisition requisition = new BudgetRequisition();
-        BeanUtils.copyProperties(data, requisition);
-        this.requisitionIRepository.save(requisition);
-        return ResponseEntity.status(HttpStatus.OK).build();
+    public ResponseEntity<Object> update(@RequestBody BudgetRequisitionDto data) {
+        try {
+            BudgetRequisition requisition = new BudgetRequisition();
+            BeanUtils.copyProperties(data, requisition);
+
+            String message = this.service.update(requisition);
+            return ResponseEntity.status(HttpStatus.OK).body(new MessageResponseDto(message));
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
+        }
     }
 
-    @GetMapping("/filter/butget/{butgetid}")
-    public ResponseEntity<List<BudgetRequisition>> getReqId(@PathVariable(name = "butgetid") Integer butgetId) {
-        List<BudgetRequisition> list = this.requisitionIRepository.listRequisition(butgetId);
-        return ResponseEntity.ok().body(list);
+    @GetMapping("/{companyId}/{resaleId}/filter/butget/{butgetid}")
+    public ResponseEntity<Object> listAllRequisition(@PathVariable(name = "companyId") Integer companyId,
+                                                     @PathVariable(name = "resaleId") Integer resaleId,
+                                                     @PathVariable(name = "butgetid") Integer butgetId) {
+        try {
+
+            List<BudgetRequisition> result = this.service.listAllRequisition(companyId, resaleId, butgetId);
+            return ResponseEntity.status(HttpStatus.OK).body(result);
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
+        }
     }
 
     @PostMapping("/delete")
-    public ResponseEntity<Object> deleteReq(@RequestBody @Valid BudgetRequisitionUpdateDto data) {
+    public ResponseEntity<Object> delete(@RequestBody BudgetRequisitionDto data) {
+        try {
+            BudgetRequisition requisition = new BudgetRequisition();
+            BeanUtils.copyProperties(data, requisition);
 
-        BudgetRequisition requisition = new BudgetRequisition();
-        BeanUtils.copyProperties(data, requisition);
-        this.requisitionIRepository.delete(requisition);
-
-        return ResponseEntity.ok().build();
+            String message = this.service.delete(requisition);
+            return ResponseEntity.status(HttpStatus.OK).body(new MessageResponseDto(message));
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
+        }
     }
 
 

@@ -22,48 +22,34 @@ public class UserRoleController {
     IUserRoleRepository repository;
 
     @PostMapping("/save")
-    public ResponseEntity<Object> saveRole(@RequestBody @Valid UserRoleDto data) {
-
+    public ResponseEntity<Object> saveRole(@RequestBody UserRoleDto data) {
         UserRole role = new UserRole();
-
         BeanUtils.copyProperties(data, role);
-
         role.setId(0);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(repository.save(role));
-
     }
 
     @PostMapping("/update")
-    public ResponseEntity<Object> updateRole(@RequestBody @Valid UserRoleDto data) {
-
+    public ResponseEntity<Object> updateRole(@RequestBody UserRoleDto data) {
         UserRole role = new UserRole();
         BeanUtils.copyProperties(data, role);
 
         return ResponseEntity.status(HttpStatus.OK).body(repository.save(role));
     }
 
-    @GetMapping("/all")
-    public ResponseEntity<List<UserRole>> allRole() {
-        List<UserRole> roles = repository.findAll();
+    @GetMapping("/{companyId}/{resaleId}/all")
+    public ResponseEntity<List<UserRole>> allRole(@PathVariable(name = "companyId") Integer companyId,
+                                                  @PathVariable(name = "resaleId") Integer resaleId) {
+        List<UserRole> roles = repository.listAll(companyId, resaleId);
         return ResponseEntity.ok(roles);
     }
 
-    @GetMapping("/all/enabled")
-    public ResponseEntity<List<UserRole>> allRoleEnabled() {
-        List<UserRole> roles = repository.listEnabled();
+    @GetMapping("/{companyId}/{resaleId}/all/enabled")
+    public ResponseEntity<List<UserRole>> allRoleEnabled(@PathVariable(name = "companyId") Integer companyId,
+                                                         @PathVariable(name = "resaleId") Integer resaleId) {
+        List<UserRole> roles = repository.listAllEnabled(companyId, resaleId);
         return ResponseEntity.ok(roles);
     }
-
-    @GetMapping("/filter/id/{id}")
-    public ResponseEntity<UserRole> getId(@PathVariable(value = "id") Integer id) {
-        Optional<UserRole> userRole = repository.findById(id);
-        if (userRole.isEmpty()) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-
-        UserRole role = userRole.get();
-        return ResponseEntity.status(HttpStatus.OK).body(role);
-
-    }
-
 
 }

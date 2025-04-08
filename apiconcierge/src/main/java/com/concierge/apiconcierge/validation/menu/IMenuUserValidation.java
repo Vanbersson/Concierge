@@ -10,5 +10,7 @@ public interface IMenuUserValidation {
 
     public String update(MenuUser menu);
 
-    public void filterMenus();
+    public String filterMenus(MenuUser menu);
+
+    public String deleteMenus(MenuUser menu);
 }

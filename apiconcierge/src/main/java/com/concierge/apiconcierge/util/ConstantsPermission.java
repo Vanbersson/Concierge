@@ -10,9 +10,8 @@ public class ConstantsPermission {
     public static final Integer ADD_AUTH_EXIT_VEHICLE_WITHOUT_O_S = 106;
     public static final Integer DEL_AUTH_EXIT_VEHICLE_WITHOUT_O_S = 107;
 
-
-
     //BUDGET
     public static final Integer BUDGET_NEW = 150;
     public static final Integer BUDGET_UPDATE = 151;
+    public static final Integer BUDGET_SHOW = 152;
 }

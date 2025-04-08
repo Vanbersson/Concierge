@@ -33,7 +33,7 @@ public class ClientCompanyValidation implements IClientCompanyValidation {
         }
 
         Optional<ClientCompany> clientResult = this.repository.findById(client.getId());
-        if(!clientResult.isEmpty())
+        if (!clientResult.isEmpty())
             return ConstantsMessage.ERROR_CLIENT_EXISTS;
 
         return ConstantsMessage.SUCCESS;
@@ -59,9 +59,22 @@ public class ClientCompanyValidation implements IClientCompanyValidation {
         return ConstantsMessage.SUCCESS;
     }
 
+    public String listAll(Integer companyId, Integer resaleId) {
+        if (companyId == null || companyId == 0)
+            return ConstantsMessage.ERROR_COMPANY;
+        if (resaleId == null || resaleId == 0)
+            return ConstantsMessage.ERROR_COMPANY;
+
+        return ConstantsMessage.SUCCESS;
+    }
+
     @Override
-    public String filterId(Integer id) {
-        if (id == null || id == 0)
+    public String filterId(Integer companyId, Integer resaleId, Integer clientId) {
+        if (companyId == null || companyId == 0)
+            return ConstantsMessage.ERROR_COMPANY;
+        if (resaleId == null || resaleId == 0)
+            return ConstantsMessage.ERROR_COMPANY;
+        if (clientId == null || clientId == 0)
             return ConstantsMessage.ERROR_ID;
         return ConstantsMessage.SUCCESS;
     }

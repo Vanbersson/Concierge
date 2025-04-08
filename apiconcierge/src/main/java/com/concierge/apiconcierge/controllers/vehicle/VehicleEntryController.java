@@ -58,7 +58,7 @@ public class VehicleEntryController {
         }
     }
 
-    @GetMapping("{companyId}/{resaleId}/allAuthorized")
+    @GetMapping("/{companyId}/{resaleId}/allAuthorized")
     public ResponseEntity<Object> allAuthorized(@PathVariable(name = "companyId") Integer companyId,
                                                 @PathVariable(name = "resaleId") Integer resaleId) {
         try {
@@ -68,7 +68,7 @@ public class VehicleEntryController {
         }
     }
 
-    @GetMapping("{companyId}/{resaleId}/allPendingAuthorization")
+    @GetMapping("/{companyId}/{resaleId}/allPendingAuthorization")
     public ResponseEntity<Object> allPendingAuthorization(@PathVariable(name = "companyId") Integer companyId,
                                                           @PathVariable(name = "resaleId") Integer resaleId) {
         try {
@@ -78,10 +78,12 @@ public class VehicleEntryController {
         }
     }
 
-    @GetMapping("/filter/id/{id}")
-    public ResponseEntity<Object> getId(@PathVariable(name = "id") Integer id) {
+    @GetMapping("/{companyId}/{resaleId}/filter/id/{id}")
+    public ResponseEntity<Object> getId(@PathVariable(name = "companyId") Integer companyId,
+                                        @PathVariable(name = "resaleId") Integer resaleId,
+                                        @PathVariable(name = "id") Integer id) {
         try {
-            Map<String, Object> vehicle = this.service.filterId(id);
+            Map<String, Object> vehicle = this.service.filterId(companyId, resaleId, id);
             if (vehicle == null)
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
             return ResponseEntity.ok(vehicle);
@@ -90,7 +92,7 @@ public class VehicleEntryController {
         }
     }
 
-    @GetMapping("{companyId}/{resaleId}/filter/placa/{placa}")
+    @GetMapping("/{companyId}/{resaleId}/filter/placa/{placa}")
     public ResponseEntity<Object> getPlaca(@PathVariable(name = "companyId") Integer companyId,
                                            @PathVariable(name = "resaleId") Integer resaleId,
                                            @PathVariable(name = "placa") String placa) {
@@ -115,7 +117,7 @@ public class VehicleEntryController {
     }
 
     @PostMapping("/authorization/add")
-    public ResponseEntity<Object> addAuthorizationExit(@RequestBody @Valid AuthExit data) {
+    public ResponseEntity<Object> addAuthorizationExit(@RequestBody AuthExit data) {
         try {
             Map<String, Object> map = this.service.addAuthExit(data);
             return ResponseEntity.status(HttpStatus.OK).body(map);
@@ -125,7 +127,7 @@ public class VehicleEntryController {
     }
 
     @PostMapping("/authorization/delete1")
-    public ResponseEntity<Object> deleteAuthorizationExit1(@RequestBody @Valid AuthExit data) {
+    public ResponseEntity<Object> deleteAuthorizationExit1(@RequestBody AuthExit data) {
         try {
             String result = this.service.deleteAuthExit1(data);
             return ResponseEntity.status(HttpStatus.OK).body(new MessageResponseDto(result));
@@ -135,7 +137,7 @@ public class VehicleEntryController {
     }
 
     @PostMapping("/authorization/delete2")
-    public ResponseEntity<Object> deleteAuthorizationExit2(@RequestBody @Valid AuthExit data) {
+    public ResponseEntity<Object> deleteAuthorizationExit2(@RequestBody AuthExit data) {
         try {
             String result = this.service.deleteAuthExit2(data);
             return ResponseEntity.status(HttpStatus.OK).body(new MessageResponseDto(result));

@@ -8,8 +8,8 @@ public interface IPermissionUserService {
 
     String save(PermissionUser permission);
 
-    List<PermissionUser> filterPermissionUser(Integer userId);
+    List<PermissionUser> filterPermissionUser(Integer companyId, Integer resaleId, Integer userId);
 
-    String deletePermissionsUser(Integer userId);
+    String deletePermissionsUser(Integer companyId, Integer resaleId,Integer userId);
 
 }

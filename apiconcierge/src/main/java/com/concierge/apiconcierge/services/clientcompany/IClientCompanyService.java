@@ -11,9 +11,9 @@ public interface IClientCompanyService {
 
     public String update(ClientCompany client);
 
-    public List<ClientCompany> listAll();
+    public List<ClientCompany> listAll(Integer companyId,Integer resaleId);
 
-    public ClientCompany filterId(Integer id);
+    public ClientCompany filterId(Integer companyId,Integer resaleId, Integer clientId);
 
     public List<ClientCompany> filterJFantasia(String fantasia);
 

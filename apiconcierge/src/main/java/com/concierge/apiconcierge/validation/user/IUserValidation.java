@@ -10,10 +10,10 @@ public interface IUserValidation {
 
     String update(User user);
 
-    String filterId(Integer id);
+    String filterId(Integer companyId, Integer resaleId, Integer id);
 
-    String filterRoleId(Integer roleId);
+    String filterRoleId(Integer companyId, Integer resaleId, Integer roleId);
 
-    String filterEmail(String email);
+    String filterEmail(Integer companyId, Integer resaleId, String email);
 
 }

@@ -40,23 +40,22 @@ public class PermissionUserController {
         }
     }
 
-    @GetMapping("/filter/user/{userId}")
-    public ResponseEntity<Object> filterIdUser(@PathVariable(value = "userId") Integer userId) {
+    @GetMapping("/{companyId}/{resaleId}/filter/user/{userId}")
+    public ResponseEntity<Object> filterPermissionUser(@PathVariable(name = "companyId") Integer companyId,
+                                                       @PathVariable(name = "resaleId") Integer resaleId,
+                                                       @PathVariable(value = "userId") Integer userId) {
         try {
-            List<PermissionUser> permissions = this.service.filterPermissionUser(userId);
+            List<PermissionUser> permissions = this.service.filterPermissionUser(companyId, resaleId, userId);
             return ResponseEntity.status(HttpStatus.OK).body(permissions);
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
         }
     }
 
-
     @PostMapping("/all/delete")
-    public ResponseEntity<Object> deleteAllPermissionUser(@RequestBody Map<String, Integer> request) {
+    public ResponseEntity<Object> deleteAllPermissionUser(@RequestBody PermissionUserDto data) {
         try {
-            Integer userId = request.get("userId");
-            String message = this.service.deletePermissionsUser(userId);
-
+            String message = this.service.deletePermissionsUser(data.companyId(), data.resaleId(), data.userId());
             return ResponseEntity.status(HttpStatus.OK).body(new MessageResponseDto(message));
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));

@@ -22,14 +22,22 @@ public class PermissionUserValidation implements IPermissionUserValidation {
     }
 
     @Override
-    public String filterPermissionUser(Integer userId) {
+    public String filterPermissionUser(Integer companyId, Integer resaleId,Integer userId) {
+        if (companyId == null || companyId == 0)
+            return ConstantsMessage.ERROR_COMPANY;
+        if (resaleId == null || resaleId == 0)
+            return ConstantsMessage.ERROR_RESALE;
         if (userId == null || userId == 0)
             return ConstantsMessage.ERROR_USER_ID;
         return ConstantsMessage.SUCCESS;
     }
 
     @Override
-    public String deletePermissionsUser(Integer userId) {
+    public String deletePermissionsUser(Integer companyId, Integer resaleId,Integer userId) {
+        if (companyId == null || companyId == 0)
+            return ConstantsMessage.ERROR_COMPANY;
+        if (resaleId == null || resaleId == 0)
+            return ConstantsMessage.ERROR_RESALE;
         if (userId == null || userId == 0)
             return ConstantsMessage.ERROR_USER_ID;
         return ConstantsMessage.SUCCESS;

@@ -1,6 +1,6 @@
-package com.concierge.apiconcierge.models.parts;
+package com.concierge.apiconcierge.models.part;
 
-import com.concierge.apiconcierge.models.budget.enums.StatusBudgetEnum;
+import com.concierge.apiconcierge.models.status.StatusEnableDisable;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -14,8 +14,8 @@ import java.util.Date;
 @SecondaryTable(name = "tb_company", pkJoinColumns = @PrimaryKeyJoinColumn(name = "id"))
 @SecondaryTable(name = "tb_resale", pkJoinColumns = @PrimaryKeyJoinColumn(name = "id"))
 @Entity
-@Table(name = "tb_parts")
-public class Parts {
+@Table(name = "tb_part")
+public class Part {
 
     @JoinColumn(table = "tb_company", referencedColumnName = "id")
     @Column(name = "company_id")
@@ -28,7 +28,7 @@ public class Parts {
     @Id
     private Integer id;
 
-    private StatusBudgetEnum status;
+    private StatusEnableDisable status;
 
     private String code;
 

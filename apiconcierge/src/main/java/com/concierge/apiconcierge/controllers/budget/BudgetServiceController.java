@@ -1,10 +1,9 @@
 package com.concierge.apiconcierge.controllers.budget;
 
-import com.concierge.apiconcierge.dtos.budget.BudgetServiceSaveDto;
-import com.concierge.apiconcierge.dtos.budget.BudgetServiceUpdateDto;
+import com.concierge.apiconcierge.dtos.budget.BudgetServiceDto;
+import com.concierge.apiconcierge.dtos.message.MessageResponseDto;
 import com.concierge.apiconcierge.models.budget.BudgetService;
-import com.concierge.apiconcierge.repositories.budget.IBudgetService;
-import jakarta.validation.Valid;
+import com.concierge.apiconcierge.services.budget.service.IBudgetServiceService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,46 +17,66 @@ import java.util.List;
 public class BudgetServiceController {
 
     @Autowired
-    private IBudgetService service;
+    private IBudgetServiceService service;
 
     @PostMapping("/save")
-    public ResponseEntity<BudgetService> saveService(@RequestBody @Valid BudgetServiceSaveDto data) {
-        BudgetService budgetService = new BudgetService();
-        BeanUtils.copyProperties(data, budgetService);
-        this.service.save(budgetService);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+    public ResponseEntity<Object> save(@RequestBody BudgetServiceDto data) {
+        try {
+            BudgetService budgetService = new BudgetService();
+            BeanUtils.copyProperties(data, budgetService);
+            String message = this.service.save(budgetService);
+            return ResponseEntity.status(HttpStatus.CREATED).body(new MessageResponseDto(message));
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
+        }
     }
 
     @PostMapping("/update")
-    public ResponseEntity<Object> updateService(@RequestBody @Valid BudgetServiceUpdateDto data) {
-        BudgetService budgetService = new BudgetService();
-        BeanUtils.copyProperties(data, budgetService);
-        this.service.save(budgetService);
-        return ResponseEntity.status(HttpStatus.OK).build();
+    public ResponseEntity<Object> update(@RequestBody BudgetServiceDto data) {
+        try {
+            BudgetService budgetService = new BudgetService();
+            BeanUtils.copyProperties(data, budgetService);
+            String message = this.service.update(budgetService);
+            return ResponseEntity.status(HttpStatus.OK).body(new MessageResponseDto(message));
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
+        }
     }
 
-    @GetMapping("/filter/butget/{butgetid}")
-    public ResponseEntity<List<BudgetService>> getServiceId(@PathVariable(name = "butgetid") Integer butget) {
-        List<BudgetService> list = this.service.listService(butget);
-        return ResponseEntity.ok(list);
+    @GetMapping("/{companyId}/{resaleId}/filter/butget/{butgetId}")
+    public ResponseEntity<Object> listServices(@PathVariable(name = "companyId") Integer companyId,
+                                               @PathVariable(name = "resaleId") Integer resaleId,
+                                               @PathVariable(name = "butgetId") Integer butgetId) {
+        try {
+            List<BudgetService> list = this.service.listServices(companyId, resaleId, butgetId);
+            return ResponseEntity.status(HttpStatus.OK).body(list);
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
+        }
     }
 
     @PostMapping("/delete")
-    public ResponseEntity<Object> deleteService(@RequestBody @Valid BudgetServiceUpdateDto data) {
-        BudgetService budgetService = new BudgetService();
-        BeanUtils.copyProperties(data, budgetService);
-        this.service.delete(budgetService);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<Object> delete(@RequestBody BudgetServiceDto data) {
+        try {
+            BudgetService budgetService = new BudgetService();
+            BeanUtils.copyProperties(data, budgetService);
+            String message = this.service.delete(budgetService);
+            return ResponseEntity.status(HttpStatus.OK).body(new MessageResponseDto(message));
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
+        }
     }
 
-    @PostMapping("/delete/all/discount/{butget}")
-    public ResponseEntity<Object> deleteAllDiscount(@PathVariable(name = "butget") Integer butget) {
-        List<BudgetService> list = this.service.listService(butget);
-        for (BudgetService item: list) {
-            item.setDiscount(0);
-            this.service.save(item);
+    @PostMapping("/delete/all/discount")
+    public ResponseEntity<Object> deleteAllDiscount(@RequestBody BudgetServiceDto data) {
+        try {
+            BudgetService budgetService = new BudgetService();
+            BeanUtils.copyProperties(data, budgetService);
+            String message = this.service.deleteAllDiscount(budgetService);
+            return ResponseEntity.status(HttpStatus.OK).body(new MessageResponseDto(message));
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
         }
-        return ResponseEntity.ok().build();
     }
 
 

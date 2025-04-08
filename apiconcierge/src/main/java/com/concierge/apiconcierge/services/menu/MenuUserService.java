@@ -42,6 +42,7 @@ public class MenuUserService implements IMenuUserService {
         }
 
     }
+
     @SneakyThrows
     @Override
     public String update(MenuUser menu) {
@@ -58,32 +59,45 @@ public class MenuUserService implements IMenuUserService {
             throw new MenuUserException(ex.getMessage());
         }
     }
+
     @SneakyThrows
     @Override
     public List<Object> filterMenus(MenuUser menu) {
         try {
-            List<MenuUser> list = this.repository.listMenus(menu.getCompanyId(), menu.getResaleId(), menu.getUserId());
+            String message = this.validation.filterMenus(menu);
 
-            List<Object> keys = new ArrayList<>();
-            for (int a = 0; a < list.size(); a++) {
-                Map<String, Object> map = new HashMap<>();
-                map.put("key", list.get(a).getMenuId());
-                keys.add(map);
+            if (ConstantsMessage.SUCCESS.equals(message)) {
+                List<MenuUser> list = this.repository.listMenus(menu.getCompanyId(), menu.getResaleId(), menu.getUserId());
+
+                List<Object> keys = new ArrayList<>();
+                for (int a = 0; a < list.size(); a++) {
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("key", list.get(a).getMenuId());
+                    keys.add(map);
+                }
+                return keys;
+            } else {
+                throw new MenuUserException(message);
             }
-            return keys;
-
         } catch (Exception ex) {
             throw new MenuUserException(ex.getMessage());
         }
 
     }
+
     @SneakyThrows
     @Override
     public String deleteMenu(MenuUser menu) {
-        try{
-            this.repository.deleteMenu(menu.getUserId());
-            return ConstantsMessage.SUCCESS;
-        }catch (Exception ex) {
+        try {
+
+            String message = this.validation.deleteMenus(menu);
+            if (ConstantsMessage.SUCCESS.equals(message)) {
+                this.repository.deleteMenu(menu.getCompanyId(), menu.getResaleId(), menu.getUserId());
+                return ConstantsMessage.SUCCESS;
+            } else {
+                throw new MenuUserException(message);
+            }
+        } catch (Exception ex) {
             throw new MenuUserException(ex.getMessage());
 
         }

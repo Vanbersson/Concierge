@@ -5,8 +5,6 @@ import com.concierge.apiconcierge.dtos.message.MessageResponseDto;
 import com.concierge.apiconcierge.dtos.budget.BudgetDto;
 import com.concierge.apiconcierge.dtos.budget.BudgetNewDto;
 import com.concierge.apiconcierge.models.budget.Budget;
-import com.concierge.apiconcierge.repositories.budget.IBudgetRepository;
-import com.concierge.apiconcierge.repositories.vehicle.entry.IVehicleEntryRepository;
 import com.concierge.apiconcierge.services.auth.TokenService;
 import com.concierge.apiconcierge.services.budget.BudgetService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -27,17 +25,13 @@ public class BudgetController {
     private BudgetService service;
     @Autowired
     private TokenService tokenService;
-    @Autowired
-    private IBudgetRepository IBudgetRepository;
-    @Autowired
-    private IVehicleEntryRepository IVehicleEntryRepository;
 
     @PostMapping("/save")
     public ResponseEntity<Object> save(@RequestBody BudgetNewDto data, HttpServletRequest request) {
         try {
-            String userEmail = this.getEmail(request);
+            String userLoginEmail = this.getEmail(request);
 
-            Integer id = this.service.save(data.vehicleEntryId(), userEmail);
+            Integer id = this.service.save(data, userLoginEmail);
             Map<String, Object> map = new HashMap<>();
             map.put("id", id);
             return ResponseEntity.status(HttpStatus.CREATED).body(map);
@@ -49,20 +43,25 @@ public class BudgetController {
     @PostMapping("/update")
     public ResponseEntity<Object> updateBudget(@RequestBody BudgetDto data, HttpServletRequest request) {
         try {
-            String userEmail = this.getEmail(request);
+            String userLoginEmail = this.getEmail(request);
             Budget budget = new Budget();
             BeanUtils.copyProperties(data, budget);
-            boolean result = this.service.update(budget, userEmail);
+            boolean result = this.service.update(budget, userLoginEmail);
             return ResponseEntity.status(HttpStatus.OK).build();
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
         }
     }
 
-    @GetMapping("/filter/vehicle/{id}")
-    public ResponseEntity<Object> getVehicleId(@PathVariable(name = "id") Integer vehicleId) {
+    @GetMapping("/{companyId}/{resaleId}/filter/vehicle/{id}")
+    public ResponseEntity<Object> getVehicleId(@PathVariable(name = "companyId") Integer companyId,
+                                               @PathVariable(name = "resaleId") Integer resaleId,
+                                               @PathVariable(name = "id") Integer vehicleId,
+                                               HttpServletRequest request) {
         try {
-            Map<String, Object> budget = this.service.filterVehicleId(vehicleId);
+            String userLoginEmail = this.getEmail(request);
+
+            Map<String, Object> budget = this.service.filterVehicleId(companyId, resaleId, vehicleId, userLoginEmail);
             return ResponseEntity.status(HttpStatus.OK).body(budget);
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));

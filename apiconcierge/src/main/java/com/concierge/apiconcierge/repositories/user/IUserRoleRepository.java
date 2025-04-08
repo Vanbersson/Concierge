@@ -11,7 +11,10 @@ import java.util.List;
 public interface IUserRoleRepository extends JpaRepository<UserRole, Integer> {
 
 
-    @Query(value = "SELECT * FROM `tb_user_role` WHERE STATUS = 0",nativeQuery = true)
-    List<UserRole> listEnabled();
+    @Query(value = "SELECT * FROM `tb_user_role` WHERE company_id=?1 AND resale_id=?2 and STATUS = 0",nativeQuery = true)
+    List<UserRole> listAllEnabled(Integer companyId, Integer resaleId);
+
+    @Query(value = "SELECT * FROM `tb_user_role` WHERE company_id=?1 AND resale_id=?2",nativeQuery = true)
+    List<UserRole> listAll(Integer companyId, Integer resaleId);
 
 }

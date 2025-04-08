@@ -11,6 +11,7 @@ import com.concierge.apiconcierge.models.vehicle.VehicleEntry;
 import com.concierge.apiconcierge.models.vehicle.enums.StatusAuthExitEnum;
 import com.concierge.apiconcierge.models.vehicle.enums.StatusVehicleEnum;
 import com.concierge.apiconcierge.models.vehicle.enums.StepVehicleEnum;
+import com.concierge.apiconcierge.repositories.budget.IBudgetRepository;
 import com.concierge.apiconcierge.repositories.vehicle.entry.IVehicleEntryRepository;
 import com.concierge.apiconcierge.services.budget.BudgetService;
 import com.concierge.apiconcierge.util.ConstantsMessage;
@@ -34,7 +35,7 @@ public class VehicleEntryService implements IVehicleEntryService {
     private VehicleEntryValidation validation;
 
     @Autowired
-    BudgetService budgetService;
+    private IBudgetRepository repositoryBudget;
 
     @SneakyThrows
     @Override
@@ -84,10 +85,10 @@ public class VehicleEntryService implements IVehicleEntryService {
 
     private void updateBudget(VehicleEntry vehicle) {
         //update client budget
-        Budget budget = this.budgetService.filterBudgetVehicle(vehicle.getId());
+        Budget budget = this.repositoryBudget.filterVehicleId(vehicle.getCompanyId(),vehicle.getResaleId(), vehicle.getId());
         budget.setClientCompanyId(vehicle.getClientCompanyId());
         budget.setIdUserAttendant(vehicle.getIdUserAttendant());
-        this.budgetService.updateBudget(budget);
+        this.repositoryBudget.save(budget);
     }
 
     @SneakyThrows
@@ -229,13 +230,16 @@ public class VehicleEntryService implements IVehicleEntryService {
 
     @SneakyThrows
     @Override
-    public Map<String, Object> filterId(Integer id) {
+    public Map<String, Object> filterId(Integer companyId, Integer resaleId, Integer id) {
         try {
-            Optional<VehicleEntry> vehicle0 = repository.findById(id);
-            if (vehicle0.isEmpty())
-                return null;
-            VehicleEntry vehicle = vehicle0.get();
-            return this.loadObject(vehicle);
+            VehicleEntry vehicle = repository.filterVehicleId(companyId, resaleId, id);
+
+            if (vehicle == null) {
+                throw new VehicleEntryException(ConstantsMessage.ERROR_VEHICLE_NOT_FOUND);
+            } else {
+                return this.loadObject(vehicle);
+            }
+
         } catch (Exception ex) {
             throw new VehicleEntryException(ex.getMessage());
         }
@@ -332,11 +336,10 @@ public class VehicleEntryService implements IVehicleEntryService {
     @Override
     public String deleteAuthExit1(AuthExit authExit) {
         try {
-            Optional<VehicleEntry> vehicle0 = this.repository.findById(authExit.idVehicle());
-            if (vehicle0.isEmpty())
-                throw new VehicleEntryException();
+            VehicleEntry vehicle = this.repository.filterVehicleId(authExit.companyId(), authExit.resaleId(), authExit.idVehicle());
+            if (vehicle == null)
+                throw new VehicleEntryException("Vehicle not found.");
 
-            VehicleEntry vehicle = vehicle0.get();
             String message = this.validation.deleteAuthExit1(vehicle, authExit);
             if (message.equals(ConstantsMessage.SUCCESS)) {
                 vehicle.setIdUserExitAuth1(null);
@@ -358,11 +361,10 @@ public class VehicleEntryService implements IVehicleEntryService {
     @Override
     public String deleteAuthExit2(AuthExit authExit) {
         try {
-            Optional<VehicleEntry> vehicle0 = this.repository.findById(authExit.idVehicle());
-            if (vehicle0.isEmpty())
-                throw new VehicleEntryException();
+            VehicleEntry vehicle = this.repository.filterVehicleId(authExit.companyId(), authExit.resaleId(), authExit.idVehicle());
+            if (vehicle == null)
+                throw new VehicleEntryException("Vehicle not found.");
 
-            VehicleEntry vehicle = vehicle0.get();
             String message = this.validation.deleteAuthExit2(vehicle, authExit);
             if (message.equals(ConstantsMessage.SUCCESS)) {
                 vehicle.setIdUserExitAuth2(null);

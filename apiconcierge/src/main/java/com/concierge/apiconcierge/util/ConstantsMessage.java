@@ -4,6 +4,7 @@ public class ConstantsMessage {
 
     public static final String SUCCESS = "Success.";
     public static final String ERROR = "Error.";
+    public static final String ERROR_NOTAUTHEXIT = "Unauthorized.";
 
 
     public static final String ERROR_USER_ID = "User Id not informed.";
@@ -26,8 +27,12 @@ public class ConstantsMessage {
     public static final String ERROR_CNPJ = "CNPJ not informed.";
     public static final String ERROR_CPF = "CPF not informed.";
     public static final String ERROR_RG = "Invalid RG.";
+    public static final String ERROR_SERVICE_ORDER_NOT = "Equal service order not.";
 
 
+    //Vehicle
+    public static final String ERROR_VEHICLE_ID = "Vehicle not informed.";
+    public static final String ERROR_VEHICLE_NOT_FOUND = "Vehicle not found.";
     public static final String ERROR_DATEENTRY = "DateEntry not informed.";
     public static final String ERROR_PLACA_EXISTS = "Placa already exists.";
     public static final String ERROR_PLACA = "Placa not informed.";
@@ -36,16 +41,22 @@ public class ConstantsMessage {
     public static final String ERROR_PERMISSION = "Permission not informed.";
     public static final String ERROR_PERMISSION_ANOTHER_USER = "Authorization of another user.";
     public static final String ERROR_AUTH_EXIT = "Delete exit authorization.";
+    public static final String ERROR_ATTENDANT = "Attendant not informed.";
 
-    public static final String ERROR_NOTAUTHEXIT = "Unauthorized.";
 
+
+    //Budget
+    public static final String ERROR_BUDGET_EXISTS = "Budget already exists.";
     public static final String ERROR_BUDGET_ATTENDANT = "BUDGET-Attendant not informed.";
     public static final String ERROR_BUDGET_CLIENT_COMPANY = "BUDGET-ClientCompany not informed.";
-    public static final String ERROR_ATTENDANT = "Attendant not informed.";
+    public static final String ERROR_DATE_GENERATION = "Date Generation not informed.";
+    public static final String ERROR_DATE_VALIDATION = "Date validation not informed.";
+    public static final String ERROR_DATE_AUTHORIZATION = "Date authorization not informed.";
+    public static final String ERROR_NAME_RESPONSIBLE = "Name responsible not informed.";
+    public static final String ERROR_TYPEPAYMENT = "Type payment not informed.";
+
     public static final String ERROR_DRIVERENTRY = "DriverEntry not informed.";
     public static final String ERROR_DRIVEREXIT = "DriverExit not informed.";
-
-
     public static final String ERROR_CLIENTCOMPANY = "ClientCompany not informed.";
 
 

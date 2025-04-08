@@ -47,7 +47,7 @@ public class MenuUserController {
         }
     }
 
-    @GetMapping("/filter/{companyId}/{resaleId}/{userId}")
+    @GetMapping("/{companyId}/{resaleId}/filter/user/{userId}")
     public ResponseEntity<Object> filterMenu(@PathVariable(name = "companyId")Integer companyId,
                                               @PathVariable(name = "resaleId")Integer resaleId,
                                               @PathVariable(name = "userId")Integer userId){

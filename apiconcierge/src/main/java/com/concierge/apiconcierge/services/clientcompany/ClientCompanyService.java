@@ -65,9 +65,14 @@ public class ClientCompanyService implements IClientCompanyService {
 
     @SneakyThrows
     @Override
-    public List<ClientCompany> listAll() {
+    public List<ClientCompany> listAll(Integer companyId, Integer resaleId) {
         try {
-            return this.repository.findAll();
+            String message = this.validation.listAll(companyId, resaleId);
+            if (ConstantsMessage.SUCCESS.equals(message)) {
+                return this.repository.listAll(companyId, resaleId);
+            } else {
+                throw new ClientCompanyException(message);
+            }
         } catch (Exception ex) {
             throw new ClientCompanyException(ex.getMessage());
         }
@@ -75,29 +80,24 @@ public class ClientCompanyService implements IClientCompanyService {
 
     @SneakyThrows
     @Override
-    public ClientCompany filterId(Integer id) {
-        try{
-            Optional<ClientCompany> clientResult = this.repository.findById(id);
-            return clientResult.orElse(null);
-        }catch (Exception ex){
+    public ClientCompany filterId(Integer companyId, Integer resaleId, Integer clientId) {
+        try {
+            String message = this.validation.filterId(companyId, resaleId, clientId);
+            if (ConstantsMessage.SUCCESS.equals(message)) {
+
+                ClientCompany client = this.repository.filterId(companyId, resaleId, clientId);
+                if (client == null)
+                    throw new ClientCompanyException("Client not found.");
+
+                return client;
+            } else {
+                throw new ClientCompanyException(message);
+            }
+        } catch (Exception ex) {
             throw new ClientCompanyException(ex.getMessage());
         }
 
     }
-
-//    @SneakyThrows
-//    public ClientCompany filterIdRemote(Integer id) {
-//
-//        try{
-//            ClientCompany[] client = this.restTemplate.getForObject(ConstantsUrls.URL_SEARCH_APOLLO_FILTER_CODE + id, ClientCompany[].class);
-//            if (client.length == 0)
-//                return null;
-//            return client[0];
-//        }catch (Exception ex){
-//            throw new ClientCompanyException(ex.getMessage());
-//        }
-//
-//    }
 
     @SneakyThrows
     @Override

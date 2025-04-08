@@ -22,7 +22,7 @@ public interface IVehicleEntryService {
 
     public List<Object> allEntry();
 
-    public Map<String, Object> filterId(Integer id);
+    public Map<String, Object> filterId(Integer companyId, Integer resaleId,Integer id);
 
     public Map<String, Object> filterPlaca(Integer companyId, Integer resaleId, String placa);
 

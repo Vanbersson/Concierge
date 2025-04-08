@@ -1,6 +1,8 @@
 package com.concierge.apiconcierge.validation.budget;
 
+import com.concierge.apiconcierge.dtos.budget.BudgetNewDto;
 import com.concierge.apiconcierge.models.budget.Budget;
+import com.concierge.apiconcierge.models.budget.enums.StatusBudgetEnum;
 import com.concierge.apiconcierge.models.permission.PermissionUser;
 import com.concierge.apiconcierge.models.user.User;
 import com.concierge.apiconcierge.models.vehicle.VehicleEntry;
@@ -12,9 +14,10 @@ import com.concierge.apiconcierge.repositories.user.IUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
 import com.concierge.apiconcierge.util.ConstantsMessage;
 import com.concierge.apiconcierge.util.ConstantsPermission;
+
+import static com.concierge.apiconcierge.util.ConstantsMessage.ERROR_PERMISSION;
 
 @Service
 public class BudgetValidation implements IBudgetValidation {
@@ -28,35 +31,24 @@ public class BudgetValidation implements IBudgetValidation {
     @Autowired
     IPermissionUserRepository permissionUser;
 
-    private final String COMPANY = "Id not informed.";
-    private final String RESALE = "Resale not informed.";
-    private final String ID = "Id not informed.";
-    private final String VEHICLE = "VehicleEntryId not informed.";
-    private final String STATUS = "Status not informed.";
-
-    private final String DATEGENERATION = "Date Generation not informed.";
-    private final String DATEVALIDATION = "Date validation not informed.";
-    private final String DATEAUTHORIZATION = "Date authorization not informed.";
-    private final String NAMERESPONSIBLE = "Name responsible not informed.";
-    private final String TYPEPAYMENT = "type payment not informed.";
-    private final String ATTENDANT = "Attendant not informed.";
-    private final String CLIENTCOMPANY = "ClientCompany not informed.";
-    private final String SERVICEORDER ="Equal service order not.";
-    private final String NOTFOUND = "Not Exists.";
-
     @Override
-    public String save(VehicleEntry vehicle,String userEmail) {
-        if (vehicle.getIdUserAttendant() == null || vehicle.getIdUserAttendant() == 0 || vehicle.getNameUserAttendant().isBlank())
-            return ATTENDANT;
-        if (vehicle.getClientCompanyId() == null || vehicle.getClientCompanyId() == 0 || vehicle.getClientCompanyName().isBlank())
-            return CLIENTCOMPANY;
-        if(vehicle.getServiceOrder() == VehicleYesNotEnum.not)
-            return SERVICEORDER;
+    public String save(BudgetNewDto budgetNewDto, String userLoginEmail) {
+        if (budgetNewDto.companyId() == null || budgetNewDto.companyId() == 0)
+            return ConstantsMessage.ERROR_COMPANY;
+        if (budgetNewDto.resaleId() == null || budgetNewDto.resaleId() == 0)
+            return ConstantsMessage.ERROR_RESALE;
+        if (budgetNewDto.vehicleEntryId() == null || budgetNewDto.vehicleEntryId() == 0)
+            return ConstantsMessage.ERROR_VEHICLE_ID;
+        if (userLoginEmail.isBlank())
+            return ConstantsMessage.ERROR;
 
-        User user = this.userRepository.findByEmail(userEmail);
-        if(user.getId() != 1){
-            PermissionUser permission = this.permissionUser.findByUserIdAndPermissionId(user.getId(), ConstantsPermission.BUDGET_NEW);
-            if(permission == null)
+        User user = this.userRepository.filterEmail(budgetNewDto.companyId(), budgetNewDto.resaleId(), userLoginEmail);
+        if (user == null)
+            return ConstantsMessage.ERROR;
+
+        if (user.getId() != 1) {
+            PermissionUser permission = this.permissionUser.findPermissionId(budgetNewDto.companyId(), budgetNewDto.companyId(), user.getId(), ConstantsPermission.BUDGET_NEW);
+            if (permission == null)
                 return ConstantsMessage.ERROR_PERMISSION;
         }
 
@@ -64,38 +56,68 @@ public class BudgetValidation implements IBudgetValidation {
     }
 
     @Override
-    public String update(Budget budget,String userEmail) {
+    public String save(VehicleEntry vehicle) {
+        if (vehicle.getBudgetStatus() != StatusBudgetEnum.semOrcamento)
+            return ConstantsMessage.ERROR_BUDGET_EXISTS;
+        if (vehicle.getIdUserAttendant() == null || vehicle.getIdUserAttendant() == 0 || vehicle.getNameUserAttendant().isBlank())
+            return ConstantsMessage.ERROR_ATTENDANT;
+        if (vehicle.getClientCompanyId() == null || vehicle.getClientCompanyId() == 0 || vehicle.getClientCompanyName().isBlank())
+            return ConstantsMessage.ERROR_CLIENTCOMPANY;
+        if (vehicle.getServiceOrder() == VehicleYesNotEnum.not)
+            return ConstantsMessage.ERROR_SERVICE_ORDER_NOT;
 
-        Optional<Budget> b = this.repository.findById(budget.getId());
-        if (b.isEmpty())
-            return NOTFOUND;
+        return ConstantsMessage.SUCCESS;
+    }
+
+    @Override
+    public String update(Budget budget, String userLoginEmail) {
+
         if (budget.getCompanyId() == null || budget.getCompanyId() == 0)
-            return COMPANY;
+            return ConstantsMessage.ERROR_COMPANY;
         if (budget.getResaleId() == null || budget.getResaleId() == 0)
-            return RESALE;
+            return ConstantsMessage.ERROR_RESALE;
         if (budget.getId() == null || budget.getId() == 0)
-            return ID;
+            return ConstantsMessage.ERROR_ID;
         if (budget.getVehicleEntryId() == null || budget.getVehicleEntryId() == 0)
-            return VEHICLE;
+            return ConstantsMessage.ERROR_VEHICLE_ID;
         if (budget.getStatus() == null)
-            return STATUS;
+            return ConstantsMessage.ERROR_STATUS;
         if (budget.getDateGeneration() == null)
-            return DATEGENERATION;
+            return ConstantsMessage.ERROR_DATE_GENERATION;
         if (budget.getDateValidation() == null)
-            return DATEVALIDATION;
+            return ConstantsMessage.ERROR_DATE_VALIDATION;
         if (budget.getNameResponsible().isBlank())
-            return NAMERESPONSIBLE;
+            return ConstantsMessage.ERROR_NAME_RESPONSIBLE;
         if (budget.getIdUserAttendant() == null || budget.getIdUserAttendant() == 0)
-            return ATTENDANT;
+            return ConstantsMessage.ERROR_ATTENDANT;
         if (budget.getClientCompanyId() == null || budget.getClientCompanyId() == 0)
-            return CLIENTCOMPANY;
+            return ConstantsMessage.ERROR_CLIENTCOMPANY;
 
-
-        User user = this.userRepository.findByEmail(userEmail);
-        if(user.getId() != 1){
-            PermissionUser permission = this.permissionUser.findByUserIdAndPermissionId(user.getId(), ConstantsPermission.BUDGET_UPDATE);
-            if(permission == null)
+        User user = this.userRepository.filterEmail(budget.getCompanyId(), budget.getResaleId(), userLoginEmail);
+        if (user.getId() != 1) {
+            PermissionUser permission = this.permissionUser.findPermissionId(budget.getCompanyId(), budget.getResaleId(), user.getId(), ConstantsPermission.BUDGET_UPDATE);
+            if (permission == null)
                 return ConstantsMessage.ERROR_PERMISSION;
+        }
+
+        return ConstantsMessage.SUCCESS;
+    }
+
+    @Override
+    public String filterVehicleId(Integer companyId, Integer resaleId, Integer vehicleId, String userLoginEmail) {
+        if (companyId == null || companyId == 0)
+            return ConstantsMessage.ERROR_COMPANY;
+        if (resaleId == null || resaleId == 0)
+            return ConstantsMessage.ERROR_RESALE;
+        if (vehicleId == null || vehicleId == 0)
+            return ConstantsMessage.ERROR_VEHICLE_ID;
+
+        //Permission
+        User user = this.userRepository.filterEmail(companyId, resaleId, userLoginEmail);
+        if (user.getId() != 1) {
+            PermissionUser permission = this.permissionUser.findPermissionId(companyId, resaleId, user.getId(), ConstantsPermission.BUDGET_SHOW);
+            if (permission == null)
+                return ERROR_PERMISSION;
         }
 
         return ConstantsMessage.SUCCESS;

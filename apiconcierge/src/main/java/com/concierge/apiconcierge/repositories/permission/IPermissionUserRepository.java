@@ -14,13 +14,16 @@ import java.util.UUID;
 @Repository
 public interface IPermissionUserRepository extends JpaRepository<PermissionUser, UUID> {
 
-    List<PermissionUser> findByUserId(Integer userId);
 
-    PermissionUser findByUserIdAndPermissionId(Integer userId, Integer permissionId);
+    @Query(value = "select * from tb_user_permission where company_id=?1 and resale_id=?2 and user_id=?3", nativeQuery = true)
+    List<PermissionUser> listPermissionUser(Integer companyId, Integer resaleId, Integer userId);
+
+    @Query(value = "select * from tb_user_permission where company_id=?1 and resale_id=?2 and user_id=?3 and permission_id=?4", nativeQuery = true)
+    PermissionUser findPermissionId(Integer companyId, Integer resaleId, Integer userId, Integer permissionId);
 
     @Transactional
     @Modifying
-    @Query(value = "delete from tb_user_permission where user_id = :userId", nativeQuery = true)
-    void deleteUser(@Param("userId") Integer userId);
+    @Query(value = "delete from tb_user_permission where company_id=?1 and resale_id=?2 and user_id=?3", nativeQuery = true)
+    void deleteUser(Integer companyId, Integer resaleId, Integer userId);
 
 }
