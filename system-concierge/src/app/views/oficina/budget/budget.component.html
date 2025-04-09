@@ -536,12 +536,11 @@
                     <ng-template pTemplate="header">
                         <tr>
                             <th class="font-normal" style="width: 10rem;">Código</th>
-                            <th class="font-normal" style="width: 40rem;">Descrição</th>
+                            <th class="font-normal" style="width: 45rem;">Descrição</th>
                             <th class="font-normal" style="width: 10rem;">Quantidade</th>
                             <th class="font-normal" style="width: 10rem;">Valor</th>
                             <th class="font-normal" style="width: 10rem;">Desconto</th>
                             <th class="font-normal" style="width: 10rem;">Total</th>
-                            <th class="font-normal" style="width: 5rem;">Editar</th>
                             <th class="font-normal" style="width: 5rem;">Remover</th>
                         </tr>
                     </ng-template>
@@ -554,10 +553,7 @@
                             <td>{{parts.discount | currency }}</td>
                             <td>{{( ( parts.quantity * parts.price ) - parts.discount) | currency}}</td>
                             <td>
-                                <p-button icon="pi pi-pencil" [text]="true" size="small" />
-                            </td>
-                            <td>
-                                <p-button icon="pi pi-trash" [text]="true" size="small" severity="danger" />
+                                <p-button icon="pi pi-trash" [text]="true" size="small" severity="danger" (onClick)="deleteBudgetItem(parts)"/>
                             </td>
                         </tr>
                     </ng-template>

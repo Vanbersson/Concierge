@@ -72,6 +72,9 @@ export class BudgetService {
   getBudgetItem$(budgetId: number): Observable<BudgetItem[]> {
     return this.http.get<BudgetItem[]>(environment.apiuUrl + "/vehicle/entry/budget/item/" + this.companyResale + "/filter/butget/" + budgetId, { headers: this.myHeaders() });
   }
+  deleteBudgetItem(item: BudgetItem): Observable<HttpResponse<BudgetServiceItem>> {
+    return this.http.post<BudgetServiceItem>(environment.apiuUrl + "/vehicle/entry/budget/item/delete", item, { headers: this.myHeaders(), observe: 'response' });
+  }
 
 
   private myHeaders(): HttpHeaders {

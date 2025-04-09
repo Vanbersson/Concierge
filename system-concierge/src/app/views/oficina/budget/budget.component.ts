@@ -933,7 +933,7 @@ export default class BudgetComponent implements OnInit, OnDestroy {
   }
   onUnSelectEventParts(event: any) {
     this.formParts.patchValue({
-      selecDesc:"",
+      selecDesc: "",
       selecQtdAvailable: 0,
       selecPrice: 0,
       selecDiscount: 0
@@ -948,7 +948,7 @@ export default class BudgetComponent implements OnInit, OnDestroy {
     this.formParts.patchValue({
       filterCode: "",
       filterDesc: "",
-      selecDesc:"",
+      selecDesc: "",
       selecQtdAvailable: 0,
       selecPrice: 0,
       selecDiscount: 0
@@ -990,7 +990,6 @@ export default class BudgetComponent implements OnInit, OnDestroy {
       return error;
     }
   }
-
   public async selectPartsConfirme() {
     const { value } = this.formParts;
 
@@ -1024,7 +1023,7 @@ export default class BudgetComponent implements OnInit, OnDestroy {
       budgetItem.ordem = this.listBudgetItem.length + 1;
       budgetItem.code = this.selectedParts.code;
       budgetItem.description = value.selecDesc;
-      budgetItem.quantity =  value.selecQtdAvailable;
+      budgetItem.quantity = value.selecQtdAvailable;
       budgetItem.discount = value.selecDiscount;
       budgetItem.price = value.selecPrice;
 
@@ -1039,7 +1038,6 @@ export default class BudgetComponent implements OnInit, OnDestroy {
     }
 
   }
-
   private async savePart(part: Part): Promise<HttpResponse<Part>> {
     try {
       return await lastValueFrom(this.partsService.save(part))
@@ -1047,10 +1045,25 @@ export default class BudgetComponent implements OnInit, OnDestroy {
       return error;
     }
   }
-
   private async saveBudgetItem(item: BudgetItem): Promise<HttpResponse<BudgetServiceItem>> {
     try {
       return await lastValueFrom(this.budgetService.saveBudgetItem(item));
+    } catch (error) {
+      return error;
+    }
+  }
+
+ async deleteBudgetItem(item: BudgetItem) {
+    const resultItem = await this.deleteItem(item);
+    if(resultItem.status == 200){
+      this.messageService.add({ severity: 'success', summary: 'Peças', detail: 'Removido com sucesso', icon: 'pi pi-check' });
+      this.getListBudgetItem();
+    }
+  }
+
+  private async deleteItem(item: BudgetItem): Promise<HttpResponse<BudgetServiceItem>> {
+    try {
+      return await lastValueFrom(this.budgetService.deleteBudgetItem(item))
     } catch (error) {
       return error;
     }

@@ -2,10 +2,12 @@ package com.concierge.apiconcierge.dtos.budget;
 
 import com.concierge.apiconcierge.models.budget.enums.StatusBudgetItemEnum;
 
+import java.util.UUID;
+
 public record BudgetItemDto(
         Integer companyId,
         Integer resaleId,
-        Integer id,
+        UUID id,
         Integer partId,
         Integer budgetId,
         StatusBudgetItemEnum status,
