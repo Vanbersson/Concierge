@@ -4,7 +4,6 @@ import com.concierge.apiconcierge.dtos.message.MessageResponseDto;
 import com.concierge.apiconcierge.dtos.vehicle.*;
 import com.concierge.apiconcierge.models.vehicle.VehicleEntry;
 import com.concierge.apiconcierge.services.vehicle.VehicleEntryService;
-import jakarta.validation.Valid;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -117,7 +116,7 @@ public class VehicleEntryController {
     }
 
     @PostMapping("/authorization/add")
-    public ResponseEntity<Object> addAuthorizationExit(@RequestBody AuthExit data) {
+    public ResponseEntity<Object> addAuthorizationExit(@RequestBody AuthExitDto data) {
         try {
             Map<String, Object> map = this.service.addAuthExit(data);
             return ResponseEntity.status(HttpStatus.OK).body(map);
@@ -127,7 +126,7 @@ public class VehicleEntryController {
     }
 
     @PostMapping("/authorization/delete1")
-    public ResponseEntity<Object> deleteAuthorizationExit1(@RequestBody AuthExit data) {
+    public ResponseEntity<Object> deleteAuthorizationExit1(@RequestBody AuthExitDto data) {
         try {
             String result = this.service.deleteAuthExit1(data);
             return ResponseEntity.status(HttpStatus.OK).body(new MessageResponseDto(result));
@@ -137,7 +136,7 @@ public class VehicleEntryController {
     }
 
     @PostMapping("/authorization/delete2")
-    public ResponseEntity<Object> deleteAuthorizationExit2(@RequestBody AuthExit data) {
+    public ResponseEntity<Object> deleteAuthorizationExit2(@RequestBody AuthExitDto data) {
         try {
             String result = this.service.deleteAuthExit2(data);
             return ResponseEntity.status(HttpStatus.OK).body(new MessageResponseDto(result));

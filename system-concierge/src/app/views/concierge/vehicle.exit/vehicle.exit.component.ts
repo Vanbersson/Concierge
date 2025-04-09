@@ -119,9 +119,7 @@ export class VehicleExitComponent implements OnInit, OnDestroy {
     } catch (error) {
       if (error.error.message == "Permission not informed.") {
         this.messageService.add({ severity: 'error', summary: 'Permissão', detail: "Você não tem permissão", icon: 'pi pi-times' });
-      } else {
-        this.messageService.add({ severity: 'error', summary: 'Veículo', detail: "Não autorizado", icon: 'pi pi-times' });
-      }
+      } 
       return error;
     }
 

@@ -1,6 +1,6 @@
 package com.concierge.apiconcierge.services.vehicle;
 
-import com.concierge.apiconcierge.dtos.vehicle.AuthExit;
+import com.concierge.apiconcierge.dtos.vehicle.AuthExitDto;
 import com.concierge.apiconcierge.dtos.vehicle.ExistsPlacaDto;
 import com.concierge.apiconcierge.dtos.vehicle.VehicleExitSaveDto;
 import com.concierge.apiconcierge.exceptions.vehicle.VehicleEntryException;
@@ -13,7 +13,6 @@ import com.concierge.apiconcierge.models.vehicle.enums.StatusVehicleEnum;
 import com.concierge.apiconcierge.models.vehicle.enums.StepVehicleEnum;
 import com.concierge.apiconcierge.repositories.budget.IBudgetRepository;
 import com.concierge.apiconcierge.repositories.vehicle.entry.IVehicleEntryRepository;
-import com.concierge.apiconcierge.services.budget.BudgetService;
 import com.concierge.apiconcierge.util.ConstantsMessage;
 import com.concierge.apiconcierge.validation.vehicle.VehicleEntryValidation;
 import lombok.SneakyThrows;
@@ -284,22 +283,22 @@ public class VehicleEntryService implements IVehicleEntryService {
 
     @SneakyThrows
     @Override
-    public Map<String, Object> addAuthExit(AuthExit authExit) {
+    public Map<String, Object> addAuthExit(AuthExitDto authExitDto) {
         Map<String, Object> map = new HashMap<>();
         try {
-            Optional<VehicleEntry> vehicle0 = this.repository.findById(authExit.idVehicle());
+            Optional<VehicleEntry> vehicle0 = this.repository.findById(authExitDto.idVehicle());
             if (vehicle0.isEmpty())
                 throw new VehicleEntryException();
             VehicleEntry vehicle = vehicle0.get();
-            String message = this.validation.addAuthExit(vehicle, authExit);
+            String message = this.validation.addAuthExit(vehicle, authExitDto);
 
             if (ConstantsMessage.SUCCESS.equals(message)) {
 
                 if (vehicle.getIdUserExitAuth1() == null) {
 
-                    vehicle.setIdUserExitAuth1(authExit.idUserExitAuth());
-                    vehicle.setNameUserExitAuth1(authExit.nameUserExitAuth());
-                    vehicle.setDateExitAuth1(authExit.dateExitAuth());
+                    vehicle.setIdUserExitAuth1(authExitDto.idUserExitAuth());
+                    vehicle.setNameUserExitAuth1(authExitDto.nameUserExitAuth());
+                    vehicle.setDateExitAuth1(authExitDto.dateExitAuth());
                     vehicle.setStatusAuthExit(statusAuthorization(vehicle));
 
                     this.repository.save(vehicle);
@@ -310,9 +309,9 @@ public class VehicleEntryService implements IVehicleEntryService {
                     map.put("dateExitAuth", vehicle.getDateExitAuth1());
                     return map;
                 } else if (vehicle.getIdUserExitAuth2() == null) {
-                    vehicle.setIdUserExitAuth2(authExit.idUserExitAuth());
-                    vehicle.setNameUserExitAuth2(authExit.nameUserExitAuth());
-                    vehicle.setDateExitAuth2(authExit.dateExitAuth());
+                    vehicle.setIdUserExitAuth2(authExitDto.idUserExitAuth());
+                    vehicle.setNameUserExitAuth2(authExitDto.nameUserExitAuth());
+                    vehicle.setDateExitAuth2(authExitDto.dateExitAuth());
                     vehicle.setStatusAuthExit(statusAuthorization(vehicle));
 
                     this.repository.save(vehicle);
@@ -334,13 +333,13 @@ public class VehicleEntryService implements IVehicleEntryService {
 
     @SneakyThrows
     @Override
-    public String deleteAuthExit1(AuthExit authExit) {
+    public String deleteAuthExit1(AuthExitDto authExitDto) {
         try {
-            VehicleEntry vehicle = this.repository.filterVehicleId(authExit.companyId(), authExit.resaleId(), authExit.idVehicle());
+            VehicleEntry vehicle = this.repository.filterVehicleId(authExitDto.companyId(), authExitDto.resaleId(), authExitDto.idVehicle());
             if (vehicle == null)
                 throw new VehicleEntryException("Vehicle not found.");
 
-            String message = this.validation.deleteAuthExit1(vehicle, authExit);
+            String message = this.validation.deleteAuthExit1(vehicle, authExitDto);
             if (message.equals(ConstantsMessage.SUCCESS)) {
                 vehicle.setIdUserExitAuth1(null);
                 vehicle.setNameUserExitAuth1("");
@@ -359,13 +358,13 @@ public class VehicleEntryService implements IVehicleEntryService {
 
     @SneakyThrows
     @Override
-    public String deleteAuthExit2(AuthExit authExit) {
+    public String deleteAuthExit2(AuthExitDto authExitDto) {
         try {
-            VehicleEntry vehicle = this.repository.filterVehicleId(authExit.companyId(), authExit.resaleId(), authExit.idVehicle());
+            VehicleEntry vehicle = this.repository.filterVehicleId(authExitDto.companyId(), authExitDto.resaleId(), authExitDto.idVehicle());
             if (vehicle == null)
                 throw new VehicleEntryException("Vehicle not found.");
 
-            String message = this.validation.deleteAuthExit2(vehicle, authExit);
+            String message = this.validation.deleteAuthExit2(vehicle, authExitDto);
             if (message.equals(ConstantsMessage.SUCCESS)) {
                 vehicle.setIdUserExitAuth2(null);
                 vehicle.setNameUserExitAuth2("");

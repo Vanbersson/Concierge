@@ -1,6 +1,6 @@
 package com.concierge.apiconcierge.validation.vehicle;
 
-import com.concierge.apiconcierge.dtos.vehicle.AuthExit;
+import com.concierge.apiconcierge.dtos.vehicle.AuthExitDto;
 import com.concierge.apiconcierge.dtos.vehicle.ExistsPlacaDto;
 import com.concierge.apiconcierge.dtos.vehicle.VehicleExitSaveDto;
 import com.concierge.apiconcierge.models.budget.enums.StatusBudgetEnum;
@@ -191,11 +191,11 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
     }
 
     @Override
-    public String addAuthExit(VehicleEntry vehicle, AuthExit authExit) {
+    public String addAuthExit(VehicleEntry vehicle, AuthExitDto authExitDto) {
 
-        if (authExit.companyId() == null || authExit.companyId() == 0)
+        if (authExitDto.companyId() == null || authExitDto.companyId() == 0)
             return ConstantsMessage.ERROR_COMPANY;
-        if (authExit.resaleId() == null || authExit.resaleId() == 0)
+        if (authExitDto.resaleId() == null || authExitDto.resaleId() == 0)
             return ConstantsMessage.ERROR_RESALE;
 
         if (vehicle.getServiceOrder().equals(VehicleYesNotEnum.yes)) {
@@ -245,14 +245,14 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
         if (vehicle.getServiceOrder().equals(VehicleYesNotEnum.yes)) {
 
             if (vehicle.getIdUserExitAuth1() == null) {
-                if (authExit.idUserExitAuth() != 1) {
-                    PermissionUser permission = this.permissionUser.findPermissionId(authExit.companyId(), authExit.resaleId(), authExit.idUserExitAuth(), ADD_AUTH_EXIT_VEHICLE_1);
+                if (authExitDto.idUserExitAuth() != 1) {
+                    PermissionUser permission = this.permissionUser.findPermissionId(authExitDto.companyId(), authExitDto.resaleId(), authExitDto.idUserExitAuth(), ADD_AUTH_EXIT_VEHICLE_1);
                     if (permission == null)
                         return ERROR_PERMISSION;
                 }
             } else if (vehicle.getIdUserExitAuth2() == null) {
-                if (authExit.idUserExitAuth() != 1) {
-                    PermissionUser permission = this.permissionUser.findPermissionId(authExit.companyId(), authExit.resaleId(), authExit.idUserExitAuth(), ADD_AUTH_EXIT_VEHICLE_2);
+                if (authExitDto.idUserExitAuth() != 1) {
+                    PermissionUser permission = this.permissionUser.findPermissionId(authExitDto.companyId(), authExitDto.resaleId(), authExitDto.idUserExitAuth(), ADD_AUTH_EXIT_VEHICLE_2);
                     if (permission == null)
                         return ERROR_PERMISSION;
                 }
@@ -262,8 +262,8 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
 
         if (vehicle.getServiceOrder().equals(VehicleYesNotEnum.not)) {
 
-            if (authExit.idUserExitAuth() != 1) {
-                PermissionUser permission = this.permissionUser.findPermissionId(authExit.companyId(), authExit.resaleId(), authExit.idUserExitAuth(), ADD_AUTH_EXIT_VEHICLE_WITHOUT_O_S);
+            if (authExitDto.idUserExitAuth() != 1) {
+                PermissionUser permission = this.permissionUser.findPermissionId(authExitDto.companyId(), authExitDto.resaleId(), authExitDto.idUserExitAuth(), ADD_AUTH_EXIT_VEHICLE_WITHOUT_O_S);
                 if (permission == null)
                     return ERROR_PERMISSION;
             }
@@ -273,7 +273,7 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
     }
 
     @Override
-    public String deleteAuthExit1(VehicleEntry vehicle, AuthExit authExit) {
+    public String deleteAuthExit1(VehicleEntry vehicle, AuthExitDto authExitDto) {
         if (vehicle.getStatusAuthExit() == StatusAuthExitEnum.NotAuth)
             return ConstantsMessage.ERROR_NOTAUTHEXIT;
         if (vehicle.getIdUserExitAuth1() == null)
@@ -285,11 +285,11 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
 
         if (vehicle.getServiceOrder().equals(VehicleYesNotEnum.yes)) {
 
-            if (authExit.idUserExitAuth() != 1) {
-                if (vehicle.getIdUserExitAuth1() != authExit.idUserExitAuth())
+            if (authExitDto.idUserExitAuth() != 1) {
+                if (vehicle.getIdUserExitAuth1() != authExitDto.idUserExitAuth())
                     return ERROR_PERMISSION_ANOTHER_USER;
 
-                PermissionUser permission = this.permissionUser.findPermissionId(authExit.companyId(), authExit.resaleId(), authExit.idUserExitAuth(), DEL_AUTH_EXIT_VEHICLE_1);
+                PermissionUser permission = this.permissionUser.findPermissionId(authExitDto.companyId(), authExitDto.resaleId(), authExitDto.idUserExitAuth(), DEL_AUTH_EXIT_VEHICLE_1);
                 if (permission == null)
                     return ERROR_PERMISSION;
             }
@@ -297,11 +297,11 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
 
         if (vehicle.getServiceOrder().equals(VehicleYesNotEnum.not)) {
 
-            if (authExit.idUserExitAuth() != 1) {
-                if (vehicle.getIdUserExitAuth1() != authExit.idUserExitAuth())
+            if (authExitDto.idUserExitAuth() != 1) {
+                if (vehicle.getIdUserExitAuth1() != authExitDto.idUserExitAuth())
                     return ERROR_PERMISSION_ANOTHER_USER;
 
-                PermissionUser permission = this.permissionUser.findPermissionId(authExit.companyId(), authExit.resaleId(), authExit.idUserExitAuth(), DEL_AUTH_EXIT_VEHICLE_WITHOUT_O_S);
+                PermissionUser permission = this.permissionUser.findPermissionId(authExitDto.companyId(), authExitDto.resaleId(), authExitDto.idUserExitAuth(), DEL_AUTH_EXIT_VEHICLE_WITHOUT_O_S);
                 if (permission == null)
                     return ERROR_PERMISSION;
             }
@@ -311,7 +311,7 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
     }
 
     @Override
-    public String deleteAuthExit2(VehicleEntry vehicle, AuthExit authExit) {
+    public String deleteAuthExit2(VehicleEntry vehicle, AuthExitDto authExitDto) {
         if (vehicle.getStatusAuthExit() == StatusAuthExitEnum.NotAuth)
             return ConstantsMessage.ERROR_NOTAUTHEXIT;
         if (vehicle.getIdUserExitAuth2() == null)
@@ -322,12 +322,12 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
             return ConstantsMessage.ERROR_NOTAUTHEXIT;
 
         if (vehicle.getServiceOrder().equals(VehicleYesNotEnum.yes)) {
-            if (authExit.idUserExitAuth() != 1) {
+            if (authExitDto.idUserExitAuth() != 1) {
 
-                if (vehicle.getIdUserExitAuth2() != authExit.idUserExitAuth())
+                if (vehicle.getIdUserExitAuth2() != authExitDto.idUserExitAuth())
                     return ERROR_PERMISSION_ANOTHER_USER;
 
-                PermissionUser permission = this.permissionUser.findPermissionId(authExit.companyId(), authExit.resaleId(), authExit.idUserExitAuth(), DEL_AUTH_EXIT_VEHICLE_2);
+                PermissionUser permission = this.permissionUser.findPermissionId(authExitDto.companyId(), authExitDto.resaleId(), authExitDto.idUserExitAuth(), DEL_AUTH_EXIT_VEHICLE_2);
                 if (permission == null)
                     return ERROR_PERMISSION;
             }
@@ -335,11 +335,11 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
 
         if (vehicle.getServiceOrder().equals(VehicleYesNotEnum.not)) {
 
-            if (authExit.idUserExitAuth() != 1) {
-                if (vehicle.getIdUserExitAuth2() != authExit.idUserExitAuth())
+            if (authExitDto.idUserExitAuth() != 1) {
+                if (vehicle.getIdUserExitAuth2() != authExitDto.idUserExitAuth())
                     return ERROR_PERMISSION_ANOTHER_USER;
 
-                PermissionUser permission = this.permissionUser.findPermissionId(authExit.companyId(), authExit.resaleId(), authExit.idUserExitAuth(), DEL_AUTH_EXIT_VEHICLE_WITHOUT_O_S);
+                PermissionUser permission = this.permissionUser.findPermissionId(authExitDto.companyId(), authExitDto.resaleId(), authExitDto.idUserExitAuth(), DEL_AUTH_EXIT_VEHICLE_WITHOUT_O_S);
                 if (permission == null)
                     return ERROR_PERMISSION;
             }

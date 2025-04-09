@@ -1,11 +1,8 @@
 package com.concierge.apiconcierge.dtos.vehicle;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-
 import java.util.Date;
 
-public record AuthExit(
+public record AuthExitDto(
         Integer companyId,
         Integer resaleId,
         Integer idVehicle,
