@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { authGuardGuard } from './services/login/auth-guard.guard';
+import { vehicleEntryGuard } from './guard/concierge/vehicle.entry.guard';
 
 export const routes: Routes = [
     {
@@ -29,7 +30,8 @@ export const routes: Routes = [
                     {
                         path: 'atendimento-veiculo',
                         title: 'Atendimento',
-                        loadComponent: () => import('./views/concierge/vehicle.entry/vehicle.entry.component')
+                        loadComponent: () => import('./views/concierge/vehicle.entry/vehicle.entry.component'),
+                        canActivate:[vehicleEntryGuard]
                     },
                     {
                         path: 'lista-entrada-veiculo',
