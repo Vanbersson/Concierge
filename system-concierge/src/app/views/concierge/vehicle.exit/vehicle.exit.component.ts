@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit, signal, ViewChild } from '@angular/core';
-import { CommonModule, UpperCasePipe } from '@angular/common';
+import { CommonModule, DatePipe, UpperCasePipe } from '@angular/common';
 
 import { InputTextModule } from 'primeng/inputtext';
 import { IconFieldModule } from 'primeng/iconfield';
@@ -78,14 +78,30 @@ export class VehicleExitComponent implements OnInit, OnDestroy {
   showOverPanel(target: any) {
     this.overPanel.toggle(null, target);
   }
+  formatDateTime(date: Date): string {
+    const datePipe = new DatePipe('en-US');
+
+    // Obtém o fuso horário local no formato ±hh:mm
+    const tzOffset = -date.getTimezoneOffset();
+    const sign = tzOffset >= 0 ? '+' : '-';
+    const hours = Math.floor(Math.abs(tzOffset) / 60).toString().padStart(2, '0');
+    const minutes = (Math.abs(tzOffset) % 60).toString().padStart(2, '0');
+    const timezone = `${sign}${hours}:${minutes}`;
+
+    // Formata a data e adiciona o fuso horário
+    return datePipe.transform(date, "yyyy-MM-dd'T'HH:mm:ss.SSS") + timezone;
+  }
+
   private async confirmationExit() {
     for (let index = 0; index < this.selectedVehicle.length; index++) {
       var element = this.selectedVehicle[index];
       this.vehicleExit = new VehicleExit();
+      this.vehicleExit.companyId = this.storageService.companyId;
+      this.vehicleExit.resaleId = this.storageService.resaleId;
       this.vehicleExit.vehicleId = element.id;
       this.vehicleExit.userId = this.storageService.id;
       this.vehicleExit.userName = this.storageService.name;
-      this.vehicleExit.dateExit = new Date();
+      this.vehicleExit.dateExit = this.formatDateTime(new Date());
 
       var result = await this.confirmationExitVehicle(this.vehicleExit);
       if (result.status == 200) {
@@ -101,7 +117,9 @@ export class VehicleExitComponent implements OnInit, OnDestroy {
     try {
       return await lastValueFrom(this.vehicleService.entryExit$(vehicle))
     } catch (error) {
-      if (error.status == 401) {
+      if (error.error.message == "Permission not informed.") {
+        this.messageService.add({ severity: 'error', summary: 'Permissão', detail: "Você não tem permissão", icon: 'pi pi-times' });
+      } else {
         this.messageService.add({ severity: 'error', summary: 'Veículo', detail: "Não autorizado", icon: 'pi pi-times' });
       }
       return error;

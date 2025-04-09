@@ -2,11 +2,11 @@ package com.concierge.apiconcierge.validation.vehicle;
 
 import com.concierge.apiconcierge.dtos.vehicle.AuthExit;
 import com.concierge.apiconcierge.dtos.vehicle.ExistsPlacaDto;
+import com.concierge.apiconcierge.dtos.vehicle.VehicleExitSaveDto;
 import com.concierge.apiconcierge.models.budget.enums.StatusBudgetEnum;
 import com.concierge.apiconcierge.models.permission.PermissionUser;
 import com.concierge.apiconcierge.models.vehicle.VehicleEntry;
 import com.concierge.apiconcierge.models.vehicle.enums.StatusAuthExitEnum;
-import com.concierge.apiconcierge.models.vehicle.enums.StatusVehicleEnum;
 import com.concierge.apiconcierge.models.vehicle.enums.VehicleYesNotEnum;
 import com.concierge.apiconcierge.repositories.permission.IPermissionUserRepository;
 import com.concierge.apiconcierge.repositories.vehicle.entry.IVehicleEntryRepository;
@@ -166,43 +166,26 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
         return ConstantsMessage.SUCCESS;
     }
 
-    public String exit(VehicleEntry vehicle) {
-        if (vehicle.getDateEntry() == null)
-            return ConstantsMessage.ERROR_DATEENTRY;
-        if (vehicle.getModelId() == null || vehicle.getModelDescription().isBlank())
-            return ConstantsMessage.ERROR_VEHICLE_MODEL;
-        if (vehicle.getColor() == null)
-            return ConstantsMessage.ERROR_COLOR;
-        if (vehicle.getStatusAuthExit() != StatusAuthExitEnum.Authorized)
-            return ConstantsMessage.ERROR_NOTAUTHEXIT;
+    public String exit(VehicleExitSaveDto dataExit) {
 
-        int countDriver = 0;
-        if (!vehicle.getDriverEntryName().isBlank()) {
-            countDriver++;
-        }
-        if (!vehicle.getDriverEntryCpf().isBlank()) {
-            countDriver++;
-        }
-        if (!vehicle.getDriverEntryRg().isBlank()) {
-            countDriver++;
-        }
-        if (countDriver <= 1) {
-            return ConstantsMessage.ERROR_DRIVERENTRY;
-        }
+        if(dataExit.companyId() == null || dataExit.companyId() == 0)
+            return ERROR_COMPANY;
+        if(dataExit.resaleId() == null || dataExit.resaleId() == 0)
+            return ERROR_RESALE;
+        if(dataExit.vehicleId() == null || dataExit.vehicleId() == 0)
+            return ERROR_VEHICLE_ID;
+        if(dataExit.userId() == null || dataExit.userId() == 0)
+            return ERROR_USER_ID;
+        if(dataExit.userName().isBlank())
+            return ERROR_NAME;
+        if(dataExit.dateExit() == null)
+            return ERROR;
 
-        countDriver = 0;
-        if (!vehicle.getDriverExitName().isBlank()) {
-            countDriver++;
+        if (dataExit.userId() != 1) {
+            PermissionUser permission = this.permissionUser.findPermissionId(dataExit.companyId(), dataExit.resaleId(), dataExit.userId(), AUTH_EXIT_VEHICLE);
+            if (permission == null)
+                return ERROR_PERMISSION;
         }
-        if (!vehicle.getDriverExitCpf().isBlank()) {
-            countDriver++;
-        }
-        if (!vehicle.getDriverExitRg().isBlank()) {
-            countDriver++;
-        }
-        if (countDriver <= 1)
-            return ConstantsMessage.ERROR_DRIVEREXIT;
-
 
         return ConstantsMessage.SUCCESS;
     }

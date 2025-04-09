@@ -51,8 +51,8 @@ public class VehicleEntryController {
     @PostMapping("/exit")
     public ResponseEntity<Object> confirmationExit(@RequestBody VehicleExitSaveDto data) {
         try {
-            String result = this.service.exit(data);
-            return ResponseEntity.ok(result);
+            String message = this.service.exit(data);
+            return ResponseEntity.status(HttpStatus.OK).body(new MessageResponseDto(message));
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
         }

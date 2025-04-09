@@ -85,7 +85,7 @@ public class VehicleEntryService implements IVehicleEntryService {
 
     private void updateBudget(VehicleEntry vehicle) {
         //update client budget
-        Budget budget = this.repositoryBudget.filterVehicleId(vehicle.getCompanyId(),vehicle.getResaleId(), vehicle.getId());
+        Budget budget = this.repositoryBudget.filterVehicleId(vehicle.getCompanyId(), vehicle.getResaleId(), vehicle.getId());
         budget.setClientCompanyId(vehicle.getClientCompanyId());
         budget.setIdUserAttendant(vehicle.getIdUserAttendant());
         this.repositoryBudget.save(budget);
@@ -95,18 +95,20 @@ public class VehicleEntryService implements IVehicleEntryService {
     @Override
     public String exit(VehicleExitSaveDto dataExit) {
         try {
+            String message = this.validation.exit(dataExit);
 
-            Optional<VehicleEntry> optional = this.repository.findById(dataExit.vehicleId());
-            VehicleEntry vehicleEntry = optional.get();
-
-            vehicleEntry.setStatus(StatusVehicleEnum.saidaAutorizada);
-            vehicleEntry.setStepEntry(StepVehicleEnum.Exit);
-            vehicleEntry.setUserIdExit(dataExit.userId());
-            vehicleEntry.setUserNameExit(dataExit.userName());
-            vehicleEntry.setDateExit(dataExit.dateExit());
-
-            String message = this.validation.exit(vehicleEntry);
             if (message.equals(ConstantsMessage.SUCCESS)) {
+
+                VehicleEntry vehicleEntry = this.repository.filterVehicleId(dataExit.companyId(), dataExit.resaleId(), dataExit.vehicleId());
+                if (vehicleEntry.getStatusAuthExit() != StatusAuthExitEnum.Authorized)
+                    throw new VehicleEntryException("Vehicle not authorized.");
+
+                vehicleEntry.setStatus(StatusVehicleEnum.saidaAutorizada);
+                vehicleEntry.setStepEntry(StepVehicleEnum.Exit);
+                vehicleEntry.setUserIdExit(dataExit.userId());
+                vehicleEntry.setUserNameExit(dataExit.userName());
+                vehicleEntry.setDateExit(dataExit.dateExit());
+
                 this.repository.save(vehicleEntry);
                 return ConstantsMessage.SUCCESS;
             } else {
@@ -115,8 +117,6 @@ public class VehicleEntryService implements IVehicleEntryService {
         } catch (Exception ex) {
             throw new VehicleEntryException(ex.getMessage());
         }
-
-
     }
 
     @SneakyThrows
