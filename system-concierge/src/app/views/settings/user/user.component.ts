@@ -222,7 +222,7 @@ export default class UserComponent implements OnInit {
     this.permissionsSelect = [];
 
     //Permission user selected
-    this.permissionService.getAllUser$(this.userSelect.id).subscribe(data => {
+    this.permissionService.getAllUser(this.userSelect.companyId, this.userSelect.resaleId, this.userSelect.id).subscribe(data => {
 
       if (data.length > 0) {
         var perTemp: Permission[] = [];
@@ -438,7 +438,7 @@ export default class UserComponent implements OnInit {
   }
   private getMenusUser() {
     this.menuSelect = [];
-    this.menuUserService.getFilterMenuUser$(this.userSelect.companyId, this.userSelect.resaleId, this.userSelect.id).subscribe(data => {
+    this.menuUserService.getFilterMenuUser(this.userSelect.companyId, this.userSelect.resaleId, this.userSelect.id).subscribe(data => {
       this.menuSelect = data;
     });
   }
@@ -451,7 +451,7 @@ export default class UserComponent implements OnInit {
     menu.companyId = this.userSelect.companyId;
     menu.resaleId = this.userSelect.resaleId;
     menu.userId = this.userSelect.id;
-    
+
     const responseDelete = await this.deleteMenus(menu);
     if (responseDelete.body.message == MESSAGE_RESPONSE_SUCCESS) {
 

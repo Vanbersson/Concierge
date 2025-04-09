@@ -22,7 +22,7 @@ export class MenuUserService {
     return this.http.post<MessageResponse>(environment.apiuUrl + "/menu/user/delete", menu, { headers: this.myHeaders(), observe: 'response' });
   }
 
-  getFilterMenuUser$(compamyId: number, resaleId: number, userId: number,): Observable<TreeNode[]> {
+  getFilterMenuUser(compamyId: number, resaleId: number, userId: number,): Observable<TreeNode[]> {
     return this.http.get<TreeNode[]>(environment.apiuUrl + "/menu/user/" + compamyId + "/" + resaleId + "/filter/user/" + userId, { headers: this.myHeaders() });
   }
 

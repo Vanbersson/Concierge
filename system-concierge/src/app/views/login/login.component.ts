@@ -9,7 +9,7 @@ import { FloatLabelModule } from 'primeng/floatlabel';
 import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
 import { ButtonModule } from 'primeng/button';
-import { MessageService, ConfirmationService } from 'primeng/api';
+import { MessageService, ConfirmationService, TreeNode } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 
 //Services
@@ -18,9 +18,16 @@ import { LayoutService } from '../../layouts/layout/service/layout.service';
 import { StorageService } from '../../services/storage/storage.service';
 import { BusyService } from '../../components/loading/busy.service';
 import { MenuUserService } from '../../services/menu/menu-user.service';
+import { PermissionService } from '../../services/permission/permission.service';
 
 //Interface
 import { IAuth } from '../../interfaces/auth/iauth';
+import { last, lastValueFrom } from 'rxjs';
+import { IAuthResponse } from '../../interfaces/auth/iauthresponse';
+import { HttpResponse } from '@angular/common/http';
+import { Permission } from '../../models/permission/permission';
+import { PermissionUser } from '../../models/permission/permission-user';
+
 
 @Component({
   selector: 'app-login',
@@ -45,10 +52,11 @@ export default class LoginComponent {
     public layoutService: LayoutService,
     private storageService: StorageService,
     private busyService: BusyService,
-    private menuUserService: MenuUserService
+    private menuUserService: MenuUserService,
+    private permissionService: PermissionService
   ) { }
 
-  public loginUser() {
+  async loginUser() {
     const { valid, value } = this.loginForm;
 
     if (valid) {
@@ -56,36 +64,45 @@ export default class LoginComponent {
 
       this.busyService.busy();
 
-      this.auth.login(login).subscribe({
-        next: (data) => {
-          this.storageService.companyId = data.body.companyId.toString();
-          this.storageService.resaleId = data.body.resaleId.toString();
-          this.storageService.photo = data.body.photo;
-          this.storageService.id = data.body.id.toString();
-          this.storageService.name = data.body.name;
-          this.storageService.email = login.email;
-          this.storageService.cellphone = data.body.cellphone;
-          this.storageService.roleDesc = data.body.roleDesc;
-          this.storageService.limitDiscount = data.body.limitDiscount.toString();
-          this.storageService.token = data.body.token;
+      const resultLogin = await this.login(login);
 
-          this.menusUser();
+      if (resultLogin.status == 200) {
+        this.messageService.add({ severity: 'success', summary: 'Bem-vindo', detail: resultLogin.body.name, icon: 'pi pi-lock-open', life: 2000 });
 
-          this.messageService.add({ severity: 'success', summary: 'Bem-vindo', detail: data.body.name, icon: 'pi pi-lock-open', life: 2000 });
+        this.storageService.companyId = resultLogin.body.companyId.toString();
+        this.storageService.resaleId = resultLogin.body.resaleId.toString();
+        this.storageService.photo = resultLogin.body.photo;
+        this.storageService.id = resultLogin.body.id.toString();
+        this.storageService.name = resultLogin.body.name;
+        this.storageService.email = login.email;
+        this.storageService.cellphone = resultLogin.body.cellphone;
+        this.storageService.roleDesc = resultLogin.body.roleDesc;
+        this.storageService.limitDiscount = resultLogin.body.limitDiscount.toString();
+        this.storageService.token = resultLogin.body.token;
 
-          setTimeout(() => {
-            this.router.navigateByUrl('/dashboard');
-          }, 2000);
-        },
-        error: (error) => {
-          this.busyService.idle();
-          this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Login ou senha inválido', icon: 'pi pi-lock', life: 2000 });
-        },
-        complete: () => {
-          this.busyService.idle();
+        const resultMenus = await this.menusUser(resultLogin.body.companyId, resultLogin.body.resaleId, resultLogin.body.id);
+        var keys = "";
+        for (let a = 0; a < resultMenus.length; a++) {
+          const element = resultMenus[a];
+          keys += element.key + ",";
         }
-      });
+        this.storageService.menus = keys;
 
+        const resultPermission = await this.permissionUser(resultLogin.body.companyId, resultLogin.body.resaleId, resultLogin.body.id);
+
+        var permissionKey = "";
+        for (let a = 0; a < resultPermission.length; a++) {
+          const element = resultPermission[a];
+          permissionKey += element.permissionId + ",";
+        }
+        this.storageService.permissions = permissionKey;
+
+        setTimeout(() => {
+          this.router.navigateByUrl('/dashboard');
+        }, 2000);
+      }
+
+      this.busyService.idle();
     }
 
   }
@@ -99,15 +116,27 @@ export default class LoginComponent {
     });
   }
 
-  private menusUser() {
-    this.menuUserService.getFilterMenuUser$(this.storageService.companyId, this.storageService.resaleId, this.storageService.id).subscribe(data => {
-      var keys = "";
-      for (let a = 0; a < data.length; a++) {
-        const element = data[a];
-        keys += element.key + ",";
-      }
-      this.storageService.menus = keys;
-    });
+  private async login(login: IAuth): Promise<HttpResponse<IAuthResponse>> {
+    try {
+      return await lastValueFrom(this.auth.login(login));
+    } catch (error) {
+      this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Login ou senha inválido', icon: 'pi pi-lock', life: 2000 });
+      return error;
+    }
+  }
+  private async menusUser(compamyId: number, resaleId: number, userId: number): Promise<TreeNode[]> {
+    try {
+      return await lastValueFrom(this.menuUserService.getFilterMenuUser(compamyId, resaleId, userId));
+    } catch (error) {
+      return [];
+    }
+  }
+  private async permissionUser(compamyId: number, resaleId: number, userId: number): Promise<PermissionUser[]> {
+    try {
+      return await lastValueFrom(this.permissionService.getAllUser(compamyId, resaleId, userId));
+    } catch (error) {
+      return error;
+    }
   }
 
 }

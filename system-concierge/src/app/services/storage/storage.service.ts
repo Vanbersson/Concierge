@@ -87,6 +87,13 @@ export class StorageService {
     return sessionStorage.getItem("menus");
   }
 
+  set permissions(per: string) {
+    sessionStorage.setItem('permission', per);
+  }
+  get permissions(): string {
+    return sessionStorage.getItem("permission");
+  }
+
   public deleteStorage() {
     sessionStorage.clear();
   }

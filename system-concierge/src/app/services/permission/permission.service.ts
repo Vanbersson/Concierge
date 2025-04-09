@@ -13,8 +13,6 @@ import { MessageResponse } from '../../models/message/message-response';
 })
 export class PermissionService {
 
-    companyResale: string = this.storage.companyId + "/" + this.storage.resaleId;
-
     constructor(private http: HttpClient, private storage: StorageService) { }
 
     getAll$(): Observable<Permission[]> {
@@ -26,8 +24,8 @@ export class PermissionService {
     deleteUser(user: PermissionUser): Observable<HttpResponse<MessageResponse>> {
         return this.http.post<MessageResponse>(environment.apiuUrl + "/permission/user/all/delete", user, { headers: this.myHeaders(), observe: 'response' });
     }
-    getAllUser$(userId: number): Observable<PermissionUser[]> {
-        return this.http.get<PermissionUser[]>(environment.apiuUrl + "/permission/user/" + this.companyResale + "/filter/user/" + userId, { headers: this.myHeaders() });
+    getAllUser(compamyId: number, resaleId: number, userId: number): Observable<PermissionUser[]> {
+        return this.http.get<PermissionUser[]>(environment.apiuUrl + "/permission/user/" + compamyId + "/" + resaleId + "/filter/user/" + userId, { headers: this.myHeaders() });
     }
 
     private myHeaders(): HttpHeaders {
