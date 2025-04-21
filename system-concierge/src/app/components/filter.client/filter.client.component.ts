@@ -20,6 +20,8 @@ import { ClientCompany } from '../../models/clientcompany/client-company';
 //Service
 import { ClientecompanyService } from '../../services/clientecompany/clientecompany.service';
 import { StorageService } from '../../services/storage/storage.service';
+import { HttpResponse } from '@angular/common/http';
+import { lastValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-filterclient',
@@ -52,7 +54,7 @@ export class FilterClientComponent {
     clientCompanyTipo: new FormControl<string>('j'),
   });
 
-  constructor(private serviceClienteCompany: ClientecompanyService,private storageService: StorageService) { }
+  constructor(private serviceClienteCompany: ClientecompanyService, private storageService: StorageService) { }
 
   //Filter Client
   public showDialogFilterClientCompany() {
@@ -62,22 +64,32 @@ export class FilterClientComponent {
     this.dialogVisibleClientCompany = false;
   }
 
-  public selectClientCompany() {
+  public async selectClientCompany() {
     if (this.dialogSelectClientCompany) {
       //Emit 
       this.dialogSelectClientCompany.companyId = this.storageService.companyId;
       this.dialogSelectClientCompany.resaleId = this.storageService.resaleId;
-      this.dialogSelectClientCompany.contactName ="";
-      this.dialogSelectClientCompany.contactEmail="";
-      this.dialogSelectClientCompany.contactDDDPhone="";
-      this.dialogSelectClientCompany.contactPhone="";
-      this.dialogSelectClientCompany.contactDDDCellphone="";
-      this.dialogSelectClientCompany.contactCellphone="";
-      
+      this.dialogSelectClientCompany.contactName = "";
+      this.dialogSelectClientCompany.contactEmail = "";
+      this.dialogSelectClientCompany.contactDDDPhone = "";
+      this.dialogSelectClientCompany.contactPhone = "";
+      this.dialogSelectClientCompany.contactDDDCellphone = "";
+      this.dialogSelectClientCompany.contactCellphone = "";
+
+      const resultClient = await this.saveClient(this.dialogSelectClientCompany);
+
       this.outputClient.emit(this.dialogSelectClientCompany);
 
       this.clientName.set(this.dialogSelectClientCompany.name);
       this.dialogVisibleClientCompany = false;
+    }
+  }
+
+  private async saveClient(client: ClientCompany): Promise<HttpResponse<ClientCompany>> {
+    try {
+      return await lastValueFrom(this.serviceClienteCompany.save(client));
+    } catch (error) {
+      return error;
     }
   }
 
