@@ -1,0 +1,436 @@
+<div class="layout-card">
+    <!-- Toast -->
+    <p-toast />
+    <div class="layout-card-title">
+        <span class="text-500 font-medium">Pedidos de compra</span>
+        <div class="flex gap-2">
+            <p-button icon="pi pi-plus" [text]="true" label="Novo pedido" (onClick)="newPurchaseOrder()" />
+            <p-button icon="pi pi-refresh" [text]="true" label="Recarregar" (onClick)="listPurchaseOrders()" />
+        </div>
+    </div>
+    <p-table #tableFilter dataKey="id" [value]="purchaseOrders" [rowHover]="true" [showCurrentPageReport]="true"
+        [tableStyle]="{ 'min-width': '50rem' }"
+        [globalFilterFields]="['id', 'clientCompanyName', 'attendantName', 'responsibleName','status']"
+        [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 25, 50]" styleClass="p-datatable-sm">
+        <ng-template pTemplate="caption">
+            <div class="flex">
+                <p-iconField iconPosition="left">
+                    <p-inputIcon>
+                        <i class="pi pi-search"></i>
+                    </p-inputIcon>
+                    <input pInputText type="text"
+                        (input)="tableFilter.filterGlobal($any($event.target).value, 'contains')"
+                        placeholder="Pesquisar" />
+                </p-iconField>
+            </div>
+        </ng-template>
+        <ng-template pTemplate="header">
+            <tr>
+                <th style="width:5%;font-weight: 400;">Pedido</th>
+                <th style="width:5%;font-weight: 400;">Nota</th>
+                <th style="width:20%;font-weight: 400;">Fornecedor</th>
+                <th style="width:20%;font-weight: 400;">Forn. Contato</th>
+                <th style="width:10%;font-weight: 400;">Dta criação</th>
+                <th style="width:10%;font-weight: 400;">Prazo entrega</th>
+                <th style="width:10%;font-weight: 400;">Responsavel</th>
+                <th style="width:10%;font-weight: 400;">Entrega</th>
+                <th style="width:10%;font-weight: 400;">Ação</th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-purchase>
+            <tr>
+                <td><span class="text-500">{{purchase.id}}</span></td>
+                @if(purchase.nfNum != 0){
+                <td><span class="text-500">{{purchase.nfNum}}</span></td>
+                }@else {
+                <td></td>
+                }
+
+                <td><span class="text-500">{{ abreviaNome(purchase.clientCompanyName) | uppercase}}</span></td>
+                <td><span class="text-500">{{purchase.attendantName | uppercase}}</span></td>
+                <td><span class="text-500">{{purchase.dateGeneration | date: 'dd/MM/yyyy'}}</span></td>
+                <td><span class="text-500">{{purchase.dateDelivery | date: 'dd/MM/yyyy'}}</span></td>
+                <td><span class="text-500">{{purchase.responsibleName | uppercase}}</span></td>
+                <td><p-tag [value]="purchase.status" [severity]="getStatusSeverity(purchase.status)" /></td>
+                <td class="flex gap-2">
+                    <p-button icon="pi pi-pencil" [text]="true" size="small" label="Editar"
+                        (onClick)="edit(purchase.id)" />
+                    <button pButton [text]="true" icon="pi pi-print" size="small" label="Imprimir" severity="secondary"
+                        (click)="print(purchase.id)"></button>
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
+
+</div>
+
+<!-- Add pedido -->
+<p-dialog header="Pedido de compra" [modal]="true" [(visible)]="purcharOrderVisible" [maximizable]="true"
+    [style]="{ width: '80rem', height:'70rem' }" [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }">
+
+    <form [formGroup]="formPurchase">
+        <div class="p-fluid p-formgrid grid">
+
+            <div class="col-12 flex justify-content-between">
+
+                <div class="field flex align-items-center gap-2 ">
+                    <span>{{"Número do pedido:"}}</span>
+                    <span class="text-xl font-bold">{{numPurchaseOrder()}}</span>
+                </div>
+                @if (nfNum()) {
+                <div class="field flex align-items-center gap-2 ">
+                    <span>{{"Nota:"}}</span>
+                    <span class="text-xl font-bold">{{nfNum()}}</span>
+                </div>
+                }@else {
+                <span class="text-xl font-bold text-red-500 shadow-2 p-2">SEM NOTA</span>
+                }
+            </div>
+            <div class="field col-12 md:col-4">
+                <label for="purchaseOrderId">Resposavel</label>
+                <p-multiSelect [options]="responsable" optionLabel="name" display="chip" [selectionLimit]="1"
+                    placeholder="Selecione" formControlName="responsible" />
+                <small class="p-error block" *ngIf="formPurchase.get('responsible')?.invalid">
+                    Campo obrigatório</small>
+            </div>
+            <div class="field col-12 md:col-3">
+                <label for="paymentId">Forma de pagamento</label>
+                <input pInputText id="paymentId" type="text" formControlName="paymentType">
+                <small class="p-error block" *ngIf="formPurchase.get('paymentType')?.invalid">
+                    Campo obrigatório</small>
+            </div>
+            <div class="field col-12 md:col-3">
+                <label for="dateDeliveryId">Previsão Entrega</label>
+                <p-calendar [iconDisplay]="'input'" dateFormat="dd/mm/yy" [showIcon]="true" inputId="icondisplay"
+                    formControlName="dateDelivery" />
+                <small class="p-error block" *ngIf="formPurchase.get('dateDelivery')?.invalid">
+                    Campo obrigatório</small>
+            </div>
+            <div class="field col-12 md:col-2">
+                <label for="">Informar nota</label>
+                <p-button type="button" label="Nota fiscal" [disabled]="!numPurchaseOrder()"
+                    (onClick)="showDialogNF()" />
+            </div>
+
+            <div class="field col-12 md:col-2">
+                <label for="clientCompanyCodeId">Código</label>
+                <p-inputNumber inputId="clientCompanyCodeId" mode="decimal" [useGrouping]="false"
+                    formControlName="clientCompanyId" />
+                <small class="p-error block" *ngIf="formPurchase.get('clientCompanyId')?.invalid">
+                    Campo obrigatório</small>
+            </div>
+            <div class="field col-10 md:col-6">
+                <label for="clientCompanyNameId">Empresa</label>
+                <input pInputText id="clientCompanyNameId" type="text" formControlName="clientCompanyName" />
+                <small class="p-error block" *ngIf="formPurchase.get('clientCompanyName')?.invalid">
+                    Campo obrigatório</small>
+            </div>
+            <div class="field col-2 md:col-1 flex flex-column">
+                <label for="">Filtro</label>
+                <app-filterclient (outputClient)="selectClientCompany.set($event)" />
+            </div>
+
+            <div class="md:col-2"></div>
+
+            <div class="field col-12 md:col-4">
+                <label for="attendantNameId">Vendedor Nome</label>
+                <input pInputText id="attendantNameId" type="text" formControlName="attendantName" />
+            </div>
+            <div class="field col-12 md:col-4">
+                <label for="attendantEmailId">Vendedor E-Mail</label>
+                <input pInputText id="attendantEmailId" type="text" formControlName="attendantEmail" />
+            </div>
+            <div class="md:col-4"> </div>
+
+            <div class="field col-12 md:col-1">
+                <label for="attendantDddCellphoneId">DDD</label>
+                <p-inputMask mask="(99)" [unmask]="true" formControlName="attendantDddCellphone" />
+            </div>
+            <div class="field col-12 md:col-3">
+                <label for="attendantCellphoneId">Celular</label>
+                <p-inputMask mask="9 9999-9999" [unmask]="true" formControlName="attendantCellphone" />
+            </div>
+            <div class="field col-12 md:col-1">
+                <label for="attendantDddPhoneId">DDD</label>
+                <p-inputMask mask="(99)" [unmask]="true" formControlName="attendantDddPhone" />
+            </div>
+            <div class="field col-12 md:col-3">
+                <label for="attendantPhoneId">Telefone</label>
+                <p-inputMask mask="9999-9999" [unmask]="true" formControlName="attendantPhone" />
+            </div>
+            @if (!numPurchaseOrder()) {
+            <div class="field col-12 md:col-2">
+                <label for="">Gerar número pedido</label>
+                <p-button label="Gerar" severity="success" (onClick)="saveNew()" />
+            </div>
+            }@else {
+            <!-- Filter Parts -->
+            <div class="field col-12 md:col-2">
+                <label for="">Selecione</label>
+                <app-filterparts (outputPart)="selectPart.set($event)" />
+            </div>
+            }
+            @if(nfNum()){
+            <div class="field col-12 md:col-2">
+                <label for="">Fechar Pedido</label>
+                <p-button icon="pi pi-times" label="Fechar" severity="danger" (onClick)="confirmClose()" />
+            </div>
+            }
+        </div>
+    </form>
+
+    <p-table #tableFilter [value]="purchaseOrderItems" dataKey="id" editMode="row"
+        [globalFilterFields]="['partCode', 'partDescription']" [paginator]="true" [rows]="5"
+        [rowsPerPageOptions]="[5, 10, 20]" styleClass="p-datatable-sm">
+        <ng-template pTemplate="header">
+            <tr>
+                <th style="width:10%;font-weight: 400;">Código</th>
+                <th style="width:20%;font-weight: 400;">Descrição</th>
+                <th style="width:5%;font-weight: 400;">Quantidade</th>
+                <th style="width:5%;font-weight: 400;">Preço</th>
+                <th style="width:5%;font-weight: 400;">Desconto</th>
+                <th style="width:10%;font-weight: 400;">Total</th>
+                <th style="width:10%;font-weight: 400;"></th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-part let-editing="editing" let-index="rowIndex">
+            <tr [pEditableRow]="part">
+                <td>
+                    <span class="text-sm">{{part.partCode}}</span>
+                </td>
+                <td>
+                    <p-cellEditor>
+                        <ng-template pTemplate="input">
+                            <input pInputText type="text" [(ngModel)]="part.partDescription" />
+                        </ng-template>
+                        <ng-template pTemplate="output">
+                            <span class="text-sm">{{printAbreviaDesc(part.partDescription) }}</span>
+                        </ng-template>
+                    </p-cellEditor>
+                </td>
+                <td>
+                    <p-cellEditor>
+                        <ng-template pTemplate="input">
+                            <p-inputNumber [(ngModel)]="part.quantity" inputId="minmaxfraction" mode="decimal"
+                                [minFractionDigits]="2" [maxFractionDigits]="5" />
+                        </ng-template>
+                        <ng-template pTemplate="output">
+                            <span class="text-sm">{{part.quantity}}</span>
+                        </ng-template>
+                    </p-cellEditor>
+                </td>
+                <td>
+                    <p-cellEditor>
+                        <ng-template pTemplate="input">
+                            <p-inputNumber [(ngModel)]="part.price" inputId="minmaxfraction" mode="decimal"
+                                [minFractionDigits]="2" [maxFractionDigits]="5" />
+                        </ng-template>
+                        <ng-template pTemplate="output">
+                            <span class="text-sm">{{part.price | currency }}</span>
+                        </ng-template>
+                    </p-cellEditor>
+                </td>
+                <td>
+                    <p-cellEditor>
+                        <ng-template pTemplate="input">
+                            <p-inputNumber [(ngModel)]="part.discount" inputId="minmaxfraction" mode="decimal"
+                                [minFractionDigits]="2" [maxFractionDigits]="5" />
+                        </ng-template>
+                        <ng-template pTemplate="output">
+                            <span class="text-sm">{{part.discount | currency }}</span>
+                        </ng-template>
+                    </p-cellEditor>
+                </td>
+                <td> <span class="text-sm"> {{ (part.quantity * part.price) - part.discount | currency }}</span> </td>
+                <td>
+                    <div class="flex align-items-center justify-content-center gap-2">
+                        <button *ngIf="!editing" pButton type="button" pInitEditableRow label="Editar"
+                            icon="pi pi-pencil" (click)="onRowEditInit(part)" class="p-button-rounded p-button-text"
+                            size="small">
+                        </button>
+                        <button *ngIf="!editing" pButton type="button" pInitEditableRow icon="pi pi-trash"
+                            (click)="deleteItem(part)" class="p-button-rounded p-button-text" size="small"
+                            severity="danger">
+                        </button>
+                        <button *ngIf="editing" pButton pRipple type="button" pSaveEditableRow icon="pi pi-check"
+                            (click)="onRowEditSave(part)" class="p-button-rounded p-button-text p-button-success mr-2">
+                        </button>
+                        <button *ngIf="editing" pButton pRipple type="button" pCancelEditableRow icon="pi pi-times"
+                            (click)="onRowEditCancel(part, index)"
+                            class="p-button-rounded p-button-text p-button-danger">
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="footer">
+            <tr>
+                <td colspan="3" class="text-right">Totais</td>
+                <td>{{ totalItemsPrice() | currency}}</td>
+                <td>{{totalItemsDiscount() | currency}}</td>
+                <td>{{ (totalItemsPrice() - totalItemsDiscount()) | currency}}
+                <td>
+            </tr>
+        </ng-template>
+    </p-table>
+
+    <div class="col-12 flex justify-content-end gap-2">
+        <button pButton type="button" pRipple label="Fechar" icon="pi pi-times" class="p-button-text"
+            (click)="hideDialogPurchase()"></button>
+        <button pButton type="button" pRipple label="Salvar" icon="pi pi-check" class="p-button-text"
+            (click)="saveUpdate()" *ngIf="numPurchaseOrder()"></button>
+    </div>
+</p-dialog>
+
+<!-- Nota Fiscal -->
+<p-dialog header="Nota Fiscal" [(visible)]="nfVisible" [modal]="true" [maximizable]="true"
+    [style]="{ width: '50rem',height:'44rem' }">
+    <form [formGroup]="formNF">
+        <div class=" p-fluid p-formgrid grid">
+            <div class="field col-12 md:col-4">
+                <label>Número</label>
+                <p-inputNumber mode="decimal" [useGrouping]="false" formControlName="nfNum" />
+                <small class="p-error block" *ngIf="formNF.get('nfNum')?.invalid">
+                    Campo obrigatório</small>
+            </div>
+            <div class="field col-12 md:col-4">
+                <label>Série</label>
+                <input pInputText type="text" formControlName="nfNumSerie" />
+                <small class="p-error block" *ngIf="formNF.get('nfNumSerie')?.invalid">
+                    Campo obrigatório</small>
+            </div>
+            <div class="md:col-4"></div>
+            <div class="field col-12 md:col-4">
+                <label>Data Emissão</label>
+                <p-calendar dateFormat="dd/mm/yy" [iconDisplay]="'input'" [showIcon]="true" inputId="icondisplay"
+                    formControlName="nfDate" />
+                <small class="p-error block" *ngIf="formNF.get('nfDate')?.invalid">
+                    Campo obrigatório</small>
+            </div>
+            <div class="md:col-8"></div>
+            <div class="field col-12">
+                <label>Chave de Acesso</label>
+                <p-inputMask mask="99999999999999999999999999999999999999999999" [unmask]="true" formControlName="nfKey"/>
+            </div>
+        </div>
+    </form>
+    <div class="flex justify-content-end gap-2 mt-2">
+        <button pButton type="button" pRipple label="Fechar" icon="pi pi-times" class="p-button-text"
+            (click)="hideDialogNF()"></button>
+        <button pButton type="submit" pRipple label="Confirmar" icon="pi pi-check" class="p-button-text"
+            (click)="confirmNF()"></button>
+    </div>
+</p-dialog>
+
+<!-- Print -->
+<div id="print-sectionId" style="display: none;">
+    <img src="../../../../assets/image/purchase-order-barra.jpeg" alt="" width="800">
+    <table style="border: 1px solid #ddd;
+        padding: 8px; font-family: Arial, Helvetica, sans-serif;
+        border-collapse: collapse;
+        width: 100%;">
+        <tr>
+            <td>
+                <span>PEDIDO Nº: <strong>{{printPurchaseOrder().id}}</strong></span>
+            </td>
+            <td>
+                <span>VENDEDOR: {{printPurchaseOrder().attendantName | uppercase}}</span>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <span>DATA: {{printPurchaseOrder().dateGeneration | date: 'dd/MM/yyyy'}}</span>
+            </td>
+            <td>
+                @if(printPurchaseOrder().attendantDddCellphone == '' || printPurchaseOrder().attendantCellphone == ''){
+                <span>CELULAR:</span>
+                }@else {
+                <span>CELULAR: {{"("+printPurchaseOrder().attendantDddCellphone+")"+"
+                    "+printPurchaseOrder().attendantCellphone}}</span>
+                }
+            </td>
+        </tr>
+        <tr>
+            <td><span>CÓDIGO FORN.: {{printPurchaseOrder().clientCompanyId}}</span></td>
+            <td><span>E-MAIL: {{printPurchaseOrder().attendantEmail}}</span></td>
+        </tr>
+        <tr>
+            <td><span>FORNECEDOR: {{printAbreviaDesc(printPurchaseOrder().clientCompanyName) }}</span></td>
+            <td><span>DATA ENTREGA: {{printPurchaseOrder().dateDelivery | date: 'dd/MM/yyyy'}}</span></td>
+        </tr>
+        <tr>
+            <td>
+                @if(printPurchaseOrder().nfNum != 0){ <span>NOTA: {{printPurchaseOrder().nfNum}}</span> }@else{
+                <span>NOTA:</span> }
+            </td>
+            <td><span>PAGAMENTO: {{printPurchaseOrder().paymentType | uppercase }}</span></td>
+        </tr>
+    </table>
+    <table id="print-table">
+        <tr>
+            <th>Código</th>
+            <th>Descrição</th>
+            <th>Qtd</th>
+            <th>Preço</th>
+            <th>Desconto</th>
+            <th>Total</th>
+        </tr>
+        <tr *ngFor="let item of printPurchaseOrderItems">
+            <td>{{item?.partCode }}</td>
+            <td>{{ printAbreviaDesc(item?.partDescription || '') }}</td>
+            <td>{{item?.quantity || ''}}</td>
+            <td>{{item?.price || 0 | currency }}</td>
+            <td>{{item?.discount || 0 | currency}}</td>
+            <td>{{(item?.price * item?.quantity) - item?.discount || 0 | currency}}</td>
+        </tr>
+        <br>
+        <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td><strong>{{totalItemsPrice() | currency}}</strong></td>
+            <td><strong>{{totalItemsDiscount() | currency}}</strong></td>
+            <td><strong>{{totalItemsPrice() - totalItemsDiscount() | currency}}</strong></td>
+        </tr>
+
+    </table>
+    <br>
+    <table style="width: 100%; text-align: center;">
+        <tr>
+            <td>AUTORIZADO POR</td>
+            <td>AUTORIZADO POR</td>
+            <td>AUTORIZADO POR</td>
+        </tr>
+        <tr>
+            <td class="text-sm"><strong>Alexsandro Paulino</strong></td>
+            <td class="text-sm"><strong>Luise Rossi</strong></td>
+            <td class="text-sm"><strong>Bruna Dones Gayer</strong></td>
+        </tr>
+        <tr>
+            <td>Comprador</td>
+            <td>Diretora Financeira</td>
+            <td>Diretora comercial</td>
+        </tr>
+    </table>
+</div>
+
+<!-- Confirm close -->
+<p-confirmDialog #cd>
+    <ng-template pTemplate="headless" let-message>
+        <div class="flex flex-column align-items-center p-5 surface-overlay border-round">
+            <div class="border-circle bg-primary inline-flex justify-content-center align-items-center h-6rem w-6rem">
+                <i class="pi pi-question text-5xl"></i>
+            </div>
+            <span class="font-bold text-2xl block mb-2 mt-4">
+                {{ message.header }}
+            </span>
+            <p class="mb-0">{{ message.message }}</p>
+            <div class="flex align-items-center gap-2 mt-4">
+                <button pButton label="Confirmar" (click)="cd.accept()" class="w-8rem">
+                </button>
+                <button pButton label="Cancelar" (click)="cd.reject()" class="p-button-outlined w-8rem ">
+                </button>
+            </div>
+        </div>
+    </ng-template>
+</p-confirmDialog>

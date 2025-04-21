@@ -90,7 +90,6 @@ export class SidebarComponent implements OnInit {
         key: '2_0',
         label: 'Peças',
         visible: false,
-        icon: 'pi pi-book',
         items: [
           {
             key: '2_1',
@@ -99,17 +98,14 @@ export class SidebarComponent implements OnInit {
           },
           {
             key: '2_2',
-            label: 'Pedido de compra',
+            label: 'Pedidos de compras',
             visible: false,
             items: [
               {
                 key: '2_2_0',
-                label: 'Novo',
-              },
-              {
-                key: '2_2_1',
-                label: 'Consulta',
-              },
+                label: 'Pedidos',
+                routerLink:'pecas/pedido/compra'
+              }
             ]
           },
           {
@@ -141,6 +137,17 @@ export class SidebarComponent implements OnInit {
                 ]
               }
             ]
+          },
+          {
+            key: '9_0',
+            label: 'Cadastro',
+            items: [
+              {
+                key: '9_1',
+                label: 'Peças',
+                routerLink: 'pecas/cadastro/pecas'
+              }
+            ]
           }
 
         ]
@@ -165,11 +172,6 @@ export class SidebarComponent implements OnInit {
 
               },
             ]
-          },
-          {
-            key: '3_2',
-            label: 'Manutenção Peças',
-            routerLink: 'oficina/pecas'
           }
         ]
       },
@@ -201,8 +203,8 @@ export class SidebarComponent implements OnInit {
                 key: '100_1_0',
                 label: 'Veículos',
                 visible: false,
-                icon:'pi pi-car',
-                routerLink:'relatorio/portaria/veiculo'
+                icon: 'pi pi-car',
+                routerLink: 'relatorio/portaria/veiculo'
               }
 
             ]

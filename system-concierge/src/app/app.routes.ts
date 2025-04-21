@@ -56,18 +56,29 @@ export const routes: Routes = [
                 ]
             },
             {
+                path:'pecas',
+                children:[
+                    {
+                        path: 'pedido/compra',
+                        title: 'Pedido de compra',
+                        loadComponent: () => import('./views/parts/purchase.order/purchase.order.component')
+                    },
+                    
+                    {
+                        path: 'cadastro/pecas',
+                        title: 'Peças',
+                        loadComponent: () => import('./views/parts/register/parts/parts.component')
+                    },
+                ]
+            },
+            {
                 path: 'oficina',
                 children: [
                     {
                         path: 'manutencao-orcamento/:vehicleid',
                         title: 'Manutenção Orçamento',
                         loadComponent: () => import('./views/oficina/budget/budget.component')
-                    },
-                    {
-                        path: 'pecas',
-                        title: 'Peças',
-                        loadComponent: () => import('./views/oficina/parts/parts.component')
-                    },
+                    }
                 ]
 
             },

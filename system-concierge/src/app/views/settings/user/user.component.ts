@@ -112,6 +112,11 @@ export default class UserComponent implements OnInit {
       {
         key: '2_0', label: 'Peças', children: [
           { key: '2_1', label: 'Consulta peças' },
+          {
+            key: '2_2', label: 'Pedidos de compras', children: [
+              { key: '2_2_0', label: 'Pedidos' },
+            ]
+          },
         ]
       },
       {
