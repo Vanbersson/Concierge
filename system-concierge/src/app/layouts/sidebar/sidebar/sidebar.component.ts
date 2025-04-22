@@ -104,35 +104,40 @@ export class SidebarComponent implements OnInit {
               {
                 key: '2_2_0',
                 label: 'Pedidos',
-                routerLink:'pecas/pedido/compra'
+                routerLink:'pecas/pedido/compra',
+                visible: false,
               }
             ]
           },
           {
             key: '2_3',
             label: 'Controle de equipamentos',
+            visible: false,
             items: [
               {
                 key: '2_3_0',
                 label: 'Pegar',
-
+                visible: false,
               },
               {
                 key: '2_3_1',
                 label: 'Devolver',
-
+                visible: false,
               },
               {
                 key: '2_3_2',
                 label: 'Cadastro',
+                visible: false,
                 items: [
                   {
                     key: '2_3_2_0',
                     label: 'Material',
+                    visible: false,
                   },
                   {
                     key: '2_3_2_1',
                     label: 'Mecânico',
+                    visible: false,
                   }
                 ]
               }
@@ -141,11 +146,13 @@ export class SidebarComponent implements OnInit {
           {
             key: '9_0',
             label: 'Cadastro',
+            visible: false,
             items: [
               {
                 key: '9_1',
                 label: 'Peças',
-                routerLink: 'pecas/cadastro/pecas'
+                routerLink: 'pecas/cadastro/pecas',
+                visible: false,
               }
             ]
           }
@@ -160,16 +167,17 @@ export class SidebarComponent implements OnInit {
           {
             key: '3_1',
             label: 'Orçamento',
+            visible: false,
             items: [
               {
                 key: '3_1_0',
                 label: 'Atendimento',
-
+                visible: false,
               },
               {
                 key: '3_1_1',
                 label: 'Consulta',
-
+                visible: false,
               },
             ]
           }

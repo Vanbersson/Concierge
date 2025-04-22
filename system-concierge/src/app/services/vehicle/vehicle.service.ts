@@ -52,9 +52,6 @@ export class VehicleService {
     return this.http.post<MessageResponse>(environment.apiuUrl + "/vehicle/entry/filter/exists/placa", existsPlaca, { headers: this.myHeaders(), observe: 'response' });
   }
 
-
-
-  /* Falta */
   entryAddAuth(auth: VehicleEntryAuth): Observable<HttpResponse<VehicleEntryAuth>> {
     return this.http.post<VehicleEntryAuth>(environment.apiuUrl + "/vehicle/entry/authorization/add", auth, { headers: this.myHeaders(), observe: 'response' });
   }
