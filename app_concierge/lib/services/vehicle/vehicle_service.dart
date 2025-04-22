@@ -6,16 +6,15 @@ import 'package:app_concierge/features/domain/vehicle/vehicle_exit.dart';
 import 'package:app_concierge/features/domain/vehicle/vehicle_model.dart';
 import 'package:dio/dio.dart';
 import 'package:app_concierge/core/constants/url_constants.dart';
-import 'package:app_concierge/core/constants/message_constants.dart';
 
 class VehicleService {
-  Future<List<VehicleEntry>> allPendingAuthorization() async {
+  Future<List<VehicleEntry>> allPendingAuthorization(int companyId, int resaleId) async {
     final dio = Dio();
     try {
       final token = await userStorange();
 
       final response = await dio.get(
-        kURL_LIST_VEHICLE_ENTRY,
+        "$kURL_BASE/vehicle/entry/$companyId/$resaleId/allPendingAuthorization",
         options: Options(headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token'
@@ -26,20 +25,19 @@ class VehicleService {
       for (var element in response.data) {
         listVehicle.add(VehicleEntry.fromJson(element));
       }
-
       return listVehicle;
     } on DioException catch (e) {
       return List.empty();
     }
   }
 
-  Future<List<VehicleEntry>> allAuthorized() async {
+  Future<List<VehicleEntry>> allAuthorized(int companyId, int resaleId) async {
     final dio = Dio();
     try {
       final token = await userStorange();
 
       final response = await dio.get(
-        kURL_LIST_VEHICLE_EXIT,
+        "$kURL_BASE/vehicle/entry/$companyId/$resaleId/allAuthorized",
         options: Options(headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token'
@@ -50,7 +48,6 @@ class VehicleService {
       for (var element in response.data) {
         listVehicle.add(VehicleEntry.fromJson(element));
       }
-
       return listVehicle;
     } on DioException catch (e) {
       return List.empty();
@@ -81,13 +78,13 @@ class VehicleService {
     }
   }
 
-  Future<Vehicle> vehicleId(int id) async {
+  Future<Vehicle> vehicleId(int companyId, int resaleId, int id) async {
     final dio = Dio();
     try {
       final token = await userStorange();
 
       final response = await dio.get(
-        "$kURL_VEHICLE_ID$id",
+        "$kURL_BASE/vehicle/entry/$companyId/$resaleId/filter/id/$id",
         options: Options(headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token'
@@ -124,7 +121,7 @@ class VehicleService {
     }
   }
 
-  Future<String> Exit(VehicleExit vehicle) async {
+  Future<String> exit(VehicleExit vehicle) async {
     final dio = Dio();
 
     try {

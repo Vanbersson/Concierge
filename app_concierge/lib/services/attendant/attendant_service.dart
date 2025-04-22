@@ -4,16 +4,13 @@ import 'package:dio/dio.dart';
 import 'package:app_concierge/core/constants/url_constants.dart';
 
 class AttendantService {
-
-
-
-  Future<List<UserAttendant>> attendants() async {
+  Future<List<UserAttendant>> attendants(int companyId, int resaleId) async {
     final dio = Dio();
     try {
       final token = await _userStorange();
 
       final response = await dio.get(
-        kURL_ATTENDANT,
+        "$kURL_BASE/user/$companyId/$resaleId/filter/roleId/2",
         options: Options(headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token'

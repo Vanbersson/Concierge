@@ -43,7 +43,9 @@ class _MainPageState extends State<MainPage> {
 
   @override
   void initState() {
-    _listVehicleEntry.value = _vehicleService.allPendingAuthorization();
+    // Obter as listas de veículos pendente de autorização
+    _listVehicleEntry.value = _vehicleService.allPendingAuthorization(widget.userLogin.companyId!, widget.userLogin.resaleId!);
+
     verifyVehicleAllAuthorized();
     super.initState();
   }
@@ -55,18 +57,24 @@ class _MainPageState extends State<MainPage> {
   }
 
   void verifyVehicleAllAuthorized() async {
-    timer = Timer.periodic(const Duration(seconds: 60), (timer) async {
+    // Obter as listas de veículos autorizados
+    List<VehicleEntry> vehicleAuth = await _vehicleService.allAuthorized(widget.userLogin.companyId!, widget.userLogin.resaleId!);
+
+    //Total de veículos autorizados
+    _allAuthorizedTotal.value = vehicleAuth.length;
+
+    timer = Timer.periodic(const Duration(seconds: 30), (timer) async {
       try {
         // Obter as listas de veículos autorizados
-        List<VehicleEntry> auth1 = await _vehicleService.allAuthorized();
+        List<VehicleEntry> vehicleAuth1 = await _vehicleService.allAuthorized(widget.userLogin.companyId!, widget.userLogin.resaleId!);
 
         //Total de veículos autorizados
-        _allAuthorizedTotal.value = auth1.length;
+        _allAuthorizedTotal.value = vehicleAuth1.length;
 
         // Obter as listas de veículos pendente de autorização
-        _listVehicleEntry.value = _vehicleService.allPendingAuthorization();
+        _listVehicleEntry.value = _vehicleService.allPendingAuthorization(widget.userLogin.companyId!, widget.userLogin.resaleId!);
       } catch (e) {
-        // print("Erro ao consultar e atualizar a lista: $e");
+       // print("Erro ao consultar e atualizar a lista: $e");
       }
     });
   }
@@ -95,18 +103,19 @@ class _MainPageState extends State<MainPage> {
     } else {
       _currIndexIconSearch.value = 0;
       searchController.text = "";
-      return _vehicleService.allPendingAuthorization();
+      return _vehicleService.allPendingAuthorization(
+          widget.userLogin.companyId!, widget.userLogin.resaleId!);
     }
   }
 
-abreviaName(String name){
-  if(name.length <= 17){
-    return name;
-  }else{
-    return name.substring(0, 17);
+  abreviaName(String name) {
+    if (name.length <= 17) {
+      return name;
+    } else {
+      return name.substring(0, 17);
+    }
   }
 
-}
   @override
   Widget build(BuildContext context) {
     Uint8List userPhoto = base64Decode(widget.userLogin.photo!);
@@ -500,7 +509,8 @@ abreviaName(String name){
                             ),
                             Text(
                               vei.clientCompanyName != ""
-                                  ? abreviaName(vei.clientCompanyName.toString()) 
+                                  ? abreviaName(
+                                      vei.clientCompanyName.toString())
                                   : "FALTA",
                               style: const TextStyle(
                                   color: Colors.black87,
@@ -542,7 +552,7 @@ abreviaName(String name){
                     onTap: () {
                       clickViewVehicle.value = true;
 
-                      _vehicleService.vehicleId(vei.id!).then((onValue) {
+                      _vehicleService.vehicleId(widget.userLogin.companyId!, widget.userLogin.resaleId!,vei.id!).then((onValue) {
                         clickViewVehicle.value = false;
                         // Chama a tela de detalhes
                         Navigator.of(context)

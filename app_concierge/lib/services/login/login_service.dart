@@ -9,14 +9,14 @@ class LoginService {
 
     try {
       final response = await dio.post(
-        kURLLOGIN,
+        "$kURL_BASE/auth/login",
         data: {'email': email, 'password': password},
       );
       if (response.statusCode == 200) {
         return UserLogin.fromJson(response.data);
       }
     } on DioException catch (e) {
-      print('Erro: $e');
+      return UserLogin(token: kERRORUNAUTHORIZED);
     }
     return UserLogin(token: kERRORUNAUTHORIZED);
   }

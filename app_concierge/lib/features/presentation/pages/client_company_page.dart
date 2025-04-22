@@ -42,16 +42,19 @@ class _ClienteCompanyPageState extends State<ClienteCompanyPage> {
 
   @override
   void initState() {
-    listModels();
+    init();
 
     super.initState();
   }
 
-  listModels() async {
-    _attendants = await _attendantService.attendants();
-    context.read<UserAttendantProvider>().add(_attendants);
-
+  init() async {
+    _attendants = await _attendantService.attendants(widget.userLogin.companyId!, widget.userLogin.resaleId!);
     _models = await _vehicleService.vehicleModels();
+     if (_attendants.isEmpty || _models.isEmpty) {
+      Navigator.pop(context);
+    }
+
+    context.read<UserAttendantProvider>().add(_attendants);
     context.read<VehicleModelProvider>().add(_models);
     loadModels.value = false;
   }
@@ -737,20 +740,20 @@ class _ClienteCompanyPageState extends State<ClienteCompanyPage> {
     );
   }
 
-  void filterClean(){
+  void filterClean() {
     clientCodeFilter.text = "";
-    clientFantasiaFilter.text= "";
+    clientFantasiaFilter.text = "";
     clientNameFilter.text = "";
   }
 
   void filterJClient() {
     ClientCompanyService service = ClientCompanyService();
-  
-     if(clientCodeFilter.text.trim() != ""){
+
+    if (clientCodeFilter.text.trim() != "") {
       clients.value = service.filterCode(clientCodeFilter.text.trim());
-    } else if(clientFantasiaFilter.text.trim() != "") {
+    } else if (clientFantasiaFilter.text.trim() != "") {
       clients.value = service.filterJFantasia(clientFantasiaFilter.text.trim());
-    }else if(clientNameFilter.text.trim() != "") {
+    } else if (clientNameFilter.text.trim() != "") {
       clients.value = service.filterJName(clientNameFilter.text.trim());
     }
   }
@@ -758,13 +761,12 @@ class _ClienteCompanyPageState extends State<ClienteCompanyPage> {
   void filterFClient() {
     ClientCompanyService service = ClientCompanyService();
 
-    if(clientCodeFilter.text.trim() != ""){
+    if (clientCodeFilter.text.trim() != "") {
       clients.value = service.filterCode(clientCodeFilter.text.trim());
-    } else if(clientFantasiaFilter.text.trim() != "") {
+    } else if (clientFantasiaFilter.text.trim() != "") {
       clients.value = service.filterFFantasia(clientFantasiaFilter.text.trim());
-    }else if(clientNameFilter.text.trim() != "") {
+    } else if (clientNameFilter.text.trim() != "") {
       clients.value = service.filterFName(clientNameFilter.text.trim());
     }
-    
   }
 }

@@ -363,7 +363,7 @@ class _VehicleDetailsState extends State<VehicleDetails> {
   }
 
   Future<String> exit(VehicleExit vehicle) async {
-    String result = await _vehicleService.Exit(vehicle);
+    String result = await _vehicleService.exit(vehicle);
 
     return result;
   }
