@@ -221,42 +221,6 @@ export default class PurchaseOrderComponent implements OnInit, DoCheck {
     // Formata a data e adiciona o fuso horário
     return datePipe.transform(date, "yyyy-MM-dd") + "T00:00:00.000-03:00";
   }
-  async saveUpdate() {
-    this.clientEnable();
-    const { value, valid } = this.formPurchase;
-
-    const nf = this.formNF.value;
-
-    if (valid) {
-      this.busyService.busy();
-
-      this.purchaseOrder.dateGeneration = this.formatDateTime(new Date(this.purchaseOrder.dateGeneration))
-      this.purchaseOrder.dateDelivery = this.formatDateTime(new Date(value.dateDelivery));
-      this.purchaseOrder.responsibleId = value.responsible.at(0).id;
-      this.purchaseOrder.responsibleName = value.responsible.at(0).name;
-      this.purchaseOrder.paymentType = value.paymentType;
-      this.purchaseOrder.clientCompanyId = value.clientCompanyId;
-      this.purchaseOrder.clientCompanyName = value.clientCompanyName;
-      this.purchaseOrder.attendantName = value?.attendantName ?? "";
-      this.purchaseOrder.attendantEmail = value?.attendantEmail ?? "";
-      this.purchaseOrder.attendantDddCellphone = value.attendantDddCellphone == null ? "" : value.attendantDddCellphone.toString();
-      this.purchaseOrder.attendantCellphone = value.attendantCellphone == null ? "" : value.attendantCellphone.toString();
-      this.purchaseOrder.attendantDddPhone = value.attendantDddPhone == null ? "" : value.attendantDddPhone.toString();
-      this.purchaseOrder.attendantPhone = value.attendantPhone == null ? "" : value.attendantPhone.toString();
-      this.purchaseOrder.nfNum = nf?.nfNum ?? 0;
-      this.purchaseOrder.nfSerie = nf?.nfNumSerie ?? "";
-      this.purchaseOrder.nfDate = nf.nfDate != null ? this.formatDateTime(new Date(nf.nfDate)) : "";
-      this.purchaseOrder.nfKey = nf?.nfKey ?? "";
-
-      const resultPu = await this.updatePurchaseOrder(this.purchaseOrder);
-      if (resultPu.status == 200) {
-        this.messageService.add({ severity: 'success', summary: 'Pedido de Compra', detail: 'Salvo com sucesso', icon: 'pi pi-check' });
-      }
-
-      this.busyService.idle();
-    }
-    this.clientdisable();
-  }
   async saveNew() {
     const { value, valid } = this.formPurchase;
 
@@ -296,6 +260,93 @@ export default class PurchaseOrderComponent implements OnInit, DoCheck {
     }
 
   }
+  async saveUpdate() {
+    this.clientEnable();
+    const { value, valid } = this.formPurchase;
+
+    const nf = this.formNF.value;
+
+    if (valid) {
+      this.busyService.busy();
+
+      this.purchaseOrder.dateGeneration = this.formatDateTime(new Date(this.purchaseOrder.dateGeneration))
+      this.purchaseOrder.dateDelivery = this.formatDateTime(new Date(value.dateDelivery));
+      this.purchaseOrder.responsibleId = value.responsible.at(0).id;
+      this.purchaseOrder.responsibleName = value.responsible.at(0).name;
+      this.purchaseOrder.paymentType = value.paymentType;
+      this.purchaseOrder.clientCompanyId = value.clientCompanyId;
+      this.purchaseOrder.clientCompanyName = value.clientCompanyName;
+      this.purchaseOrder.attendantName = value?.attendantName ?? "";
+      this.purchaseOrder.attendantEmail = value?.attendantEmail ?? "";
+      this.purchaseOrder.attendantDddCellphone = value.attendantDddCellphone == null ? "" : value.attendantDddCellphone.toString();
+      this.purchaseOrder.attendantCellphone = value.attendantCellphone == null ? "" : value.attendantCellphone.toString();
+      this.purchaseOrder.attendantDddPhone = value.attendantDddPhone == null ? "" : value.attendantDddPhone.toString();
+      this.purchaseOrder.attendantPhone = value.attendantPhone == null ? "" : value.attendantPhone.toString();
+      this.purchaseOrder.nfNum = nf?.nfNum ?? 0;
+      this.purchaseOrder.nfSerie = nf?.nfNumSerie ?? "";
+      this.purchaseOrder.nfDate = nf.nfDate != null ? this.formatDateTime(new Date(nf.nfDate)) : "";
+      this.purchaseOrder.nfKey = nf?.nfKey ?? "";
+
+      const resultPu = await this.updatePurchaseOrder(this.purchaseOrder);
+      if (resultPu.status == 200) {
+        this.messageService.add({ severity: 'success', summary: 'Pedido de Compra', detail: 'Salvo com sucesso', icon: 'pi pi-check' });
+      }
+
+      this.busyService.idle();
+    }
+    this.clientdisable();
+  }
+  confirmClose() {
+    this.confirmationService.confirm({
+      header: 'Fechar pedido?',
+      message: 'Por favor confirme para fechar.',
+      accept: async () => {
+
+        this.clientEnable();
+        const { value, valid } = this.formPurchase;
+
+        const nf = this.formNF.value;
+
+        if (valid) {
+          this.busyService.busy();
+
+          this.purchaseOrder.status = "Closed_Purchase_Order";
+          this.purchaseOrder.dateGeneration = this.formatDateTime(new Date(this.purchaseOrder.dateGeneration))
+          this.purchaseOrder.dateDelivery = this.formatDateTime(new Date(value.dateDelivery));
+          this.purchaseOrder.responsibleId = value.responsible.at(0).id;
+          this.purchaseOrder.responsibleName = value.responsible.at(0).name;
+          this.purchaseOrder.paymentType = value.paymentType;
+          this.purchaseOrder.clientCompanyId = value.clientCompanyId;
+          this.purchaseOrder.clientCompanyName = value.clientCompanyName;
+          this.purchaseOrder.attendantName = value?.attendantName ?? "";
+          this.purchaseOrder.attendantEmail = value?.attendantEmail ?? "";
+          this.purchaseOrder.attendantDddCellphone = value.attendantDddCellphone == null ? "" : value.attendantDddCellphone.toString();
+          this.purchaseOrder.attendantCellphone = value.attendantCellphone == null ? "" : value.attendantCellphone.toString();
+          this.purchaseOrder.attendantDddPhone = value.attendantDddPhone == null ? "" : value.attendantDddPhone.toString();
+          this.purchaseOrder.attendantPhone = value.attendantPhone == null ? "" : value.attendantPhone.toString();
+          this.purchaseOrder.nfNum = nf?.nfNum ?? 0;
+          this.purchaseOrder.nfSerie = nf?.nfNumSerie ?? "";
+          this.purchaseOrder.nfDate = nf.nfDate != null ? this.formatDateTime(new Date(nf.nfDate)) : "";
+          this.purchaseOrder.nfKey = nf?.nfKey ?? "";
+
+          const resultPu = await this.updatePurchaseOrder(this.purchaseOrder);
+          if (resultPu.status == 200) {
+            this.messageService.add({ severity: 'success', summary: 'Pedido', detail: 'Fechado com sucesso', icon: 'pi pi-check' });
+            this.hideDialogPurchase();
+            this.listPurchaseOrders();
+          }
+
+          this.busyService.idle();
+        }
+        this.clientdisable();
+
+      },
+      reject: () => {
+        this.messageService.add({ severity: 'error', summary: 'Cancelado', detail: 'Você não fechou o pedido', icon: 'pi pi-times' });
+      }
+    });
+  }
+
   private async savePurchaseOrder(pu: PurchaseOrder): Promise<HttpResponse<PurchaseOrder>> {
     try {
       return await lastValueFrom(this.purchaseOrderService.save(pu));
@@ -456,12 +507,25 @@ export default class PurchaseOrderComponent implements OnInit, DoCheck {
     this.totalItemsDiscount.set(tempDiscount);
     this.totalItemsPrice.set(tempPrice);
   }
-  deleteItem(item: PurchaseOrderItem) {
-    this.purchaseOrderItemService.delete(item).subscribe(async data => {
+  async delete(item: PurchaseOrderItem) {
+
+    const resultItem = await this.deleteItem(item);
+
+    if (resultItem.status == 200) {
       //List items
       this.purchaseOrderItems = await this.listPurchaseOrderItem(this.purchaseOrder.companyId, this.purchaseOrder.resaleId, this.purchaseOrder.id);
       this.somaItem();
-    });
+    }
+
+  }
+
+  private async deleteItem(item: PurchaseOrderItem): Promise<HttpResponse<PurchaseOrderItem>> {
+    try {
+      return await lastValueFrom(this.purchaseOrderItemService.delete(item));
+    } catch (error) {
+      return error;
+    }
+
   }
 
   abreviaNome(name: string): string {
@@ -523,57 +587,6 @@ export default class PurchaseOrderComponent implements OnInit, DoCheck {
     return desc.substring(0, 20);
   }
 
-  confirmClose() {
-    this.confirmationService.confirm({
-      header: 'Fechar pedido?',
-      message: 'Por favor confirme para fechar.',
-      accept: async () => {
 
-        this.clientEnable();
-        const { value, valid } = this.formPurchase;
-
-        const nf = this.formNF.value;
-
-        if (valid) {
-          this.busyService.busy();
-
-          this.purchaseOrder.status = "Closed_Purchase_Order";
-          this.purchaseOrder.dateGeneration = this.formatDateTime(new Date(this.purchaseOrder.dateGeneration))
-          this.purchaseOrder.dateDelivery = this.formatDateTime(new Date(value.dateDelivery));
-          this.purchaseOrder.responsibleId = value.responsible.at(0).id;
-          this.purchaseOrder.responsibleName = value.responsible.at(0).name;
-          this.purchaseOrder.paymentType = value.paymentType;
-          this.purchaseOrder.clientCompanyId = value.clientCompanyId;
-          this.purchaseOrder.clientCompanyName = value.clientCompanyName;
-          this.purchaseOrder.attendantName = value?.attendantName ?? "";
-          this.purchaseOrder.attendantEmail = value?.attendantEmail ?? "";
-          this.purchaseOrder.attendantDddCellphone = value.attendantDddCellphone == null ? "" : value.attendantDddCellphone.toString();
-          this.purchaseOrder.attendantCellphone = value.attendantCellphone == null ? "" : value.attendantCellphone.toString();
-          this.purchaseOrder.attendantDddPhone = value.attendantDddPhone == null ? "" : value.attendantDddPhone.toString();
-          this.purchaseOrder.attendantPhone = value.attendantPhone == null ? "" : value.attendantPhone.toString();
-          this.purchaseOrder.nfNum = nf?.nfNum ?? 0;
-          this.purchaseOrder.nfSerie = nf?.nfNumSerie ?? "";
-          this.purchaseOrder.nfDate = nf.nfDate != null ? this.formatDateTime(new Date(nf.nfDate)) : "";
-          this.purchaseOrder.nfKey = nf?.nfKey ?? "";
-
-          const resultPu = await this.updatePurchaseOrder(this.purchaseOrder);
-          if (resultPu.status == 200) {
-            this.messageService.add({ severity: 'success', summary: 'Pedido', detail: 'Fechado com sucesso', icon: 'pi pi-check' });
-            this.hideDialogPurchase();
-            this.listPurchaseOrders();
-          }
-
-          this.busyService.idle();
-        }
-        this.clientdisable();
-
-
-
-      },
-      reject: () => {
-        this.messageService.add({ severity: 'error', summary: 'Cancelado', detail: 'Você não fechou o pedido', icon: 'pi pi-times' });
-      }
-    });
-  }
 
 }

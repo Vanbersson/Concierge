@@ -75,7 +75,7 @@ export default class VeiculosComponent implements OnInit, OnDestroy {
     ];
 
     this.listVehicles();
-    this.taskService.startTask(() => this.listTaskVehicle(), 20000);
+    this.taskService.startTask(() => this.listTaskVehicle(), 60000);
   }
   ngOnDestroy(): void {
     this.taskService.stopTask();

@@ -14,8 +14,8 @@ public class PurchaseOrderValidation implements IPurchaseOrderValidation {
             return ConstantsMessage.ERROR_COMPANY;
         if (purchase.getResaleId() == null || purchase.getResaleId() == 0)
             return ConstantsMessage.ERROR_RESALE;
-        if(purchase.getStatus() == PurchaseOrderStatus.Closed_Purchase_Order)
-            return "Purchase order close.";
+        if(purchase.getStatus() == null)
+            return "Status not informed.";
         if(purchase.getResponsibleId() == null || purchase.getResponsibleId() == 0)
             return ConstantsMessage.ERROR_ATTENDANT;
         if(purchase.getResponsibleName().isBlank())
@@ -42,8 +42,8 @@ public class PurchaseOrderValidation implements IPurchaseOrderValidation {
             return ConstantsMessage.ERROR_RESALE;
         if (purchase.getId() == null || purchase.getId() == 0)
             return ConstantsMessage.ERROR_ID;
-        if(purchase.getStatus() == PurchaseOrderStatus.Closed_Purchase_Order)
-            return "Purchase order close.";
+        if(purchase.getStatus() == null)
+            return "Status not informed.";
         if(purchase.getResponsibleId() == null || purchase.getResponsibleId() == 0)
             return ConstantsMessage.ERROR_ATTENDANT;
         if(purchase.getResponsibleName().isBlank())

@@ -59,7 +59,7 @@ public class PurchaseOrderItemService implements IPurchaseOrderItemService {
         try {
             String message = this.validation.delete(item);
             if (ConstantsMessage.SUCCESS.equals(message)) {
-                this.repository.delete(item);
+                this.repository.deleteItem(item.getId());
                 return ConstantsMessage.SUCCESS;
             } else {
                 throw new PurchaseOrderException(message);

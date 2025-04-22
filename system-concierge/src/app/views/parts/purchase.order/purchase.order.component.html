@@ -196,7 +196,14 @@
         <ng-template pTemplate="body" let-part let-editing="editing" let-index="rowIndex">
             <tr [pEditableRow]="part">
                 <td>
-                    <span class="text-sm">{{part.partCode}}</span>
+                    <p-cellEditor>
+                        <ng-template pTemplate="input">
+                            <input pInputText type="text" [(ngModel)]="part.partCode" />
+                        </ng-template>
+                        <ng-template pTemplate="output">
+                            <span class="text-sm">{{part.partCode}}</span>
+                        </ng-template>
+                    </p-cellEditor>
                 </td>
                 <td>
                     <p-cellEditor>
