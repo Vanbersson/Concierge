@@ -428,8 +428,6 @@ public class VehicleEntryService implements IVehicleEntryService {
     }
 
     private Map<String, Object> loadObject(VehicleEntry vehicle) {
-        //SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        //SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
 
         Map<String, Object> map = new HashMap<>();
 
