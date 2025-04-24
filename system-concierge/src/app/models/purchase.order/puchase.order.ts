@@ -5,6 +5,7 @@ export class PurchaseOrder {
     status: string = '';
     dateGeneration: Date | string = '';
     dateDelivery: Date | string = '';
+    dateReceived: Date | string = '';
     responsibleId: number = 0;
     responsibleName: string = '';
     clientCompanyId: number = 0;

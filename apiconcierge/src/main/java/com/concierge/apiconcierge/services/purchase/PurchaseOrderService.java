@@ -55,6 +55,10 @@ public class PurchaseOrderService implements IPurchaseOrderService {
         }
     }
 
+    public String close(PurchaseOrder purchase){
+        return "";
+    }
+
     @SneakyThrows
     @Override
     public List<Map<String, Object>> filterOpen(Integer companyId, Integer resaleId) {

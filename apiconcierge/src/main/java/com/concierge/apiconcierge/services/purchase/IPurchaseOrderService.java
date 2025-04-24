@@ -11,6 +11,8 @@ public interface IPurchaseOrderService {
 
     public String update(PurchaseOrder purchase);
 
+    public String close(PurchaseOrder purchase);
+
     public List<Map<String, Object>> filterOpen(Integer companyId, Integer resaleId);
 
     public Map<String, Object> filterId(Integer companyId, Integer resaleId, Integer purchaseId);

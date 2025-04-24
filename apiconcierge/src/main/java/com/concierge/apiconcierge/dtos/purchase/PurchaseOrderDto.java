@@ -12,6 +12,7 @@ public record PurchaseOrderDto(
         PurchaseOrderStatus status,
         Date dateGeneration,
         Date dateDelivery,
+        Date dateReceived,
         Integer responsibleId,
         String responsibleName,
         Integer clientCompanyId,

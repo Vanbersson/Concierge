@@ -39,6 +39,9 @@ public class PurchaseOrder {
     @Column(name = "date_delivery")
     private Date dateDelivery;
 
+    @Column(name = "date_received")
+    private Date dateReceived;
+
     @JoinColumn(table = "tb_user", referencedColumnName = "id")
     @Column(name = "responsible_id")
     private Integer responsibleId;

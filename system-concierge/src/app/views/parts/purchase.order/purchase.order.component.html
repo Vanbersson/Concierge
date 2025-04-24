@@ -173,7 +173,7 @@
             @if(nfNum()){
             <div class="field col-12 md:col-2">
                 <label for="">Fechar Pedido</label>
-                <p-button icon="pi pi-times" label="Fechar" severity="danger" (onClick)="confirmClose()" />
+                <p-button icon="pi pi-times" label="Fechar" severity="danger" (onClick)="showDialogDateclose()" />
             </div>
             }
         </div>
@@ -317,7 +317,8 @@
             <div class="md:col-8"></div>
             <div class="field col-12">
                 <label>Chave de Acesso</label>
-                <p-inputMask mask="99999999999999999999999999999999999999999999" [unmask]="true" formControlName="nfKey"/>
+                <p-inputMask mask="99999999999999999999999999999999999999999999" [unmask]="true"
+                    formControlName="nfKey" />
             </div>
         </div>
     </form>
@@ -441,3 +442,42 @@
         </div>
     </ng-template>
 </p-confirmDialog>
+
+<p-dialog header="Data Entrega" [(visible)]="dateCloseVisible"  [style]="{ width: '30rem',height:'37rem' }">
+    <form [formGroup]="formDateClose">
+        <div class="p-fluid p-formgrid grid">
+            <div class="field col-12">
+                <label for="datecloseId">Data de entrega do material</label>
+                <p-calendar dateFormat="dd/mm/yy" [showIcon]="true" [showOnFocus]="false" inputId="datecloseId"
+                    formControlName="dateClose" />
+                <small class="p-error block" *ngIf="formDateClose.get('dateClose')?.invalid">
+                    Campo obrigatório</small>
+            </div>
+            <div class="md:col-12"></div>
+            <div class="md:col-12"></div>
+            <div class="md:col-12"></div>
+            <div class="md:col-12"></div>
+            <div class="md:col-12"></div>
+            <div class="md:col-12"></div>
+            <div class="md:col-12"></div>
+            <div class="md:col-12"></div>
+            <div class="md:col-12"></div>
+            <div class="md:col-12"></div>
+            <div class="md:col-12"></div>
+            <div class="md:col-12"></div>
+            <div class="md:col-12"></div>
+            <div class="md:col-12"></div>
+            <div class="md:col-12"></div>
+            <div class="md:col-12"></div>
+            <div class="md:col-12"></div>
+            <div class="md:col-12"></div>
+            <div class="md:col-12"></div>     
+        </div>
+    </form>
+    <div class="flex justify-content-end gap-2 mt-2">
+        <button pButton type="button" pRipple label="Fechar" icon="pi pi-times" class="p-button-text"
+            (click)="hideDialogDateclose()"></button>
+        <button pButton type="submit" pRipple label="Confirmar" icon="pi pi-check" class="p-button-text"
+            (click)="confirmDateClose()"></button>
+    </div>
+</p-dialog>

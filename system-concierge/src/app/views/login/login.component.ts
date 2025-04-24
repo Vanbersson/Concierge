@@ -54,7 +54,10 @@ export default class LoginComponent {
     private busyService: BusyService,
     private menuUserService: MenuUserService,
     private permissionService: PermissionService
-  ) { }
+  ) { 
+
+   
+  }
 
   async loginUser() {
     const { valid, value } = this.loginForm;

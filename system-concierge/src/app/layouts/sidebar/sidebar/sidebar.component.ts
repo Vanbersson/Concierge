@@ -104,7 +104,7 @@ export class SidebarComponent implements OnInit {
               {
                 key: '2_2_0',
                 label: 'Pedidos',
-                routerLink:'pecas/pedido/compra',
+                routerLink: 'pecas/pedido/compra',
                 visible: false,
               }
             ]
@@ -211,11 +211,25 @@ export class SidebarComponent implements OnInit {
                 key: '100_1_0',
                 label: 'Veículos',
                 visible: false,
-                icon: 'pi pi-car',
                 routerLink: 'relatorio/portaria/veiculo'
               }
 
             ]
+          },
+          {
+            key: '100_2',
+            label: 'Peças',
+            visible: false,
+            items: [
+              {
+                key: '100_2_0',
+                label: 'Pedidos de compras',
+                visible: false,
+                routerLink: 'relatorio/pecas/pedidos'
+              }
+
+            ]
+
           }
         ]
       },

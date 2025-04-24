@@ -56,20 +56,4 @@ public class VehicleReportService implements IVehicleReportService {
 
     }
 
-    private String createSql(VehicleReportDto vehicle){
-
-        String sql = "SELECT * FROM tb_vehicle_entry WHERE ";
-
-        if(vehicle.companyId() != null)
-            sql +="company_id="+ vehicle.companyId();
-        if(vehicle.resaleId() != null)
-            sql +=" AND resale_id="+vehicle.resaleId();
-        if(vehicle.dateInit() != null)
-            sql += " AND date_entry BETWEEN '2025-02-24 00:00:00' AND 2025-03-27 23:59:59";
-//        if(vehicle.dateFinal() != null)
-//            sql += " OR date_entry BETWEEN " + vehicle.dateFinal() + " AND " + vehicle.dateFinal();
-
-        return sql;
-
-    }
 }
