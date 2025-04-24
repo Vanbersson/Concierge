@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, DoCheck, signal } from '@angular/core';
+import { Component, DoCheck, OnInit, signal } from '@angular/core';
 import { FormGroup, FormControl, ReactiveFormsModule, FormsModule, Validators } from '@angular/forms'
 import { HttpResponse } from '@angular/common/http';
 import { lastValueFrom } from 'rxjs';
@@ -49,7 +49,6 @@ export interface IFilterVehicles {
   vehicleId?: number;
   placa?: string;
   frota?: string;
- 
 }
 
 @Component({
@@ -64,7 +63,7 @@ export interface IFilterVehicles {
   styleUrl: './vehicle.component.scss',
   providers: [MessageService]
 })
-export default class VehicleComponent implements DoCheck {
+export default class VehicleComponent implements OnInit,DoCheck {
 
   dialogVisible: boolean = false;
   listVehicleEntry: VehicleEntry[] = [];
@@ -78,10 +77,10 @@ export default class VehicleComponent implements DoCheck {
     vehicleNew: new FormControl<string | null>(null),
     dateInit: new FormControl<Date | string>('', Validators.required),
     dateFinal: new FormControl<Date | string>('', Validators.required),
-    clientCompanyId: new FormControl<number>(0),
+    clientCompanyId: new FormControl<number>(null),
     clientCompanyName: new FormControl<string>(''),
     modelVehicle: new FormControl<ModelVehicle[]>([]),
-    vehicleId: new FormControl<number>(0),
+    vehicleId: new FormControl<number>(null),
     placa: new FormControl<string>(''),
     frota: new FormControl<string>('')
   });
@@ -91,11 +90,26 @@ export default class VehicleComponent implements DoCheck {
     private busyService: BusyService,
     private storageService: StorageService) {
   }
+  ngOnInit(): void {
+    this.clientdisable();
+  }
   ngDoCheck(): void {
-    this.formFilter.patchValue({
-      clientCompanyId: this.selectClientCompany().id,
-      clientCompanyName: this.selectClientCompany().name
-    });
+    if(this.selectClientCompany().id != 0){
+      this.formFilter.patchValue({
+        clientCompanyId: this.selectClientCompany().id,
+        clientCompanyName: this.selectClientCompany().name
+      });
+    }
+    
+  }
+  private clientEnable() {
+    this.formFilter.get('clientCompanyId').enable();
+    this.formFilter.get('clientCompanyName').enable();
+  }
+  private clientdisable() {
+    this.formFilter.get('clientCompanyId').disable();
+    this.formFilter.get('clientCompanyName').disable();
+
   }
   private preList(vehicle: VehicleEntry): VehicleEntry {
     if (vehicle.vehicleNew == "yes") {
@@ -149,10 +163,10 @@ export default class VehicleComponent implements DoCheck {
       vehicleNew:null,
       dateInit: '',
       dateFinal: '',
-      clientCompanyId: 0,
+      clientCompanyId: null,
       clientCompanyName: '',
       modelVehicle: [],
-      vehicleId: 0,
+      vehicleId: null,
       placa: '',
       frota: ''
     });
@@ -169,11 +183,11 @@ export default class VehicleComponent implements DoCheck {
   public hideDialog() {
     this.dialogVisible = false;
   }
-
-  public async filterClient() {
+  public async searchFilter() {
     this.hideDialog();
 
     this.busyService.busy();
+    this.clientEnable();
 
     const { value, valid } = this.formFilter;
 
@@ -200,9 +214,9 @@ export default class VehicleComponent implements DoCheck {
       this.listVehicleEntry = resultFilter.body;
     }
 
+    this.clientdisable();
     this.busyService.idle();
   }
-
   private async filterVehicles(filters: any): Promise<HttpResponse<VehicleEntry[]>> {
     try {
       return await lastValueFrom(this.reportService.filterVehicle(filters));

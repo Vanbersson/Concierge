@@ -17,11 +17,7 @@
                     <input pInputText type="text" (input)="dt1.filterGlobal($event.target.value, 'contains')"
                         placeholder="Pesquisar" />
                 </p-iconField>
-                <div class="gap-2">
-                    <p-button icon="pi pi-print" severity="secondary" [text]="true" />
-                    <p-button icon="pi pi-file-excel" severity="success" [text]="true" />
-                    <p-button icon="pi pi-filter" severity="warning" [text]="true" (onClick)="showDialog()" />
-                </div>
+                <p-button icon="pi pi-filter" severity="warning" [text]="true" (onClick)="showDialog()" label="Filtros" />
             </div>
         </ng-template>
         <ng-template pTemplate="header">
@@ -97,8 +93,7 @@
 
     <form [formGroup]="formFilter">
         <div class="p-fluid p-formgrid grid">
-            <div class="md:col-12">
-            </div>
+            
             <div class="field col-12 flex justify-content-end mt-2">
                 <p-button icon="pi pi-refresh" [text]="true" label="Limpar" (onClick)="cleanform()" />
             </div>
@@ -112,9 +107,10 @@
                 <p-calendar dateFormat="dd/mm/yy" [iconDisplay]="'input'" [showIcon]="true" inputId="buttondisplay"
                     formControlName="dateFinal" />
             </div>
+            <div class="md:col-6"></div>
             <div class="field col-12 md:col-6 ">
                 <label for="">Tipo</label>
-                <div class="flex align-items-center gap-2 mt-2">
+                <div class="flex align-items-center gap-2 border-1 border-round border-300 p-3">
                     <div class="flex align-items-center">
                         <p-radioButton value="E" inputId="type1" formControlName="type"></p-radioButton>
                         <label for="type1" class="ml-2">
@@ -135,6 +131,7 @@
                     </div>
                 </div>
             </div>
+            <div class="md:col-6"></div>
             <div class="field col-12 md:col-2">
                 <label for="clientCompanyCodeId">Código</label>
                 <p-inputNumber inputId="clientCompanyCodeId" mode="decimal" [useGrouping]="false"
@@ -148,10 +145,7 @@
                 <label for="">Filtro</label>
                 <app-filterclient (outputClient)="selectClientCompany.set($event)" />
             </div>
-
             <div class="md:col-3"></div>
-
-
             <div class="field col-12 md:col-4">
                 <label for="vehiclemodelid">Modelos</label>
                 <p-multiSelect [options]="vehicleModels$ | async" display="chip" [selectionLimit]="1"
@@ -183,16 +177,12 @@
                     <p-checkbox formControlName="vehicleNew" value="yes" inputId="vehicleNewId" />
                     <label for="vehicleNewId">Veículos novos</label>
                 </div>
-                
             </div>
             <div class="md:col-5"></div>
-
             <div class=" field col-12 md:col-2">
                 <label for="codeId">Código</label>
                 <p-inputNumber inputId="codeId" mode="decimal" [useGrouping]="false" formControlName="vehicleId" />
             </div>
-            <div class="md:col-10"></div>
-
             <div class=" field col-12 md:col-4">
                 <label for="placaId">Placa</label>
                 <p-inputMask id="placaId" mask="***-****" [unmask]="true" [style]="{'text-transform':'uppercase'}"
@@ -220,8 +210,8 @@
         <div class="flex justify-content-end gap-2 mt-5">
             <button pButton type="button" pRipple label="Fechar" icon="pi pi-times" class="p-button-text"
                 (click)="hideDialog()"></button>
-            <button pButton type="button" pRipple label="Confirmar" icon="pi pi-check" class="p-button-text"
-                (click)="filterClient()"></button>
+            <button pButton type="button" pRipple label="Pesquisar" icon="pi pi-search" class="p-button-text"
+                (click)="searchFilter()"></button>
         </div>
     </form>
 </p-dialog>

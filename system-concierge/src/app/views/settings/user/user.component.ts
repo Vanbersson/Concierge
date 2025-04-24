@@ -128,9 +128,14 @@ export default class UserComponent implements OnInit {
         key: '100_0', label: 'Relatório', children: [
           {
             key: '100_1', label: 'Portaria', children: [
-              { key: '100_1_0', label: 'Veículos', icon: 'pi pi-car' },
+              { key: '100_1_0', label: 'Veículos' },
             ]
           },
+          {
+            key: '100_2', label: 'Peças', children:[
+              { key: '100_2_0', label: 'Pedidos de compras' },
+            ]
+          }
         ]
       },
       {
