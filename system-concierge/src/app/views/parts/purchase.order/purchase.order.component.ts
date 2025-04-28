@@ -1,4 +1,4 @@
-import { Component, DoCheck, OnInit, signal, ChangeDetectorRef } from '@angular/core';
+import { Component, DoCheck, OnInit, signal, ChangeDetectorRef, ViewChild } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { lastValueFrom } from 'rxjs';
@@ -21,10 +21,6 @@ import { CalendarModule } from 'primeng/calendar';
 import { TagModule } from 'primeng/tag';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 
-//Print
-import printJS from 'print-js';
-
-
 //Class
 import { PurchaseOrder } from '../../../models/purchase.order/puchase.order';
 import { ClientCompany } from '../../../models/clientcompany/client-company';
@@ -35,6 +31,7 @@ import { Part } from '../../../models/parts/Part';
 //Components
 import { FilterClientComponent } from '../../../components/filter.client/filter.client.component';
 import { FilterPartsComponent } from '../../../components/filter.parts/filter.parts.component';
+import { PrintPurchaseComponent } from '../../../components/print.purchase/print.purchase.component';
 
 //Service
 import { UserService } from '../../../services/user/user.service';
@@ -46,8 +43,8 @@ import { PurchaseOrderItemService } from '../../../services/purchase/purchase-or
 @Component({
   selector: 'app-purchase.order',
   standalone: true,
-  imports: [CommonModule, FilterClientComponent, FilterPartsComponent, ToastModule, ButtonModule, TableModule,
-    InputTextModule, IconFieldModule, InputIconModule, DialogModule,
+  imports: [CommonModule, PrintPurchaseComponent, FilterClientComponent, FilterPartsComponent,
+    ToastModule, ButtonModule, TableModule, InputTextModule, IconFieldModule, InputIconModule, DialogModule,
     ReactiveFormsModule, FormsModule, InputGroupModule, InputNumberModule, MultiSelectModule, InputMaskModule, TagModule, ConfirmDialogModule,
     CalendarModule],
   templateUrl: './purchase.order.component.html',
@@ -110,6 +107,9 @@ export default class PurchaseOrderComponent implements OnInit, DoCheck {
   formDateClose = new FormGroup({
     dateClose: new FormControl<Date | string>(new Date(), Validators.required)
   });
+
+  //Print
+  @ViewChild('printComponent') printComponent!: PrintPurchaseComponent;
 
   constructor(
     private busyService: BusyService,
@@ -346,43 +346,12 @@ export default class PurchaseOrderComponent implements OnInit, DoCheck {
 
   }
   //Print
-  async print(id: number) {
-
-    const resultPu = await this.purchaseEdit(id);
-    if (resultPu.status == 200) {
-      //Dados 
-      this.printPurchaseOrder.set(resultPu.body);
-
-      this.printPurchaseOrderItems = Array(25).fill(new PurchaseOrderItem());
-
-      //List items
-      this.purchaseOrderItems = await this.listPurchaseOrderItem(this.storageService.companyId, this.storageService.resaleId, id);
-      this.somaItem();
-
-      for (let index = 0; index < this.purchaseOrderItems.length; index++) {
-        this.printPurchaseOrderItems[index] = this.purchaseOrderItems.at(index);
-      }
-
-      setTimeout(() => {
-        const print = document.getElementById('print-sectionId');
-        print.style.display = 'block';
-        printJS({
-          printable: 'print-sectionId',
-          type: 'html',
-          targetStyles: ['*'], // garante que os estilos globais sejam aplicados
-          scanStyles: true, // use true se quiser escanear estilos inline também
-          documentTitle: 'Pedido de compra'
-        });
-        print.style.display = 'none';
-      }, 200);
-
+  print(id: number) {
+    if (this.printComponent) {
+      this.printComponent.print(id);
+    } else {
+      console.error('PrintPurchaseComponent não inicializado');
     }
-
-  }
-  printAbreviaDesc(desc: string) {
-    if (desc == '') return desc;
-    if (desc.length <= 20) return desc;
-    return desc.substring(0, 20);
   }
   //Services
   private async savePurchaseOrder(pu: PurchaseOrder): Promise<HttpResponse<PurchaseOrder>> {
@@ -399,7 +368,6 @@ export default class PurchaseOrderComponent implements OnInit, DoCheck {
       return error;
     }
   }
-
   compararDatas(dateG: Date, dateD: Date): string {
     const diff = dateD.getTime() - dateG.getTime();
     if (diff > 0) return `No prazo`;

@@ -4,7 +4,6 @@
         .p-button-label {
             font-weight: 400;
         }
-
     }
 
     .layout-card-title {
@@ -21,25 +20,6 @@
             padding-left: 1.5rem;
         }
 
-    }
-
-    #print-table {
-        font-family: Arial, Helvetica, sans-serif;
-        border-collapse: collapse;
-        width: 100%;
-    }
-
-    #print-table td,
-    #print-table th {
-        border: 1px solid #ddd;
-        padding: 4px;
-    }
-
-    #print-table th {
-        padding-top: 12px;
-        padding-bottom: 12px;
-        text-align: left;
-        background-color: var(--blue-500);
     }
 }
 

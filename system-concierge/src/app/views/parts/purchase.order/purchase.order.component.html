@@ -55,8 +55,8 @@
                 <td class="flex gap-2">
                     <p-button icon="pi pi-pencil" [text]="true" size="small" label="Editar"
                         (onClick)="edit(purchase.id)" />
-                    <button pButton [text]="true" icon="pi pi-print" size="small" label="Imprimir" severity="secondary"
-                        (click)="print(purchase.id)"></button>
+                        <p-button icon="pi pi-print" (onClick)="print(purchase.id)" label="Imprimir"
+                        severity="secondary" [text]="true" size="small"></p-button>
                 </td>
             </tr>
         </ng-template>
@@ -331,96 +331,7 @@
 </p-dialog>
 
 <!-- Print -->
-<div id="print-sectionId" style="display: none;">
-    <img src="../../../../assets/image/purchase-order-barra.jpeg" alt="" width="800">
-    <table style="border: 1px solid #ddd;
-        padding: 8px; font-family: Arial, Helvetica, sans-serif;
-        border-collapse: collapse;
-        width: 100%;">
-        <tr>
-            <td>
-                <span>PEDIDO Nº: <strong>{{printPurchaseOrder().id}}</strong></span>
-            </td>
-            <td>
-                <span>VENDEDOR: {{printPurchaseOrder().attendantName | uppercase}}</span>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <span>DATA: {{printPurchaseOrder().dateGeneration | date: 'dd/MM/yyyy'}}</span>
-            </td>
-            <td>
-                @if(printPurchaseOrder().attendantDddCellphone == '' || printPurchaseOrder().attendantCellphone == ''){
-                <span>CELULAR:</span>
-                }@else {
-                <span>CELULAR: {{"("+printPurchaseOrder().attendantDddCellphone+")"+"
-                    "+printPurchaseOrder().attendantCellphone}}</span>
-                }
-            </td>
-        </tr>
-        <tr>
-            <td><span>CÓDIGO FORN.: {{printPurchaseOrder().clientCompanyId}}</span></td>
-            <td><span>E-MAIL: {{printPurchaseOrder().attendantEmail}}</span></td>
-        </tr>
-        <tr>
-            <td><span>FORNECEDOR: {{printAbreviaDesc(printPurchaseOrder().clientCompanyName) }}</span></td>
-            <td><span>DATA ENTREGA: {{printPurchaseOrder().dateDelivery | date: 'dd/MM/yyyy'}}</span></td>
-        </tr>
-        <tr>
-            <td>
-                @if(printPurchaseOrder().nfNum != 0){ <span>NOTA: {{printPurchaseOrder().nfNum}}</span> }@else{
-                <span>NOTA:</span> }
-            </td>
-            <td><span>PAGAMENTO: {{printPurchaseOrder().paymentType | uppercase }}</span></td>
-        </tr>
-    </table>
-    <table id="print-table">
-        <tr>
-            <th>Código</th>
-            <th>Descrição</th>
-            <th>Qtd</th>
-            <th>Preço</th>
-            <th>Desconto</th>
-            <th>Total</th>
-        </tr>
-        <tr *ngFor="let item of printPurchaseOrderItems">
-            <td>{{item?.partCode }}</td>
-            <td>{{ printAbreviaDesc(item?.partDescription || '') }}</td>
-            <td>{{item?.quantity || ''}}</td>
-            <td>{{item?.price || 0 | currency }}</td>
-            <td>{{item?.discount || 0 | currency}}</td>
-            <td>{{(item?.price * item?.quantity) - item?.discount || 0 | currency}}</td>
-        </tr>
-        <br>
-        <tr>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td><strong>{{totalItemsPrice() | currency}}</strong></td>
-            <td><strong>{{totalItemsDiscount() | currency}}</strong></td>
-            <td><strong>{{totalItemsPrice() - totalItemsDiscount() | currency}}</strong></td>
-        </tr>
-
-    </table>
-    <br>
-    <table style="width: 100%; text-align: center;">
-        <tr>
-            <td>AUTORIZADO POR</td>
-            <td>AUTORIZADO POR</td>
-            <td>AUTORIZADO POR</td>
-        </tr>
-        <tr>
-            <td class="text-sm"><strong>Alexsandro Paulino</strong></td>
-            <td class="text-sm"><strong>Luise Rossi</strong></td>
-            <td class="text-sm"><strong>Bruna Dones Gayer</strong></td>
-        </tr>
-        <tr>
-            <td>Comprador</td>
-            <td>Diretora Financeira</td>
-            <td>Diretora comercial</td>
-        </tr>
-    </table>
-</div>
+<app-printPurchase #printComponent></app-printPurchase>
 
 <!-- Confirm close -->
 <p-confirmDialog #cd>
