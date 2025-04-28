@@ -117,6 +117,10 @@ export const routes: Routes = [
                     {
                         path:'portaria/veiculo',
                         loadComponent: () => import('./views/report/concierge/vehicle/vehicle.component')
+                    },
+                    {
+                        path:'pecas/pedidos',
+                        loadComponent: () => import('./views/report/part/purchase.order/purchase.order.component')
                     }
                 ]
             },
