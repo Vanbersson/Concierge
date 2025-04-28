@@ -89,4 +89,6 @@ public class PurchaseOrder {
     @Column(name = "nf_key")
     private String nfKey;
 
+    private String information;
+
 }

@@ -2,7 +2,7 @@
 <div id="print-sectionId" style="display: none;">
     <img src="../../../../assets/image/purchase-order-barra.jpeg" alt="" width="800">
     <table style="border: 1px solid #ddd;
-        padding: 8px; font-family: Arial, Helvetica, sans-serif;
+        padding: 4px; font-family: Arial, Helvetica, sans-serif;
         border-collapse: collapse;
         width: 100%;">
         <tr>
@@ -53,7 +53,7 @@
         </tr>
         <tr *ngFor="let item of printPurchaseOrderItems">
             <td>{{item?.partCode }}</td>
-            <td>{{ abreviaDesc(item?.partDescription || '') }}</td>
+            <td>{{ abreviaDesc(item?.partDescription || '') | uppercase }}</td>
             <td>{{item?.quantity || ''}}</td>
             <td>{{item?.price || 0 | currency }}</td>
             <td>{{item?.discount || 0 | currency}}</td>
@@ -71,6 +71,10 @@
 
     </table>
     <br>
+    <div style="height: 60px; width: 100%; border: 1px solid #ddd;text-align: left;
+    padding: 4px; font-family: Arial, Helvetica, sans-serif; border-collapse: collapse;">
+        <label for="">Inf.: </label>{{printPurchaseOrder().information | uppercase}}
+    </div>
     <table style="width: 100%; text-align: center;">
         <tr>
             <td>AUTORIZADO POR</td>
@@ -78,14 +82,14 @@
             <td>AUTORIZADO POR</td>
         </tr>
         <tr>
-            <td class="text-sm"><strong>Alexsandro Paulino</strong></td>
-            <td class="text-sm"><strong>Luise Rossi</strong></td>
-            <td class="text-sm"><strong>Bruna Dones Gayer</strong></td>
+            <td class="text-xs"><strong>Alexsandro Paulino</strong></td>
+            <td class="text-xs"><strong>Luise Rossi</strong></td>
+            <td class="text-xs"><strong>Bruna Dones Gayer</strong></td>
         </tr>
         <tr>
-            <td>Comprador</td>
-            <td>Diretora Financeira</td>
-            <td>Diretora comercial</td>
+            <td class="text-xs">Comprador</td>
+            <td class="text-xs">Diretora Financeira</td>
+            <td class="text-xs">Diretora comercial</td>
         </tr>
     </table>
 </div>

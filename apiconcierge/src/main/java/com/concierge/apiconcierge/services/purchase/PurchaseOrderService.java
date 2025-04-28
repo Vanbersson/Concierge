@@ -129,6 +129,7 @@ public class PurchaseOrderService implements IPurchaseOrderService {
                     map.put("nfDate", pu.getNfDate());
                 }
                 map.put("nfKey", pu.getNfKey());
+                map.put("information",pu.getInformation());
                 return map;
             } else {
                 throw new RuntimeException(message);

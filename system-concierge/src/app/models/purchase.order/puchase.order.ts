@@ -21,4 +21,5 @@ export class PurchaseOrder {
     nfSerie: string = '';
     nfDate: Date | string = '';
     nfKey: string = '';
+    information: string = '';
 }

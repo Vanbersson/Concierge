@@ -20,6 +20,7 @@ import { InputMaskModule } from 'primeng/inputmask';
 import { CalendarModule } from 'primeng/calendar';
 import { TagModule } from 'primeng/tag';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { InputTextareaModule } from 'primeng/inputtextarea';
 
 //Class
 import { PurchaseOrder } from '../../../models/purchase.order/puchase.order';
@@ -43,7 +44,7 @@ import { PurchaseOrderItemService } from '../../../services/purchase/purchase-or
 @Component({
   selector: 'app-purchase.order',
   standalone: true,
-  imports: [CommonModule, PrintPurchaseComponent, FilterClientComponent, FilterPartsComponent,
+  imports: [CommonModule, PrintPurchaseComponent, FilterClientComponent, FilterPartsComponent, InputTextareaModule,
     ToastModule, ButtonModule, TableModule, InputTextModule, IconFieldModule, InputIconModule, DialogModule,
     ReactiveFormsModule, FormsModule, InputGroupModule, InputNumberModule, MultiSelectModule, InputMaskModule, TagModule, ConfirmDialogModule,
     CalendarModule],
@@ -94,7 +95,8 @@ export default class PurchaseOrderComponent implements OnInit, DoCheck {
     nfNum: new FormControl<number | null>(null),
     nfNumSerie: new FormControl<string>(""),
     nfDate: new FormControl<Date | string>(""),
-    nfKey: new FormControl<string>("")
+    nfKey: new FormControl<string>(""),
+    information: new FormControl<string>("")
   });
 
   formNF = new FormGroup({
@@ -211,6 +213,7 @@ export default class PurchaseOrderComponent implements OnInit, DoCheck {
       this.purchaseOrder.nfSerie = "";
       this.purchaseOrder.nfDate = ""
       this.purchaseOrder.nfKey = "";
+      this.purchaseOrder.information = value?.information ?? "";
 
       const resultPu = await this.savePurchaseOrder(this.purchaseOrder);
       if (resultPu.status == 201) {
@@ -250,6 +253,7 @@ export default class PurchaseOrderComponent implements OnInit, DoCheck {
       this.purchaseOrder.nfSerie = nf?.nfNumSerie ?? "";
       this.purchaseOrder.nfDate = nf.nfDate != null ? this.formatDateTime(new Date(nf.nfDate)) : "";
       this.purchaseOrder.nfKey = nf?.nfKey ?? "";
+      this.purchaseOrder.information = value?.information ?? "";
 
       const resultPu = await this.updatePurchaseOrder(this.purchaseOrder);
       if (resultPu.status == 200) {
@@ -328,7 +332,7 @@ export default class PurchaseOrderComponent implements OnInit, DoCheck {
     }
   }
   //Delete
-  async delete(item: PurchaseOrderItem) {
+  async deletePart(item: PurchaseOrderItem) {
     const resultItem = await this.deleteItem(item);
     if (resultItem.status == 200) {
       //List items
@@ -414,7 +418,8 @@ export default class PurchaseOrderComponent implements OnInit, DoCheck {
       nfNum: null,
       nfNumSerie: "",
       nfDate: "",
-      nfKey: ""
+      nfKey: "",
+      information:""
     });
     this.numPurchaseOrder.set(null);
     this.selectClientCompany.set(new ClientCompany());
@@ -469,7 +474,8 @@ export default class PurchaseOrderComponent implements OnInit, DoCheck {
         nfNum: this.purchaseOrder.nfNum != 0 ? this.purchaseOrder.nfNum : null,
         nfNumSerie: this.purchaseOrder?.nfSerie ?? "",
         nfDate: this.purchaseOrder.nfDate != "" ? new Date(this.purchaseOrder.nfDate) : null,
-        nfKey: this.purchaseOrder.nfKey != "" ? this.purchaseOrder.nfKey : null
+        nfKey: this.purchaseOrder.nfKey != "" ? this.purchaseOrder.nfKey : null,
+        information: this.purchaseOrder?.information ?? ""
       });
 
       this.formNF.patchValue({

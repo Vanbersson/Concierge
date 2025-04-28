@@ -1,0 +1,1 @@
+alter table tb_purchase_order add column  information varchar(255);

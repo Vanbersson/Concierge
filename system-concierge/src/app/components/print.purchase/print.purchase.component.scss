@@ -8,13 +8,10 @@
     #print-table td,
     #print-table th {
         border: 1px solid #ddd;
-        padding: 2px;
         font-size: 8px;
     }
 
     #print-table th {
-        padding-top: 4px;
-        padding-bottom: 4px;
         text-align: left;
         background-color: var(--blue-500);
     }

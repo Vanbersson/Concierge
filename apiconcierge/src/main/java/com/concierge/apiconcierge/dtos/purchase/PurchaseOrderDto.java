@@ -27,6 +27,7 @@ public record PurchaseOrderDto(
         Integer nfNum,
         String nfSerie,
         Date nfDate,
-        String nfKey
+        String nfKey,
+        String information
 ) {
 }
