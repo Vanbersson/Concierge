@@ -1,4 +1,4 @@
-import { Component, DoCheck, OnInit, signal } from '@angular/core';
+import { Component, DoCheck, EventEmitter, OnInit, Output, signal, ViewChild } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormControl, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 
@@ -17,6 +17,7 @@ import { InputMaskModule } from 'primeng/inputmask';
 import { CalendarModule } from 'primeng/calendar';
 import { RadioButtonModule } from 'primeng/radiobutton';
 import { DialogModule } from 'primeng/dialog';
+import { TagModule } from 'primeng/tag';
 import { MultiSelectModule } from 'primeng/multiselect';
 
 //Class
@@ -30,9 +31,17 @@ import { PurchaseReportService } from '../../../../services/reports/parts/purcha
 
 //Companent
 import { FilterClientComponent } from '../../../../components/filter.client/filter.client.component';
+
 import { ClientCompany } from '../../../../models/clientcompany/client-company';
 import { UserService } from '../../../../services/user/user.service';
 import { User } from '../../../../models/user/user';
+import { lastValueFrom } from 'rxjs';
+import { HttpResponse } from '@angular/common/http';
+import { PurchaseOrderItem } from '../../../../models/purchase.order/purchase.order.item';
+
+//Print
+import { PurchaseOrderItemService } from '../../../../services/purchase/purchase-order-item.service';
+import { PrintPurchaseComponent } from '../../../../components/print.purchase/print.purchase.component';
 
 
 export interface IFilterPurchaseOrder {
@@ -40,11 +49,11 @@ export interface IFilterPurchaseOrder {
   resaleId: number;
   dateInit?: Date | string;
   dateFinal?: Date | string;
-  type: string;
-  delivery: string;
+  status: string;
+  statusDelivery: string;
   clientCompanyId?: number;
-  responsableId?: number;
-  purchaseOrderId?: number;
+  responsibleId?: number;
+  id?: number;
   nfNum?: number;
 
 }
@@ -52,7 +61,7 @@ export interface IFilterPurchaseOrder {
 @Component({
   selector: 'app-purchase.order',
   standalone: true,
-  imports: [CommonModule, FilterClientComponent, ReactiveFormsModule, ToastModule, TableModule, ButtonModule, InputMaskModule,
+  imports: [CommonModule, PrintPurchaseComponent, FilterClientComponent, TagModule, ReactiveFormsModule, ToastModule, TableModule, ButtonModule, InputMaskModule,
     InputTextModule, IconFieldModule, InputIconModule, InputNumberModule, MultiSelectModule,
     InputGroupModule, RadioButtonModule, DialogModule,
     CalendarModule],
@@ -70,8 +79,8 @@ export default class PurchaseOrderComponent implements OnInit, DoCheck {
   formFilter = new FormGroup({
     dateInit: new FormControl<Date | string>(''),
     dateFinal: new FormControl<Date | string>(''),
-    type: new FormControl<string>('N'),
-    delivery: new FormControl<string>('N'),
+    type: new FormControl<string>('All'),
+    delivery: new FormControl<string>(''),
     clientCompanyId: new FormControl<number | null>(null),
     clientCompanyName: new FormControl<string>(""),
     responsible: new FormControl<User[]>([]),
@@ -79,16 +88,18 @@ export default class PurchaseOrderComponent implements OnInit, DoCheck {
     nfNum: new FormControl<number | null>(null)
   });
 
+  //Print
+  @ViewChild('printComponent') printComponent!: PrintPurchaseComponent;
+
   constructor(private busyService: BusyService,
     private storageService: StorageService,
     private messageService: MessageService,
-    private purchaseOrderService: PurchaseOrderService,
     private purchaseReportService: PurchaseReportService,
-    private userService: UserService) { }
+    private userService: UserService
+  ) { }
 
   ngOnInit(): void {
     this.clientdisable();
-    this.listPurchaseOrders();
   }
   ngDoCheck(): void {
     if (this.selectClientCompany().id != 0) {
@@ -99,7 +110,6 @@ export default class PurchaseOrderComponent implements OnInit, DoCheck {
     }
 
   }
-
   private clientEnable() {
     this.formFilter.get('clientCompanyId').enable();
     this.formFilter.get('clientCompanyName').enable();
@@ -108,17 +118,6 @@ export default class PurchaseOrderComponent implements OnInit, DoCheck {
     this.formFilter.get('clientCompanyId').disable();
     this.formFilter.get('clientCompanyName').disable();
 
-  }
-
-  listPurchaseOrders() {
-    this.purchaseOrderService.filterOpen$(this.storageService.companyId, this.storageService.resaleId).subscribe(data => {
-      for (var item of data) {
-        const data1 = this.formatDateTime(new Date());
-        const data2 = new Date(item.dateDelivery);
-        item.status = this.compararDatas(new Date(data1), data2);
-      }
-      this.purchaseOrders = data;
-    });
   }
   compararDatas(dateG: Date, dateD: Date): string {
     const diff = dateD.getTime() - dateG.getTime();
@@ -132,7 +131,44 @@ export default class PurchaseOrderComponent implements OnInit, DoCheck {
     // Formata a data e adiciona o fuso horário
     return datePipe.transform(date, "yyyy-MM-dd") + "T00:00:00.000-03:00";
   }
-  getStatusSeverity(status: string): any {
+  getStatusDelivery(pu: PurchaseOrder): string {
+
+    if (pu.status == "Open_Purchase_Order") {
+      const data1 = this.formatDateTime(new Date());
+      const dateDelivery = new Date(pu.dateDelivery);
+      return this.compararDatas(new Date(data1), dateDelivery);
+    } else {
+      var status = "No prazo";
+
+      const dateDelivery = new Date(pu.dateDelivery);
+      const dateReceived = new Date(pu.dateReceived);
+      const diff = dateDelivery.getTime() - dateReceived.getTime();
+
+      if (diff < 0) status = "Atrasado";
+
+      return status;
+    }
+
+  }
+  getStatusSeverity(pu: PurchaseOrder): any {
+
+    var status = "";
+
+    if (pu.status == "Open_Purchase_Order") {
+      const data1 = this.formatDateTime(new Date());
+      const data2 = new Date(pu.dateDelivery);
+      status = this.compararDatas(new Date(data1), data2);
+    } else {
+      const data1 = new Date(pu.dateDelivery);
+      const data2 = new Date(pu.dateReceived);
+
+      const diff = data1.getTime() - data2.getTime();
+
+      if (diff > 0) status = "No prazo";
+      if (diff < 0) status = "Atrasado";
+      if (diff == 0) status = "No prazo";
+    }
+
     switch (status) {
       case 'Hoje':
         return 'warning';
@@ -155,9 +191,25 @@ export default class PurchaseOrderComponent implements OnInit, DoCheck {
   public hideDialog() {
     this.dialogVisible = false;
   }
+  cleanList() {
+    this.purchaseOrders = [];
+  }
+  cleanformFilter() {
+    this.clientEnable();
+    this.selectClientCompany.set(new ClientCompany());
+    this.formFilter.patchValue({
+      dateInit: '',
+      dateFinal: '',
+      type: 'All',
+      delivery: '',
+      clientCompanyId: null,
+      clientCompanyName: '',
+      responsible: [],
+      purchaseOrderId: null,
+      nfNum: null
+    });
 
-  cleanform() {
-
+    this.clientdisable();
   }
 
   async searchPurchaseOrder() {
@@ -171,17 +223,44 @@ export default class PurchaseOrderComponent implements OnInit, DoCheck {
       resaleId: this.storageService.resaleId,
       dateInit: value.dateInit != '' ? this.formatDateTime(new Date(value.dateInit)) : "",
       dateFinal: value.dateFinal != "" ? this.formatDateTime(new Date(value.dateFinal)) : "",
-      type: value.type,
-      delivery: value.delivery,
+      status: value.type == "All" ? "" : value.type,
+      statusDelivery: value.delivery,
       clientCompanyId: value?.clientCompanyId ?? 0,
-      responsableId: value.responsible.at(0)?.id ?? 0,
-      purchaseOrderId: value?.purchaseOrderId ?? 0,
+      responsibleId: value.responsible.at(0)?.id ?? 0,
+      id: value?.purchaseOrderId ?? 0,
       nfNum: value?.nfNum ?? 0
     };
 
+    const resultFilters = await this.filter(filter);
+    if (resultFilters.status == 200) {
 
+      if (value.delivery != "") {
+
+      }
+
+      this.purchaseOrders = resultFilters.body;
+    }
+
+    this.clientdisable();
     this.busyService.idle();
-    console.log(filter);
-
+    this.hideDialog();
   }
+
+  private async filter(filters: IFilterPurchaseOrder): Promise<HttpResponse<PurchaseOrder[]>> {
+    try {
+      return await lastValueFrom(this.purchaseReportService.filter(filters));
+    } catch (error) {
+      return error;
+    }
+  }
+
+  //Print
+  print(id: number) {
+    if (this.printComponent) {
+      this.printComponent.print(id);
+    } else {
+      console.error('PrintPurchaseComponent não inicializado');
+    }
+  }
+
 }

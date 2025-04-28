@@ -13,7 +13,6 @@ public record VehicleReportDto(
         Date dateFinal,
         Integer clientId,
         Integer modelId,
-
         Integer vehicleId,
         String placa,
         String frota

@@ -12,8 +12,8 @@ export class PurchaseReportService {
 
   constructor(private http: HttpClient, private storage: StorageService) { }
 
-  public filter(filters: PurchaseOrder): Observable<HttpResponse<PurchaseOrder>> {
-    return this.http.post<PurchaseOrder>(environment + "/reports/parts/purchase/order/filter", filters, { headers: this.myHeaders(), observe: 'response' });
+  public filter(filters: any): Observable<HttpResponse<PurchaseOrder[]>> {
+    return this.http.post<PurchaseOrder[]>(environment.apiuUrl + "/reports/parts/purchase/order/filter", filters, { headers: this.myHeaders(), observe: 'response' });
   }
 
   private myHeaders(): HttpHeaders {

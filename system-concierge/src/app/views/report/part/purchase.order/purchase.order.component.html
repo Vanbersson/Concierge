@@ -2,7 +2,7 @@
     <p-toast />
     <div class="layout-card-title">
         <span class="text-500 font-medium">Pedidos de compras</span>
-        <p-button icon="pi pi-refresh" [text]="true" label="Limpar" />
+        <p-button icon="pi pi-refresh" [text]="true" label="Limpar" (onClick)="cleanList()" />
     </div>
 
     <p-table #tableFilter dataKey="id" [value]="purchaseOrders" [rowHover]="true" [showCurrentPageReport]="true"
@@ -50,13 +50,19 @@
                 <td><span class="text-500">{{purchase.attendantName | uppercase}}</span></td>
                 <td><span class="text-500">{{purchase.dateGeneration | date: 'dd/MM/yyyy'}}</span></td>
                 <td><span class="text-500">{{purchase.dateDelivery | date: 'dd/MM/yyyy'}}</span></td>
-                <td></td>
+                <td><span class="text-500">{{purchase.dateReceived | date: 'dd/MM/yyyy'}}</span></td>
                 <td><span class="text-500">{{purchase.responsibleName | uppercase}}</span></td>
-                <td><p-tag [value]="purchase.status" [severity]="getStatusSeverity(purchase.status)" /></td>
-                <td></td>
+                <td><p-tag [value]="getStatusDelivery(purchase)" [severity]="getStatusSeverity(purchase)" /></td>
                 <td>
-                    <button pButton [text]="true" icon="pi pi-print" size="small" label="Imprimir"
-                        severity="secondary"></button>
+                    @if(purchase.status == "Open_Purchase_Order"){
+                    <p-tag value="Aberto" severity="success" />
+                    }@else {
+                    <p-tag value="Fechado" severity="danger" />
+                    }
+                </td>
+                <td>
+                    <p-button icon="pi pi-print" (onClick)="print(purchase.id)" label="Imprimir"
+                        severity="secondary" [text]="true" size="small"></p-button>
                 </td>
             </tr>
         </ng-template>
@@ -64,13 +70,17 @@
 
 </div>
 
+<!-- Print -->
+<app-printPurchase #printComponent></app-printPurchase>
+
+<!-- Filters -->
 <p-dialog [(visible)]="dialogVisible" header="Filtros" [modal]="true" [style]="{ width: '70rem',height:'60rem' }"
     [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }" [maximizable]="true">
     <form [formGroup]="formFilter">
         <div class="p-fluid p-formgrid grid">
-            
+
             <div class="field col-12 flex justify-content-end mt-2">
-                <p-button icon="pi pi-refresh" [text]="true" label="Limpar" (onClick)="cleanform()" />
+                <p-button icon="pi pi-refresh" [text]="true" label="Limpar" (onClick)="cleanformFilter()" />
             </div>
             <div class="field col-12 md:col-3">
                 <label for="dateIniId">Período inicial</label>
@@ -88,20 +98,22 @@
                 <label for="">Tipo</label>
                 <div class="flex align-items-center gap-2 border-1 border-round border-300 p-3">
                     <div class="flex align-items-center">
-                        <p-radioButton value="Open_Purchase_Order" inputId="type1" formControlName="type"></p-radioButton>
-                        <label for="type1" class="ml-2">
+                        <p-radioButton value="Open_Purchase_Order" inputId="OpenId"
+                            formControlName="type"></p-radioButton>
+                        <label for="OpenId" class="ml-2">
                             Aberto
                         </label>
                     </div>
                     <div class="flex align-items-center">
-                        <p-radioButton value="Closed_Purchase_Order" inputId="type2" formControlName="type"></p-radioButton>
-                        <label for="type2" class="ml-2">
+                        <p-radioButton value="Closed_Purchase_Order" inputId="CloseId"
+                            formControlName="type"></p-radioButton>
+                        <label for="CloseId" class="ml-2">
                             Encerrado
                         </label>
                     </div>
                     <div class="flex align-items-center">
-                        <p-radioButton value="All" inputId="type3" formControlName="type"></p-radioButton>
-                        <label for="type3" class="ml-2">
+                        <p-radioButton value="All" inputId="AllId" formControlName="type"></p-radioButton>
+                        <label for="AllId" class="ml-2">
                             Ambos
                         </label>
                     </div>
@@ -111,20 +123,20 @@
                 <label for="">Entrega</label>
                 <div class="flex align-items-center gap-2 border-1 border-round border-300 p-3">
                     <div class="flex align-items-center">
-                        <p-radioButton value="Today" inputId="type1" formControlName="delivery"></p-radioButton>
-                        <label for="type1" class="ml-2">
+                        <p-radioButton value="Today" inputId="TodayId" formControlName="delivery"></p-radioButton>
+                        <label for="TodayId" class="ml-2">
                             Hoje
                         </label>
                     </div>
                     <div class="flex align-items-center">
-                        <p-radioButton value="OnTime" inputId="type2" formControlName="delivery"></p-radioButton>
-                        <label for="type2" class="ml-2">
+                        <p-radioButton value="OnTime" inputId="OnTimeId" formControlName="delivery"></p-radioButton>
+                        <label for="OnTimeId" class="ml-2">
                             No prazo
                         </label>
                     </div>
                     <div class="flex align-items-center">
-                        <p-radioButton value="Late" inputId="type3" formControlName="delivery"></p-radioButton>
-                        <label for="type3" class="ml-2">
+                        <p-radioButton value="Late" inputId="LateId" formControlName="delivery"></p-radioButton>
+                        <label for="LateId" class="ml-2">
                             Atrasado
                         </label>
                     </div>
@@ -151,7 +163,8 @@
             </div>
             <div class=" field col-12 md:col-2">
                 <label for="purchaseId">Nº Pedido</label>
-                <p-inputNumber inputId="purchaseId" mode="decimal" [useGrouping]="false" formControlName="purchaseOrderId" />
+                <p-inputNumber inputId="purchaseId" mode="decimal" [useGrouping]="false"
+                    formControlName="purchaseOrderId" />
             </div>
             <div class=" field col-12 md:col-2">
                 <label for="nfNumId">Nº Nota</label>
@@ -186,7 +199,8 @@
         <div class="flex justify-content-end gap-2 mt-5">
             <button pButton type="button" pRipple label="Fechar" icon="pi pi-times" class="p-button-text"
                 (click)="hideDialog()"></button>
-            <button pButton type="button" pRipple label="Pesquisar" icon="pi pi-search" class="p-button-text" (click)="searchPurchaseOrder()"></button>
+            <button pButton type="button" pRipple label="Pesquisar" icon="pi pi-search" class="p-button-text"
+                (click)="searchPurchaseOrder()"></button>
         </div>
     </form>
 </p-dialog>
