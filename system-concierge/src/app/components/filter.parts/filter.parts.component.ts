@@ -49,14 +49,11 @@ export class FilterPartsComponent implements OnInit {
   });
 
 
-  constructor(private partsService: PartsService, private busyService: BusyService,private storageService: StorageService) { }
+  constructor(private partsService: PartsService, private busyService: BusyService, private storageService: StorageService) { }
 
   ngOnInit(): void {
 
   }
-
-
-
   showDialogParts() {
     this.visibleParts = true;
   }
@@ -66,14 +63,15 @@ export class FilterPartsComponent implements OnInit {
 
   async selectPartsConfirme() {
     if (this.selectedParts) {
-const {value} = this.formParts;
+      const { value } = this.formParts;
 
       this.selectedParts.companyId = this.storageService.companyId;
       this.selectedParts.resaleId = this.storageService.resaleId;
       this.selectedParts.status = 'ativo';
+      this.selectedParts.description = value.selecDesc;
       this.selectedParts.qtdAvailable = value.selecQtdAvailable;
       this.selectedParts.discount = value.selecDiscount;
-      this.selectedParts.price = value.selecPrice; 
+      this.selectedParts.price = value.selecPrice;
 
       const resultPart = await this.savePart(this.selectedParts);
 

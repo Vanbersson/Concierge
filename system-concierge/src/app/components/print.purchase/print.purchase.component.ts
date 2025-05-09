@@ -28,7 +28,7 @@ import { ButtonModule } from 'primeng/button';
 export class PrintPurchaseComponent {
 
   printPurchaseOrder = signal<PurchaseOrder>(new PurchaseOrder());
-  printPurchaseOrderItems: PurchaseOrderItem[] = Array(30).fill(new PurchaseOrderItem());
+  printPurchaseOrderItems: PurchaseOrderItem[] = [];
   totalItemsDiscount = signal<number>(0);
   totalItemsPrice = signal<number>(0);
   purchaseOrderItems: PurchaseOrderItem[] = [];
@@ -38,10 +38,9 @@ export class PrintPurchaseComponent {
     private purchaseOrderService: PurchaseOrderService,
     private purchaseOrderItemService: PurchaseOrderItemService) { }
 
-  //Print
   public async print(id: number) {
 
-    const resultPu = await this.purchaseEdit(id);
+    const resultPu = await this.PurchaseOrderFilterId(id);
     if (resultPu.status == 200) {
       //Dados 
       this.printPurchaseOrder.set(resultPu.body);
@@ -72,16 +71,14 @@ export class PrintPurchaseComponent {
     }
 
   }
-
   abreviaDesc(desc: string) {
     if (desc == '') return desc;
     if (desc.length <= 20) return desc;
     return desc.substring(0, 20);
   }
-
-  private async purchaseEdit(id: number): Promise<HttpResponse<PurchaseOrder>> {
+  private async PurchaseOrderFilterId(id: number): Promise<HttpResponse<PurchaseOrder>> {
     try {
-      return await lastValueFrom(this.purchaseOrderService.filterId$(this.storageService.companyId, this.storageService.resaleId, id));
+      return await lastValueFrom(this.purchaseOrderService.filterId(this.storageService.companyId, this.storageService.resaleId, id));
     } catch (error) {
       return error;
     }

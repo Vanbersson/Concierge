@@ -50,7 +50,6 @@ public class BudgetRequisitionController {
                                                      @PathVariable(name = "resaleId") Integer resaleId,
                                                      @PathVariable(name = "butgetid") Integer butgetId) {
         try {
-
             List<BudgetRequisition> result = this.service.listAllRequisition(companyId, resaleId, butgetId);
             return ResponseEntity.status(HttpStatus.OK).body(result);
         } catch (Exception ex) {

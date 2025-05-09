@@ -1111,7 +1111,7 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
   //Budget
   public confirmGerarOrcamento() {
 
-    if (this.vehicleEntry.budgetStatus != "semOrcamento") {
+    if (this.vehicleEntry.budgetStatus != "NotBudget") {
       this.router.navigateByUrl("/oficina/manutencao-orcamento/" + this.formVehicle.value.id);
     } else {
 
@@ -1131,10 +1131,10 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
           const budgetResult = await this.saveBudget(this.budget);
           if (budgetResult.status == 201) {
             this.vehicleEntry.budgetStatus = budgetResult.body.status;
-            this.messageService.add({ severity: 'info', summary: 'Orçamento - ' + budgetResult.body.id, detail: 'Gerado com sucesso', life: 3000 });
+            this.messageService.add({ severity: 'info', summary: 'Orçamento - ' + budgetResult.body.id, detail: 'Gerado com sucesso', life: 2000 });
             setTimeout(() => {
               this.router.navigateByUrl('/oficina/manutencao-orcamento/' + this.formVehicle.value.id);
-            }, 3000);
+            }, 2000);
           }
 
         }/* ,

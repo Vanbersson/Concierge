@@ -4,35 +4,44 @@
         justify-content: space-between;
         margin-bottom: 1rem;
 
-        span {
+         span {
             display: flex;
             align-items: center;
-            font-size: 1.25rem;
-            font-weight: 400;
-            color: #64748b;
+            font-size: 1.25rem;            
             padding-left: 1.5rem;
-        }
+        } 
 
     }
 
-    .mobile-visible{
+    .mobile-visible {
         display: none;
     }
 
-    ::ng-deep{
+    ::ng-deep {
         .p-button-label {
             font-weight: 400;
         }
+
+        .p-tag {
+            font-weight: 400;
+        }
+
+        .p-tag.p-tag-secondary {
+            background-color: var(--color-grey-300);
+            color: var(--color-text-primary);
+        }
+
     }
 
     @media only screen and (min-width: 375px) and (max-width: 667px) {
         .mobile-visible-none {
             display: none;
         }
+
         .mobile-visible {
             display: flex;
             justify-content: center;
-           
+
         }
 
     }

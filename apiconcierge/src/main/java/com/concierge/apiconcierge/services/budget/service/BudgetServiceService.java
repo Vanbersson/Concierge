@@ -72,9 +72,16 @@ public class BudgetServiceService implements IBudgetServiceService {
     @Override
     public String delete(BudgetService budgetService) {
         try {
-            String message = this.validation.update(budgetService);
+            String message = this.validation.delete(budgetService);
             if (ConstantsMessage.SUCCESS.equals(message)) {
-                this.repository.delete(budgetService);
+                this.repository.deleteService(budgetService.getCompanyId(), budgetService.getResaleId(), budgetService.getId());
+
+                //Atualiza ordem
+                List<BudgetService> list = this.repository.listAllService(budgetService.getCompanyId(), budgetService.getResaleId(), budgetService.getBudgetId());
+                for (int i = 0; i < list.size(); i++) {
+                    list.get(i).setOrdem(i + 1);
+                    this.repository.save(list.get(i));
+                }
                 return ConstantsMessage.SUCCESS;
             } else {
                 throw new BudgetException(message);
@@ -90,13 +97,11 @@ public class BudgetServiceService implements IBudgetServiceService {
         try {
             String message = this.validation.deleteAllDiscount(budgetService);
             if (ConstantsMessage.SUCCESS.equals(message)) {
-
                 List<BudgetService> list = this.repository.listAllService(budgetService.getCompanyId(), budgetService.getResaleId(), budgetService.getBudgetId());
                 for (BudgetService item : list) {
                     item.setDiscount(0);
                     this.repository.save(item);
                 }
-
                 return ConstantsMessage.SUCCESS;
             } else {
                 throw new BudgetException(message);

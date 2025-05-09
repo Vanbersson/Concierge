@@ -43,7 +43,7 @@ public class VehicleEntryService implements IVehicleEntryService {
             vehicle.setId(null);
             vehicle.setStatus(StatusVehicleEnum.entradaAutorizada);
             vehicle.setStepEntry(StepVehicleEnum.Attendant);
-            vehicle.setBudgetStatus(StatusBudgetEnum.semOrcamento);
+            vehicle.setBudgetStatus(StatusBudgetEnum.NotBudget);
             vehicle.setStatusAuthExit(StatusAuthExitEnum.NotAuth);
             vehicle.setUserNameExit("");
 
@@ -68,7 +68,7 @@ public class VehicleEntryService implements IVehicleEntryService {
             String message = this.validation.update(vehicleEntry);
             if (message.equals(ConstantsMessage.SUCCESS)) {
                 if (vehicleEntry.getClientCompanyId() != null) {
-                    if (vehicle.getBudgetStatus() != StatusBudgetEnum.semOrcamento) {
+                    if (vehicle.getBudgetStatus() != StatusBudgetEnum.NotBudget) {
                         this.updateBudget(vehicleEntry);
                     }
                 }

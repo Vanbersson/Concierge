@@ -18,5 +18,7 @@ public record BudgetDto(
         String typePayment,
         Integer idUserAttendant,
         Integer clientCompanyId,
-        String information) {
+        String information,
+        Date clientSendDate,
+        Date clientApprovedDate) {
 }

@@ -96,7 +96,7 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
         }
 
         if (vehicle.getServiceOrder() == VehicleYesNotEnum.yes) {
-            if (vehicle.getBudgetStatus() != StatusBudgetEnum.semOrcamento) {
+            if (vehicle.getBudgetStatus() != StatusBudgetEnum.NotBudget) {
                 if (vehicle.getIdUserAttendant() == null || vehicle.getIdUserAttendant() == 0 || vehicle.getNameUserAttendant().isBlank())
                     return ConstantsMessage.ERROR_BUDGET_ATTENDANT;
 
@@ -129,7 +129,7 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
 
         if (vehicle.getServiceOrder() == VehicleYesNotEnum.not) {
 
-            if (vehicle.getBudgetStatus() != StatusBudgetEnum.semOrcamento)
+            if (vehicle.getBudgetStatus() != StatusBudgetEnum.NotBudget)
                 return "Budget already exists.";
 
             if (vehicle.getStatusAuthExit() != StatusAuthExitEnum.NotAuth) {

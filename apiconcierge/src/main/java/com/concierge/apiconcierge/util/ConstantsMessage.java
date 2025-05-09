@@ -29,6 +29,8 @@ public class ConstantsMessage {
     public static final String ERROR_RG = "Invalid RG.";
     public static final String ERROR_SERVICE_ORDER_NOT = "Equal service order not.";
 
+    public static final String ERROR_ORDEM = "Ordem not informed.";
+
 
     //Vehicle
     public static final String ERROR_VEHICLE_ID = "Vehicle not informed.";
@@ -46,6 +48,7 @@ public class ConstantsMessage {
 
 
     //Budget
+    public static final String ERROR_BUDGET_ID = "Budget id not informed.";
     public static final String ERROR_BUDGET_EXISTS = "Budget already exists.";
     public static final String ERROR_BUDGET_ATTENDANT = "BUDGET-Attendant not informed.";
     public static final String ERROR_BUDGET_CLIENT_COMPANY = "BUDGET-ClientCompany not informed.";

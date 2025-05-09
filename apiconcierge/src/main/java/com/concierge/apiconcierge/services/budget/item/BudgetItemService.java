@@ -58,7 +58,15 @@ public class BudgetItemService implements IBudgetItemService {
         try {
             String message = this.validation.delete(part);
             if (ConstantsMessage.SUCCESS.equals(message)) {
-                this.repository.delete(part);
+                this.repository.deleteItem(part.getCompanyId(), part.getResaleId(), part.getId());
+
+                //Atualiza a ordem
+                List<BudgetItem> list = this.repository.listAllItems(part.getCompanyId(), part.getResaleId(), part.getBudgetId());
+                for (int i = 0; i < list.size(); i++) {
+                    list.get(i).setOrdem(i + 1);
+                    this.repository.save(list.get(i));
+                }
+
                 return ConstantsMessage.SUCCESS;
             } else {
                 throw new BudgetException(message);

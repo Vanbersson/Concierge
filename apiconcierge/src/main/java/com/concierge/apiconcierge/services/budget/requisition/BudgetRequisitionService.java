@@ -58,7 +58,14 @@ public class BudgetRequisitionService implements IBudgetRequisitionService {
         try {
             String message = this.validation.delete(requisition);
             if (ConstantsMessage.SUCCESS.equals(message)) {
-                this.repository.delete(requisition);
+                this.repository.deleteRequisition(requisition.getCompanyId(), requisition.getResaleId(), requisition.getId());
+
+                //Atualiza ordem
+                List<BudgetRequisition> list = this.repository.listAllRequisition(requisition.getCompanyId(), requisition.getResaleId(), requisition.getBudgetId());
+                for (int i = 0; i < list.size(); i++) {
+                    list.get(i).setOrdem(i + 1);
+                    this.repository.save(list.get(i));
+                }
                 return ConstantsMessage.SUCCESS;
             } else {
                 throw new BudgetException(message);

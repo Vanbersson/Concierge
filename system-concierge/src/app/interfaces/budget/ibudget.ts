@@ -12,4 +12,6 @@ export interface IBudget {
     idUserAttendant: number;
     clientCompanyId: number;
     information: string;
+    clientSendDate: Date | string;
+    clientApprovedDate: Date | string;
 }

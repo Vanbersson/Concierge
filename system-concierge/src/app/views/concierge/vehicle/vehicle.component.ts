@@ -113,18 +113,25 @@ export default class VeiculosComponent implements OnInit, OnDestroy {
     }
 
     switch (vehicle.budgetStatus) {
-      case 'pendenteAprovacao':
+      case 'PendingApproval':
         vehicle.budgetStatus = 'Pendente Aprovação';
         break;
-      case 'naoEnviado':
+      case 'OpenBudget':
         vehicle.budgetStatus = 'Não Enviado';
         break;
-      case 'semOrcamento':
+      case 'CompleteBudget':
+        vehicle.budgetStatus = 'Não Enviado';
+        break;
+      case 'NotSended':
+        vehicle.budgetStatus = 'Não Enviado';
+        break;
+      case 'NotBudget':
         vehicle.budgetStatus = 'Sem Orçamento';
         break;
-      case 'Aprovado':
+      case 'Approved':
+        vehicle.budgetStatus = 'Aprovado';
         break;
-      case 'naoAprovado':
+      case 'NotApproved':
         vehicle.budgetStatus = 'Não Aprovado';
         break;
     }
@@ -152,11 +159,11 @@ export default class VeiculosComponent implements OnInit, OnDestroy {
 
     switch (value) {
       case 'Pendente Aprovação':
-        return 'primary';
+        return 'warning';
       case 'Não Enviado':
         return 'info';
       case 'Sem Orçamento':
-        return 'warning';
+        return 'secondary';
       case 'Aprovado':
         return 'success';
       case 'Não Aprovado':
@@ -241,7 +248,7 @@ export default class VeiculosComponent implements OnInit, OnDestroy {
     try {
       return await lastValueFrom(this.vehicleService.entryAddAuth(auth));
     } catch (error) {
-     
+
       if (error.error.message == MESSAGE_RESPONSE_NOT_CLIENT) {
         this.messageService.add({ severity: 'error', summary: 'Empresa', detail: "Não informada", icon: 'pi pi-times' });
       } else if (error.error.message == MESSAGE_RESPONSE_NOT_ATTENDANT) {
@@ -250,7 +257,7 @@ export default class VeiculosComponent implements OnInit, OnDestroy {
         this.messageService.add({ severity: 'error', summary: 'Motorista Saída', detail: "Não informado", icon: 'pi pi-times' });
       } else if (error.error.message == "Permission not informed.") {
         this.permissionNot();
-      }else{
+      } else {
         this.messageService.add({ severity: 'error', summary: 'Erro', detail: "Não autorizado", icon: 'pi pi-times' });
       }
 
@@ -259,8 +266,8 @@ export default class VeiculosComponent implements OnInit, OnDestroy {
 
   }
 
-   //Permission Not
-   private permissionNot() {
+  //Permission Not
+  private permissionNot() {
     this.messageService.add({ severity: 'error', summary: 'Permissão', detail: "Você não tem permissão", icon: 'pi pi-times' });
   }
 

@@ -57,7 +57,7 @@ public class BudgetValidation implements IBudgetValidation {
 
     @Override
     public String save(VehicleEntry vehicle) {
-        if (vehicle.getBudgetStatus() != StatusBudgetEnum.semOrcamento)
+        if (vehicle.getBudgetStatus() != StatusBudgetEnum.NotBudget)
             return ConstantsMessage.ERROR_BUDGET_EXISTS;
         if (vehicle.getIdUserAttendant() == null || vehicle.getIdUserAttendant() == 0 || vehicle.getNameUserAttendant().isBlank())
             return ConstantsMessage.ERROR_ATTENDANT;

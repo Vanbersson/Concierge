@@ -493,7 +493,7 @@ export default class PurchaseOrderComponent implements OnInit, DoCheck {
   }
   private async purchaseEdit(id: number): Promise<HttpResponse<PurchaseOrder>> {
     try {
-      return await lastValueFrom(this.purchaseOrderService.filterId$(this.storageService.companyId, this.storageService.resaleId, id));
+      return await lastValueFrom(this.purchaseOrderService.filterId(this.storageService.companyId, this.storageService.resaleId, id));
     } catch (error) {
       return error;
     }

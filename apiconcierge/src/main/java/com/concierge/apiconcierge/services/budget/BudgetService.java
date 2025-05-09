@@ -50,7 +50,7 @@ public class BudgetService implements IBudgetService {
                 Budget budget = new Budget();
                 budget.setCompanyId(vehicleEntry.getCompanyId());
                 budget.setResaleId(vehicleEntry.getResaleId());
-                budget.setStatus(StatusBudgetEnum.naoEnviado);
+                budget.setStatus(StatusBudgetEnum.OpenBudget);
                 budget.setDateGeneration(new Date());
                 budget.setVehicleEntryId(vehicleEntry.getId());
                 budget.setIdUserAttendant(vehicleEntry.getIdUserAttendant());
@@ -64,7 +64,7 @@ public class BudgetService implements IBudgetService {
                 //alterar o status do orçamento na entrada de veículo
                 if (vehicleEntry.getStepEntry() == StepVehicleEnum.Attendant)
                     vehicleEntry.setStepEntry(StepVehicleEnum.Budget);
-                vehicleEntry.setBudgetStatus(StatusBudgetEnum.naoEnviado);
+                vehicleEntry.setBudgetStatus(StatusBudgetEnum.OpenBudget);
                 this.repositoryVehicleEntry.save(vehicleEntry);
             } else {
                 throw new BudgetException(message);
@@ -95,7 +95,6 @@ public class BudgetService implements IBudgetService {
     @Override
     public Map<String, Object> filterVehicleId(Integer companyId, Integer resaleId, Integer vehicleId, String userLoginEmail) {
         try {
-
             String message = this.validation.filterVehicleId(companyId, resaleId, vehicleId, userLoginEmail);
             if (ConstantsMessage.SUCCESS.equals(message)) {
 
@@ -103,20 +102,7 @@ public class BudgetService implements IBudgetService {
                 if (budget == null)
                     throw new BudgetException("Budget not found.");
 
-                VehicleEntry vehicle = this.repositoryVehicleEntry.filterVehicleId(companyId, resaleId, budget.getVehicleEntryId());
-                if (vehicle == null)
-                    throw new BudgetException("Vehicle not found.");
-
-                Map<String, Object> map = this.loadBudget(budget);
-
-                map.put("placa", vehicle.getPlaca());
-                map.put("frota", vehicle.getFrota());
-                map.put("modelDescription", vehicle.getModelDescription());
-                map.put("color", vehicle.getColor());
-                map.put("kmEntry", vehicle.getKmEntry());
-
-                return map;
-
+                return this.loadBudget(budget);
             } else {
                 throw new BudgetException(message);
             }
@@ -149,6 +135,16 @@ public class BudgetService implements IBudgetService {
         map.put("idUserAttendant", budget.getIdUserAttendant());
         map.put("clientCompanyId", budget.getClientCompanyId());
         map.put("information", budget.getInformation());
+        if (budget.getClientSendDate() == null) {
+            map.put("clientSendDate", "");
+        } else {
+            map.put("clientSendDate", budget.getClientSendDate());
+        }
+        if (budget.getClientApprovedDate() == null) {
+            map.put("clientApprovedDate", "");
+        } else {
+            map.put("clientApprovedDate", budget.getClientApprovedDate());
+        }
 
         return map;
     }

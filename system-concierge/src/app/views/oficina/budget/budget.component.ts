@@ -1,9 +1,9 @@
-import { ChangeDetectorRef, Component, OnDestroy, OnInit, signal } from '@angular/core';
+import { ChangeDetectorRef, Component, DoCheck, OnDestroy, OnInit, signal } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { Router, ActivatedRoute, RouterModule } from '@angular/router';
-import { FormControl, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormControl, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 
-import { MessageService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
 import { InputTextModule } from 'primeng/inputtext';
 import { ButtonModule } from 'primeng/button';
 import { InputMaskModule } from 'primeng/inputmask';
@@ -20,7 +20,7 @@ import { MultiSelectModule } from 'primeng/multiselect';
 import { DialogModule } from 'primeng/dialog';
 import { InputIconModule } from 'primeng/inputicon';
 import { IconFieldModule } from 'primeng/iconfield';
-
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 
 //Service
 import { StorageService } from '../../../services/storage/storage.service';
@@ -34,12 +34,17 @@ import { BudgetItem } from '../../../models/budget/budget-item';
 import { lastValueFrom } from 'rxjs';
 import { Budget } from '../../../models/budget/budget';
 import { ClientecompanyService } from '../../../services/clientecompany/clientecompany.service';
-import { PartsService } from '../../../services/parts/parts.service';
 import { Part } from '../../../models/parts/Part';
 import { HttpResponse } from '@angular/common/http';
 import { ClientCompany } from '../../../models/clientcompany/client-company';
 import { User } from '../../../models/user/user';
 import { BusyService } from '../../../components/loading/busy.service';
+
+//Component
+import { FilterPartsComponent } from '../../../components/filter.parts/filter.parts.component';
+import { MessageResponse } from '../../../models/message/message-response';
+import { VehicleService } from '../../../services/vehicle/vehicle.service';
+import { VehicleEntry } from '../../../models/vehicle/vehicle-entry';
 
 export interface IPayment {
   payment: string,
@@ -48,37 +53,26 @@ export interface IPayment {
 @Component({
   selector: 'app-budget',
   standalone: true,
-  imports: [CommonModule, RouterModule, InputTextModule, ButtonModule, ReactiveFormsModule, InputIconModule, IconFieldModule, InputMaskModule, DialogModule, MultiSelectModule, CalendarModule, InputTextareaModule, ProgressBarModule, ToastModule, InputGroupModule, InputNumberModule, TabViewModule, TableModule, DividerModule],
+  imports: [CommonModule, FilterPartsComponent, RouterModule, InputTextModule, ButtonModule, ReactiveFormsModule, FormsModule,
+    InputIconModule, IconFieldModule, InputMaskModule, DialogModule, MultiSelectModule, ConfirmDialogModule,
+    CalendarModule, InputTextareaModule, ProgressBarModule, ToastModule, InputGroupModule,
+    InputNumberModule, TabViewModule, TableModule, DividerModule],
   templateUrl: './budget.component.html',
   styleUrl: './budget.component.scss',
-  providers: [MessageService]
+  providers: [MessageService, ConfirmationService]
 })
-export default class BudgetComponent implements OnInit, OnDestroy {
+export default class BudgetComponent implements OnInit, OnDestroy, DoCheck {
 
-  private budget: Budget;
+  budget: Budget = new Budget();
+  clientCompany: ClientCompany = new ClientCompany();
+  attendant: User = new User();
+  vehicleEntry: VehicleEntry = new VehicleEntry();
+
   vehicleId = signal<number>(0);
 
   listPayment: IPayment[] = [];
 
   visibleBudget: boolean = false;
-  requisition: BudgetRequisition;
-  budgetServiceItem: BudgetServiceItem;
-  budgetItem: BudgetItem;
-
-  listBudgetRequisition: BudgetRequisition[] = [];
-  listBudgetService: BudgetServiceItem[] = [];
-
-  totalBudgetService = signal<number>(0);
-  totalBudgetParts = signal<number>(0);
-  totalBudgetDiscountService = signal<number>(0);
-  totalBudgetDiscountParts = signal<number>(0);
-  limitUserDiscount = signal<number>(0);
-
-  visibleDiscount = false;
-  progressDiscount: number = 0;
-  progressTotal: number = 0;
-  intervalDiscount = null;
-  private percentAletDiscount = 60;
 
   formBudget = new FormGroup({
     dateValidation: new FormControl<Date | null>(null),
@@ -87,13 +81,29 @@ export default class BudgetComponent implements OnInit, OnDestroy {
     information: new FormControl<string>(""),
   });
 
-  formBudgetRequisition = new FormGroup({
-    id: new FormControl<string>(''),
-    budgetId: new FormControl<number>(0),
-    ordem: new FormControl<number>(0),
-    description: new FormControl<string>('', Validators.required),
+  // Dialog Budget //
+  limitUserDiscount = signal<number>(0);
+
+  //Aba Resume
+  listBudgetRequisition: BudgetRequisition[] = [];
+  formDiscount = new FormGroup({
+    discountServPer: new FormControl(0),
+    discountServVal: new FormControl(0),
+    discountPartPer: new FormControl(0),
+    discountPartVal: new FormControl(0)
   });
 
+  //Aba Requisition
+  requisition: BudgetRequisition;
+  formBudgetRequisition = new FormGroup({
+    description: new FormControl<string>('', Validators.required)
+  });
+
+  //Aba Service
+  totalBudgetService = signal<number>(0);
+  totalBudgetDiscountService = signal<number>(0);
+  budgetServiceItem: BudgetServiceItem;
+  listBudgetService: BudgetServiceItem[] = [];
   formBudgetService = new FormGroup<any>({
     description: new FormControl<string>('', Validators.required),
     hourService: new FormControl<number>(0.0, Validators.required),
@@ -101,91 +111,62 @@ export default class BudgetComponent implements OnInit, OnDestroy {
     discount: new FormControl<number>(0),
   });
 
-  formDiscount = new FormGroup({
-    servPer: new FormControl(0),
-    servVal: new FormControl(0),
-    itemPer: new FormControl(0),
-    itemVal: new FormControl(0),
-  });
-
-  viewBudgetId = signal<number>(0);
-  viewBudgetDateGeneration = signal<Date | null>(null);
-
-  viewClientName = signal<string>("");
-  viewClientCnpj = signal<string>("");
-  viewClientCpf = signal<string>("");
-  viewClientPhone = signal<string>("");
-
-  viewAttendantName = signal<string>("");
-
-  viewClientZipCode = signal<string>("");
-  viewClientState = signal<string>("");
-  viewClientCity = signal<string>("");
-  viewClientNeighborhood = signal<string>("");
-  viewClientAddress = signal<string>("");
-  viewClientAddressNumber = signal<string>("");
-  viewClientAddressComplement = signal<string>("");
-
-  viewClientContactName = signal<string>("");
-  viewClientContactEmail = signal<string>("");
-  viewClientContactCellphone = signal<string>("");
-  viewClientContactPhone = signal<string>("");
-
-  viewClientPlaca = signal<string>("");
-  viewClientFrota = signal<string>("");
-  viewClientModelDescription = signal<string>("");
-  viewClientColor = signal<string>("");
-  viewClientKmEntry = signal<string>("");
-
-  //Parts
-  visibleParts: boolean = false;
-
-  partsDisabledButton = true;
-  listParts: Part[] = [];
-
+  //Aba Parts
+  totalBudgetParts = signal<number>(0);
+  totalBudgetDiscountParts = signal<number>(0);
+  selectPart = signal<Part>(new Part());
   listBudgetItem: BudgetItem[] = [];
+  clonedPartItem: { [s: string]: BudgetItem } = {};
 
-  selectedParts!: Part;
-  formParts = new FormGroup({
-    filterCode: new FormControl(''),
-    filterDesc: new FormControl(''),
-    selecDesc: new FormControl(''),
-    selecPrice: new FormControl<number>(0),
-    selecDiscount: new FormControl<number>(0),
-    selecQtdAvailable: new FormControl<number>(0)
-  });
+  budgetItem: BudgetItem;
 
+  //Toas info percent discount
+  visibleDiscount = false;
+  toastProgressDiscount: number = 0;
+  toastProgressTotal: number = 0;
+  toastIntervalDiscount = null;
+  toastTotal = signal<number>(0);
+  toastDiscount = signal<number>(0);
+  toastDesc = signal<string>("Serviço + Peças");
+  private percentAletDiscount = 60;
 
   constructor(
-    private userService: UserService,
-    private partsService: PartsService,
+    private vehicleService: VehicleService,
     private storageService: StorageService,
     private budgetService: BudgetService,
     private serviceClienteCompany: ClientecompanyService,
     private router: Router,
     private messageService: MessageService,
+    private confirmationService: ConfirmationService,
     private activatedRoute: ActivatedRoute,
     private cdr: ChangeDetectorRef,
-    private busyService: BusyService) {
-    this.budgetServiceItem = new BudgetServiceItem();
-    this.vehicleId.set(Number.parseInt(this.activatedRoute.snapshot.params['vehicleid']));
-  }
+    private busyService: BusyService) { }
+
   ngOnInit(): void {
+    try {
+      this.vehicleId.set(Number.parseInt(this.activatedRoute.snapshot.params['vehicleid']));
 
-    this.listPayment = [
-      { payment: 'A Vista' },
-      { payment: 'Faturado' },
-      { payment: 'Cartão Debito' },
-      { payment: 'Cartão Credito' },
-      { payment: 'Pix' },
-    ];
+      this.listPayment = [
+        { payment: 'A Vista' },
+        { payment: 'Faturado' },
+        { payment: 'Cartão Debito' },
+        { payment: 'Cartão Credito' },
+        { payment: 'Pix' },
+      ];
 
-    this.init();
-
-    this.PartsDisable();
+      this.init();
+    } catch (error) {
+      this.router.navigateByUrl("/portaria/lista-entrada-veiculo");
+    }
   }
   ngOnDestroy(): void {
 
+  }
+  ngDoCheck(): void {
+    if (this.selectPart().code != "") {
+      this.savePart(this.selectPart());
+      this.selectPart.set(new Part());
+    }
   }
   private async init() {
     this.busyService.busy();
@@ -194,86 +175,75 @@ export default class BudgetComponent implements OnInit, OnDestroy {
     const bugetResult = await this.getBudget();
 
     if (bugetResult.status == 200) {
-
-      //Client
-      const clientResult = await this.getClient(bugetResult.body.clientCompanyId);
-      if (clientResult.status == 200) {
-        const client = clientResult.body;
-
-        this.viewClientName.set(client.name);
-        if (client.fisjur == "Juridica") {
-          const CNPJ = client.cnpj.substring(0, 2) + "." + client.cnpj.substring(2, 5) + "." + client.cnpj.substring(5, 8) + "/" + client.cnpj.substring(8, 12) + "-" + client.cnpj.substring(12, 14);
-          this.viewClientCnpj.set(CNPJ);
-        }
-        if (client.fisjur == "Fisica") {
-          const CPF = client.cpf.substring(0, 3) + "." + client.cpf.substring(3, 6) + "." + client.cpf.substring(6, 9) + "-" + client.cpf.substring(9, 11);
-          this.viewClientCpf.set(CPF);
-        }
-        if (client.dddPhone != "") {
-          this.viewClientPhone.set("(" + client.dddPhone + ") " + client.phone);
-        }
-        this.viewClientZipCode.set(client.zipCode.substring(0, 5) + "-" + client.zipCode.substring(5, 8));
-        this.viewClientState.set(client.state);
-        this.viewClientCity.set(client.city);
-        this.viewClientNeighborhood.set(client.neighborhood);
-        this.viewClientAddress.set(client.address);
-        this.viewClientAddressNumber.set(client.addressNumber);
-        this.viewClientAddressComplement.set(client.addressComplement);
-        this.viewClientContactName.set(client.contactName);
-        this.viewClientContactEmail.set(client.contactEmail);
-        if (client.contactCellphone != "") {
-          this.viewClientContactCellphone.set(this.maskCellphone(client.contactDDDCellphone, client.contactCellphone));
-        }
-        if (client.contactPhone != "") {
-          this.viewClientContactPhone.set(this.maskPhone(client.contactDDDPhone, client.contactPhone));
-        }
-      }
-
-      //User
-      this.limitUserDiscount.set(this.storageService.limitDiscount);
-
-      //Attendant
-      const userResult = await this.getAttendant(bugetResult.body.idUserAttendant);
-      if (userResult.status == 200) {
-        this.viewAttendantName.set(userResult.body.name);
-      }
-
       this.budget = bugetResult.body;
 
-      this.viewBudgetId.set(bugetResult.body.id);
-      this.viewBudgetDateGeneration.set(new Date(bugetResult.body.dateGeneration));
-      if (bugetResult.body.placa) {
-        this.viewClientPlaca.set(bugetResult.body.placa.substring(0, 3) + "-" + bugetResult.body.placa.substring(3, 7));
+      //Client
+      const clientResult = await this.getClient(this.budget.clientCompanyId);
+      if (clientResult.status == 200) {
+        this.clientCompany = clientResult.body;
       }
 
-      this.viewClientFrota.set(bugetResult.body.frota);
-      this.viewClientModelDescription.set(bugetResult.body.modelDescription);
-      this.viewClientColor.set(bugetResult.body.color);
-      this.viewClientKmEntry.set(bugetResult.body.kmEntry);
+      //Vehicle
+      const resultVehicle = await this.getVehicleEntry(this.budget.vehicleEntryId);
+      if (resultVehicle.status == 200) {
+        this.vehicleEntry = resultVehicle.body;
+      }
+
+      //Limit discount user 
+      this.limitUserDiscount.set(this.storageService.limitDiscount);
 
       this.getListBudgetRequisition();
       this.getListBudgetSetvice();
       this.getListBudgetItem();
 
       this.formBudget.patchValue({
-        dateValidation: bugetResult.body.dateValidation != "" ? new Date(bugetResult.body.dateValidation) : null,
-        nameResponsible: bugetResult.body.nameResponsible,
-        typePayment: bugetResult.body.typePayment != "" ? [{ payment: bugetResult.body.typePayment }] : [],
-        information: bugetResult.body.information,
+        dateValidation: this.budget.dateValidation != "" ? new Date(this.budget.dateValidation) : null,
+        nameResponsible: this.budget.nameResponsible,
+        typePayment: this.budget.typePayment != "" ? [{ payment: this.budget.typePayment }] : [],
+        information: this.budget.information,
       });
 
+      this.busyService.idle();
     } else {
-      setTimeout(() => {
-        this.router.navigateByUrl("/portaria/lista-entrada-veiculo");
-      }, 3000);
-
+      this.busyService.idle();
+      this.router.navigateByUrl("/portaria/lista-entrada-veiculo");
     }
-    this.busyService.idle();
-
+  }
+  maskCNPJ(cnpj: string): string {
+    const CNPJ = cnpj.substring(0, 2) + "." + cnpj.substring(2, 5) + "." + cnpj.substring(5, 8) + "/" + cnpj.substring(8, 12) + "-" + cnpj.substring(12, 14);
+    return CNPJ;
+  }
+  maskCPF(cpf: string): string {
+    const CPF = cpf.substring(0, 3) + "." + cpf.substring(3, 6) + "." + cpf.substring(6, 9) + "-" + cpf.substring(9, 11);
+    return CPF;
+  }
+  maskCellphone(dddCellphone: string, cellphone: string): string {
+    if (cellphone.length != 9)
+      return "";
+    if (dddCellphone.length != 2)
+      return "";
+    var cellphone = "(" + dddCellphone + ") " + cellphone.substring(0, 1) + " " + cellphone.substring(1, 5) + "-" + cellphone.substring(5, 9);
+    return cellphone;
+  }
+  maskPhone(dddPhone: string, phone: string): string {
+    if (phone.length != 8)
+      return "";
+    if (dddPhone.length != 2)
+      return "";
+    var phone = "(" + dddPhone + ") " + phone.substring(0, 4) + "-" + phone.substring(4, 8);
+    return phone;
+  }
+  maskZipCode(zipCode: string): string {
+    if (zipCode == "") return "";
+    return zipCode.substring(0, 5) + "-" + zipCode.substring(5, 8);
+  }
+  maskPlaca(placa: string): string {
+    if (placa == "") return "";
+    return placa.substring(0, 3) + "-" + placa.substring(3, 7);
   }
   private async getBudget(): Promise<HttpResponse<Budget>> {
     try {
-      return await lastValueFrom(this.budgetService.getBudgetFilterVehicle$(this.vehicleId()));
+      return await lastValueFrom(this.budgetService.getBudgetFilterVehicle(this.vehicleId()));
     } catch (error) {
       if (error.error.message == "Permission not informed.") {
         this.permissionNot();
@@ -289,10 +259,11 @@ export default class BudgetComponent implements OnInit, OnDestroy {
       return error;
     }
   }
-  private async getAttendant(id: number): Promise<HttpResponse<User>> {
+  private async getVehicleEntry(id: number): Promise<HttpResponse<VehicleEntry>> {
     try {
-      return await lastValueFrom(this.userService.getUserFilterId(id));
+      return await lastValueFrom(this.vehicleService.entryFilterId$(id));
     } catch (error) {
+      this.messageService.add({ severity: 'error', summary: 'Erro', detail: "Vaículo não encontrado", icon: 'pi pi-times' });
       return error;
     }
   }
@@ -354,28 +325,230 @@ export default class BudgetComponent implements OnInit, OnDestroy {
 
     });
   }
-  private maskCellphone(dddCellphone: string, cellphone: string): string {
-    if (cellphone.length != 9)
-      return "";
-    if (dddCellphone.length != 2)
-      return "";
-    var cellphone = "(" + dddCellphone + ") " + cellphone.substring(0, 1) + " " + cellphone.substring(1, 5) + "-" + cellphone.substring(5, 9);
-    return cellphone;
+
+
+  //Resume
+  private toastInfoDiscount(total: number, discount: number) {
+
+    this.toastTotal.set(total);
+    this.toastDiscount.set(discount);
+
+    if (!this.visibleDiscount) {
+      this.messageService.add({ key: 'toastInfoDiscount', sticky: true, severity: 'custom', summary: 'Você atingiu.' });
+      this.visibleDiscount = true;
+      this.toastProgressDiscount = 0;
+
+      if (this.toastIntervalDiscount) {
+        clearInterval(this.toastIntervalDiscount);
+      }
+
+      this.toastIntervalDiscount = setInterval(() => {
+        if (this.toastProgressDiscount < this.toastProgressTotal) {
+          this.toastProgressDiscount = this.toastProgressDiscount + 2;
+        }
+
+        if (this.toastProgressDiscount >= 100) {
+          this.toastProgressDiscount = 100;
+          clearInterval(this.toastIntervalDiscount);
+        }
+
+        this.cdr.markForCheck();
+      }, 10);
+    }
   }
-  private maskPhone(dddPhone: string, phone: string): string {
-    if (phone.length != 8)
-      return "";
-    if (dddPhone.length != 2)
-      return "";
-    var phone = "(" + dddPhone + ") " + phone.substring(0, 4) + "-" + phone.substring(4, 8);
-    return phone;
+  async addDiscountAllService() {
+    const { value } = this.formDiscount;
+    if (value.discountServPer == 0 && value.discountServVal == 0) return;
+
+    var totalDiscount = this.totalBudgetDiscountService();
+    var totalGeral = this.totalBudgetService();
+    var totalLimit = 0;
+
+    if (value.discountServPer > 0) {
+      totalDiscount += (totalGeral * value.discountServPer) / 100;
+    } else if (value.discountServVal > 0) {
+      totalDiscount += value.discountServVal;
+    }
+
+    totalLimit = (totalGeral * this.storageService.limitDiscount) / 100;
+    //Verifica se o desconto e válido
+    if (totalDiscount > totalLimit) {
+      this.messageService.add({ severity: 'error', summary: 'Desconto', detail: 'Maior que o permitido', icon: 'pi pi-times' });
+      return;
+    }
+
+    //Clean discount
+    for (var service of this.listBudgetService) {
+      service.discount = 0;
+    }
+    await this.calcDiscountService(totalDiscount, this.listBudgetService);
+
+    this.toastProgressTotal = (totalDiscount * 100) / totalLimit;
+    if (this.toastProgressTotal > this.percentAletDiscount) {
+      this.toastDesc.set("em serviços");
+      this.toastInfoDiscount(totalGeral, totalDiscount);
+    }
+
   }
+  async addDiscountAllPart() {
+    const { value } = this.formDiscount;
+    if (value.discountPartPer == 0 && value.discountPartVal == 0) return;
+
+    var totalDiscount = this.totalBudgetDiscountParts();
+    var totalGeral = this.totalBudgetParts();
+    var totalLimit = 0;
+
+    //Percentual
+    if (value.discountPartPer > 0) {
+      totalDiscount += (totalGeral * value.discountPartPer) / 100;
+    } else if (value.discountPartVal > 0) {
+      totalDiscount += value.discountPartVal;
+    }
+
+    totalLimit = (totalGeral * this.storageService.limitDiscount) / 100;
+    //Verifica se o desconto e válido
+    if (totalDiscount > totalLimit) {
+      this.messageService.add({ severity: 'error', summary: 'Desconto', detail: 'Maior que o permitido', icon: 'pi pi-times' });
+      return;
+    }
+
+    //Clean discount
+    for (var part of this.listBudgetItem) {
+      part.discount = 0;
+    }
+    await this.calcDiscountPart(totalDiscount, this.listBudgetItem);
+
+    this.toastProgressTotal = (totalDiscount * 100) / totalLimit;
+    if (this.toastProgressTotal > this.percentAletDiscount) {
+      this.toastDesc.set("em peças");
+      this.toastInfoDiscount(totalGeral, totalDiscount);
+    }
+  }
+  async calcDiscountService(valorTotal: number, itens: BudgetServiceItem[]) {
+
+    var discountResto = valorTotal % itens.length;
+    var discount = (valorTotal - discountResto) / itens.length;
+
+    //Parts
+    for (let index = 0; index < itens.length; index++) {
+      var service = itens[index];
+
+      if ((service.discount + discount) <= (service.price * service.hourService)) {
+        service.discount += discount;
+        valorTotal = (valorTotal - discount);
+      }
+
+      if ((service.discount + discountResto) <= (service.price * service.hourService)) {
+        service.discount += discountResto;
+        valorTotal = (valorTotal - discountResto);
+        discountResto = 0;
+      }
+
+    }
+
+    if (valorTotal > 0) {
+      this.calcDiscountService(valorTotal, itens);
+    } else {
+      //Save parts
+      for (var service of itens) {
+        await this.updateService(service);
+      }
+      this.cleanFormDiscount();
+      this.getListBudgetSetvice();
+    }
+  }
+  async calcDiscountPart(valorTotal: number, itens: BudgetItem[]) {
+
+    var discountResto = valorTotal % itens.length;
+    var discount = (valorTotal - discountResto) / itens.length;
+
+    //Parts
+    for (let index = 0; index < itens.length; index++) {
+      var part = itens[index];
+
+      if ((part.discount + discount) <= (part.price * part.quantity)) {
+        part.discount += discount;
+        valorTotal = (valorTotal - discount);
+      }
+
+      if ((part.discount + discountResto) <= (part.price * part.quantity)) {
+        part.discount += discountResto;
+        valorTotal = (valorTotal - discountResto);
+        discountResto = 0;
+      }
+
+    }
+
+    if (valorTotal > 0) {
+      this.calcDiscountPart(valorTotal, itens);
+    } else {
+      //Save parts
+      for (var part of itens) {
+        await this.updateBudgetItem(part);
+      }
+      this.cleanFormDiscount();
+      this.getListBudgetItem();
+    }
+  }
+  confirmDeleteDiscountService() {
+    this.confirmationService.confirm({
+      header: 'Remover Descontos?',
+      message: 'Por favor confirme para remover.',
+      accept: async () => {
+        this.deleteAllDiscountService();
+      },
+      reject: () => {
+        this.messageService.add({ severity: 'info', summary: 'Cancelado', detail: 'Você não removeu os descontos', icon: 'pi pi-info-circle' });
+      }
+    });
+  }
+  confirmDeleteDiscountPart() {
+    this.confirmationService.confirm({
+      header: 'Remover Descontos?',
+      message: 'Por favor confirme para remover.',
+      accept: async () => {
+        this.deleteAllDiscountPart();
+      },
+      reject: () => {
+        this.messageService.add({ severity: 'info', summary: 'Cancelado', detail: 'Você não removeu os descontos', icon: 'pi pi-info-circle' });
+      }
+    });
+  }
+  deleteAllDiscountService() {
+    if (this.totalBudgetDiscountService() > 0) {
+      this.budgetService.deleteDiscountAllService(this.listBudgetService[0]).subscribe((data) => {
+        if (data.status == 200) {
+          this.getListBudgetSetvice();
+          this.messageService.add({ severity: 'success', summary: 'Desconto em serviços', detail: 'Removido com sucesso', icon: 'pi pi-check' });
+        }
+      });
+    }
+
+    this.cleanFormDiscount();
+  }
+  deleteAllDiscountPart() {
+    if (this.totalBudgetDiscountParts() > 0) {
+      this.budgetService.deleteDiscountAllItem(this.listBudgetItem[0]).subscribe(data => {
+        this.getListBudgetItem();
+        this.messageService.add({ severity: 'success', summary: 'Desconto em peças', detail: 'Removido com sucesso', icon: 'pi pi-check' });
+      });
+    }
+
+    this.cleanFormDiscount();
+  }
+  private cleanFormDiscount() {
+    this.formDiscount.patchValue({ discountServPer: 0, discountServVal: 0, discountPartPer: 0, discountPartVal: 0 });
+  }
+  onCloseAlertDiscount() {
+    this.visibleDiscount = false;
+  }
+
+  //Requisition
   getListBudgetRequisition() {
     this.budgetService.getBudgetRequisition$(this.budget.id).subscribe((data) => {
       this.listBudgetRequisition = data;
     });
   }
-
   saveBudgetRequisition() {
 
     const { value, valid } = this.formBudgetRequisition;
@@ -388,8 +561,9 @@ export default class BudgetComponent implements OnInit, OnDestroy {
       this.requisition.ordem = this.getSizeListBudgetRequisition() + 1;
       this.requisition.description = value.description;
 
-      this.budgetService.saveBudgetRequisition$(this.requisition).subscribe((data) => {
+      this.budgetService.saveBudgetRequisition(this.requisition).subscribe((data) => {
         if (data.status == 201) {
+          this.requisition = null;
           this.cleanBudgetRequisition();
           this.getListBudgetRequisition();
           this.alertShowRequisition0();
@@ -402,20 +576,15 @@ export default class BudgetComponent implements OnInit, OnDestroy {
     }
 
   }
-
   updateBudgetRequisition() {
     const { value, valid } = this.formBudgetRequisition;
     if (valid && value.description!.toString().trim() != "") {
-      this.requisition = new BudgetRequisition();
-      this.requisition.companyId = this.storageService.companyId;
-      this.requisition.resaleId = this.storageService.resaleId;
-      this.requisition.id = value.id;
-      this.requisition.budgetId = this.budget.id;
-      this.requisition.ordem = value.ordem;
+
       this.requisition.description = value.description;
 
       this.budgetService.updateBudgetRequisition$(this.requisition).subscribe((data) => {
         if (data.status == 200) {
+          this.requisition = null;
           this.cleanBudgetRequisition();
           this.getListBudgetRequisition();
           this.alertShowRequisition2();
@@ -427,201 +596,224 @@ export default class BudgetComponent implements OnInit, OnDestroy {
       this.alertShowRequisition1();
     }
   }
-
   editarBudgetRequisition(req: BudgetRequisition) {
 
+    this.requisition = req;
     this.formBudgetRequisition.patchValue({
-      id: req.id,
-      budgetId: req.budgetId,
-      ordem: req.ordem,
       description: req.description
     });
 
   }
+  async removerBudgetRequisition(req: BudgetRequisition) {
 
-  removerBudgetRequisition(ordem: number) {
-
-    if (this.listBudgetRequisition.length > 1) {
-      var listTemp: BudgetRequisition[] = [];
-      for (let index = 0; index < this.listBudgetRequisition.length; index++) {
-        const item = this.listBudgetRequisition[index];
-
-        if (ordem == item.ordem) {
-
-          this.requisition = new BudgetRequisition();
-          this.requisition.companyId = item.companyId;
-          this.requisition.resaleId = item.resaleId;
-          this.requisition.id = item.id;
-          this.requisition.budgetId = item.budgetId;
-          this.requisition.ordem = item.ordem;
-          this.requisition.description = item.description;
-
-          this.budgetService.deleteBudgetRequisition$(this.requisition).subscribe();
-          this.cleanBudgetRequisition();
-
-        } else {
-          listTemp.push(item);
-        }
-
-      }
-      this.listBudgetRequisition = [];
-
-      for (let index = 0; index < listTemp.length; index++) {
-        const item = listTemp[index];
-        item.ordem = index + 1;
-        this.budgetService.updateBudgetRequisition$(item).subscribe((data) => {
-          if (data.status == 200 && (index == (listTemp.length - 1))) {
-            this.getListBudgetRequisition();
-          }
-        });
-      }
-    } else {
-      this.alertShowRequisition3();
+    if (this.listBudgetService.length != 0) {
+      this.messageService.add({ severity: 'info', summary: 'Atenção', detail: 'Existe serviços lançados', icon: 'pi pi-info-circle' });
+      return;
     }
 
-  }
+    if (this.listBudgetItem.length != 0) {
+      this.messageService.add({ severity: 'info', summary: 'Atenção', detail: 'Existe peças lançadas', icon: 'pi pi-info-circle' });
+      return;
+    }
 
+    const resultDelete = await this.deleteRequisition(req);
+
+    if (resultDelete.status == 200) {
+      this.getListBudgetRequisition();
+    }
+
+    return;
+  }
+  private async deleteRequisition(req: BudgetRequisition): Promise<HttpResponse<MessageResponse>> {
+    try {
+      return await lastValueFrom(this.budgetService.deleteBudgetRequisition(req));
+    } catch (error) {
+      return error;
+    }
+  }
   private getSizeListBudgetRequisition(): number {
     return this.listBudgetRequisition.length;
   }
-
   cleanBudgetRequisition() {
     this.formBudgetRequisition.patchValue({
-      id: '',
-      budgetId: 0,
-      ordem: 0,
       description: ''
     });
   }
 
   //Service
-
-  private async getListBudgetSetvice(): Promise<boolean> {
-    try {
-      var data = await lastValueFrom(this.budgetService.getBudgetService$(this.budget.id));
-
+  private getListBudgetSetvice() {
+    this.budgetService.getBudgetService(this.budget.id).subscribe(data => {
       this.listBudgetService = data;
       this.somaService();
-      return true;
-    } catch (error) {
+    });
+  }
+  async saveBudgetService() {
+    const { value } = this.formBudgetService;
+    this.budgetServiceItem = new BudgetServiceItem();
+    this.budgetServiceItem.companyId = this.storageService.companyId;
+    this.budgetServiceItem.resaleId = this.storageService.resaleId;
+    this.budgetServiceItem.budgetId = this.budget.id;
+    this.budgetServiceItem.status = "Pending";
+
+    this.budgetServiceItem.ordem = this.getSizeListBudgetService() + 1;
+    this.budgetServiceItem.description = value.description;
+    this.budgetServiceItem.hourService = value.hourService;
+    this.budgetServiceItem.price = value.price;
+    this.budgetServiceItem.discount = value.discount;
+
+    const resultValid = this.validInputService();
+    if (resultValid == false) return;
+
+    //Verifica se o desconto é permitido
+    if (this.budgetServiceItem.discount > 0) {
+      const resultDiscount = this.calcDiscountSaveService(this.budgetServiceItem);
+      if (resultDiscount == false) return;
+    }
+
+    const resultService = await this.saveService(this.budgetServiceItem);
+    if (resultService.status == 201) {
+      this.alertShowService0();
+      this.cleanBudgetService();
       this.getListBudgetSetvice();
     }
-    return false;
 
   }
+  private async saveService(service: BudgetServiceItem): Promise<HttpResponse<BudgetServiceItem>> {
+    try {
+      return await lastValueFrom(this.budgetService.saveBudgetService(service));
+    } catch (error) {
+      return error;
+    }
+  }
+  async updateBudgetService() {
 
-  public saveBudgetService() {
-    if (this.validSaveBudgetService()) {
-      const { value } = this.formBudgetService;
+    const resultValid = this.validInputService();
+    if (resultValid == false) return;
 
-      this.budgetServiceItem.companyId = this.storageService.companyId;
-      this.budgetServiceItem.resaleId = this.storageService.resaleId;
-      this.budgetServiceItem.budgetId = this.budget.id;
-      this.budgetServiceItem.status = "NotApproved";
+    const { value } = this.formBudgetService;
+    this.budgetServiceItem.description = value.description;
+    this.budgetServiceItem.hourService = value.hourService;
+    this.budgetServiceItem.price = value.price;
+    this.budgetServiceItem.discount = value.discount;
 
-      this.budgetServiceItem.ordem = this.getSizeListBudgetService() + 1;
-      this.budgetServiceItem.description = value.description;
-      this.budgetServiceItem.hourService = value.hourService;
-      this.budgetServiceItem.price = value.price;
-      this.budgetServiceItem.discount = value.discount;
-
-      this.budgetService.saveBudgetService$(this.budgetServiceItem).subscribe((data) => {
-        if (data.status == 201) {
-          this.alertShowService0();
-          this.getListBudgetSetvice();
-          this.cleanBudgetService();
-        }
-      });
-
+    //Verifica se o desconto é permitido
+    if (this.budgetServiceItem.discount > 0) {
+      const resultDiscount = this.calcDiscountUpdateService(this.budgetServiceItem);
+      if (resultDiscount == false) return;
     }
 
+    const resultUpdate = await this.updateService(this.budgetServiceItem);
+    if (resultUpdate.status == 200) {
+      this.alertShowService1();
+      this.getListBudgetSetvice();
+      this.cleanBudgetService();
+    }
   }
+  private async updateService(service: BudgetServiceItem): Promise<HttpResponse<BudgetServiceItem>> {
+    try {
+      return await lastValueFrom(this.budgetService.updateBudgetService(service));
+    } catch (error) {
+      return error;
+    }
+  }
+  async removerBudgetService(service: BudgetServiceItem) {
 
-  public updateBudgetService(service: BudgetServiceItem) {
+    const resultDiscount = this.calcDiscountDeleteService(service);
+    if (resultDiscount == false) return;
 
-    if (this.validUpdateBudgetService()) {
+    const resultService = await this.deleteService(service);
+    if (resultService.status == 200) {
+      this.getListBudgetSetvice();
+    }
+  }
+  private async deleteService(service: BudgetServiceItem): Promise<HttpResponse<MessageResponse>> {
+    try {
+      return await lastValueFrom(this.budgetService.deleteBudgetService(service));
+    } catch (error) {
+      return error;
+    }
+  }
+  calcDiscountSaveService(service: BudgetServiceItem): boolean {
 
-      this.budgetServiceItem.description = service.description;
-      this.budgetServiceItem.hourService = service.hourService;
-      this.budgetServiceItem.price = service.price;
-      this.budgetServiceItem.discount = service.discount;
+    var tempTotal = service.price * service.hourService;
+    var tempTotalDiscount = service.discount;
 
-      this.budgetService.updateBudgetService$(this.budgetServiceItem).subscribe((data) => {
-        if (data.status == 200) {
-          this.alertShowService1();
-          this.getListBudgetSetvice();
-          this.cleanBudgetService();
-        }
-      });
+    for (var item of this.listBudgetService) {
+      tempTotal += item.price * item.hourService;
+      tempTotalDiscount += item.discount;
     }
 
-  }
+    if (tempTotalDiscount == 0) return true;
 
-  private validSaveBudgetService() {
-    const { value, valid } = this.formBudgetService;
+    const totalLimit = (tempTotal * this.storageService.limitDiscount) / 100;
 
-    if (!this.validInput()) {
+    if (tempTotalDiscount > totalLimit) {
+      this.messageService.add({ severity: 'error', summary: 'Desconto', detail: 'Maior que o permitido', icon: 'pi pi-times' });
       return false;
     }
 
-    if (value.discount > 0) {
-      const newDiscount = this.totalBudgetDiscountService() + value.discount;
-      const newTotal = this.totalBudgetService() + (value.price * value.hourService);
-      const percent = (newTotal * this.storageService.limitDiscount) / 100;
-      if (newDiscount > percent) {
-        this.messageService.add({ severity: 'error', summary: 'Desconto', detail: 'Maior que o permitido', icon: 'pi pi-times' });
-        return false;
-      }
-      this.progressTotal = (newDiscount * 100) / percent;
-      if (this.progressTotal > this.percentAletDiscount) {
-        this.infoPercenDiscount();
-      }
-    }
-    if (!valid) {
-      return false;
-    }
-
-    return true;
-  }
-
-  private validUpdateBudgetService(): boolean {
-    const { value, valid } = this.formBudgetService;
-
-    if (!this.validInput()) {
-      return false;
-    }
-
-    if (value.discount > 0) {
-      var newDiscount = value.discount;
-      var newTotal = (value.price * value.hourService);
-
-      var tempTotal = 0;
-      var tempDiscount = 0;
-      for (let index = 0; index < this.listBudgetService.length; index++) {
-        const item = this.listBudgetService[index];
-
-        if (item.id != this.budgetServiceItem.id) {
-          tempTotal += item.price * item.hourService;
-          tempDiscount += item.discount;
-        }
-
-      }
-      newTotal += tempTotal;
-      newDiscount += tempDiscount;
-      const percent = (newTotal * this.storageService.limitDiscount) / 100;
-      if (newDiscount > percent) {
-        this.messageService.add({ severity: 'error', summary: 'Desconto', detail: 'Maior que o permitido', icon: 'pi pi-times' });
-        return false;
-      }
-      this.progressTotal = (newDiscount * 100) / percent;
-      if (this.progressTotal > this.percentAletDiscount) {
-        this.infoPercenDiscount();
-      }
+    this.toastProgressTotal = (tempTotalDiscount * 100) / totalLimit;
+    if (this.toastProgressTotal > this.percentAletDiscount) {
+      this.toastDesc.set("em serviços");
+      this.toastInfoDiscount(tempTotal, tempTotalDiscount);
     }
     return true;
   }
+  calcDiscountUpdateService(service: BudgetServiceItem): boolean {
 
-  private validInput(): boolean {
+    var tempTotal = service.price * service.hourService;
+    var tempTotalDiscount = service.discount;
+    for (var item of this.listBudgetService) {
+      if (item.id != service.id) {
+        tempTotal += item.price * item.hourService;
+        tempTotalDiscount += item.discount;
+      }
+    }
+
+    if (tempTotalDiscount == 0) return true;
+
+    const totalLimit = (tempTotal * this.storageService.limitDiscount) / 100;
+
+    if (tempTotalDiscount > totalLimit) {
+      this.messageService.add({ severity: 'error', summary: 'Desconto', detail: 'Maior que o permitido', icon: 'pi pi-times' });
+      return false;
+    }
+
+    this.toastProgressTotal = (tempTotalDiscount * 100) / totalLimit;
+    if (this.toastProgressTotal > this.percentAletDiscount) {
+      this.toastDesc.set("em serviços");
+      this.toastInfoDiscount(tempTotal, tempTotalDiscount);
+    }
+    return true;
+  }
+  calcDiscountDeleteService(service: BudgetServiceItem): boolean {
+
+    var tempTotal = 0;
+    var tempTotalDiscount = 0;
+    for (var item of this.listBudgetService) {
+      if (item.id != service.id) {
+        tempTotal += item.price * item.hourService;
+        tempTotalDiscount += item.discount;
+      }
+    }
+
+    if (tempTotalDiscount == 0) return true;
+
+    const totalLimit = (tempTotal * this.storageService.limitDiscount) / 100;
+
+    if (tempTotalDiscount > totalLimit) {
+      this.messageService.add({ severity: 'error', summary: 'Desconto', detail: 'Maior que o permitido', icon: 'pi pi-times' });
+      return false;
+    }
+
+    this.toastProgressTotal = (tempTotalDiscount * 100) / totalLimit;
+    if (this.toastProgressTotal > this.percentAletDiscount) {
+      this.toastDesc.set("em serviços");
+      this.toastInfoDiscount(tempTotal, tempTotalDiscount);
+    }
+    return true;
+  }
+  private validInputService(): boolean {
 
     const { value } = this.formBudgetService;
     if (this.listBudgetRequisition.length == 0) {
@@ -645,40 +837,27 @@ export default class BudgetComponent implements OnInit, OnDestroy {
     }
     return true;
   }
-
   editarBudgetService(service: BudgetServiceItem) {
-
-    this.budgetServiceItem.companyId = service.companyId;
-    this.budgetServiceItem.resaleId = service.resaleId;
-    this.budgetServiceItem.budgetId = this.budget.id;
-    this.budgetServiceItem.id = service.id;
-    this.budgetServiceItem.status = service.status;
-    this.budgetServiceItem.ordem = service.ordem;
-
+    this.budgetServiceItem = service;
     this.formBudgetService.patchValue({
       description: service.description,
       hourService: service.hourService,
       price: service.price,
       discount: service.discount
     });
-
   }
-
   getSizeListBudgetService(): number {
     return this.listBudgetService.length;
   }
-
   cleanBudgetService() {
     this.formBudgetService.patchValue({
       description: "",
       hourService: 0,
       price: 0,
       discount: 0
-
     });
-    this.budgetServiceItem = new BudgetServiceItem();
+    this.budgetServiceItem = null;
   }
-
   private somaService() {
     this.totalBudgetService.set(0);
     this.totalBudgetDiscountService.set(0);
@@ -695,183 +874,6 @@ export default class BudgetComponent implements OnInit, OnDestroy {
 
     this.totalBudgetService.set(totalTemp);
     this.totalBudgetDiscountService.set(totalDescontoTemp);
-  }
-
-  removerBudgetService(ordem: number) {
-
-    var listTemp: BudgetServiceItem[] = [];
-
-    for (let index = 0; index < this.listBudgetService.length; index++) {
-
-      const item = this.listBudgetService.at(index);
-
-      if (ordem == item.ordem) {
-
-        this.budgetServiceItem.companyId = item.companyId;
-        this.budgetServiceItem.resaleId = item.resaleId;
-        this.budgetServiceItem.id = item.id;
-        this.budgetServiceItem.budgetId = item.budgetId;
-        this.budgetServiceItem.status = item.status;
-        this.budgetServiceItem.ordem = item.ordem;
-        this.budgetServiceItem.description = item.description;
-        this.budgetServiceItem.hourService = item.hourService;
-        this.budgetServiceItem.price = item.price;
-        this.budgetServiceItem.discount = item.discount;
-
-        this.budgetService.deleteBudgetService$(this.budgetServiceItem).subscribe();
-        this.cleanBudgetService();
-
-      } else {
-        listTemp.push(item);
-      }
-
-    }
-    this.listBudgetService = [];
-
-    this.totalBudgetService.set(0);
-    this.totalBudgetDiscountService.set(0);
-
-    for (let index = 0; index < listTemp.length; index++) {
-      const item = listTemp.at(index);
-
-      item.ordem = index + 1;
-      this.budgetService.updateBudgetService$(item).subscribe((data) => {
-        if (data.status == 200) {
-          this.getListBudgetSetvice();
-        }
-      });
-    }
-
-  }
-
-  deleteAllDiscountService() {
-    if (this.totalBudgetDiscountService() > 0) {
-      this.budgetService.deleteDiscountAllService$(this.listBudgetService[0]).subscribe((data) => {
-        if (data.status == 200) {
-          this.getListBudgetSetvice();
-          this.alertShowDiscount2();
-        }
-      });
-      this.cleanFormDiscount();
-    }
-  }
-
-  private validDiscountService(): boolean {
-
-    const { value } = this.formDiscount;
-    if (value.servVal <= 0 && value.servPer <= 0) { return false; }
-
-    const limit = this.storageService.limitDiscount;
-    const valueLimitDisc = (this.totalBudgetService() * limit) / 100;
-    const newValueDiscountPerc = ((this.totalBudgetService() * value.servPer) / 100) + this.totalBudgetDiscountService();
-    const newValueDiscount = this.totalBudgetDiscountService() + value.servVal;
-
-    if (this.totalBudgetDiscountService() == valueLimitDisc) {
-      this.progressTotal = 100;
-      this.infoPercenDiscount();
-      return false;
-    }
-
-    if (newValueDiscount > valueLimitDisc) {
-      this.messageService.add({ severity: 'error', summary: 'Desconto', detail: 'Maior que o permitido', icon: 'pi pi-times' });
-      return false;
-    }
-
-    if (newValueDiscountPerc > valueLimitDisc) {
-      this.messageService.add({ severity: 'error', summary: 'Desconto', detail: 'Maior que o permitido', icon: 'pi pi-times' });
-      return false;
-    }
-
-    return true;
-
-  }
-
-  public addDiscountAllService() {
-
-    if (this.validDiscountService()) {
-
-      const { value } = this.formDiscount;
-
-      var discount = 0;
-      var discountResto = 0;
-
-      //Desconto serviço percentual
-      if (value.servPer > 0) {
-        const newDiscount = ((this.totalBudgetService() * value.servPer) / 100) + this.totalBudgetDiscountService();
-        discountResto = newDiscount % this.listBudgetService.length;
-        discount = (newDiscount - discountResto) / this.listBudgetService.length;
-      }
-
-      //Desconto serviço valor
-      if (value.servVal > 0) {
-        const newDiscount = this.totalBudgetDiscountService() + value.servVal;
-        discountResto = newDiscount % this.listBudgetService.length;
-        discount = (newDiscount - discountResto) / this.listBudgetService.length;
-      }
-
-      for (let index = 0; index < this.listBudgetService.length; index++) {
-        var element = this.listBudgetService[index];
-        //Last Discount
-        if (index == this.listBudgetService.length - 1) {
-          element.discount = discount + discountResto;
-          this.budgetService.updateBudgetService$(element).subscribe(async (data) => {
-            if (data.status == 200) {
-              this.messageService.add({ severity: 'success', summary: 'Desconto', detail: 'Aplicado com sucesso', icon: 'pi pi-check' });
-              const result = await this.getListBudgetSetvice();
-
-              const percent = (this.totalBudgetService() * this.limitUserDiscount()) / 100;
-              this.progressTotal = (this.totalBudgetDiscountService() * 100) / percent;
-              if (this.progressTotal > this.percentAletDiscount) {
-                this.infoPercenDiscount();
-              }
-            };
-          });
-
-        } else {
-          element.discount = discount;
-          this.budgetService.updateBudgetService$(element).subscribe();
-        }
-
-      }
-
-      this.cleanFormDiscount();
-    }
-
-  }
-
-  private cleanFormDiscount() {
-    this.formDiscount.patchValue({ servPer: 0, servVal: 0, itemPer: 0, itemVal: 0 });
-  }
-
-  onCloseAlertDiscount() {
-    this.visibleDiscount = false;
-  }
-
-  private infoPercenDiscount() {
-
-    if (!this.visibleDiscount) {
-      this.messageService.add({ key: 'toastInfoDiscount', sticky: true, severity: 'custom', summary: 'Você atingiu.' });
-      this.visibleDiscount = true;
-      this.progressDiscount = 0;
-
-      if (this.intervalDiscount) {
-        clearInterval(this.intervalDiscount);
-      }
-
-      this.intervalDiscount = setInterval(() => {
-        if (this.progressDiscount < this.progressTotal) {
-          this.progressDiscount = this.progressDiscount + 2;
-        }
-
-        if (this.progressDiscount >= 100) {
-          this.progressDiscount = 100;
-          clearInterval(this.intervalDiscount);
-        }
-
-        this.cdr.markForCheck();
-      }, 10);
-    }
-
   }
 
   //Parts
@@ -891,204 +893,231 @@ export default class BudgetComponent implements OnInit, OnDestroy {
   private somaBudgetItem() {
     this.totalBudgetParts.set(0);
     var tempTotalParts = 0;
-
     this.totalBudgetDiscountParts.set(0);
     var tempTotalDiscount = 0;
 
     for (let index = 0; index < this.listBudgetItem.length; index++) {
       const element = this.listBudgetItem[index];
-      tempTotalParts += element.price;
+      tempTotalParts += element.quantity * element.price;
       tempTotalDiscount += element.discount;
     }
-
     this.totalBudgetParts.set(tempTotalParts);
     this.totalBudgetDiscountParts.set(tempTotalDiscount);
   }
-  showDialogParts() {
-    this.visibleParts = true;
-  }
-  hideDialogParts() {
-    this.visibleParts = false;
-  }
-  private PartsDisable() {
-    this.formParts.get('selecQtdAvailable').disable();
-    this.formParts.get('selecPrice').disable();
-    this.formParts.get('selecDiscount').disable();
-  }
-  private PartsEnable() {
-    this.formParts.get('selecQtdAvailable').enable();
-    this.formParts.get('selecPrice').enable();
-    this.formParts.get('selecDiscount').enable();
-  }
-  onSelectEventParts(event: any) {
-    this.formParts.patchValue({
-      selecDesc: this.selectedParts.description,
-      selecQtdAvailable: 0,
-      selecDiscount: 0,
-      selecPrice: this.selectedParts.price,
-
-    });
-    this.partsDisabledButton = false;
-    this.PartsEnable();
-  }
-  onUnSelectEventParts(event: any) {
-    this.formParts.patchValue({
-      selecDesc: "",
-      selecQtdAvailable: 0,
-      selecPrice: 0,
-      selecDiscount: 0
-    })
-    this.partsDisabledButton = true;
-
-
-    this.PartsDisable();
-
-  }
-  cleanParts() {
-    this.formParts.patchValue({
-      filterCode: "",
-      filterDesc: "",
-      selecDesc: "",
-      selecQtdAvailable: 0,
-      selecPrice: 0,
-      selecDiscount: 0
-    })
-    this.selectedParts = null;
-    this.partsDisabledButton = true;
-  }
-  public async filterParts() {
-    this.busyService.busy();
-
-    this.listParts = [];
-    const { value } = this.formParts;
-
-    if (value.filterCode != '') {
-      const partsResult = await this.getPartsFilterCode(value.filterCode);
-      if (partsResult.status == 200) {
-        this.listParts = partsResult.body;
-      }
-
-    } else if (value.filterDesc != '') {
-      const partsResult = await this.getPartsFilterDesc(value.filterDesc);
-      if (partsResult.status == 200) {
-        this.listParts = partsResult.body;
-      }
+  validSavePart(p: Part): boolean {
+    if (this.listBudgetRequisition.length == 0) {
+      this.alertShowRequisition1();
+      return false;
     }
-    this.busyService.idle();
-  }
-  private async getPartsFilterCode(code: string): Promise<HttpResponse<Part[]>> {
-    try {
-      return await lastValueFrom(this.partsService.getExternalFilterCode$(code));
-    } catch (error) {
-      return error;
+    if (p.description.trim() == "") {
+      this.messageService.add({ severity: 'error', summary: 'Peças', detail: 'Descrição não informada', icon: 'pi pi-times' });
+      return false;
     }
-  }
-  private async getPartsFilterDesc(desc: string): Promise<HttpResponse<Part[]>> {
-    try {
-      return await lastValueFrom(this.partsService.getExternalFilterDesc$(desc));
-    } catch (error) {
-      return error;
+    if (p.qtdAvailable <= 0) {
+      this.messageService.add({ severity: 'error', summary: 'Peças', detail: 'Quantidade inválida', icon: 'pi pi-times' });
+      return false;
     }
+    if (p.price <= 0) {
+      this.messageService.add({ severity: 'error', summary: 'Peças', detail: 'Preço não informado', icon: 'pi pi-times' });
+      return false;
+    }
+    if (p.discount < 0) {
+      this.messageService.add({ severity: 'error', summary: 'Peças', detail: 'Desconto inválido', icon: 'pi pi-times' });
+      return false;
+    }
+    if (p.discount > (p.price * p.qtdAvailable)) {
+      this.messageService.add({ severity: 'error', summary: 'Peças', detail: 'Desconto inválido', icon: 'pi pi-times' });
+      return false;
+    }
+
+    return true;
   }
-  public async selectPartsConfirme() {
-    const { value } = this.formParts;
+  public async savePart(p: Part) {
 
-    if (this.selectedParts == null) {
-      this.messageService.add({ severity: 'error', summary: 'Peças', detail: 'Não selecionada', icon: 'pi pi-times' });
-    } else if (value.selecQtdAvailable <= 0) {
-      this.messageService.add({ severity: 'info', summary: 'Quantidade', detail: 'Não informada' });
-    } else if (value.selecPrice <= 0) {
-      this.messageService.add({ severity: 'info', summary: 'Preço', detail: 'Não informado' });
-    } else if (value.selecDiscount < 0) {
-      this.messageService.add({ severity: 'error', summary: 'Disconto', detail: 'Inválido', icon: 'pi pi-times' });
-    } else if (value.selecDiscount > (value.selecQtdAvailable * value.selecPrice)) {
-      this.messageService.add({ severity: 'error', summary: 'Disconto', detail: 'Inválido', icon: 'pi pi-times' });
-    } else {
-
-      this.selectedParts.companyId = this.storageService.companyId;
-      this.selectedParts.resaleId = this.storageService.resaleId;
-      this.selectedParts.status = "ativo";
-      const resultPart = await this.savePart(this.selectedParts);
-
-      this.selectedParts.qtdAvailable = value.selecQtdAvailable;
-      this.selectedParts.discount = value.selecDiscount;
-      this.selectedParts.price = value.selecPrice;
-
+    if (this.validSavePart(p)) {
       var budgetItem: BudgetItem = new BudgetItem();
-      budgetItem.companyId = this.selectedParts.companyId;
-      budgetItem.resaleId = this.selectedParts.resaleId;
-      budgetItem.partId = this.selectedParts.id;
+      budgetItem.companyId = p.companyId;
+      budgetItem.resaleId = p.resaleId;
+      budgetItem.partId = p.id;
       budgetItem.budgetId = this.budget.id;
       budgetItem.status = "Pending";
       budgetItem.ordem = this.listBudgetItem.length + 1;
-      budgetItem.code = this.selectedParts.code;
-      budgetItem.description = value.selecDesc;
-      budgetItem.quantity = value.selecQtdAvailable;
-      budgetItem.discount = value.selecDiscount;
-      budgetItem.price = value.selecPrice;
+      budgetItem.code = p.code;
+      budgetItem.description = p.description;
+      budgetItem.quantity = p.qtdAvailable;
+      budgetItem.discount = p.discount;
+      budgetItem.price = p.price;
 
-      const resultItem = await this.saveBudgetItem(budgetItem);
-      if (resultItem.status == 201) {
-        this.hideDialogParts();
-        await this.getListBudgetItem();
-        this.cleanParts();
+      if (budgetItem.discount > 0) {
+        const resultDiscount = this.calcDiscountSaveParts(budgetItem);
+        if (resultDiscount) {
+          const resultItem = await this.saveBudgetItem(budgetItem);
+          if (resultItem.status == 201) {
+            await this.getListBudgetItem();
+          }
+        }
+      } else {
+        const resultItem = await this.saveBudgetItem(budgetItem);
+        if (resultItem.status == 201) {
+          await this.getListBudgetItem();
+        }
       }
-
-
     }
 
   }
-  private async savePart(part: Part): Promise<HttpResponse<Part>> {
-    try {
-      return await lastValueFrom(this.partsService.save(part))
-    } catch (error) {
-      return error;
-    }
-  }
-  private async saveBudgetItem(item: BudgetItem): Promise<HttpResponse<BudgetServiceItem>> {
+  private async saveBudgetItem(item: BudgetItem): Promise<HttpResponse<BudgetItem>> {
     try {
       return await lastValueFrom(this.budgetService.saveBudgetItem(item));
     } catch (error) {
       return error;
     }
   }
+  calcDiscountSaveParts(part: BudgetItem): boolean {
 
- async deleteBudgetItem(item: BudgetItem) {
-    const resultItem = await this.deleteItem(item);
-    if(resultItem.status == 200){
-      this.messageService.add({ severity: 'success', summary: 'Peças', detail: 'Removido com sucesso', icon: 'pi pi-check' });
-      this.getListBudgetItem();
+    var tempTotal = part.price * part.quantity;
+    var tempTotalDiscount = part.discount;
+    for (var item of this.listBudgetItem) {
+      tempTotal += item.price * item.quantity;
+      tempTotalDiscount += item.discount;
+    }
+
+    if (tempTotalDiscount == 0) return true;
+
+    const totalLimit = (tempTotal * this.storageService.limitDiscount) / 100;
+
+    if (tempTotalDiscount > totalLimit) {
+      this.messageService.add({ severity: 'error', summary: 'Desconto', detail: 'Maior que o permitido', icon: 'pi pi-times' });
+      return false;
+    }
+
+    this.toastProgressTotal = (tempTotalDiscount * 100) / totalLimit;
+    if (this.toastProgressTotal > this.percentAletDiscount) {
+      this.toastDesc.set("em peças");
+      this.toastInfoDiscount(tempTotal, tempTotalDiscount);
+    }
+    return true;
+  }
+  calcDiscountUpdateParts(part: BudgetItem): boolean {
+
+    if (part.discount > (part.price * part.quantity)) {
+      this.messageService.add({ severity: 'error', summary: 'Desconto', detail: 'Maior que o valor da peça', icon: 'pi pi-times' });
+      return false;
+    }
+
+    var tempTotal = part.price * part.quantity;
+    var tempTotalDiscount = part.discount;
+
+    for (var item of this.listBudgetItem) {
+      if (item.id != part.id) {
+        tempTotal += item.price * item.quantity;
+        tempTotalDiscount += item.discount;
+      }
+    }
+
+    if (tempTotalDiscount == 0) return true;
+
+    const totalLimit = (tempTotal * this.storageService.limitDiscount) / 100;
+
+    if (tempTotalDiscount > totalLimit) {
+      this.messageService.add({ severity: 'error', summary: 'Desconto', detail: 'Maior que o permitido', icon: 'pi pi-times' });
+      return false;
+    }
+
+    this.toastProgressTotal = (tempTotalDiscount * 100) / totalLimit;
+    if (this.toastProgressTotal > this.percentAletDiscount) {
+      this.toastDesc.set("em peças");
+      this.toastInfoDiscount(tempTotal, tempTotalDiscount);
+    }
+    return true;
+  }
+  calcDiscountDeleteParts(part: BudgetItem): boolean {
+    var tempTotal = 0;
+    var tempTotalDiscount = 0;
+    for (var item of this.listBudgetItem) {
+      if (item.id != part.id) {
+        tempTotal += item.price * item.quantity;
+        tempTotalDiscount += item.discount;
+      }
+    }
+
+    if (tempTotalDiscount == 0) return true;
+
+    const totalLimit = (tempTotal * this.storageService.limitDiscount) / 100;
+
+    if (tempTotalDiscount > totalLimit) {
+      this.messageService.add({ severity: 'error', summary: 'Desconto', detail: 'Maior que o permitido', icon: 'pi pi-times' });
+      return false;
+    }
+
+    this.toastProgressTotal = (tempTotalDiscount * 100) / totalLimit;
+    if (this.toastProgressTotal > this.percentAletDiscount) {
+      this.toastDesc.set("em peças");
+      this.toastInfoDiscount(tempTotal, tempTotalDiscount);
+    }
+    return true;
+  }
+  private async updateBudgetItem(item: BudgetItem): Promise<HttpResponse<BudgetItem>> {
+    try {
+      return await lastValueFrom(this.budgetService.updateBudgetItem(item));
+    } catch (error) {
+      return error;
     }
   }
+  async deleteBudgetItem(item: BudgetItem) {
 
-  private async deleteItem(item: BudgetItem): Promise<HttpResponse<BudgetServiceItem>> {
+    const resultDiscount = this.calcDiscountDeleteParts(item);
+
+    if (resultDiscount) {
+      const resultItem = await this.deleteItem(item);
+      if (resultItem.status == 200) {
+        this.messageService.add({ severity: 'success', summary: 'Peças', detail: 'Removido com sucesso', icon: 'pi pi-check' });
+        this.getListBudgetItem();
+      }
+    }
+  }
+  private async deleteItem(item: BudgetItem): Promise<HttpResponse<BudgetItem>> {
     try {
       return await lastValueFrom(this.budgetService.deleteBudgetItem(item))
     } catch (error) {
       return error;
     }
   }
-
-  alertShowDiscount2() {
-    this.messageService.add({ severity: 'success', summary: 'Desconto', detail: 'Removido com sucesso', icon: 'pi pi-check' });
+  onRowEditInit(item: BudgetItem) {
+    this.clonedPartItem[item.id as string] = { ...item };
   }
+  async onRowEditSave(item: BudgetItem, index: number) {
+
+    const resultDiscount = this.calcDiscountUpdateParts(item);
+
+    if (resultDiscount) {
+      const resultUpdate = await this.updateBudgetItem(item);
+      if (resultUpdate.status == 200) {
+        delete this.clonedPartItem[item.id as string];
+        await this.getListBudgetItem();
+      }
+    } else {
+      this.onRowEditCancel(item, index);
+    }
+
+  }
+  onRowEditCancel(item: BudgetItem, index: number) {
+    this.listBudgetItem[index] = this.clonedPartItem[item.id as string];
+    delete this.clonedPartItem[item.id as string];
+  }
+
 
   alertShowRequisition0() {
     this.messageService.add({ severity: 'success', summary: 'Solicitação', detail: 'Adicionada com sucesso', icon: 'pi pi-plus' });
   }
-
   alertShowRequisition1() {
     this.messageService.add({ severity: 'info', summary: 'Atenção', detail: 'Não a solicitação' });
   }
-
   alertShowRequisition2() {
     this.messageService.add({ severity: 'success', summary: 'Solicitação', detail: 'Atualizada com sucesso', icon: 'pi pi-check' });
   }
-
   alertShowRequisition3() {
     this.messageService.add({ severity: 'info', summary: 'Solicitação', detail: 'Não pode ser removida' });
   }
-
   alertShowService0() {
     this.messageService.add({ severity: 'success', summary: 'Serviço', detail: 'Adicionado com sucesso', icon: 'pi pi-plus' });
   }

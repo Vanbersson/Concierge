@@ -28,21 +28,35 @@
         margin-bottom: 0px !important;
     }
 
+    .btn-action {
+        display: flex;
+        flex-direction: row;
+        margin-top: 1rem;
+        gap: 8px;
+    }
+
+    .mobile-anabled{
+        display: none;
+    }
+
     ::ng-deep {
         .p-button.p-button-secondary-custom {
             color: #475569;
             background-color: #f1f5f9;
             border: 1px solid #f1f5f9
         }
+
         .p-button.p-button-secondary-custom:hover {
             background-color: #e9ecee;
             border: 1px solid #e9ecee
         }
+
         .p-button.p-button-success-custom {
             color: #475569;
             background-color: #acf3aa;
             border: 1px solid #acf3aa
         }
+
         .p-button.p-button-success-custom:hover {
             background-color: #a0f19e;
             border: 1px solid #a0f19e
@@ -56,7 +70,15 @@
     /* Small devices (portrait tablets and large phones, 600px and up) */
     @media only screen and (min-width: 375px) and (max-width: 667px) {
         .mobile-disabled {
-            display: none;
+            display: none !important;
+        }
+
+        .mobile-anabled{
+            display: block;
+        }
+
+        .btn-action {
+            flex-direction: column;
         }
     }
 }

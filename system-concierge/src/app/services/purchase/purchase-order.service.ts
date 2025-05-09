@@ -23,7 +23,7 @@ export class PurchaseOrderService {
   public filterOpen$(companyId: number, resaleId: number): Observable<PurchaseOrder[]> {
     return this.http.get<PurchaseOrder[]>(environment.apiuUrl + "/purchase/order/" + companyId + "/" + resaleId + "/filter/open", { headers: this.myHeaders() });
   }
-  public filterId$(companyId: number, resaleId: number, purchaseId: number): Observable<HttpResponse<PurchaseOrder>> {
+  public filterId(companyId: number, resaleId: number, purchaseId: number): Observable<HttpResponse<PurchaseOrder>> {
     return this.http.get<PurchaseOrder>(environment.apiuUrl + "/purchase/order/" + companyId + "/" + resaleId + "/filter/id/" + purchaseId, { headers: this.myHeaders(), observe: 'response' });
   }
 

@@ -62,4 +62,10 @@ public class Budget {
     private Integer clientCompanyId;
 
     private String information;
+
+    @Column(name = "client_send_date")
+    private Date clientSendDate;
+
+    @Column(name = "client_approved_date")
+    private Date clientApprovedDate;
 }
