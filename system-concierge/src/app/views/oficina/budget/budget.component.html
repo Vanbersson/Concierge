@@ -254,7 +254,7 @@
         <button pButton type="button" label="Salvar Orçamento" size="small" [raised]="true" severity="secondary-custom"
             icon="pi pi-check" (click)="saveBudget()"></button>
         <button pButton type="button" label="Imprimir" size="small" [raised]="true" severity="secondary-custom"
-            icon="pi pi-print"></button>
+            icon="pi pi-print" (click)="print()"></button>
         <button pButton type="button" label="Enviar Cliente" size="small" [raised]="true" severity="success-custom"
             icon="pi pi-send"></button>
        
@@ -678,3 +678,6 @@
         </div>
     </ng-template>
 </p-confirmDialog>
+
+<!-- Print -->
+ <app-printbudget #printComponent/>

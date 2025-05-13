@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, DoCheck, OnDestroy, OnInit, signal } from '@angular/core';
+import { ChangeDetectorRef, Component, DoCheck, OnDestroy, OnInit, signal, ViewChild } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { Router, ActivatedRoute, RouterModule } from '@angular/router';
 import { FormControl, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
@@ -46,6 +46,9 @@ import { MessageResponse } from '../../../models/message/message-response';
 import { VehicleService } from '../../../services/vehicle/vehicle.service';
 import { VehicleEntry } from '../../../models/vehicle/vehicle-entry';
 
+//Print
+import { PrintBudgetComponent } from '../../../components/print.budget/print.budget.component';
+
 export interface IPayment {
   payment: string,
 }
@@ -53,7 +56,7 @@ export interface IPayment {
 @Component({
   selector: 'app-budget',
   standalone: true,
-  imports: [CommonModule, FilterPartsComponent, RouterModule, InputTextModule, ButtonModule, ReactiveFormsModule, FormsModule,
+  imports: [CommonModule, PrintBudgetComponent, FilterPartsComponent, RouterModule, InputTextModule, ButtonModule, ReactiveFormsModule, FormsModule,
     InputIconModule, IconFieldModule, InputMaskModule, DialogModule, MultiSelectModule, ConfirmDialogModule,
     CalendarModule, InputTextareaModule, ProgressBarModule, ToastModule, InputGroupModule,
     InputNumberModule, TabViewModule, TableModule, DividerModule],
@@ -65,7 +68,6 @@ export default class BudgetComponent implements OnInit, OnDestroy, DoCheck {
 
   budget: Budget = new Budget();
   clientCompany: ClientCompany = new ClientCompany();
-  attendant: User = new User();
   vehicleEntry: VehicleEntry = new VehicleEntry();
 
   vehicleId = signal<number>(0);
@@ -129,6 +131,9 @@ export default class BudgetComponent implements OnInit, OnDestroy, DoCheck {
   toastDiscount = signal<number>(0);
   toastDesc = signal<string>("Serviço + Peças");
   private percentAletDiscount = 60;
+
+  //Print
+  @ViewChild("printComponent") printComponent!: PrintBudgetComponent;
 
   constructor(
     private vehicleService: VehicleService,
@@ -1104,6 +1109,20 @@ export default class BudgetComponent implements OnInit, OnDestroy, DoCheck {
     this.listBudgetItem[index] = this.clonedPartItem[item.id as string];
     delete this.clonedPartItem[item.id as string];
   }
+
+
+  //Print Budget
+  print() {
+
+    try {
+      this.printComponent.print(this.budget, this.listBudgetRequisition, this.listBudgetService, this.listBudgetItem, this.clientCompany, this.vehicleEntry);
+    } catch (error) {
+      console.log(error)
+    }
+
+  }
+
+
 
 
   alertShowRequisition0() {

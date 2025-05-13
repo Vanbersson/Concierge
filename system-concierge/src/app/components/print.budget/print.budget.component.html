@@ -1,0 +1,184 @@
+<div id="print-budgetId" style="display: none; width: 100%; height: 100%;">
+    <div class="flex justify-content-between ">
+        <span>NATIVA MAQUINAS E IMPLEMENTO LTDA</span>
+        <span>Orçamento: <strong>{{budget.id}}</strong></span>
+    </div>
+    <div class="print-divider"></div>
+    <table class="print-table">
+        <tbody>
+            <tr>
+                <td>Nro. O.S.: {{ vehicleEntry.numServiceOrder}}</td>
+                <td>Consutor: {{vehicleEntry.nameUserAttendant | uppercase}}</td>
+                <td>Validade: {{budget.dateValidation| date:'dd/MM/yyyy'}}</td>
+            </tr>
+            <tr>
+                <td>Placa: {{maskPlaca(vehicleEntry.placa) | uppercase}}</td>
+                <td>Modelo: {{vehicleEntry.modelDescription | uppercase}}</td>
+                <td>Cor: {{vehicleEntry.color | uppercase}}</td>
+            </tr>
+            <tr>
+                <td>Cliente. {{clientCompany.id}} {{clientCompany.name}}</td>
+                <td *ngIf="clientCompany.fisjur == 'Juridica'">CNPJ: {{maskCNPJ(clientCompany.cnpj)}} </td>
+                <td *ngIf="clientCompany.fisjur != 'Juridica'">CPF: {{maskCPF(clientCompany.cpf)}} </td>
+                <td *ngIf="clientCompany.fisjur != 'Juridica'">RG: {{clientCompany.rg}} </td>
+            </tr>
+            <tr>
+                <td>Fone: {{clientCompany.dddPhone}} {{clientCompany.phone}}</td>
+                <td>Celular: {{clientCompany.dddCellphone}} {{clientCompany.cellphone}}</td>
+            </tr>
+            <tr>
+                <td>Endereço: {{clientCompany.address}} {{clientCompany.addressNumber}}</td>
+                <td>Bairro: {{clientCompany.neighborhood}}</td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="print-table">
+        <tbody>
+            <tr>
+                <td>Cidade: {{clientCompany.city | uppercase}}</td>
+                <td>UF: {{clientCompany.state}}</td>
+                <td>CEP: {{clientCompany.zipCode}}</td>
+
+            </tr>
+        </tbody>
+    </table>
+    <div class="print-divider"></div>
+    <div class="flex justify-content-center">
+        <span>Solicitações</span>
+    </div>
+    <br>
+    <table class="print-table">
+        <thead>
+            <tr>
+                <th style="width: 10%;">Ordem</th>
+                <th style="width: 90%;">Descrição</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let req of listBudgetRequisition">
+                <td>{{req.ordem}}</td>
+                <td>{{req.description | uppercase}}</td>
+            </tr>
+        </tbody>
+    </table>
+    <div class="print-divider"></div>
+    <div class="flex justify-content-center">
+        <span>Serviços</span>
+    </div>
+    <br>
+    <table class="print-table">
+        <thead>
+            <tr>
+                <th style="width: 10%;">Ordem</th>
+                <th style="width: 40%;">Descrição</th>
+                <th style="width: 10%;">Tempo</th>
+                <th style="width: 10%;">Vlr Hora</th>
+                <th style="width: 10%;">Desconto</th>
+                <th style="width: 15%;">Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let serv of listBudgetServiceItem">
+                <td>{{serv.ordem}}</td>
+                <td>{{serv.description | uppercase}}</td>
+                <td>{{serv.hourService}}</td>
+                <td>{{serv.price | currency}}</td>
+                <td>{{serv.discount | currency}}</td>
+                <td>{{(serv.price * serv.hourService) - serv.discount | currency }}</td>
+            </tr>
+        </tbody>
+        <tfoot>
+            <tr>
+                <td></td>
+                <td style="text-align: right;">
+                    <strong>Total de Serviços</strong>
+                </td>
+                <td></td>
+                <td>
+                    <strong>{{totalService | currency }}</strong>
+                </td>
+                <td>
+                    <strong>{{totalServiceDiscount | currency }}</strong>
+                </td>
+                <td>
+                    <strong>{{totalService - totalServiceDiscount | currency }}</strong>
+                </td>
+            </tr>
+        </tfoot>
+    </table>
+    <div class="print-divider"></div>
+    <div class="flex justify-content-center">
+        <span>Peças</span>
+    </div>
+    <br>
+    <table class="print-table">
+        <thead>
+            <tr>
+                <th style="width: 6%;">Ordem</th>
+                <th style="width: 14%;">Código</th>
+                <th style="width: 45%;">Descrição</th>
+                <th style="width: 10%;">Qtd</th>
+                <th style="width: 10%;">Valor</th>
+                <th style="width: 10%;">Desconto</th>
+                <th style="width: 10%;">Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let item of listBudgetItem">
+                <td>{{item.ordem}}</td>
+                <td>{{item.code}}</td>
+                <td>{{item.description | uppercase }}</td>
+                <td>{{item.quantity | number:'1.2-2' }}</td>
+                <td>{{item.price | currency}}</td>
+                <td>{{item.discount | currency }}</td>
+                <td>{{(item.price * item.quantity) - item.discount | currency}}</td>
+            </tr>
+        </tbody>
+        <tfoot>
+            <td></td>
+            <td></td>
+            <td style="text-align: right;">
+                <strong>Total de Peças</strong>
+            </td>
+            <td></td>
+            <td>
+                <strong>{{totalPart | currency }}</strong>
+            </td>
+            <td>
+                <strong>{{totalPartDiscount | currency }}</strong>
+            </td>
+            <td>
+                <strong>{{totalPart - totalPartDiscount | currency}}</strong>
+            <td>
+        </tfoot>
+    </table>
+    <div class="flex justify-content-end flex-wrap">
+        <table class="mt-5" style="width: 300px;">
+            <tr>
+                <td>Total de Serviços</td>
+                <td style="text-align: right;">
+                    <strong>{{totalService - totalPartDiscount | currency }}</strong>
+                </td>
+            </tr>
+            <tr>
+                <td>Total de Peças</td>
+                <td style="text-align: right;">
+                    <strong>{{totalPart - totalPartDiscount |currency }}</strong>
+                </td>
+            </tr>
+            <tr>
+                <td>Total Geral</td>
+                <td style="text-align: right;">
+                    <strong>{{totalGeral |currency }}</strong>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div class="flex mt-5 mb-1">
+        <span>Informações</span>
+    </div>
+
+    <div class="flex border-1 w-full h-4rem">
+        {{budget.information}}
+    </div>
+</div>
