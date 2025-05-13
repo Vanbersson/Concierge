@@ -2,17 +2,12 @@
 
     <div class="layout-card-title">
         <span>Manutenção de clientes</span>
-        <p-button icon="pi pi-user-plus" [text]="true" label="Cliente" (onClick)="showDialog()"/>
+        <p-button icon="pi pi-plus" [text]="true" label="Novo Cliente" (onClick)="showDialog()" />
     </div>
-    <p-table #dt1 dataKey="id" [value]="clients" 
-    [rowHover]="true" 
-    [showCurrentPageReport]="true"    
-    currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} entradas"
-    [globalFilterFields]="['id', 'fantasia', 'name', 'cnpj', 'cpf']" 
-    [paginator]="true" 
-    [rows]="10"
-    [rowsPerPageOptions]="[10, 25, 50]" 
-    styleClass="p-datatable-sm">
+    <p-table #dt1 dataKey="id" [value]="clients" [rowHover]="true" [showCurrentPageReport]="true"
+        currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} Cadastros"
+        [globalFilterFields]="['id', 'fantasia', 'name', 'cnpj', 'cpf']" [paginator]="true" [rows]="10"
+        [rowsPerPageOptions]="[10, 25, 50]" styleClass="p-datatable-sm">
         <ng-template pTemplate="caption">
             <div class="flex justify-content-between">
                 <p-iconField iconPosition="left">
@@ -22,7 +17,7 @@
                     <input pInputText type="text" (input)="dt1.filterGlobal($event.target.value, 'contains')"
                         placeholder="Pesquisar" />
                 </p-iconField>
-               
+
             </div>
         </ng-template>
         <ng-template pTemplate="header">
@@ -57,22 +52,161 @@
 
         </ng-template>
     </p-table>
-
-    <p-dialog [(visible)]="visible" [modal]="true">
-        <form>
-            <div class="p-fluid p-formgrid grid">
-                <div class="field col-12 md:col-2">
-                    <label for="clientId">Código</label>
-                    <input id="clientId" pInputText />
-                </div>
-                <div class="field col-12 md:col-6">
-                    <label for="ClientName">Razão Social</label>
-                    <input id="ClientName" pInputText />
-                </div>
-
-            </div>
-        </form>
-
-
-    </p-dialog>
 </div>
+
+<!-- Dialog cliente -->
+<p-dialog header="Cadastro" [(visible)]="visible" [modal]="true" [style]="{ width: '80rem', height:'70rem' }"
+    [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }">
+
+    <p-tabView>
+        <p-tabPanel header="Dados">
+            <form [formGroup]="formClient">
+                <div class="p-fluid p-formgrid grid">
+                    <div class="field col-12 md:col-2">
+                        <label for="clientId">Código</label>
+                        <p-inputNumber inputId="clientId" mode="decimal" formControlName="id" />
+                    </div>
+                    <div class="field col-12 md:col-7">
+                        <label for="ClientName">Razão Social</label>
+                        <input id="ClientName" pInputText />
+                    </div>
+                    <div class="md:col-3">
+                    </div>
+                    <div class="field col-12 md:col-3">
+                        <label for="ClientName">Fantasia</label>
+                        <input id="ClientName" pInputText />
+                    </div>
+                    <div class="field col-12 md:col-2">
+                        <label for="purchaseOrderId">Cli/For</label>
+                        <p-multiSelect [options]="clifor" optionLabel="type" display="chip" [selectionLimit]="1"
+                            placeholder="Selecione" />
+                    </div>
+                    <div class="field col-12 md:col-2">
+                        <label for="purchaseOrderId">Jur/Fis</label>
+                        <p-multiSelect [options]="jurfis" optionLabel="type" display="chip" [selectionLimit]="1"
+                            placeholder="Selecione" formControlName="jurfis" />
+                    </div>
+                    <div class="md:col-5">
+                    </div>
+                    <div class="field col-12 md:col-1">
+                        <label for="ClientName">DDD</label>
+                        <input id="ClientName" pInputText />
+                    </div>
+                    <div class="field col-12 md:col-3">
+                        <label for="ClientName">Telefone</label>
+                        <input id="ClientName" pInputText />
+                    </div>
+
+                    <div class="field col-12 md:col-1">
+                        <label for="ClientName">DDD</label>
+                        <input id="ClientName" pInputText />
+                    </div>
+                    <div class="field col-12 md:col-3">
+                        <label for="ClientName">Celular</label>
+                        <input id="ClientName" pInputText />
+                    </div>
+                    <div class="md:col-4">
+                    </div>
+                    <div class="field col-12 md:col-2">
+                        <label for="ClientName">CEP</label>
+                        <input id="ClientName" pInputText />
+                    </div>
+                    <div class="field col-12 md:col-6">
+                        <label for="ClientName">Logradouro</label>
+                        <input id="ClientName" pInputText />
+                    </div>
+                    <div class="field col-12 md:col-1">
+                        <label for="ClientName">Nº</label>
+                        <input id="ClientName" pInputText />
+                    </div>
+                    <div class="md:col-5">
+                    </div>
+                    <div class="field col-12 md:col-9">
+                        <label for="ClientName">Complemento</label>
+                        <input id="ClientName" pInputText />
+                    </div>
+                    <div class="md:col-3">
+                    </div>
+                    <div class="field col-12 md:col-1">
+                        <label for="ClientName">UF</label>
+                        <input id="ClientName" pInputText />
+                    </div>
+                    <div class="field col-12 md:col-4">
+                        <label for="ClientName">Cidade</label>
+                        <input id="ClientName" pInputText />
+                    </div>
+                    <div class="field col-12 md:col-4">
+                        <label for="ClientName">Bairro</label>
+                        <input id="ClientName" pInputText />
+                    </div>
+
+
+                </div>
+            </form>
+        </p-tabPanel>
+        <p-tabPanel header="Contato">
+            <form>
+                <div class="p-fluid p-formgrid grid">
+                    <div class="field col-12 md:col-6">
+                        <label for="ClientName">Nome</label>
+                        <input id="ClientName" pInputText />
+                    </div>
+                    <div class="md:col-6"></div>
+                    <div class="field col-12 md:col-6">
+                        <label for="ClientName">E-Mail</label>
+                        <input id="ClientName" pInputText />
+                    </div>
+                    <div class="md:col-6"></div>
+                    <div class="field col-12 md:col-1">
+                        <label for="ClientName">DDD</label>
+                        <input id="ClientName" pInputText />
+                    </div>
+                    <div class="field col-12 md:col-3">
+                        <label for="ClientName">Telefone</label>
+                        <input id="ClientName" pInputText />
+                    </div>
+
+                    <div class="field col-12 md:col-1">
+                        <label for="ClientName">DDD</label>
+                        <input id="ClientName" pInputText />
+                    </div>
+                    <div class="field col-12 md:col-3">
+                        <label for="ClientName">Celular</label>
+                        <input id="ClientName" pInputText />
+                    </div>
+                </div>
+            </form>
+        </p-tabPanel>
+        <p-tabPanel header="Jurídica" *ngIf="showJuridica">
+            <form>
+                <div class="p-fluid p-formgrid grid">
+                    <div class="field col-12 md:col-3">
+                        <label for="ClientName">CNPJ</label>
+                        <input id="ClientName" pInputText />
+                    </div>
+                </div>
+            </form>
+        </p-tabPanel>
+        <p-tabPanel header="Física" *ngIf="showFisica">
+            <form>
+                <div class="p-fluid p-formgrid grid">
+                    <div class="field col-12 md:col-3">
+                        <label for="ClientName">CPF</label>
+                        <input id="ClientName" pInputText />
+                    </div>
+                    <div class="field col-12 md:col-3">
+                        <label for="ClientName">RG</label>
+                        <input id="ClientName" pInputText />
+                    </div>
+                    <div class="md:col-3">
+                    </div>
+                </div>
+            </form>
+        </p-tabPanel>
+    </p-tabView>
+
+    <div class="col-12 flex justify-content-end gap-2">
+        <button pButton type="button" pRipple label="Fechar" icon="pi pi-times" class="p-button-text"></button>
+        <button pButton type="button" pRipple label="Salvar" icon="pi pi-check" class="p-button-text"></button>
+    </div>
+</p-dialog>

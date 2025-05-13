@@ -1,6 +1,7 @@
-import { Component, DoCheck, EventEmitter, Input, Output, signal } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpResponse } from '@angular/common/http';
+import { lastValueFrom } from 'rxjs';
 
 //Class
 import { PurchaseOrder } from '../../models/purchase.order/puchase.order';
@@ -8,20 +9,16 @@ import { PurchaseOrderItem } from '../../models/purchase.order/purchase.order.it
 
 //Print
 import printJS from 'print-js';
-import { lastValueFrom } from 'rxjs';
 
 //Service
 import { PurchaseOrderItemService } from '../../services/purchase/purchase-order-item.service';
 import { PurchaseOrderService } from '../../services/purchase/purchase-order.service';
 import { StorageService } from '../../services/storage/storage.service';
 
-//PrimeNG
-import { ButtonModule } from 'primeng/button';
-
 @Component({
   selector: 'app-printPurchase',
   standalone: true,
-  imports: [CommonModule, ButtonModule],
+  imports: [CommonModule],
   templateUrl: './print.purchase.component.html',
   styleUrl: './print.purchase.component.scss'
 })
