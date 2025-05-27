@@ -61,7 +61,7 @@ export class PrintPurchaseComponent {
           targetStyles: ['*'], // garante que os estilos globais sejam aplicados
           scanStyles: true, // use true se quiser escanear estilos inline também
           documentTitle: 'Pedido de compra',
-          font_size:'10pt'
+          font_size:'8pt'
         });
         print.style.display = 'none';
       }, 200);
