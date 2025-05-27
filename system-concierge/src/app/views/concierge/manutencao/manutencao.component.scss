@@ -14,9 +14,7 @@
     }
 
     .mobile-visible-none {
-        display: flex;
-        justify-content: center;
-        
+        display: block;        
     }
 
     .layout-main-between {
@@ -199,7 +197,7 @@
         .layourt-button-action-speedDial {
             display: flex;
             position: fixed !important;
-            bottom: 32vh;
+            bottom: 30vh;
             right: 18vw;
         }
 

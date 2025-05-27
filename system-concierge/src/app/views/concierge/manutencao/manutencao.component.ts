@@ -26,7 +26,7 @@ import { InputIconModule } from 'primeng/inputicon';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { SpeedDialModule } from 'primeng/speeddial';
 import { CheckboxModule } from 'primeng/checkbox';
-import { TimelineModule } from 'primeng/timeline';
+import { StepsModule } from 'primeng/steps';
 
 //Service
 import { VehicleService } from '../../../services/vehicle/vehicle.service';
@@ -64,11 +64,6 @@ import { IBudget } from '../../../interfaces/budget/ibudget';
 import { FilterClientComponent } from '../../../components/filter.client/filter.client.component';
 import { StatusBudgetEnum } from '../../../models/budget/status-budget-enum';
 
-interface EventItem {
-  description?: string;
-  icon?: string;
-  color?: string;
-}
 interface IModel {
   description: string,
   id: number
@@ -79,7 +74,7 @@ interface IModel {
   standalone: true,
   imports: [CommonModule, FilterClientComponent, RouterModule,
     TabViewModule, FormsModule, IconFieldModule,
-    CheckboxModule, TimelineModule, SpeedDialModule,
+    CheckboxModule, StepsModule, SpeedDialModule,
     ConfirmDialogModule, InputIconModule, ImageModule,
     DialogModule, ToastModule, TableModule, ReactiveFormsModule,
     InputTextareaModule, InputNumberModule, InputTextModule,
@@ -94,10 +89,12 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
   RESPONSE_SUCCESS: string = "Success.";
   IMAGE_MAX_SIZE: number = 4243795;
 
-  stepEntry: EventItem[];
+  itemsStatus: MenuItem[] | undefined;
+  activeIndexStatus: number = 0;
 
   private vehicleEntry: VehicleEntry;
   public id: number = 0;
+
   //Vehicle
   private notAuth = STATUS_VEHICLE_ENTRY_NOTAUTH;
   private firstAuth = STATUS_VEHICLE_ENTRY_FIRSTAUTH;
@@ -235,6 +232,24 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
       weekHeader: 'Sm'
     });
 
+    this.itemsStatus = [
+      {
+        label: 'Atendimento',
+      },
+      {
+        label: 'Orçamento',
+      },
+      {
+        label: 'Serviço em execução',
+      },
+      {
+        label: 'Serviço concluído',
+      },
+      {
+        label: 'Saída concluída'
+      }
+    ];
+
     //Id vehicle entry
     this.id = this.activatedRoute.snapshot.params['id'];
 
@@ -259,13 +274,6 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
         tooltipOptions: { tooltipLabel: 'Autorizar Saída' },
         command: () => {
           this.authExit();
-        }
-      },
-      {
-        icon: 'pi pi-print',
-        tooltipOptions: { tooltipLabel: 'Imprimir' },
-        command: () => {
-          this.messageService.add({ severity: 'info', summary: 'Print', detail: 'Data Print' });
         }
       },
       {
@@ -355,66 +363,6 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
       return error;
     }
   }
-  private stepEvent(event: string) {
-
-    switch (event) {
-      case "Attendant":
-        this.stepEntry = [
-          { description: 'Atendimento', icon: 'pi pi-spin pi-cog', color: '#673AB7' },
-          { description: 'Orçamento', icon: 'pi pi-times', color: '#607D8B' },
-          { description: 'Serviço em execução', icon: 'pi pi-times', color: '#607D8B' },
-          { description: 'Serviço concluido', icon: 'pi pi-times', color: '#607D8B' },
-          { description: 'Saída', icon: 'pi pi-times', color: '#607D8B' }
-        ];
-        break;
-      case "Budget":
-        this.stepEntry = [
-          { description: 'Atendimento', icon: 'pi pi-check', color: '#22c55e' },
-          { description: 'Orçamento', icon: 'pi pi-spin pi-cog', color: '#673AB7' },
-          { description: 'Serviço em execução', icon: 'pi pi-times', color: '#607D8B' },
-          { description: 'Serviço concluido', icon: 'pi pi-times', color: '#607D8B' },
-          { description: 'Saída', icon: 'pi pi-times', color: '#607D8B' }
-        ];
-        break;
-      case "Running_Service":
-        this.stepEntry = [
-          { description: 'Atendimento', icon: 'pi pi-check', color: '#22c55e' },
-          { description: 'Orçamento', icon: 'pi pi-check', color: '#22c55e' },
-          { description: 'Serviço em execução', icon: 'pi pi-spin pi-cog', color: '#673AB7' },
-          { description: 'Serviço concluido', icon: 'pi pi-times', color: '#607D8B' },
-          { description: 'Saída', icon: 'pi pi-times', color: '#607D8B' }
-        ];
-        break;
-      case "Full_Service":
-        this.stepEntry = [
-          { description: 'Atendimento', icon: 'pi pi-check', color: '#22c55e' },
-          { description: 'Orçamento', icon: 'pi pi-check', color: '#22c55e' },
-          { description: 'Serviço em execução', icon: 'pi pi-check', color: '#22c55e' },
-          { description: 'Serviço concluido', icon: 'pi pi-spin pi-cog', color: '#673AB7' },
-          { description: 'Saída', icon: 'pi pi-times', color: '#607D8B' }
-        ];
-        break;
-      case "Exit":
-        this.stepEntry = [
-          { description: 'Atendimento', icon: 'pi pi-check', color: '#22c55e' },
-          { description: 'Orçamento', icon: 'pi pi-check', color: '#22c55e' },
-          { description: 'Serviço em execução', icon: 'pi pi-check', color: '#22c55e' },
-          { description: 'Serviço concluido', icon: 'pi pi-check', color: '#22c55e' },
-          { description: 'Saída', icon: 'pi pi-check', color: '#22c55e' }
-        ];
-        break;
-      default:
-        this.stepEntry = [
-          { description: 'Atendimento', icon: 'pi pi-times', color: '#607D8B' },
-          { description: 'Orçamento', icon: 'pi pi-times', color: '#607D8B' },
-          { description: 'Serviço em execução', icon: 'pi pi-times', color: '#607D8B' },
-          { description: 'Serviço concluido', icon: 'pi pi-times', color: '#607D8B' },
-          { description: 'Saída', icon: 'pi pi-times', color: '#607D8B' }
-        ];
-        break;
-    }
-
-  }
   private disableInput() {
     this.formVehicle.get('nameUserExitAuth1').disable();
     this.formVehicle.get('nameUserExitAuth2').disable();
@@ -424,9 +372,30 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
     this.formVehicle.get('nameUserExitAuth2').enable();
 
   }
+  private stepStatus(status: string) {
+
+    switch (status) {
+      case 'Attendant':
+        this.activeIndexStatus = 0;
+        break;
+      case 'Budget':
+        this.activeIndexStatus = 1;
+        break;
+      case 'Running_Service':
+        this.activeIndexStatus = 2;
+        break;
+      case 'Full_Service':
+        this.activeIndexStatus = 3;
+        break;
+      case 'Exit':
+        this.activeIndexStatus = 4;
+        break;
+    }
+
+  }
   private loadForms() {
 
-    this.stepEvent(this.vehicleEntry.stepEntry);
+    this.stepStatus(this.vehicleEntry.stepEntry);
 
     for (var attendant of this.attendantsUser) {
       if (attendant.id == this.vehicleEntry.idUserAttendant) {

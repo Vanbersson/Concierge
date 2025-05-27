@@ -2,22 +2,10 @@
     <p-toast />
     <div class="layout-card-title">
         <span>Manutenção de veículos</span>
-        <p-button icon="pi pi-arrow-right" [text]="true" label="Voltar" routerLink="/portaria/lista-entrada-veiculo"/>
-    </div>
-
-    <div class="mobile-visible-none">
-        <p-timeline [value]="stepEntry" layout="horizontal">
-            <ng-template pTemplate="marker" let-event>
-                <span
-                    class="flex w-2rem h-2rem align-items-center justify-content-center text-white border-circle z-1 shadow-1"
-                    [style]="{ 'background-color': event.color }">
-                    <i [class]="event.icon"></i>
-                </span>
-            </ng-template>
-            <ng-template pTemplate="content" let-event>
-                <span>{{ event.description }}</span>
-            </ng-template>
-        </p-timeline>
+        <div class="w-6 mobile-visible-none">
+            <p-steps [model]="itemsStatus" [readonly]="true" [activeIndex]="activeIndexStatus" />
+        </div>
+        <p-button icon="pi pi-arrow-right" [text]="true" label="Voltar" routerLink="/portaria/lista-entrada-veiculo" />
     </div>
 
     <div class="layout-main-between">
@@ -35,11 +23,8 @@
                         <div class="field col-12 md:col-2">
                             <label for="dateEntry">Data Entrada</label>
 
-                            <p-calendar [iconDisplay]="'input'" 
-                            [showIcon]="true" 
-                            [showTime]="true"
-                            dateFormat="dd/mm/yy " 
-                            formControlName="dateEntry" />
+                            <p-calendar [iconDisplay]="'input'" [showIcon]="true" [showTime]="true"
+                                dateFormat="dd/mm/yy " formControlName="dateEntry" />
 
                             <small class="p-error block" *ngIf="formVehicle.get('dateEntry')?.invalid">
                                 Campo obrigatório</small>
@@ -48,7 +33,7 @@
                         <div class="field col-12 md:col-2">
                             <label for="datePrevisionExit">Previsão saída</label>
                             <p-calendar [iconDisplay]="'input'" [showIcon]="true" [showTime]="true"
-                                dateFormat="dd/mm/yy" inputId="datePrevisionExit" formControlName="datePrevisionExit"/>
+                                dateFormat="dd/mm/yy" inputId="datePrevisionExit" formControlName="datePrevisionExit" />
                         </div>
                         <div class="field col-12 md:col-2">
                             <label for="placa">Placa</label>
@@ -310,19 +295,23 @@
                 <form [formGroup]="formClientCompany">
                     <div class="p-fluid p-formgrid grid">
                         <div class="col-12 flex align-items-center gap-2">
-                            <p-checkbox inputId="ClientCompanyNotId" value="not" formControlName="clientCompanyNot" (click)="validationClientCompany()" />
+                            <p-checkbox inputId="ClientCompanyNotId" value="not" formControlName="clientCompanyNot"
+                                (click)="validationClientCompany()" />
                             <label for="ClientCompanyNotId" style="color: #3B82F6;">Empresa sem cadastro!</label>
                         </div>
                         <div class="field col-12 md:col-1">
                             <label for="clientCompanyId">Código</label>
-                            <p-inputNumber inputId="clientCompanyId" [useGrouping]="false" formControlName="clientCompanyId" />
-                            <small class="p-error block" *ngIf="formClientCompany.get('clientCompanyId')?.invalid">Campo obrigatório</small>
+                            <p-inputNumber inputId="clientCompanyId" [useGrouping]="false"
+                                formControlName="clientCompanyId" />
+                            <small class="p-error block" *ngIf="formClientCompany.get('clientCompanyId')?.invalid">Campo
+                                obrigatório</small>
                         </div>
                         <div class="md:col-11"></div>
                         <div class="field col-10 md:col-6">
                             <label for="clientCompanyName">Empresa</label>
                             <input pInputText id="clientCompanyName" type="text" formControlName="clientCompanyName" />
-                            <small class="p-error block" *ngIf="formClientCompany.get('clientCompanyName')?.invalid">Campo obrigatório</small>
+                            <small class="p-error block"
+                                *ngIf="formClientCompany.get('clientCompanyName')?.invalid">Campo obrigatório</small>
                         </div>
                         <div class="field col-2 md:col-1 flex flex-column">
                             <label for="">Filtro</label>
@@ -331,18 +320,22 @@
                         <div class="md:col-5"></div>
                         <div class="field col-12 md:col-2">
                             <label for="clientCompanyCnpj">CNPJ</label>
-                            <p-inputMask id="clientCompanyCnpj" mask="99.999.999/9999-99" formControlName="clientCompanyCnpj" />
-                            <small class="p-error block" *ngIf="formClientCompany.get('clientCompanyCnpj')?.invalid">Campo obrigatório</small>
+                            <p-inputMask id="clientCompanyCnpj" mask="99.999.999/9999-99"
+                                formControlName="clientCompanyCnpj" />
+                            <small class="p-error block"
+                                *ngIf="formClientCompany.get('clientCompanyCnpj')?.invalid">Campo obrigatório</small>
                         </div>
                         <div class="field col-12 md:col-2">
                             <label for="clientCompanyCpf">CPF</label>
                             <p-inputMask id="clientCompanyCpf" mask="999.999.999-99"
                                 formControlName="clientCompanyCpf" />
-                            <small class="p-error block" *ngIf="formClientCompany.get('clientCompanyCpf')?.invalid">Campo obrigatório</small>
+                            <small class="p-error block"
+                                *ngIf="formClientCompany.get('clientCompanyCpf')?.invalid">Campo obrigatório</small>
                         </div>
                         <div class="field col-12 md:col-2">
                             <label for="clientCompanyRg">RG</label>
-                            <p-inputNumber inputId="clientCompanyRg" [useGrouping]="false" formControlName="clientCompanyRg" />
+                            <p-inputNumber inputId="clientCompanyRg" [useGrouping]="false"
+                                formControlName="clientCompanyRg" />
                         </div>
                     </div>
                 </form>
@@ -531,8 +524,6 @@
                     severity="secondary-custom" (click)="save()"></button>
                 <button pButton type="button" label="Orçamento" icon="pi pi-file" size="small" [raised]="true"
                     severity="secondary-custom" (click)="confirmGerarOrcamento()"></button>
-                <button pButton type="button" label="Imprimir" icon="pi pi-print" size="small" [raised]="true"
-                    severity="secondary-custom"></button>
                 <button pButton type="button" label="Liberar" icon="pi pi-truck" size="small" [raised]="true"
                     severity="success-custom" (click)="authExit()"></button>
             </div>
