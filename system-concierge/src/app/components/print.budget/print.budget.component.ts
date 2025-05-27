@@ -49,6 +49,26 @@ export class PrintBudgetComponent {
     const CPF = cpf.substring(0, 3) + "." + cpf.substring(3, 6) + "." + cpf.substring(6, 9) + "-" + cpf.substring(9, 11);
     return CPF;
   }
+   formatNumberBudget(id: number): string {
+
+    var code = "";
+
+    if (id.toString().length == 1) {
+      code = "00000" + id;
+    } else if (id.toString().length == 2) {
+      code = "0000" + id;
+    } else if (id.toString().length == 3) {
+      code = "000" + id;
+    } else if (id.toString().length == 4) {
+      code = "00" + id;
+    } else if (id.toString().length == 5) {
+      code = "0" + id;
+    } else if (id.toString().length >= 6) {
+      code = id.toString();
+    }
+
+    return code;
+  }
 
   public async print(budget: Budget, listBudgetRequisition: BudgetRequisition[], listBudgetServiceItem: BudgetServiceItem[], listBudgetItem: BudgetItem[], clientCompany: ClientCompany, vehicleEntry: VehicleEntry) {
 

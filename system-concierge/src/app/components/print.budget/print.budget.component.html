@@ -1,57 +1,115 @@
 <div id="print-budgetId" style="display: none; width: 100%; height: 100%;">
-    <div class="flex justify-content-between ">
+     <img src="../../../../assets/image/barra-nativa.jpg" alt="" width="800">
+    <div class="flex justify-content-between mb-2 mt-2">
         <span>NATIVA MAQUINAS E IMPLEMENTO LTDA</span>
-        <span>Orçamento: <strong>{{budget.id}}</strong></span>
+        <span>ORÇAMENTO: <strong>Nº {{formatNumberBudget(budget.id)}}</strong></span>
     </div>
-    <div class="print-divider"></div>
-    <table class="print-table">
-        <tbody>
-            <tr>
-                <td>Nro. O.S.: {{ vehicleEntry.numServiceOrder}}</td>
-                <td>Consutor: {{vehicleEntry.nameUserAttendant | uppercase}}</td>
-                <td>Validade: {{budget.dateValidation| date:'dd/MM/yyyy'}}</td>
-            </tr>
-            <tr>
-                <td>Placa: {{maskPlaca(vehicleEntry.placa) | uppercase}}</td>
-                <td>Modelo: {{vehicleEntry.modelDescription | uppercase}}</td>
-                <td>Cor: {{vehicleEntry.color | uppercase}}</td>
-            </tr>
-            <tr>
-                <td>Cliente. {{clientCompany.id}} {{clientCompany.name}}</td>
-                <td *ngIf="clientCompany.fisjur == 'Juridica'">CNPJ: {{maskCNPJ(clientCompany.cnpj)}} </td>
-                <td *ngIf="clientCompany.fisjur != 'Juridica'">CPF: {{maskCPF(clientCompany.cpf)}} </td>
-                <td *ngIf="clientCompany.fisjur != 'Juridica'">RG: {{clientCompany.rg}} </td>
-            </tr>
-            <tr>
-                <td>Fone: {{clientCompany.dddPhone}} {{clientCompany.phone}}</td>
-                <td>Celular: {{clientCompany.dddCellphone}} {{clientCompany.cellphone}}</td>
-            </tr>
-            <tr>
-                <td>Endereço: {{clientCompany.address}} {{clientCompany.addressNumber}}</td>
-                <td>Bairro: {{clientCompany.neighborhood}}</td>
-            </tr>
-        </tbody>
-    </table>
-    <table class="print-table">
-        <tbody>
-            <tr>
-                <td>Cidade: {{clientCompany.city | uppercase}}</td>
-                <td>UF: {{clientCompany.state}}</td>
-                <td>CEP: {{clientCompany.zipCode}}</td>
 
-            </tr>
-        </tbody>
-    </table>
-    <div class="print-divider"></div>
-    <div class="flex justify-content-center">
-        <span>Solicitações</span>
+    <div class="border-bottom-1"></div>
+    <div class="flex mb-1">
+        <div class="flex justify-content-between w-screen">
+            <div class="w-3">
+                <span class="text-small mr-1">O.S.:</span>
+                <span class="text-normal">{{vehicleEntry.numServiceOrder}}</span>
+            </div>
+            <div class="w-3">
+                <span class="text-small mr-1">Consutor:</span>
+                <span class="text-normal">{{vehicleEntry.nameUserAttendant | uppercase}}</span>
+            </div>
+            <div class="w-3">
+                <span class="text-small mr-1">Validade:</span>
+                <span class="text-normal">{{budget.dateValidation| date:'dd/MM/yyyy'}}</span>
+            </div>
+        </div>
+    </div>
+    <div class="flex mb-1">
+        <div class="flex justify-content-between w-screen">
+            <div class="w-3">
+                <span class="text-small mr-1">Placa:</span>
+                <span class="text-normal">{{maskPlaca(vehicleEntry.placa) | uppercase}}</span>
+            </div>
+            <div class="w-3">
+                <span class="text-small mr-1">Modelo:</span>
+                <span class="text-normal">{{vehicleEntry.modelDescription | uppercase}}</span>
+            </div>
+            <div class="w-3">
+                <span class="text-small mr-1">Cor:</span>
+                <span class="text-normal">{{vehicleEntry.color | uppercase}}</span>
+            </div>
+            <div class="w-3">
+                <span class="text-small mr-1">KM:</span>
+                <span class="text-normal">{{vehicleEntry.kmEntry}}</span>
+            </div>
+        </div>
+    </div>
+    <div class="flex mb-1">
+        <div class="w-7">
+            <span class="text-small mr-1">Cliente:</span>
+            <span class="text-normal">{{clientCompany.id}} {{clientCompany.name}}</span>
+        </div>
+        <div *ngIf="clientCompany.fisjur == 'Juridica'" class="w-2">
+            <span class="text-small mr-1">CNPJ:</span>
+            <span class="text-normal">{{maskCNPJ(clientCompany.cnpj)}}</span>
+        </div>
+        <div *ngIf="clientCompany.fisjur != 'Juridica'" class="w-2">
+            <span class="text-small mr-1">CPF:</span>
+            <span class="text-normal">{{maskCPF(clientCompany.cpf)}}</span>
+        </div>
+    </div>
+    <div class="flex mb-1">
+        <div class="flex justify-content-between w-screen">
+            <div class="w-3">
+                <span class="text-small mr-1">Fone:</span>
+                <span class="text-normal">{{clientCompany.dddPhone}} {{clientCompany.phone}}</span>
+            </div>
+            <div class="w-3">
+                <span class="text-small mr-1">Celular:</span>
+                <span class="text-normal">{{clientCompany.dddCellphone}} {{clientCompany.cellphone}}</span>
+            </div>
+            <div class="w-3">
+                <span class="text-small mr-1">Email:</span>
+                <span class="text-normal">{{clientCompany.contactEmail}}</span>
+            </div>
+        </div>
+    </div>
+    <div class="flex mb-1">
+        <div class="flex justify-content-between w-screen">
+            <div class="w-1">
+                <span class="text-small mr-1">CEP:</span>
+                <span class="text-normal">{{clientCompany.zipCode}}</span>
+            </div>
+            <div class="w-1">
+                <span class="text-small mr-1">UF:</span>
+                <span class="text-normal">{{clientCompany.state | uppercase}}</span>
+            </div>
+            <div class="w-3">
+                <span class="text-small mr-1">Cidade:</span>
+                <span class="text-normal">{{clientCompany.city | uppercase}}</span>
+            </div>
+            <div class="w-3">
+                <span class="text-small mr-1">Bairro:</span>
+                <span class="text-normal">{{clientCompany.neighborhood | uppercase}}</span>
+            </div>
+        </div>
+    </div>
+    <div class="flex mb-1">
+        <div class="w-screen">
+            <span class="text-small mr-1">Endereço:</span>
+            <span class="text-normal">{{clientCompany.address}} {{clientCompany.addressNumber}}</span>
+        </div>
+    </div>
+
+    <div class="border-bottom-1"></div>
+
+    <div class="flex mt-1">
+        <span>SOLICITAÇÕES</span>
     </div>
     <br>
     <table class="print-table">
         <thead>
             <tr>
-                <th style="width: 10%;">Ordem</th>
-                <th style="width: 90%;">Descrição</th>
+                <th style="width: 10%;">ORDEM</th>
+                <th style="width: 90%;">DESCRIÇÃO</th>
             </tr>
         </thead>
         <tbody>
@@ -61,20 +119,22 @@
             </tr>
         </tbody>
     </table>
-    <div class="print-divider"></div>
-    <div class="flex justify-content-center">
-        <span>Serviços</span>
+
+    <div class="border-bottom-1"></div>
+
+    <div class="flex mt-1">
+        <span>SERVIÇOS</span>
     </div>
     <br>
     <table class="print-table">
         <thead>
             <tr>
-                <th style="width: 10%;">Ordem</th>
-                <th style="width: 40%;">Descrição</th>
-                <th style="width: 10%;">Tempo</th>
-                <th style="width: 10%;">Vlr Hora</th>
-                <th style="width: 10%;">Desconto</th>
-                <th style="width: 15%;">Total</th>
+                <th style="width: 10%;">ORDEM</th>
+                <th style="width: 40%;">DESCRIÇÃO</th>
+                <th style="width: 10%;">TEMPO</th>
+                <th style="width: 10%;">Vlr HORA</th>
+                <th style="width: 10%;">DESCONTO</th>
+                <th style="width: 15%;">TOTAL</th>
             </tr>
         </thead>
         <tbody>
@@ -91,7 +151,7 @@
             <tr>
                 <td></td>
                 <td style="text-align: right;">
-                    <strong>Total de Serviços</strong>
+                    <strong>TOTAL DE SERVIÇOS</strong>
                 </td>
                 <td></td>
                 <td>
@@ -106,21 +166,23 @@
             </tr>
         </tfoot>
     </table>
-    <div class="print-divider"></div>
-    <div class="flex justify-content-center">
-        <span>Peças</span>
+
+    <div class="border-bottom-1"></div>
+
+    <div class="flex mt-1">
+        <span>PEÇAS</span>
     </div>
     <br>
     <table class="print-table">
         <thead>
             <tr>
-                <th style="width: 6%;">Ordem</th>
-                <th style="width: 14%;">Código</th>
-                <th style="width: 45%;">Descrição</th>
-                <th style="width: 10%;">Qtd</th>
-                <th style="width: 10%;">Valor</th>
-                <th style="width: 10%;">Desconto</th>
-                <th style="width: 10%;">Total</th>
+                <th style="width: 6%;">ORDEM</th>
+                <th style="width: 14%;">CÓDIGO</th>
+                <th style="width: 45%;">DESCRIÇÃO</th>
+                <th style="width: 10%;">QUANT.</th>
+                <th style="width: 10%;">VALOR</th>
+                <th style="width: 10%;">DESCONTO</th>
+                <th style="width: 10%;">TOTAL</th>
             </tr>
         </thead>
         <tbody>
@@ -139,7 +201,7 @@
                 <td></td>
                 <td></td>
                 <td style="text-align: right;">
-                    <strong>Total de Peças</strong>
+                    <strong>TOTAL DE PEÇAS</strong>
                 </td>
                 <td></td>
                 <td>
@@ -157,29 +219,29 @@
     <div class="flex justify-content-end flex-wrap">
         <table class="mt-5" style="width: 300px;">
             <tr>
-                <td>Total de Serviços</td>
-                <td style="text-align: right;">
+                <td class="text-normal p-1">TOTAL DE SERVIÇOS</td>
+                <td class="text-normal" style="text-align: right;">
                     <strong>{{totalService - totalServiceDiscount | currency }}</strong>
                 </td>
             </tr>
             <tr>
-                <td>Total de Peças</td>
-                <td style="text-align: right;">
+                <td class="text-normal p-1">TOTAL DE PEÇAS</td>
+                <td class="text-normal" style="text-align: right;">
                     <strong>{{totalPart - totalPartDiscount |currency }}</strong>
                 </td>
             </tr>
             <tr>
-                <td>Total Geral</td>
-                <td style="text-align: right;">
+                <td class="text-normal p-1">TOTAL GERAL</td>
+                <td class="text-normal" style="text-align: right;">
                     <strong>{{totalGeral |currency }}</strong>
                 </td>
             </tr>
         </table>
     </div>
     <div class="flex mt-5 mb-1">
-        <span>Informações</span>
+        <span class="text-small">Informações</span>
     </div>
-    <div class="flex border-1 w-full h-4rem">
+    <div class="flex border-1 w-full h-4rem p-1 text-normal">
         {{budget.information}}
     </div>
 </div>

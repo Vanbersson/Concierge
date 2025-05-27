@@ -4,14 +4,24 @@
         width: 100%;
     }
 
-    .print-table th ,
+    .print-table th,
     .print-table td {
         font-weight: 400;
         text-align: left;
     }
 
-    .print-divider {
-        border-bottom: 1px solid #0f0f0f;
-        margin: 10px 0;
+    .print-table th {
+        text-align: start;
+        background-color: rgb(224, 223, 228);
+    }
+
+    .text-small {
+        font-size: 10px;
+    }
+
+    .text-normal {
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--color-grey-700);
     }
 }

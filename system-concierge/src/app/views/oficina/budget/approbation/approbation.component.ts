@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common'
 
 //PrimeNG
@@ -19,21 +19,21 @@ import { BudgetServiceItem } from '../../../../models/budget/budget-item-service
 import { BudgetItem } from '../../../../models/budget/budget-item';
 import { ClientCompany } from '../../../../models/clientcompany/client-company';
 import { VehicleEntry } from '../../../../models/vehicle/vehicle-entry';
-import { BudgetService } from '../../../../services/budget/budget.service';
-import { StatusBudgetEnum } from '../../../../models/budget/status-budget-enum';
-
+import { PrintBudgetComponent } from '../../../../components/print.budget/print.budget.component';
 
 @Component({
   selector: 'app-approbation',
   standalone: true,
-  imports: [CommonModule, ButtonModule, ToastModule],
+  imports: [CommonModule, ButtonModule, ToastModule,PrintBudgetComponent],
   templateUrl: './approbation.component.html',
   styleUrl: './approbation.component.scss',
   providers: [MessageService]
 })
 export default class ApprobationComponent implements OnInit {
   private token: string = "";
+  enabledSendApprobation = false;
   dateApprobation: Date = new Date();
+
   budget: Budget = new Budget();
   listBudgetRequisition: BudgetRequisition[] = [];
   listBudgetServiceItem: BudgetServiceItem[] = [];
@@ -46,6 +46,9 @@ export default class ApprobationComponent implements OnInit {
   totalPart: number;
   totalPartDiscount: number;
   totalGeral: number;
+
+  //Print
+  @ViewChild("printComponent") printComponent!: PrintBudgetComponent;
 
   constructor(private messageService: MessageService,
     private activatedRoute: ActivatedRoute,
@@ -151,6 +154,7 @@ export default class ApprobationComponent implements OnInit {
     const resultApprobation = await this.statusUpdateBudget();
     if (resultApprobation.status == 200) {
       this.messageService.add({ severity: 'success', summary: 'Aprovação', detail: 'Orçamento aprovado com sucesso', icon: 'pi pi-check', life: 3000 });
+      this.enabledSendApprobation = true;
     } else {
 
     }
@@ -163,6 +167,14 @@ export default class ApprobationComponent implements OnInit {
       return await lastValueFrom(this.emailClientService.statusUpdateBudget(this.token));
     } catch (error) {
       return error;
+    }
+  }
+  //Print Budget
+  print() {
+    try {
+      this.printComponent.print(this.budget, this.listBudgetRequisition, this.listBudgetServiceItem, this.listBudgetItem, this.clientCompany, this.vehicleEntry);
+    } catch (error) {
+      console.log(error)
     }
   }
 }

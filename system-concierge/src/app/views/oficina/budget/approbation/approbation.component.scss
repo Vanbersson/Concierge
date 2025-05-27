@@ -17,7 +17,7 @@
         background-color: #fff;
         padding: 10px;
         width: 900px;
-        height: 100vh;
+        min-height: 100vh;
     }
 
     .text-small {
@@ -28,6 +28,12 @@
         font-size: 12px;
         font-weight: 700;
         color: var(--color-grey-700);
+    }
+
+    ::ng-deep {
+        .p-button-label {
+            font-weight: 400;
+        }
     }
 
 

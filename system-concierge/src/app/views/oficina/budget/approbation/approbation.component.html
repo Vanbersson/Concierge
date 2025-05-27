@@ -1,9 +1,12 @@
 <div class="flex justify-content-center bg-auto surface-500">
     <p-toast/>
     <div class="card-budget">
-        <div class="flex justify-content-end m-3">
-            <button pButton label="Aprovar Orçamento" size="large" (click)="approbation()"></button>
+        <div *ngIf="!enabledSendApprobation" class="flex justify-content-end flex-column m-3 gap-1">
+            <label for="btnApprobation">Click aqui para provar seu orçamento</label>
+            <button id="btnApprobation" pButton label="Aprovar Orçamento" size="large" severity="success" (click)="approbation()"></button>
         </div>
+
+        <img src="../../../../assets/image/barra-nativa.jpg" alt="" width="880">
 
         <div class="flex mb-1 mt-2">
             <div class="flex flex-column w-full border-1">
@@ -238,5 +241,12 @@
         <div class="flex border-1 w-full h-4rem p-1 text-normal">
             {{budget.information | uppercase}}
         </div>
+
+        <div class="flex justify-content-center mt-4 ">
+            <button pButton label="Imprimir" size="small" severity="secondary" (click)="print()"></button>
+        </div>
     </div>
 </div>
+
+<!-- Print -->
+<app-printbudget #printComponent />
