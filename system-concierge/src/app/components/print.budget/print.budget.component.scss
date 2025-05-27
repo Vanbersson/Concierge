@@ -1,20 +1,13 @@
 :host {
     .print-table {
-        font-size: small;
         border-collapse: collapse;
         width: 100%;
     }
 
-    .print-table th {
-        font-weight: 400;
-        text-align: left;
-        font-size: small;
-    }
-
+    .print-table th ,
     .print-table td {
         font-weight: 400;
         text-align: left;
-        font-size: small;
     }
 
     .print-divider {

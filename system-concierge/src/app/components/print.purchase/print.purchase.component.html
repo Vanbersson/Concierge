@@ -1,48 +1,45 @@
 <!-- Print -->
 <div id="print-sectionId" style="display: none;">
     <img src="../../../../assets/image/purchase-order-barra.jpeg" alt="" width="800">
-    <table style="border: 1px solid #ddd;
-        padding: 4px; font-family: Arial, Helvetica, sans-serif;
-        border-collapse: collapse;
-        width: 100%;">
+    <table style="border: 1px solid #ddd; padding: 4px; width: 100%;">
         <tr>
             <td>
-                <span>PEDIDO Nº: <strong>{{printPurchaseOrder().id}}</strong></span>
+                <span>Pedido Nº: <strong>{{printPurchaseOrder().id}}</strong></span>
             </td>
             <td>
-                <span>VENDEDOR: {{printPurchaseOrder().attendantName | uppercase}}</span>
+                <span>Vendedor: {{printPurchaseOrder().attendantName | uppercase}}</span>
             </td>
         </tr>
         <tr>
             <td>
-                <span>DATA: {{printPurchaseOrder().dateGeneration | date: 'dd/MM/yyyy'}}</span>
+                <span>Data: {{printPurchaseOrder().dateGeneration | date: 'dd/MM/yyyy'}}</span>
             </td>
             <td>
                 @if(printPurchaseOrder().attendantDddCellphone == '' || printPurchaseOrder().attendantCellphone == ''){
-                <span>CELULAR:</span>
+                <span>Celular:</span>
                 }@else {
-                <span>CELULAR: {{"("+printPurchaseOrder().attendantDddCellphone+")"+"
+                <span>Celular: {{"("+printPurchaseOrder().attendantDddCellphone+")"+"
                     "+printPurchaseOrder().attendantCellphone}}</span>
                 }
             </td>
         </tr>
         <tr>
-            <td><span>CÓDIGO FORN.: {{printPurchaseOrder().clientCompanyId}}</span></td>
-            <td><span>E-MAIL: {{printPurchaseOrder().attendantEmail}}</span></td>
+            <td><span>Código Forn.: {{printPurchaseOrder().clientCompanyId}}</span></td>
+            <td><span>E-mail: {{printPurchaseOrder().attendantEmail}}</span></td>
         </tr>
         <tr>
-            <td><span>FORNECEDOR: {{abreviaDesc(printPurchaseOrder().clientCompanyName) }}</span></td>
-            <td><span>DATA ENTREGA: {{printPurchaseOrder().dateDelivery | date: 'dd/MM/yyyy'}}</span></td>
+            <td><span>Fornecedor: {{abreviaDesc(printPurchaseOrder().clientCompanyName) }}</span></td>
+            <td><span>Data Entrega: {{printPurchaseOrder().dateDelivery | date: 'dd/MM/yyyy'}}</span></td>
         </tr>
         <tr>
             <td>
-                @if(printPurchaseOrder().nfNum != 0){ <span>NOTA: {{printPurchaseOrder().nfNum}}</span> }@else{
-                <span>NOTA:</span> }
+                @if(printPurchaseOrder().nfNum != 0){ <span>NF: {{printPurchaseOrder().nfNum}}</span> }@else{
+                <span>NF:</span> }
             </td>
-            <td><span>PAGAMENTO: {{printPurchaseOrder().paymentType | uppercase }}</span></td>
+            <td><span>Pagamento: {{printPurchaseOrder().paymentType | uppercase }}</span></td>
         </tr>
     </table>
-    <table id="print-table">
+    <table class="print-table">
         <tr>
             <th>Código</th>
             <th>Descrição</th>

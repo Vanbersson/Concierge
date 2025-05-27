@@ -1,5 +1,18 @@
 :host {
 
+    .layout-card-title {
+        display: flex;
+        justify-content: space-between;
+      
+        span {
+            display: flex;
+            align-items: center;
+            font-size: 1.5rem; 
+            font-weight: 600;           
+            color: var(--color-text-primary);
+        } 
+    }
+
     .mobile-visible-none {
         display: flex;
         justify-content: center;
@@ -35,21 +48,6 @@
 
     .layourt-button-action-speedDial {
         display: none;
-    }
-
-    .layout-card-title {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 0.5rem;
-
-        span {
-            display: flex;
-            align-items: center;
-            font-size: 1.25rem;
-            font-weight: 400;
-            color: #64748b;
-        }
-
     }
 
     .layourt-button-action {

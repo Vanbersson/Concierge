@@ -18,6 +18,7 @@ public class ConstantsMessage {
     public static final String ERROR_RESALE = "Resale not informed.";
     public static final String ERROR_ID = "Id not informed.";
     public static final String ERROR_STATUS = "Status not informed.";
+    public static final String ERROR_STATUS_DIFFERENT = "Status different.";
     public static final String ERROR_FANTASIA = "FANTASIA not informed.";
     public static final String ERROR_NAME = "Name not informed.";
     public static final String ERROR_PASSWORD = "Password not informed.";
@@ -40,11 +41,11 @@ public class ConstantsMessage {
     public static final String ERROR_PLACA = "Placa not informed.";
     public static final String ERROR_COLOR = "Color not informed.";
     public static final String ERROR_VEHICLE_MODEL = "Model not informed.";
+    public static final String ERROR_VEHICLE_NUMBER_O_S = "Number Service order not informed.";
     public static final String ERROR_PERMISSION = "Permission not informed.";
     public static final String ERROR_PERMISSION_ANOTHER_USER = "Authorization of another user.";
     public static final String ERROR_AUTH_EXIT = "Delete exit authorization.";
     public static final String ERROR_ATTENDANT = "Attendant not informed.";
-
 
 
     //Budget
@@ -61,9 +62,6 @@ public class ConstantsMessage {
     public static final String ERROR_DRIVERENTRY = "DriverEntry not informed.";
     public static final String ERROR_DRIVEREXIT = "DriverExit not informed.";
     public static final String ERROR_CLIENTCOMPANY = "ClientCompany not informed.";
-
-
-
 
 
 }

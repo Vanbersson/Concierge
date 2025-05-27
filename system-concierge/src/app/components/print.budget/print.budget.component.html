@@ -135,21 +135,23 @@
             </tr>
         </tbody>
         <tfoot>
-            <td></td>
-            <td></td>
-            <td style="text-align: right;">
-                <strong>Total de Peças</strong>
-            </td>
-            <td></td>
-            <td>
-                <strong>{{totalPart | currency }}</strong>
-            </td>
-            <td>
-                <strong>{{totalPartDiscount | currency }}</strong>
-            </td>
-            <td>
-                <strong>{{totalPart - totalPartDiscount | currency}}</strong>
-            <td>
+            <tr>
+                <td></td>
+                <td></td>
+                <td style="text-align: right;">
+                    <strong>Total de Peças</strong>
+                </td>
+                <td></td>
+                <td>
+                    <strong>{{totalPart | currency }}</strong>
+                </td>
+                <td>
+                    <strong>{{totalPartDiscount | currency }}</strong>
+                </td>
+                <td>
+                    <strong>{{totalPart - totalPartDiscount | currency}}</strong>
+                </td>
+            </tr>
         </tfoot>
     </table>
     <div class="flex justify-content-end flex-wrap">
@@ -177,7 +179,6 @@
     <div class="flex mt-5 mb-1">
         <span>Informações</span>
     </div>
-
     <div class="flex border-1 w-full h-4rem">
         {{budget.information}}
     </div>

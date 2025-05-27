@@ -96,6 +96,9 @@ export default class VeiculosComponent implements OnInit, OnDestroy {
   }
 
   private preList(vehicle: VehicleEntry): VehicleEntry {
+    //Format Date
+    const datePipe = new DatePipe('pt-BR');
+    vehicle.dateEntry = datePipe.transform(this.formatDateTime(new Date(vehicle.dateEntry)), 'dd/MM/yyyy HH:mm');
 
     if (vehicle.vehicleNew == "yes") {
       vehicle.placa = "NOVO";

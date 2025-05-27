@@ -1,11 +1,5 @@
 :host {
 
-    ::ng-deep {
-        .p-button-label {
-            font-weight: 400;
-        }
-    }
-
     .layout-card-title {
         display: flex;
         justify-content: space-between;
@@ -14,12 +8,26 @@
         span {
             display: flex;
             align-items: center;
-            font-size: 1.25rem;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--color-text-primary);
+        }
+    }
+
+    ::ng-deep {
+        .p-button-label {
             font-weight: 400;
-            color: #64748b;
-            padding-left: 1.5rem;
         }
 
-    }
-}
+        .p-tag {
+            font-weight: 400;
+        }
 
+        .p-tag.p-tag-secondary {
+            background-color: var(--color-grey-300);
+            color: var(--color-text-primary);
+        }
+    }
+
+
+}

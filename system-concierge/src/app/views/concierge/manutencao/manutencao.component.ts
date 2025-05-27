@@ -5,6 +5,7 @@ import { Validators, FormsModule, ReactiveFormsModule, FormGroup, FormControl } 
 import { NgxImageCompressService } from 'ngx-image-compress';
 
 //PrimeNg
+import { PrimeNGConfig } from 'primeng/api';
 import { TabViewModule } from 'primeng/tabview';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextareaModule } from 'primeng/inputtextarea';
@@ -31,14 +32,17 @@ import { TimelineModule } from 'primeng/timeline';
 import { VehicleService } from '../../../services/vehicle/vehicle.service';
 import { UserService } from '../../../services/user/user.service';
 import { VehicleModelService } from '../../../services/vehicle-model/vehicle-model.service';
-import { ClientecompanyService } from '../../../services/clientecompany/clientecompany.service';
 
 //Interface
 import { IBudgetNew } from '../../../interfaces/budget/ibudget-new';
 import { IColor } from '../../../interfaces/icolor';
 
 //Constants
-import { STATUS_VEHICLE_ENTRY_NOTAUTH, STATUS_VEHICLE_ENTRY_FIRSTAUTH, STATUS_VEHICLE_ENTRY_AUTHORIZED, MESSAGE_RESPONSE_NOT_CLIENT, MESSAGE_RESPONSE_NOT_ATTENDANT, MESSAGE_RESPONSE_NOT_DRIVEREXIT, MESSAGE_RESPONSE_ERROR_AUTH_EXIT } from '../../../util/constants';
+import {
+  STATUS_VEHICLE_ENTRY_NOTAUTH, STATUS_VEHICLE_ENTRY_FIRSTAUTH,
+  STATUS_VEHICLE_ENTRY_AUTHORIZED, MESSAGE_RESPONSE_NOT_CLIENT,
+  MESSAGE_RESPONSE_NOT_ATTENDANT, MESSAGE_RESPONSE_NOT_DRIVEREXIT, MESSAGE_RESPONSE_ERROR_AUTH_EXIT
+} from '../../../util/constants';
 
 //Class
 import { User } from '../../../models/user/user';
@@ -58,6 +62,7 @@ import { IBudget } from '../../../interfaces/budget/ibudget';
 
 //Components
 import { FilterClientComponent } from '../../../components/filter.client/filter.client.component';
+import { StatusBudgetEnum } from '../../../models/budget/status-budget-enum';
 
 interface EventItem {
   description?: string;
@@ -197,6 +202,7 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
   itemsButtonMenu: MenuItem[] = [];
 
   constructor(
+    private primeNGConfig: PrimeNGConfig,
     private vehicleService: VehicleService,
     private activatedRoute: ActivatedRoute,
     private budgetService: BudgetService,
@@ -205,7 +211,6 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
     private storageService: StorageService,
     private userService: UserService,
     private vehicleModelService: VehicleModelService,
-    private serviceClienteCompany: ClientecompanyService,
     private confirmationService: ConfirmationService,
     private messageService: MessageService,
     private busyService: BusyService,
@@ -214,6 +219,21 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
 
   }
   ngOnInit(): void {
+
+    this.primeNGConfig.setTranslation({
+      accept: 'Accept',
+      reject: 'Cancel',
+      firstDayOfWeek: 0,
+      dayNames: ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"],
+      dayNamesShort: ["dom", "seg", "ter", "qua", "qui", "sex", "sáb"],
+      dayNamesMin: ["D", "S", "T", "Q", "Q", "S", "S"],
+      monthNames: ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"],
+      monthNamesShort: ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"],
+      today: 'Hoje',
+      clear: 'Limpar',
+      dateFormat: 'dd/mm/yy',
+      weekHeader: 'Sm'
+    });
 
     //Id vehicle entry
     this.id = this.activatedRoute.snapshot.params['id'];
@@ -442,7 +462,7 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
       quantityTire: this.vehicleEntry.quantityTire == 0 ? null : this.vehicleEntry.quantityTire,
       quantityTireComplete: this.vehicleEntry.quantityTireComplete == 0 ? null : this.vehicleEntry.quantityTireComplete,
       quantityToolBox: this.vehicleEntry.quantityToolBox == 0 ? null : this.vehicleEntry.quantityToolBox,
-      numServiceOrder: this.vehicleEntry.numServiceOrder,
+      numServiceOrder: this.vehicleEntry.numServiceOrder == "" ? null : this.vehicleEntry.numServiceOrder,
       numNfe: this.vehicleEntry.numNfe == "" ? null : this.vehicleEntry.numNfe,
       numNfse: this.vehicleEntry.numNfse == "" ? null : this.vehicleEntry.numNfse,
       information: this.vehicleEntry.information,
@@ -1110,8 +1130,12 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
   }
   //Budget
   public confirmGerarOrcamento() {
+    if (this.formVehicle.value.numServiceOrder == "" || this.formVehicle.value.numServiceOrder == null) {
+      this.messageService.add({ severity: 'info', summary: 'Número O.S.', detail: 'Não informado', icon: 'pi pi-info-circle' });
+      return;
+    }
 
-    if (this.vehicleEntry.budgetStatus != "NotBudget") {
+    if (this.vehicleEntry.budgetStatus != StatusBudgetEnum.NotBudget) {
       this.router.navigateByUrl("/oficina/manutencao-orcamento/" + this.formVehicle.value.id);
     } else {
 
@@ -1149,12 +1173,15 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
       return await lastValueFrom(this.budgetService.addBudget$(this.budget));
     } catch (error) {
       const SERVICEORDER = "Equal service order not.";
+      const SERVICEORDER_NUMBER = "Number Service order not informed.";
       if (error.error.message == MESSAGE_RESPONSE_NOT_CLIENT) {
         this.messageService.add({ severity: 'error', summary: 'Empresa', detail: "Não informada", icon: 'pi pi-times' });
       } else if (error.error.message == MESSAGE_RESPONSE_NOT_ATTENDANT) {
         this.messageService.add({ severity: 'error', summary: 'Consultor', detail: "Não informado", icon: 'pi pi-times' });
       } else if (error.error.message == SERVICEORDER) {
         this.messageService.add({ severity: 'error', summary: 'Ordem Serviço', detail: "Informado não", icon: 'pi pi-times' });
+      } else if (error.error.message == SERVICEORDER_NUMBER) {
+        this.messageService.add({ severity: 'error', summary: 'Número O.S.', detail: "Não informado", icon: 'pi pi-times' });
       } else if (error.error.message == "Permission not informed.") {
         this.permissionNot();
       }
@@ -1328,10 +1355,6 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
       //Loading data
       this.loadingVehicle();
 
-      if (this.selectClientCompany().id != 0) {
-        const resultClient = await this.saveClient(this.selectClientCompany());
-      }
-
       const resultVehicle = await this.updateVehicle(this.vehicleEntry);
 
       if (resultVehicle.status == 200) {
@@ -1349,6 +1372,8 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
     } catch (error) {
       const BUDGET_ATTENDANT = "BUDGET-Attendant not informed.";
       const BUDGET_CLIENTCOMPANY = "BUDGET-ClientCompany not informed.";
+      const SERVICEORDER = "Equal service order not.";
+      const SERVICEORDER_NUMBER = "Number Service order not informed.";
       if (error.error.message == MESSAGE_RESPONSE_NOT_ATTENDANT) {
         this.showUserAttendant();
       }
@@ -1366,17 +1391,19 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
       if (error.error.message == MESSAGE_RESPONSE_ERROR_AUTH_EXIT) {
         this.messageService.add({ severity: 'info', summary: 'Informação', detail: "Remova autorização de saída" });
       }
+
+      if (error.error.message == SERVICEORDER) {
+        this.messageService.add({ severity: 'error', summary: 'Ordem Serviço', detail: "Informado não", icon: 'pi pi-times' });
+      }
+
+      if (error.error.message == SERVICEORDER_NUMBER) {
+        this.messageService.add({ severity: 'error', summary: 'Número O.S.', detail: "Não informado", icon: 'pi pi-times' });
+      }
       return error;
     }
 
   }
-  private async saveClient(client: ClientCompany): Promise<HttpResponse<ClientCompany>> {
-    try {
-      return await lastValueFrom(this.serviceClienteCompany.save(client));
-    } catch (error) {
-      return error;
-    }
-  }
+
   //Permission Not
   private permissionNot() {
     this.messageService.add({ severity: 'error', summary: 'Permissão', detail: "Você não tem permissão", icon: 'pi pi-times' });

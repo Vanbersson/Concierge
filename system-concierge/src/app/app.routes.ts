@@ -9,6 +9,11 @@ export const routes: Routes = [
         loadComponent: () => import('./views/login/login.component'),
     },
     {
+        path: 'orcamento/aprovacao',
+        title: 'Aprovação',
+        loadComponent: () => import('./views/oficina/budget/approbation/approbation.component'),
+    },
+    {
         path: '',
         loadComponent: () => import('./layouts/layout/layout.component'),
         canActivateChild: [authGuardGuard],
@@ -31,7 +36,7 @@ export const routes: Routes = [
                         path: 'atendimento-veiculo',
                         title: 'Atendimento',
                         loadComponent: () => import('./views/concierge/vehicle.entry/vehicle.entry.component'),
-                        canActivate:[vehicleEntryGuard]
+                        canActivate: [vehicleEntryGuard]
                     },
                     {
                         path: 'lista-entrada-veiculo',
@@ -56,14 +61,14 @@ export const routes: Routes = [
                 ]
             },
             {
-                path:'pecas',
-                children:[
+                path: 'pecas',
+                children: [
                     {
                         path: 'pedido/compra',
                         title: 'Pedido de compra',
                         loadComponent: () => import('./views/parts/purchase.order/purchase.order.component')
                     },
-                    
+
                     {
                         path: 'cadastro/pecas',
                         title: 'Peças',
@@ -77,10 +82,9 @@ export const routes: Routes = [
                     {
                         path: 'manutencao-orcamento/:vehicleid',
                         title: 'Manutenção Orçamento',
-                        loadComponent: () => import('./views/oficina/budget/budget.component')
+                        loadComponent: () => import('./views/oficina/budget/budget/budget.component')
                     }
                 ]
-
             },
             {
                 path: 'faturamento',
@@ -91,7 +95,6 @@ export const routes: Routes = [
                         loadComponent: () => import('./views/faturamento/manutencao-cliente/manutencao-cliente.component')
                     },
                 ]
-
             },
             {
                 path: 'configuracao',
@@ -109,26 +112,25 @@ export const routes: Routes = [
 
                     }
                 ]
-
             },
             {
-                path:'relatorio',
-                children:[
+                path: 'relatorio',
+                children: [
                     {
-                        path:'portaria/veiculo',
+                        path: 'portaria/veiculo',
                         loadComponent: () => import('./views/report/concierge/vehicle/vehicle.component')
                     },
                     {
-                        path:'pecas/pedidos',
+                        path: 'pecas/pedidos',
                         loadComponent: () => import('./views/report/part/purchase.order/purchase.order.component')
                     }
                 ]
-            },
-            {
-                path: '**',
-                loadComponent: () => import('./views/not-found/not-found.component')
             }
         ]
-
-    }
+    },
+    {
+        path: '**',
+        title: 'Pagina não encontrada',
+        loadComponent: () => import('./views/not-found/not-found.component')
+    },
 ];

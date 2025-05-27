@@ -2,7 +2,7 @@
     <!-- Toast -->
     <p-toast />
     <div class="layout-card-title">
-        <span class="text-500 font-medium">Pedidos de compra</span>
+        <span>Pedidos de compras</span>
         <div class="flex gap-2">
             <p-button icon="pi pi-plus" [text]="true" label="Novo pedido" (onClick)="newPurchaseOrder()" />
             <p-button icon="pi pi-refresh" [text]="true" label="Recarregar" (onClick)="listPurchaseOrders()" />
@@ -220,7 +220,8 @@
                 <td>
                     <p-cellEditor>
                         <ng-template pTemplate="input">
-                            <p-inputNumber model="decimal" currency="BRL" locale="pt-BR" [minFractionDigits]="2" [maxFractionDigits]="2" [(ngModel)]="part.quantity" />
+                            <p-inputNumber model="decimal" currency="BRL" locale="pt-BR" [minFractionDigits]="2"
+                                [maxFractionDigits]="2" [(ngModel)]="part.quantity" />
                         </ng-template>
                         <ng-template pTemplate="output">
                             <span class="text-sm">{{part.quantity | number:'1.2-2'}}</span>
@@ -230,7 +231,8 @@
                 <td>
                     <p-cellEditor>
                         <ng-template pTemplate="input">
-                            <p-inputNumber model="decimal" currency="BRL" locale="pt-BR" [minFractionDigits]="2" [maxFractionDigits]="2" [(ngModel)]="part.price" />
+                            <p-inputNumber model="decimal" currency="BRL" locale="pt-BR" [minFractionDigits]="2"
+                                [maxFractionDigits]="2" [(ngModel)]="part.price" />
                         </ng-template>
                         <ng-template pTemplate="output">
                             <span class="text-sm">{{part.price | currency }}</span>
@@ -240,7 +242,8 @@
                 <td>
                     <p-cellEditor>
                         <ng-template pTemplate="input">
-                            <p-inputNumber model="decimal" currency="BRL" locale="pt-BR" [minFractionDigits]="2" [maxFractionDigits]="2" [(ngModel)]="part.discount" />
+                            <p-inputNumber model="decimal" currency="BRL" locale="pt-BR" [minFractionDigits]="2"
+                                [maxFractionDigits]="2" [(ngModel)]="part.discount" />
                         </ng-template>
                         <ng-template pTemplate="output">
                             <span class="text-sm">{{part.discount | currency }}</span>

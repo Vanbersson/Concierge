@@ -65,6 +65,8 @@ public class BudgetValidation implements IBudgetValidation {
             return ConstantsMessage.ERROR_CLIENTCOMPANY;
         if (vehicle.getServiceOrder() == VehicleYesNotEnum.not)
             return ConstantsMessage.ERROR_SERVICE_ORDER_NOT;
+        if (vehicle.getNumServiceOrder().isBlank())
+            return ConstantsMessage.ERROR_VEHICLE_NUMBER_O_S;
 
         return ConstantsMessage.SUCCESS;
     }
@@ -84,8 +86,6 @@ public class BudgetValidation implements IBudgetValidation {
             return ConstantsMessage.ERROR_STATUS;
         if (budget.getDateGeneration() == null)
             return ConstantsMessage.ERROR_DATE_GENERATION;
-        if (budget.getDateValidation() == null)
-            return ConstantsMessage.ERROR_DATE_VALIDATION;
         if (budget.getNameResponsible().isBlank())
             return ConstantsMessage.ERROR_NAME_RESPONSIBLE;
         if (budget.getIdUserAttendant() == null || budget.getIdUserAttendant() == 0)
@@ -102,6 +102,84 @@ public class BudgetValidation implements IBudgetValidation {
 
         return ConstantsMessage.SUCCESS;
     }
+    @Override
+    public String statusUpdate(Budget budget){
+        if (budget.getCompanyId() == null || budget.getCompanyId() == 0)
+            return ConstantsMessage.ERROR_COMPANY;
+        if (budget.getResaleId() == null || budget.getResaleId() == 0)
+            return ConstantsMessage.ERROR_RESALE;
+        if (budget.getId() == null || budget.getId() == 0)
+            return ConstantsMessage.ERROR_ID;
+        if (budget.getStatus() == null)
+            return ConstantsMessage.ERROR_STATUS;
+
+        return ConstantsMessage.SUCCESS;
+    }
+
+    @Override
+    public String filterBudgetId(Integer companyId, Integer resaleId, Integer budgetId) {
+        if (companyId == null || companyId == 0)
+            return ConstantsMessage.ERROR_COMPANY;
+        if (resaleId == null || resaleId == 0)
+            return ConstantsMessage.ERROR_RESALE;
+        if (budgetId == null || budgetId == 0)
+            return ConstantsMessage.ERROR_ID;
+
+        return ConstantsMessage.SUCCESS;
+    }
+
+    @Override
+    public String openBudget(Budget budget) {
+        if (budget.getCompanyId() == null || budget.getCompanyId() == 0)
+            return ConstantsMessage.ERROR_COMPANY;
+        if (budget.getResaleId() == null || budget.getResaleId() == 0)
+            return ConstantsMessage.ERROR_RESALE;
+        if (budget.getId() == null || budget.getId() == 0)
+            return ConstantsMessage.ERROR_ID;
+        if (budget.getVehicleEntryId() == null || budget.getVehicleEntryId() == 0)
+            return ConstantsMessage.ERROR_VEHICLE_ID;
+        if (budget.getStatus() == null)
+            return ConstantsMessage.ERROR_STATUS;
+        if (budget.getStatus() != StatusBudgetEnum.OpenBudget)
+            return ConstantsMessage.ERROR_STATUS_DIFFERENT;
+        if (budget.getDateGeneration() == null)
+            return ConstantsMessage.ERROR_DATE_GENERATION;
+        if (budget.getNameResponsible().isBlank())
+            return ConstantsMessage.ERROR_NAME_RESPONSIBLE;
+        if (budget.getIdUserAttendant() == null || budget.getIdUserAttendant() == 0)
+            return ConstantsMessage.ERROR_ATTENDANT;
+        if (budget.getClientCompanyId() == null || budget.getClientCompanyId() == 0)
+            return ConstantsMessage.ERROR_CLIENTCOMPANY;
+
+        return ConstantsMessage.SUCCESS;
+    }
+
+    @Override
+    public String closeBudget(Budget budget) {
+        if (budget.getCompanyId() == null || budget.getCompanyId() == 0)
+            return ConstantsMessage.ERROR_COMPANY;
+        if (budget.getResaleId() == null || budget.getResaleId() == 0)
+            return ConstantsMessage.ERROR_RESALE;
+        if (budget.getId() == null || budget.getId() == 0)
+            return ConstantsMessage.ERROR_ID;
+        if (budget.getVehicleEntryId() == null || budget.getVehicleEntryId() == 0)
+            return ConstantsMessage.ERROR_VEHICLE_ID;
+        if (budget.getStatus() == null)
+            return ConstantsMessage.ERROR_STATUS;
+        if (budget.getStatus() != StatusBudgetEnum.CompleteBudget)
+            return ConstantsMessage.ERROR_STATUS_DIFFERENT;
+        if (budget.getDateGeneration() == null)
+            return ConstantsMessage.ERROR_DATE_GENERATION;
+        if (budget.getNameResponsible().isBlank())
+            return ConstantsMessage.ERROR_NAME_RESPONSIBLE;
+        if (budget.getIdUserAttendant() == null || budget.getIdUserAttendant() == 0)
+            return ConstantsMessage.ERROR_ATTENDANT;
+        if (budget.getClientCompanyId() == null || budget.getClientCompanyId() == 0)
+            return ConstantsMessage.ERROR_CLIENTCOMPANY;
+
+        return ConstantsMessage.SUCCESS;
+    }
+
 
     @Override
     public String filterVehicleId(Integer companyId, Integer resaleId, Integer vehicleId, String userLoginEmail) {

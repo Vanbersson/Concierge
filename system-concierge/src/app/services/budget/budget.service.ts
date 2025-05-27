@@ -24,10 +24,19 @@ export class BudgetService {
     return this.http.post<Budget>(environment.apiuUrl + "/vehicle/entry/budget/save", vehicleId, { headers: this.myHeaders(), observe: 'response' });
   }
 
-  updateBudget$(budget: Budget): Observable<HttpResponse<Budget>> {
+  updateBudget(budget: Budget): Observable<HttpResponse<Budget>> {
     return this.http.post<Budget>(environment.apiuUrl + "/vehicle/entry/budget/update", budget, { headers: this.myHeaders(), observe: 'response' });
   }
+   statusUpdateBudget(budget: Budget): Observable<HttpResponse<MessageResponse>> {
+    return this.http.post<MessageResponse>(environment.apiuUrl + "/vehicle/entry/budget/status/update", budget, { headers: this.myHeaders(), observe: 'response' });
+  }
 
+  openStatusBudget(budget: Budget): Observable<HttpResponse<MessageResponse>> {
+    return this.http.post<MessageResponse>(environment.apiuUrl + "/vehicle/entry/budget/openBudget", budget, { headers: this.myHeaders(), observe: 'response' });
+  }
+  closeStatusBudget(budget: Budget): Observable<HttpResponse<MessageResponse>> {
+    return this.http.post<MessageResponse>(environment.apiuUrl + "/vehicle/entry/budget/closeBudget", budget, { headers: this.myHeaders(), observe: 'response' });
+  }
   getBudgetFilterVehicle(vehicleId: number): Observable<HttpResponse<Budget>> {
     return this.http.get<Budget>(environment.apiuUrl + "/vehicle/entry/budget/" + this.companyResale + "/filter/vehicle/" + vehicleId, { headers: this.myHeaders(), observe: 'response' });
   }
@@ -41,7 +50,7 @@ export class BudgetService {
     return this.http.post<BudgetRequisition>(environment.apiuUrl + "/vehicle/entry/budget/requisition/update", requisition, { headers: this.myHeaders(), observe: 'response' });
   }
 
-  getBudgetRequisition$(budgetId: number): Observable<BudgetRequisition[]> {
+  getBudgetRequisition(budgetId: number): Observable<BudgetRequisition[]> {
     return this.http.get<BudgetRequisition[]>(environment.apiuUrl + "/vehicle/entry/budget/requisition/" + this.companyResale + "/filter/butget/" + budgetId, { headers: this.myHeaders() });
   }
 
@@ -73,7 +82,7 @@ export class BudgetService {
   updateBudgetItem(item: BudgetItem): Observable<HttpResponse<BudgetItem>> {
     return this.http.post<BudgetItem>(environment.apiuUrl + "/vehicle/entry/budget/item/update", item, { headers: this.myHeaders(), observe: 'response' });
   }
-  getBudgetItem$(budgetId: number): Observable<BudgetItem[]> {
+  getBudgetItem(budgetId: number): Observable<BudgetItem[]> {
     return this.http.get<BudgetItem[]>(environment.apiuUrl + "/vehicle/entry/budget/item/" + this.companyResale + "/filter/butget/" + budgetId, { headers: this.myHeaders() });
   }
   deleteBudgetItem(item: BudgetItem): Observable<HttpResponse<BudgetItem>> {

@@ -64,6 +64,7 @@ public class BudgetService implements IBudgetService {
                 //alterar o status do orçamento na entrada de veículo
                 if (vehicleEntry.getStepEntry() == StepVehicleEnum.Attendant)
                     vehicleEntry.setStepEntry(StepVehicleEnum.Budget);
+
                 vehicleEntry.setBudgetStatus(StatusBudgetEnum.OpenBudget);
                 this.repositoryVehicleEntry.save(vehicleEntry);
             } else {
@@ -90,6 +91,110 @@ public class BudgetService implements IBudgetService {
             throw new BudgetException(ex.getMessage());
         }
     }
+
+    @SneakyThrows
+    @Override
+    public String statusUpdate(Budget budget) {
+        try {
+            String message = this.validation.statusUpdate(budget);
+            if (ConstantsMessage.SUCCESS.equals(message)) {
+
+                Budget bud = this.repository.filterBudgetId(budget.getCompanyId(), budget.getResaleId(), budget.getId());
+                bud.setStatus(budget.getStatus());
+                this.repository.save(bud);
+
+                VehicleEntry veh = this.repositoryVehicleEntry.filterVehicleId(budget.getCompanyId(), budget.getResaleId(), budget.getVehicleEntryId());
+                veh.setBudgetStatus(budget.getStatus());
+                this.repositoryVehicleEntry.save(veh);
+
+                return ConstantsMessage.SUCCESS;
+            } else {
+                throw new BudgetException(message);
+            }
+        } catch (Exception ex) {
+            throw new BudgetException(ex.getMessage());
+        }
+    }
+
+    @SneakyThrows
+    @Override
+    public Budget filterId(Integer companyId, Integer resaleId, Integer budgetId) {
+        try {
+            String message = this.validation.filterBudgetId(companyId, resaleId, budgetId);
+            if (ConstantsMessage.SUCCESS.equals(message)) {
+                return this.repository.filterBudgetId(companyId, resaleId, budgetId);
+            } else {
+                throw new BudgetException(message);
+            }
+        } catch (Exception ex) {
+            throw new BudgetException(ex.getMessage());
+        }
+    }
+
+    @SneakyThrows
+    @Override
+    public Map<String, Object> filterBudgetId(Integer companyId, Integer resaleId, Integer budgetId) {
+        try {
+            String message = this.validation.filterBudgetId(companyId, resaleId, budgetId);
+            if (ConstantsMessage.SUCCESS.equals(message)) {
+                Budget budget = this.repository.filterBudgetId(companyId, resaleId, budgetId);
+
+                return this.loadBudget(budget);
+            } else {
+                throw new BudgetException(message);
+            }
+        } catch (Exception ex) {
+            throw new BudgetException(ex.getMessage());
+        }
+    }
+
+    @SneakyThrows
+    @Override
+    public String openBudget(Budget budget) {
+        try {
+            String message = this.validation.openBudget(budget);
+            if (ConstantsMessage.SUCCESS.equals(message)) {
+
+                //update status vehicle
+                VehicleEntry vehicle = this.repositoryVehicleEntry.filterVehicleId(budget.getCompanyId(), budget.getResaleId(), budget.getVehicleEntryId());
+                vehicle.setBudgetStatus(StatusBudgetEnum.OpenBudget);
+                this.repositoryVehicleEntry.save(vehicle);
+
+                //update status budget
+                budget.setStatus(StatusBudgetEnum.OpenBudget);
+                this.repository.save(budget);
+                return ConstantsMessage.SUCCESS;
+            } else {
+                throw new BudgetException(message);
+            }
+        } catch (Exception ex) {
+            throw new BudgetException(ex.getMessage());
+        }
+    }
+
+    @SneakyThrows
+    @Override
+    public String closeBudget(Budget budget) {
+        try {
+            String message = this.validation.closeBudget(budget);
+            if (ConstantsMessage.SUCCESS.equals(message)) {
+                //update status vehicle
+                VehicleEntry vehicle = this.repositoryVehicleEntry.filterVehicleId(budget.getCompanyId(), budget.getResaleId(), budget.getVehicleEntryId());
+                vehicle.setBudgetStatus(StatusBudgetEnum.CompleteBudget);
+                this.repositoryVehicleEntry.save(vehicle);
+
+                //update status budget
+                budget.setStatus(StatusBudgetEnum.CompleteBudget);
+                this.repository.save(budget);
+                return ConstantsMessage.SUCCESS;
+            } else {
+                throw new BudgetException(message);
+            }
+        } catch (Exception ex) {
+            throw new BudgetException(ex.getMessage());
+        }
+    }
+
 
     @SneakyThrows
     @Override

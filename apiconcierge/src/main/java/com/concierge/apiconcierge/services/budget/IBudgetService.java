@@ -11,5 +11,13 @@ public interface IBudgetService {
 
     public boolean update(Budget budget, String userLoginEmail);
 
+    public String statusUpdate(Budget budget);
+    public Budget filterId(Integer companyId, Integer resaleId, Integer budgetId);
+
+    public Map<String, Object> filterBudgetId(Integer companyId, Integer resaleId, Integer budgetId);
+
+    public String openBudget(Budget budget);
+    public String closeBudget(Budget budget);
+
     public Map<String, Object> filterVehicleId(Integer companyId, Integer resaleId, Integer vehicleId, String userLoginEmail);
 }

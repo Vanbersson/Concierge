@@ -53,7 +53,7 @@ export class VehicleExitComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.listVehicles();
 
-    this.taskService.startTask(() => this.listVehicles(), 20000);
+    this.taskService.startTask(() => this.listVehicles(), 60000);
   }
   ngOnDestroy(): void {
     this.taskService.stopTask();

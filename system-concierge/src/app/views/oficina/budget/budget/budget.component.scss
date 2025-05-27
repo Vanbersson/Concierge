@@ -1,0 +1,83 @@
+:host {
+
+    .layout-input-disabled {
+        display: flex;
+        min-height: 40px;
+        font-size: 1rem;
+        padding: 0.75rem;
+        border-radius: 6px;
+        border: 1px solid var(--color-grey-300);
+    }
+
+    .layout-card-title {
+        display: flex;
+        justify-content: space-between;
+       
+        span {
+            display: flex;
+            align-items: center;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--color-text-primary);
+        }
+    }
+
+    .card {
+        padding: 1rem !important;
+        margin-bottom: 0px !important;
+    }
+
+    .btn-action {
+        display: flex;
+        flex-direction: row;
+        margin-top: 1rem;
+        gap: 8px;
+    }
+
+    .mobile-anabled {
+        display: none;
+    }
+
+    ::ng-deep {
+        .p-button.p-button-secondary-custom {
+            color: #475569;
+            background-color: #f1f5f9;
+            border: 1px solid #f1f5f9
+        }
+
+        .p-button.p-button-secondary-custom:hover {
+            background-color: #e9ecee;
+            border: 1px solid #e9ecee
+        }
+
+        .p-button.p-button-success-custom {
+            color: #475569;
+            background-color: #acf3aa;
+            border: 1px solid #acf3aa
+        }
+
+        .p-button.p-button-success-custom:hover {
+            background-color: #a0f19e;
+            border: 1px solid #a0f19e
+        }
+
+        .p-button-label {
+            font-weight: 400;
+        }
+    }
+
+    /* Small devices (portrait tablets and large phones, 600px and up) */
+    @media only screen and (min-width: 375px) and (max-width: 667px) {
+        .mobile-disabled {
+            display: none !important;
+        }
+
+        .mobile-anabled {
+            display: block;
+        }
+
+        .btn-action {
+            flex-direction: column;
+        }
+    }
+}

@@ -95,6 +95,11 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
             return ConstantsMessage.ERROR_DRIVERENTRY;
         }
 
+        if(vehicle.getBudgetStatus() != StatusBudgetEnum.NotBudget ){
+            if(vehicle.getServiceOrder() == VehicleYesNotEnum.not)
+                return  ConstantsMessage.ERROR_SERVICE_ORDER_NOT;
+        }
+
         if (vehicle.getServiceOrder() == VehicleYesNotEnum.yes) {
             if (vehicle.getBudgetStatus() != StatusBudgetEnum.NotBudget) {
                 if (vehicle.getIdUserAttendant() == null || vehicle.getIdUserAttendant() == 0 || vehicle.getNameUserAttendant().isBlank())
@@ -102,6 +107,8 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
 
                 if (vehicle.getClientCompanyId() == null || vehicle.getClientCompanyId() == 0 || vehicle.getClientCompanyName().isBlank())
                     return ConstantsMessage.ERROR_BUDGET_CLIENT_COMPANY;
+                if(vehicle.getNumServiceOrder().isBlank())
+                    return ConstantsMessage.ERROR_VEHICLE_NUMBER_O_S;
             }
 
             //Verifica autorização de saída

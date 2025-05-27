@@ -1,0 +1,34 @@
+:host {
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 10px;
+    }
+
+    th {
+        text-align: start;
+        background-color: rgb(224, 223, 228);
+    }
+
+    .card-budget {
+        display: block;
+        justify-content: center;
+        background-color: #fff;
+        padding: 10px;
+        width: 900px;
+        height: 100vh;
+    }
+
+    .text-small {
+        font-size: 10px;
+    }
+
+    .text-normal {
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--color-grey-700);
+    }
+
+
+}

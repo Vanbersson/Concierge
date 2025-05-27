@@ -2,15 +2,15 @@
     .layout-card-title {
         display: flex;
         justify-content: space-between;
-        padding-left: 1.5rem;
-        padding-right: 1.5rem;
+        padding-right: 1.2rem;
 
         span {
             display: flex;
             align-items: center;
-            font-size: 1.25rem;
-            color: var(--color-grey-700);
-        }
+            font-size: 1.5rem; 
+            font-weight: 600;           
+            color: var(--color-text-primary);
+        } 
     }
 
     .layout-button-alert {

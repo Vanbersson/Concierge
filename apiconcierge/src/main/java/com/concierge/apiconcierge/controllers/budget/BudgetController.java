@@ -53,6 +53,42 @@ public class BudgetController {
         }
     }
 
+    @PostMapping("/status/update")
+    public ResponseEntity<Object> statusUpdateBudget(@RequestBody BudgetDto data) {
+        try {
+            Budget budget = new Budget();
+            BeanUtils.copyProperties(data, budget);
+            String message = this.service.statusUpdate(budget);
+            return ResponseEntity.status(HttpStatus.OK).body(new MessageResponseDto(message));
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
+        }
+    }
+
+    @PostMapping("/openBudget")
+    public ResponseEntity<Object> openBudget(@RequestBody BudgetDto data) {
+        try {
+            Budget budget = new Budget();
+            BeanUtils.copyProperties(data, budget);
+            String message = this.service.openBudget(budget);
+            return ResponseEntity.status(HttpStatus.OK).body(new MessageResponseDto(message));
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
+        }
+    }
+
+    @PostMapping("/closeBudget")
+    public ResponseEntity<Object> closeBudget(@RequestBody BudgetDto data) {
+        try {
+            Budget budget = new Budget();
+            BeanUtils.copyProperties(data, budget);
+            String message = this.service.closeBudget(budget);
+            return ResponseEntity.status(HttpStatus.OK).body(new MessageResponseDto(message));
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
+        }
+    }
+
     @GetMapping("/{companyId}/{resaleId}/filter/vehicle/{id}")
     public ResponseEntity<Object> getVehicleId(@PathVariable(name = "companyId") Integer companyId,
                                                @PathVariable(name = "resaleId") Integer resaleId,

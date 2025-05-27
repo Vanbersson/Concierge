@@ -11,5 +11,12 @@ public interface IBudgetValidation {
 
     public String update(Budget budget, String userLoginEmail);
 
+    public String statusUpdate(Budget budget);
+
+    public String filterBudgetId(Integer companyId, Integer resaleId, Integer budgetId);
+
+    public String openBudget(Budget budget);
+    public String closeBudget(Budget budget);
+
     public String filterVehicleId(Integer companyId, Integer resaleId, Integer vehicleId, String userLoginEmail);
 }

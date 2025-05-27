@@ -10,7 +10,6 @@ registerLocaleData(localePt)
 
 export const appConfig: ApplicationConfig = {
   providers: [
-
     provideRouter(routes),
     provideHttpClient(),
     provideAnimations(),

@@ -126,8 +126,6 @@ public class VehicleEntryService implements IVehicleEntryService {
 
         try {
             List<VehicleEntry> vehicles = this.repository.allAuthorized(companyId, resaleId);
-            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-
             for (VehicleEntry item : vehicles) {
                 long differenceMilliseconds = new Date().getTime() - item.getDateEntry().getTime();
                 String placa = "";
@@ -140,7 +138,7 @@ public class VehicleEntryService implements IVehicleEntryService {
                 map.put("frota", item.getFrota());
                 map.put("vehicleNew", item.getVehicleNew());
                 map.put("modelDescription", item.getModelDescription());
-                map.put("dateEntry", dateFormat.format(item.getDateEntry()));
+                map.put("dateEntry", item.getDateEntry());
                 map.put("days", TimeUnit.DAYS.convert(differenceMilliseconds, TimeUnit.MILLISECONDS));
                 map.put("nameUserAttendant", item.getNameUserAttendant());
                 map.put("clientCompanyName", item.getClientCompanyName());
@@ -162,7 +160,6 @@ public class VehicleEntryService implements IVehicleEntryService {
 
         try {
             List<VehicleEntry> vehicles = this.repository.allPendingAuthorization(companyId, resaleId);
-            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
 
             for (VehicleEntry item : vehicles) {
                 long differenceMilliseconds = new Date().getTime() - item.getDateEntry().getTime();
@@ -176,7 +173,7 @@ public class VehicleEntryService implements IVehicleEntryService {
                 map.put("frota", item.getFrota());
                 map.put("vehicleNew", item.getVehicleNew());
                 map.put("modelDescription", item.getModelDescription());
-                map.put("dateEntry", dateFormat.format(item.getDateEntry()));
+                map.put("dateEntry", item.getDateEntry());
                 map.put("days", TimeUnit.DAYS.convert(differenceMilliseconds, TimeUnit.MILLISECONDS));
                 map.put("nameUserAttendant", item.getNameUserAttendant());
                 map.put("clientCompanyName", item.getClientCompanyName());

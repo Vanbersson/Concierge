@@ -5,6 +5,7 @@ import { lastValueFrom } from 'rxjs';
 import { HttpResponse } from '@angular/common/http';
 
 //PrimeNG
+import { PrimeNGConfig } from 'primeng/api';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { ButtonModule } from 'primeng/button';
@@ -114,6 +115,7 @@ export default class PurchaseOrderComponent implements OnInit, DoCheck {
   @ViewChild('printComponent') printComponent!: PrintPurchaseComponent;
 
   constructor(
+     private primeNGConfig: PrimeNGConfig,
     private busyService: BusyService,
     private storageService: StorageService,
     private messageService: MessageService,
@@ -125,6 +127,21 @@ export default class PurchaseOrderComponent implements OnInit, DoCheck {
   ) { }
 
   ngOnInit(): void {
+     this.primeNGConfig.setTranslation({
+      accept: 'Accept',
+      reject: 'Cancel',
+      firstDayOfWeek: 0,
+      dayNames: ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"],
+      dayNamesShort: ["dom", "seg", "ter", "qua", "qui", "sex", "sáb"],
+      dayNamesMin: ["D", "S", "T", "Q", "Q", "S", "S"],
+      monthNames: ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"],
+      monthNamesShort: ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"],
+      today: 'Hoje',
+      clear: 'Limpar',
+      dateFormat: 'dd/mm/yy',
+      weekHeader: 'Sm'
+    });
+
     this.listPurchaseOrders();
 
     this.userService.getUserFilterRoleId$(3).subscribe(data => {
@@ -185,6 +202,7 @@ export default class PurchaseOrderComponent implements OnInit, DoCheck {
     this.formPurchase.get('clientCompanyName').disable();
 
   }
+
   //Save
   async saveNew() {
     const { value, valid } = this.formPurchase;
