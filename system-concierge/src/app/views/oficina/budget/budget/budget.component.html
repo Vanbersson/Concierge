@@ -5,7 +5,7 @@
     <div class="layout-card-title">
         <span>Orçamento</span>
         <div class="w-5">
-            <p-steps [model]="items" [readonly]="true" [activeIndex]="activeIndex" />
+            <p-steps [model]="itemsStatus" [readonly]="true" [activeIndex]="activeIndexStatus" />
         </div>
         <p-button icon="pi pi-arrow-right" [text]="true" label="Voltar"
             [routerLink]="'/portaria/mannutencao-entrada-veiculo/'+vehicleId()" />
@@ -627,9 +627,9 @@
             </p-tabPanel>
         </p-tabView>
         <div class="flex justify-content-between">
-            <button *ngIf="!enabledSendMailButton" pButton type="button" label="Orçamento Concluído" size="small"
+            <button *ngIf="!enabledOpenBudget" pButton type="button" label="Orçamento Concluído" size="small"
                 [raised]="true" severity="secondary-custom" icon="pi pi-book" (click)="closeBudget()"></button>
-            <button *ngIf="enabledSendMailButton" pButton type="button" label="Abrir Orçamento" size="small"
+            <button *ngIf="enabledOpenBudget" pButton type="button" label="Abrir Orçamento" size="small"
                 [raised]="true" severity="secondary-custom" icon="pi pi-lock-open"
                 (click)="confirmOpenBudget()"></button>
 

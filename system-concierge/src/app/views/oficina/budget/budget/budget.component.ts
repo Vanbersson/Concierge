@@ -60,8 +60,8 @@ export interface IPayment {
 }
 
 export enum StatusBudget {
-  open = "Orçamento Aberto",
-  close = "Orçamento Fechado"
+  open = "Open",
+  close = "Close"
 }
 
 @Component({
@@ -80,11 +80,14 @@ export default class BudgetComponent implements OnInit, OnDestroy, DoCheck {
   budget: Budget = new Budget();
   clientCompany: ClientCompany = new ClientCompany();
   vehicleEntry: VehicleEntry = new VehicleEntry();
+
   vehicleId = signal<number>(0);
   listPayment: IPayment[] = [];
-
   visibleBudget: boolean = false;
-  //textStatusBudget = "";
+  itemsStatus: MenuItem[] | undefined;
+  activeIndexStatus: number = 0;
+  enabledSendMailButton = false;
+
   formBudget = new FormGroup({
     dateValidation: new FormControl<Date | null>(null),
     nameResponsible: new FormControl<string>(""),
@@ -94,10 +97,8 @@ export default class BudgetComponent implements OnInit, OnDestroy, DoCheck {
 
   // Dialog Budget //
   limitUserDiscount = signal<number>(0);
-  enabledSendMailButton = false;
+  enabledOpenBudget = false;
   inputSendEmailId: string = "";
-  items: MenuItem[] | undefined;
-  activeIndex: number = 0;
 
   //Aba Resume
   listBudgetRequisition: BudgetRequisition[] = [];
@@ -168,7 +169,7 @@ export default class BudgetComponent implements OnInit, OnDestroy, DoCheck {
 
   ngOnInit(): void {
 
-    this.items = [
+    this.itemsStatus = [
       {
         label: 'Aberto',
       },
@@ -281,16 +282,19 @@ export default class BudgetComponent implements OnInit, OnDestroy, DoCheck {
 
       if (this.budget.status == StatusBudgetEnum.OpenBudget) {
         this.enabledSendMailButton = false;
-        this.activeIndex = 0;
+        this.activeIndexStatus = 0;
       } else if (this.budget.status == StatusBudgetEnum.CompleteBudget) {
         this.enabledSendMailButton = true;
-        this.activeIndex = 1;
+        this.enabledOpenBudget = true;
+        this.activeIndexStatus = 1;
       } else if (this.budget.status == StatusBudgetEnum.PendingApproval) {
         this.enabledSendMailButton = true;
-        this.activeIndex = 2;
+        this.enabledOpenBudget = true;
+        this.activeIndexStatus = 2;
       } else if (this.budget.status == StatusBudgetEnum.Approved) {
-        this.enabledSendMailButton = true;
-        this.activeIndex = 3;
+        this.enabledSendMailButton = false;
+        this.enabledOpenBudget = true;
+        this.activeIndexStatus = 3;
       }
 
       this.busyService.idle();
@@ -425,8 +429,9 @@ export default class BudgetComponent implements OnInit, OnDestroy, DoCheck {
     const resultBudget = await this.openStatusBudget(this.budget);
 
     if (resultBudget.status == 200) {
-      this.activeIndex = 0;
+      this.activeIndexStatus = 0;
       this.enabledSendMailButton = false;
+      this.enabledOpenBudget = false;
       this.messageService.add({ severity: 'success', summary: 'Orçamento', detail: 'Aberto com sucesso', icon: 'pi pi-check' });
     }
   }
@@ -440,8 +445,9 @@ export default class BudgetComponent implements OnInit, OnDestroy, DoCheck {
     const resultBudget = await this.closeStatusBudget(this.budget);
 
     if (resultBudget.status == 200) {
-      this.activeIndex = 1;
+      this.activeIndexStatus = 1;
       this.enabledSendMailButton = true;
+      this.enabledOpenBudget = true;
       this.messageService.add({ severity: 'success', summary: 'Orçamento', detail: 'Finalizado com sucesso', icon: 'pi pi-check' });
     }
   }
@@ -516,6 +522,13 @@ export default class BudgetComponent implements OnInit, OnDestroy, DoCheck {
 
     return dateToCheck < today;
   }
+  private verifyStatusBudget(): string {
+    if (this.budget.status == StatusBudgetEnum.OpenBudget) {
+      return StatusBudget.open;
+    } else {
+      return StatusBudget.close;
+    }
+  }
 
   //Resume
   private toastInfoDiscount(total: number, discount: number) {
@@ -547,6 +560,10 @@ export default class BudgetComponent implements OnInit, OnDestroy, DoCheck {
     }
   }
   async addDiscountAllService() {
+     if (this.verifyStatusBudget() == StatusBudget.close) {
+      this.infoCloseBudget();
+      return;
+    }
     const { value } = this.formDiscount;
     if (value.discountServPer == 0 && value.discountServVal == 0) return;
 
@@ -581,6 +598,10 @@ export default class BudgetComponent implements OnInit, OnDestroy, DoCheck {
 
   }
   async addDiscountAllPart() {
+     if (this.verifyStatusBudget() == StatusBudget.close) {
+      this.infoCloseBudget();
+      return;
+    }
     const { value } = this.formDiscount;
     if (value.discountPartPer == 0 && value.discountPartVal == 0) return;
 
@@ -683,6 +704,10 @@ export default class BudgetComponent implements OnInit, OnDestroy, DoCheck {
     }
   }
   confirmDeleteDiscountService() {
+     if (this.verifyStatusBudget() == StatusBudget.close) {
+      this.infoCloseBudget();
+      return;
+    }
     this.confirmationService.confirm({
       header: 'Remover Descontos?',
       message: 'Por favor confirme para remover.',
@@ -695,6 +720,11 @@ export default class BudgetComponent implements OnInit, OnDestroy, DoCheck {
     });
   }
   confirmDeleteDiscountPart() {
+     if (this.verifyStatusBudget() == StatusBudget.close) {
+      this.infoCloseBudget();
+      return;
+    }
+    
     this.confirmationService.confirm({
       header: 'Remover Descontos?',
       message: 'Por favor confirme para remover.',
@@ -746,8 +776,7 @@ export default class BudgetComponent implements OnInit, OnDestroy, DoCheck {
     }
   }
   saveBudgetRequisition() {
-
-    if (this.enabledSendMailButton) {
+    if (this.verifyStatusBudget() == StatusBudget.close) {
       this.infoCloseBudget();
       return;
     }
@@ -778,10 +807,6 @@ export default class BudgetComponent implements OnInit, OnDestroy, DoCheck {
 
   }
   updateBudgetRequisition() {
-    if (this.enabledSendMailButton) {
-      this.infoCloseBudget();
-      return;
-    }
     const { value, valid } = this.formBudgetRequisition;
     if (valid && value.description!.toString().trim() != "") {
 
@@ -802,6 +827,10 @@ export default class BudgetComponent implements OnInit, OnDestroy, DoCheck {
     }
   }
   editarBudgetRequisition(req: BudgetRequisition) {
+    if (this.verifyStatusBudget() == StatusBudget.close) {
+      this.infoCloseBudget();
+      return;
+    }
 
     this.requisition = req;
     this.formBudgetRequisition.patchValue({
@@ -810,7 +839,7 @@ export default class BudgetComponent implements OnInit, OnDestroy, DoCheck {
 
   }
   async removerBudgetRequisition(req: BudgetRequisition) {
-    if (this.enabledSendMailButton) {
+    if (this.verifyStatusBudget() == StatusBudget.close) {
       this.infoCloseBudget();
       return;
     }
@@ -865,7 +894,7 @@ export default class BudgetComponent implements OnInit, OnDestroy, DoCheck {
     }); */
   }
   async saveBudgetService() {
-    if (this.enabledSendMailButton) {
+    if (this.verifyStatusBudget() == StatusBudget.close) {
       this.infoCloseBudget();
       return;
     }
@@ -909,10 +938,6 @@ export default class BudgetComponent implements OnInit, OnDestroy, DoCheck {
     }
   }
   async updateBudgetService() {
-    if (this.enabledSendMailButton) {
-      this.infoCloseBudget();
-      return;
-    }
 
     const resultValid = this.validInputService();
     if (resultValid == false) return;
@@ -945,7 +970,7 @@ export default class BudgetComponent implements OnInit, OnDestroy, DoCheck {
     }
   }
   async removerBudgetService(service: BudgetServiceItem) {
-    if (this.enabledSendMailButton) {
+    if (this.verifyStatusBudget() == StatusBudget.close) {
       this.infoCloseBudget();
       return;
     }
@@ -1071,6 +1096,10 @@ export default class BudgetComponent implements OnInit, OnDestroy, DoCheck {
     return true;
   }
   editarBudgetService(service: BudgetServiceItem) {
+    if (this.verifyStatusBudget() == StatusBudget.close) {
+      this.infoCloseBudget();
+      return;
+    }
     this.budgetServiceItem = service;
     this.formBudgetService.patchValue({
       description: service.description,
@@ -1160,8 +1189,7 @@ export default class BudgetComponent implements OnInit, OnDestroy, DoCheck {
     return true;
   }
   public async savePart(p: Part) {
-
-    if (this.enabledSendMailButton) {
+    if (this.verifyStatusBudget() == StatusBudget.close) {
       this.infoCloseBudget();
       return;
     }
@@ -1298,8 +1326,7 @@ export default class BudgetComponent implements OnInit, OnDestroy, DoCheck {
     }
   }
   async deleteBudgetItem(item: BudgetItem) {
-
-    if (this.enabledSendMailButton) {
+    if (this.verifyStatusBudget() == StatusBudget.close) {
       this.infoCloseBudget();
       return;
     }
@@ -1323,11 +1350,15 @@ export default class BudgetComponent implements OnInit, OnDestroy, DoCheck {
     }
   }
   onRowEditInit(item: BudgetItem) {
+    if (this.verifyStatusBudget() == StatusBudget.close) {
+      this.infoCloseBudget();
+      return;
+    }
     this.clonedPartItem[item.id as string] = { ...item };
   }
   async onRowEditSave(item: BudgetItem, index: number) {
 
-    if (this.enabledSendMailButton) {
+    if (this.verifyStatusBudget() == StatusBudget.close) {
       this.infoCloseBudget();
       this.onRowEditCancel(item, index);
       return;
@@ -1494,12 +1525,11 @@ export default class BudgetComponent implements OnInit, OnDestroy, DoCheck {
       this.messageService.add({ severity: 'success', summary: 'Email', detail: 'enviado com sucesso', icon: 'pi pi-check' });
 
       this.budget.status = StatusBudgetEnum.PendingApproval;
-      this.activeIndex = 2;
+      this.activeIndexStatus = 2;
       this.statusUpdateBudget(this.budget);
     } else {
       this.messageService.add({ severity: 'error', summary: 'Email', detail: "Erro no envio dos emails", icon: 'pi pi-times' });
     }
-
 
   }
 
