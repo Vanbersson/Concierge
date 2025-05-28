@@ -23,21 +23,17 @@
     <div class="card-login-title">
       <span>Conecte-se</span>
     </div>
-    <P class="mt-2 mb-4">Faça login em sua conta</P>
+    <P class=" mb-4">Faça login em sua conta</P>
     <form [formGroup]="loginForm" (ngSubmit)="loginUser()">
 
       <div class="grid p-fluid p-formgrid">
         <div class="field col-12">
-          <p-floatLabel>
-            <input id="emailid" type="text" pInputText formControlName="email" autofocus="true"/>
-            <label for="emailid">Digite seu email</label>
-          </p-floatLabel>
+          <label for="emailId">Digite seu email</label>
+          <input id="emailId" type="text" pInputText formControlName="email" autofocus="true" />
         </div>
         <div class="field col-12">
-          <p-floatLabel>
-            <p-password id="idsenha" [toggleMask]="true" [feedback]="false" formControlName="password" />
-            <label for="idsenha">Digite sua senha</label>
-          </p-floatLabel>
+          <label for="passId">Digite sua senha</label>
+          <p-password id="passId" [toggleMask]="true" [feedback]="false" formControlName="password" />
         </div>
       </div>
       <div class="grid p-fluid p-formgrid">
@@ -49,13 +45,13 @@
             (onClick)="forgetPass()" />
         </div>
       </div>
-      
+
     </form>
   </div>
 
   <div class="card-login-info">
     <div class="info-tile">
-      <span>Bem vindo!</span>
+      <span>Bem-vindo</span>
     </div>
     <p>Sua oficina perto de você.</p>
   </div>

@@ -2,10 +2,11 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, Validators, FormControl, FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
+import { HttpResponse } from '@angular/common/http';
+import { lastValueFrom } from 'rxjs';
 
 //PrimeNG
 import { ToastModule } from 'primeng/toast';
-import { FloatLabelModule } from 'primeng/floatlabel';
 import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
 import { ButtonModule } from 'primeng/button';
@@ -22,17 +23,15 @@ import { PermissionService } from '../../services/permission/permission.service'
 
 //Interface
 import { IAuth } from '../../interfaces/auth/iauth';
-import { last, lastValueFrom } from 'rxjs';
 import { IAuthResponse } from '../../interfaces/auth/iauthresponse';
-import { HttpResponse } from '@angular/common/http';
-import { Permission } from '../../models/permission/permission';
-import { PermissionUser } from '../../models/permission/permission-user';
 
+//Class
+import { PermissionUser } from '../../models/permission/permission-user';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, FloatLabelModule, ButtonModule, PasswordModule, InputTextModule, ToastModule, ReactiveFormsModule, ConfirmDialogModule],
+  imports: [CommonModule, ButtonModule, PasswordModule, InputTextModule, ToastModule, ReactiveFormsModule, ConfirmDialogModule],
   providers: [MessageService, ConfirmationService],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss'
@@ -55,8 +54,6 @@ export default class LoginComponent {
     private menuUserService: MenuUserService,
     private permissionService: PermissionService
   ) { 
-
-   
   }
 
   async loginUser() {
@@ -109,7 +106,6 @@ export default class LoginComponent {
     }
 
   }
-
   forgetPass() {
     this.confirmationService.confirm({
       header: 'Você esqueceu a senha?',
@@ -118,7 +114,6 @@ export default class LoginComponent {
       }
     });
   }
-
   private async login(login: IAuth): Promise<HttpResponse<IAuthResponse>> {
     try {
       return await lastValueFrom(this.auth.login(login));
