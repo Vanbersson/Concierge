@@ -165,6 +165,13 @@ export default class VehicleEntryComponent implements OnInit, OnDestroy, DoCheck
     ];
 
     this.addRequireInit();
+
+    //Prorietário
+    this.disableClientId();
+    this.disableClientName();
+    this.disableClientCnpj();
+    this.disableClientCpf();
+    this.disableClientRg();
   }
   ngOnDestroy(): void {
 
@@ -182,7 +189,6 @@ export default class VehicleEntryComponent implements OnInit, OnDestroy, DoCheck
 
       if (this.selectClientCompany().fisjur == "Juridica") {
         this.removeValidClientCompanyCpf();
-
         this.addValidClientCompanyCnpj();
       } else {
         this.removeValidClientCompanyCnpj();
@@ -203,6 +209,40 @@ export default class VehicleEntryComponent implements OnInit, OnDestroy, DoCheck
     this.addRequirePlaca();
   }
   //ClientCompany
+  disableClientId() {
+    this.formClientCompany.get('clientCompanyId').disable();
+  }
+  enabledClientId() {
+    this.formClientCompany.get('clientCompanyId').enable();
+  }
+
+  disableClientName() {
+    this.formClientCompany.get('clientCompanyName').disable();
+  }
+  enabledClientName() {
+    this.formClientCompany.get('clientCompanyName').enable();
+  }
+  disableClientCnpj() {
+    this.formClientCompany.get('clientCompanyCnpj').disable();
+  }
+  enabledClientCnpj() {
+    this.formClientCompany.get('clientCompanyCnpj').enable();
+  }
+
+  disableClientCpf() {
+    this.formClientCompany.get('clientCompanyCpf').disable();
+  }
+  enabledClientCpf() {
+    this.formClientCompany.get('clientCompanyCpf').enable();
+  }
+
+  disableClientRg() {
+    this.formClientCompany.get('clientCompanyRg').disable();
+  }
+  enabledClientRg() {
+    this.formClientCompany.get('clientCompanyRg').enable();
+  }
+
   //Valid Id
   private addValidClientCompanyId() {
     this.formClientCompany.controls['clientCompanyId'].addValidators(Validators.required);
@@ -600,7 +640,7 @@ export default class VehicleEntryComponent implements OnInit, OnDestroy, DoCheck
     } catch (error) {
       return error;
     }
-    
+
   }
 
 
@@ -612,9 +652,9 @@ export default class VehicleEntryComponent implements OnInit, OnDestroy, DoCheck
       if (this.formVehicle.value.vehicleNew == "not") {
 
         const resultPlaca = await this.existsPlaca();
-        if(resultPlaca.body.message == "yes"){
+        if (resultPlaca.body.message == "yes") {
           this.messageService.add({ severity: 'error', summary: 'Veículo ' + this.upperCasePipe.transform(this.formVehicle.value.placa), detail: "Já se encontra na empresa", icon: 'pi pi-truck', life: 10000 });
-        }else{
+        } else {
           this.loadVehicleEntry();
         }
 

@@ -213,7 +213,6 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
     private busyService: BusyService,
     private ngxImageCompressService: NgxImageCompressService
   ) {
-
   }
   ngOnInit(): void {
 
@@ -293,6 +292,13 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
     ];
 
     this.disableInput();
+
+    //Prorietário
+    this.disableClientId();
+    this.disableClientName();
+    this.disableClientCnpj();
+    this.disableClientCpf();
+    this.disableClientRg();
   }
   ngDoCheck(): void {
     if (this.selectClientCompany().id != 0) {
@@ -930,6 +936,40 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
     });
 
   }
+  disableClientId() {
+    this.formClientCompany.get('clientCompanyId').disable();
+  }
+  enabledClientId() {
+    this.formClientCompany.get('clientCompanyId').enable();
+  }
+
+  disableClientName() {
+    this.formClientCompany.get('clientCompanyName').disable();
+  }
+  enabledClientName() {
+    this.formClientCompany.get('clientCompanyName').enable();
+  }
+  disableClientCnpj() {
+    this.formClientCompany.get('clientCompanyCnpj').disable();
+  }
+  enabledClientCnpj() {
+    this.formClientCompany.get('clientCompanyCnpj').enable();
+  }
+
+  disableClientCpf() {
+    this.formClientCompany.get('clientCompanyCpf').disable();
+  }
+  enabledClientCpf() {
+    this.formClientCompany.get('clientCompanyCpf').enable();
+  }
+
+  disableClientRg() {
+    this.formClientCompany.get('clientCompanyRg').disable();
+  }
+  enabledClientRg() {
+    this.formClientCompany.get('clientCompanyRg').enable();
+  }
+
   //Driver
   public async photoEntryDriver() {
     this.ngxImageCompressService.uploadFile().then(({ image, orientation }) => {
@@ -1320,7 +1360,15 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
   public async save() {
     this.busyService.busy();
 
+    //Prorietário
+    this.enabledClientId();
+    this.enabledClientName();
+    this.enabledClientCnpj();
+    this.enabledClientCpf();
+    this.enabledClientRg();
+    
     if (this.validForms()) {
+
       //Loading data
       this.loadingVehicle();
 
@@ -1332,6 +1380,13 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
         this.selectClientCompany.set(new ClientCompany());
       }
     }
+
+    //Prorietário
+    this.disableClientId();
+    this.disableClientName();
+    this.disableClientCnpj();
+    this.disableClientCpf();
+    this.disableClientRg();
 
     this.busyService.idle();
   }
