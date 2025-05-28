@@ -2,7 +2,8 @@ import { ChangeDetectorRef, Component, DoCheck, OnDestroy, OnInit, signal, ViewC
 import { CommonModule, DatePipe } from '@angular/common';
 import { Router, ActivatedRoute, RouterModule } from '@angular/router';
 import { FormControl, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
-
+import { environment } from '../../../../../environments/environment';
+//PrimeNG
 import { PrimeNGConfig } from 'primeng/api';
 import { MenuItem, ConfirmationService, MessageService } from 'primeng/api';
 import { InputTextModule } from 'primeng/inputtext';
@@ -560,7 +561,7 @@ export default class BudgetComponent implements OnInit, OnDestroy, DoCheck {
     }
   }
   async addDiscountAllService() {
-     if (this.verifyStatusBudget() == StatusBudget.close) {
+    if (this.verifyStatusBudget() == StatusBudget.close) {
       this.infoCloseBudget();
       return;
     }
@@ -598,7 +599,7 @@ export default class BudgetComponent implements OnInit, OnDestroy, DoCheck {
 
   }
   async addDiscountAllPart() {
-     if (this.verifyStatusBudget() == StatusBudget.close) {
+    if (this.verifyStatusBudget() == StatusBudget.close) {
       this.infoCloseBudget();
       return;
     }
@@ -704,7 +705,7 @@ export default class BudgetComponent implements OnInit, OnDestroy, DoCheck {
     }
   }
   confirmDeleteDiscountService() {
-     if (this.verifyStatusBudget() == StatusBudget.close) {
+    if (this.verifyStatusBudget() == StatusBudget.close) {
       this.infoCloseBudget();
       return;
     }
@@ -720,11 +721,11 @@ export default class BudgetComponent implements OnInit, OnDestroy, DoCheck {
     });
   }
   confirmDeleteDiscountPart() {
-     if (this.verifyStatusBudget() == StatusBudget.close) {
+    if (this.verifyStatusBudget() == StatusBudget.close) {
       this.infoCloseBudget();
       return;
     }
-    
+
     this.confirmationService.confirm({
       header: 'Remover Descontos?',
       message: 'Por favor confirme para remover.',
@@ -1502,7 +1503,7 @@ export default class BudgetComponent implements OnInit, OnDestroy, DoCheck {
                     color: #fff;
                     font-size: 16px;
                     font-weight: 500; 
-                    text-decoration: none;" href="http://localhost:4200/orcamento/aprovacao`+ token + `" target="_blank">
+                    text-decoration: none;" href="`+ environment.site + `/orcamento/aprovacao` + token + `" target="_blank">
                         VER ORÇAMENTO
                     </a>
                 </td>
