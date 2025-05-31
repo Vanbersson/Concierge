@@ -40,9 +40,6 @@ class _VehicleDetailsState extends State<VehicleDetails> {
     vehicle = widget.vehicleEntry;
     placaFormat();
 
-    DateTime data = DateTime.parse(vehicle.dateEntry!);
-    widget.vehicleEntry.dateEntry = DateFormat("dd/MM/yyyy HH:mm").format(data);
-
     statusAuthExit.value = vehicle.statusAuthExit!;
 
     super.initState();
@@ -53,6 +50,34 @@ class _VehicleDetailsState extends State<VehicleDetails> {
       widget.vehicleEntry.placa =
           "${vehicle.placa!.toUpperCase().substring(0, 3)}-${vehicle.placa!.toUpperCase().substring(3, 7)}";
     }
+  }
+
+  String formatDateWithTimezone(DateTime dateTime) {
+    String twoDigits(int n) => n.toString().padLeft(2, '0');
+
+    final String year = dateTime.year.toString();
+    final String month = twoDigits(dateTime.month);
+    final String day = twoDigits(dateTime.day);
+    final String hour = twoDigits(dateTime.hour);
+    final String minute = twoDigits(dateTime.minute);
+    final String second = twoDigits(dateTime.second);
+    final String millisecond = dateTime.millisecond.toString().padLeft(3, '0');
+
+    final Duration offset = dateTime.timeZoneOffset;
+    final String sign = offset.isNegative ? '-' : '+';
+    final int offsetHours = offset.inHours.abs();
+    final int offsetMinutes = (offset.inMinutes.abs()) % 60;
+    final String formattedOffset =
+        '$sign${twoDigits(offsetHours)}:${twoDigits(offsetMinutes)}';
+
+    return '$year-$month-${day}T$hour:$minute:$second.$millisecond$formattedOffset';
+  }
+
+  String formatDate(String date) {
+    if (date == "") return "";
+
+    DateTime dateTime = DateTime.parse(date).toLocal();
+    return DateFormat("dd/MM/yyyy HH:mm").format(dateTime);
   }
 
   @override
@@ -171,7 +196,8 @@ class _VehicleDetailsState extends State<VehicleDetails> {
                             ),
                             Mytext(
                               showLabel: "Data Entrada",
-                              showText: widget.vehicleEntry.dateEntry!,
+                              showText:
+                                  formatDate(widget.vehicleEntry.dateEntry!),
                               myWidth: sizeScreen * 0.63,
                             ),
                           ],
@@ -427,10 +453,7 @@ class _VehicleDetailsState extends State<VehicleDetails> {
                 ve.userId = widget.userLogin.id;
                 ve.userName = widget.userLogin.name;
 
-                var df = DateFormat("yyyy-MM-dd");
-                var tf = DateFormat("HH:mm:ss");
-                ve.dateExit =
-                    "${df.format(DateTime.now())}T${tf.format(DateTime.now())}";
+                ve.dateExit = formatDateWithTimezone(DateTime.now());
 
                 String result = await exit(ve);
                 if (result == "Success.") {
@@ -484,16 +507,6 @@ class _VehicleDetailsState extends State<VehicleDetails> {
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
-  String getFormatDataHora(String data) {
-    if (data == "") {
-      return "";
-    } else {
-      DateTime dt = DateTime.parse(data);
-      var formate = DateFormat('dd/MM/yyyy HH:mm').format(dt);
-      return formate.toString();
-    }
-  }
-
   String maskPlaca(String placa) {
     try {
       var mask = MaskTextInputFormatter(
@@ -512,8 +525,8 @@ class _VehicleDetailsState extends State<VehicleDetails> {
         "Empresa nome: ${vehicle.clientCompanyName}\n"
         "Modelo: ${vehicle.modelDescription}\nCor: ${vehicle.color} \n"
         "Placa: ${maskPlaca(vehicle.placa!)}\nFrota: ${vehicle.frota}\nKM: ${vehicle.kmEntry}\n"
-        "Data entrada: ${vehicle.dateEntry}\nPorteiro entrada: ${vehicle.nameUserEntry}\n"
-        "Data saída: ${vehicle.dateExit == null ? '' : getFormatDataHora(vehicle.dateExit.toString())}\nPorteiro saída: ${vehicle.userNameExit ?? ''}\n"
+        "Data entrada: ${formatDate(vehicle.dateEntry!)}\nPorteiro entrada: ${vehicle.nameUserEntry}\n"
+        "Data saída: ${vehicle.dateExit == null ? '' : formatDate(vehicle.dateExit!)}\nPorteiro saída: ${vehicle.userNameExit ?? ''}\n"
         "Consultor: ${vehicle.nameUserAttendant ?? ''}\n"
         "O.S.: ${vehicle.numServiceOrder != 0 ? vehicle.numServiceOrder : ''}\n"
         "NFe: ${vehicle.numNfe != 0 ? vehicle.numNfe : ''}\n"

@@ -3,15 +3,10 @@ import 'dart:ffi';
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:app_concierge/features/domain/client/client_company.dart';
-import 'package:app_concierge/features/domain/user/user_attendant.dart';
 import 'package:app_concierge/features/domain/user/user_driver.dart';
 import 'package:app_concierge/features/domain/user/user_login.dart';
-import 'package:app_concierge/features/domain/vehicle/vehicle_model.dart';
 import 'package:app_concierge/features/presentation/pages/vehicle_add_page.dart';
 import 'package:app_concierge/features/presentation/widgets/mytextfield.dart';
-import 'package:app_concierge/services/attendant/attendant_service.dart';
-import 'package:app_concierge/services/vehicle/vehicle_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 
@@ -20,11 +15,9 @@ import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
 class DriverPage extends StatefulWidget {
   UserLogin userLogin;
-  ClientCompany clientCompany;
   DriverPage({
     super.key,
-    required this.userLogin,
-    required this.clientCompany,
+    required this.userLogin
   });
 
   @override
@@ -416,7 +409,6 @@ class _DriverPageState extends State<DriverPage> {
     return PageRouteBuilder(
         pageBuilder: (context, animation, secondaryAnimation) => VehicleAddPage(
               userLogin: widget.userLogin,
-              clientCompany: widget.clientCompany,
               userDriver: _userDriver,
             ),
         transitionDuration: const Duration(milliseconds: 600),

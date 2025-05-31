@@ -1,3 +1,4 @@
+import 'package:app_concierge/features/domain/client/client_company_provider.dart';
 import 'package:app_concierge/features/domain/user/user_attendant_provider.dart';
 import 'package:app_concierge/features/domain/vehicle/vehicle_model_provider.dart';
 import 'package:app_concierge/features/domain/vehicle/vehicle_provider.dart';
@@ -9,7 +10,8 @@ import 'package:provider/provider.dart';
 void main() {
   //Device Orientation
   WidgetsFlutterBinding.ensureInitialized();
-  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
+  SystemChrome.setPreferredOrientations(
+      [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
   runApp(const MyApp());
 }
 
@@ -24,6 +26,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => VehicleProvider()),
         ChangeNotifierProvider(create: (_) => UserAttendantProvider()),
         ChangeNotifierProvider(create: (_) => VehicleModelProvider()),
+        ChangeNotifierProvider(create: (_) => ClientCompanyProvider())
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,

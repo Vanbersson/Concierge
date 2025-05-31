@@ -4,6 +4,7 @@ import 'dart:typed_data';
 
 import 'package:app_concierge/features/data/domain/user_login_sqlite_service.dart';
 import 'package:app_concierge/features/domain/client/client_company.dart';
+import 'package:app_concierge/features/domain/client/client_company_provider.dart';
 import 'package:app_concierge/features/domain/user/user_attendant.dart';
 import 'package:app_concierge/features/domain/user/user_attendant_provider.dart';
 import 'package:app_concierge/features/domain/user/user_driver.dart';
@@ -24,13 +25,13 @@ import 'package:flutter_image_compress/flutter_image_compress.dart';
 
 class VehiclePage extends StatefulWidget {
   UserLogin userLogin;
-  ClientCompany clientCompany;
+  // ClientCompany clientCompany;
   UserDriver userDriver;
 
   VehiclePage(
       {super.key,
       required this.userLogin,
-      required this.clientCompany,
+      // required this.clientCompany,
       required this.userDriver});
 
   @override
@@ -41,6 +42,7 @@ class _VehiclePageState extends State<VehiclePage> {
   final VehicleService _vehicleService = VehicleService();
   double sizeScreen = 0;
   late Vehicle _vehicle;
+  late ClientCompany _client;
 
   final ValueNotifier<bool> isvehicleNew = ValueNotifier(false);
   final ValueNotifier<bool> isvehicleService = ValueNotifier(true);
@@ -131,6 +133,7 @@ class _VehiclePageState extends State<VehiclePage> {
 
     _attendants = context.watch<UserAttendantProvider>().items;
     _models = context.watch<VehicleModelProvider>().items;
+    _client = context.watch<ClientCompanyProvider>().client;
 
     return Scaffold(
       backgroundColor: Colors.grey.shade100,
@@ -854,7 +857,7 @@ class _VehiclePageState extends State<VehiclePage> {
       //Placa exists
       String resultPlaca = await this._vehicleService.existsPlaca(existsPlaca);
       if (resultPlaca == "yes") {
-         ScaffoldMessenger.of(context).showSnackBar(
+        ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Veículo já se encontra na empresa.'),
             backgroundColor: Colors.red,
@@ -867,6 +870,27 @@ class _VehiclePageState extends State<VehiclePage> {
     return true;
   }
 
+  String formatDateWithTimezone(DateTime dateTime) {
+    String twoDigits(int n) => n.toString().padLeft(2, '0');
+
+    final String year = dateTime.year.toString();
+    final String month = twoDigits(dateTime.month);
+    final String day = twoDigits(dateTime.day);
+    final String hour = twoDigits(dateTime.hour);
+    final String minute = twoDigits(dateTime.minute);
+    final String second = twoDigits(dateTime.second);
+    final String millisecond = dateTime.millisecond.toString().padLeft(3, '0');
+
+    final Duration offset = dateTime.timeZoneOffset;
+    final String sign = offset.isNegative ? '-' : '+';
+    final int offsetHours = offset.inHours.abs();
+    final int offsetMinutes = (offset.inMinutes.abs()) % 60;
+    final String formattedOffset =
+        '$sign${twoDigits(offsetHours)}:${twoDigits(offsetMinutes)}';
+
+    return '$year-$month-${day}T$hour:$minute:$second.$millisecond$formattedOffset';
+  }
+
   void addVehicle() async {
     if (await validVehicle()) {
       _vehicle.companyId = widget.userLogin.companyId;
@@ -874,11 +898,7 @@ class _VehiclePageState extends State<VehiclePage> {
 
       _vehicle.idUserEntry = widget.userLogin.id;
       _vehicle.nameUserEntry = widget.userLogin.name;
-
-      var df = DateFormat("yyyy-MM-dd");
-      var tf = DateFormat("HH:mm:ss");
-      _vehicle.dateEntry =
-          "${df.format(DateTime.now())}T${tf.format(DateTime.now())}";
+      _vehicle.dateEntry = formatDateWithTimezone(DateTime.now());
 
       _vehicle.datePrevisionExit = "";
 
@@ -886,12 +906,12 @@ class _VehiclePageState extends State<VehiclePage> {
       _vehicle.userNameExit = "";
       _vehicle.dateExit = "";
 
-      if (widget.clientCompany.id != null) {
-        _vehicle.clientCompanyId = widget.clientCompany.id;
-        _vehicle.clientCompanyName = widget.clientCompany.name;
-        _vehicle.clientCompanyCnpj = widget.clientCompany.cnpj ?? "";
-        _vehicle.clientCompanyCpf = widget.clientCompany.cpf ?? "";
-        _vehicle.clientCompanyRg = widget.clientCompany.rg ?? "";
+      if (_client.id != null) {
+        _vehicle.clientCompanyId = _client.id;
+        _vehicle.clientCompanyName = _client.name;
+        _vehicle.clientCompanyCnpj = _client.cnpj ?? "";
+        _vehicle.clientCompanyCpf = _client.cpf ?? "";
+        _vehicle.clientCompanyRg = _client.rg ?? "";
       } else {
         _vehicle.clientCompanyId = 0;
         _vehicle.clientCompanyName = "";

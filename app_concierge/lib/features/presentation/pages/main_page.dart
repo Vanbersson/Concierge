@@ -11,6 +11,7 @@ import 'package:app_concierge/services/vehicle/vehicle_service.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'dart:typed_data';
+import 'package:intl/intl.dart';
 
 import 'package:app_concierge/features/domain/user/user_login.dart';
 
@@ -44,7 +45,8 @@ class _MainPageState extends State<MainPage> {
   @override
   void initState() {
     // Obter as listas de veículos pendente de autorização
-    _listVehicleEntry.value = _vehicleService.allPendingAuthorization(widget.userLogin.companyId!, widget.userLogin.resaleId!);
+    _listVehicleEntry.value = _vehicleService.allPendingAuthorization(
+        widget.userLogin.companyId!, widget.userLogin.resaleId!);
 
     verifyVehicleAllAuthorized();
     super.initState();
@@ -58,7 +60,8 @@ class _MainPageState extends State<MainPage> {
 
   void verifyVehicleAllAuthorized() async {
     // Obter as listas de veículos autorizados
-    List<VehicleEntry> vehicleAuth = await _vehicleService.allAuthorized(widget.userLogin.companyId!, widget.userLogin.resaleId!);
+    List<VehicleEntry> vehicleAuth = await _vehicleService.allAuthorized(
+        widget.userLogin.companyId!, widget.userLogin.resaleId!);
 
     //Total de veículos autorizados
     _allAuthorizedTotal.value = vehicleAuth.length;
@@ -66,15 +69,17 @@ class _MainPageState extends State<MainPage> {
     timer = Timer.periodic(const Duration(seconds: 30), (timer) async {
       try {
         // Obter as listas de veículos autorizados
-        List<VehicleEntry> vehicleAuth1 = await _vehicleService.allAuthorized(widget.userLogin.companyId!, widget.userLogin.resaleId!);
+        List<VehicleEntry> vehicleAuth1 = await _vehicleService.allAuthorized(
+            widget.userLogin.companyId!, widget.userLogin.resaleId!);
 
         //Total de veículos autorizados
         _allAuthorizedTotal.value = vehicleAuth1.length;
 
         // Obter as listas de veículos pendente de autorização
-        _listVehicleEntry.value = _vehicleService.allPendingAuthorization(widget.userLogin.companyId!, widget.userLogin.resaleId!);
+        _listVehicleEntry.value = _vehicleService.allPendingAuthorization(
+            widget.userLogin.companyId!, widget.userLogin.resaleId!);
       } catch (e) {
-       // print("Erro ao consultar e atualizar a lista: $e");
+        // print("Erro ao consultar e atualizar a lista: $e");
       }
     });
   }
@@ -108,11 +113,26 @@ class _MainPageState extends State<MainPage> {
     }
   }
 
+  String formtDate(String date) {
+    if (date == "") return "";
+
+    DateTime dateTime = DateTime.parse(date).toLocal();
+    return DateFormat("dd/MM/yyyy HH:mm").format(dateTime);
+  }
+
   abreviaName(String name) {
     if (name.length <= 17) {
       return name;
     } else {
       return name.substring(0, 17);
+    }
+  }
+
+  abreviaNameModel(String name) {
+    if (name.length <= 15) {
+      return name;
+    } else {
+      return name.substring(0, 15);
     }
   }
 
@@ -529,13 +549,15 @@ class _MainPageState extends State<MainPage> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(
-                                "${vei.dateEntry}",
+                                formtDate(vei.dateEntry!),
                                 style: const TextStyle(
                                     color: Colors.black87,
                                     fontWeight: FontWeight.w300),
                               ),
                               Text(
-                                vei.modelDescription.toString().toUpperCase(),
+                                abreviaNameModel(vei.modelDescription!)
+                                    .toString()
+                                    .toUpperCase(),
                                 style: const TextStyle(
                                     color: Colors.black87,
                                     fontWeight: FontWeight.w300),
@@ -552,7 +574,10 @@ class _MainPageState extends State<MainPage> {
                     onTap: () {
                       clickViewVehicle.value = true;
 
-                      _vehicleService.vehicleId(widget.userLogin.companyId!, widget.userLogin.resaleId!,vei.id!).then((onValue) {
+                      _vehicleService
+                          .vehicleId(widget.userLogin.companyId!,
+                              widget.userLogin.resaleId!, vei.id!)
+                          .then((onValue) {
                         clickViewVehicle.value = false;
                         // Chama a tela de detalhes
                         Navigator.of(context)

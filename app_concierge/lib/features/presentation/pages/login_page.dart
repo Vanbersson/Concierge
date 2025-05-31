@@ -35,36 +35,88 @@ class _LoginPageState extends State<LoginPage> {
     sizeScreen = MediaQuery.of(context).size.shortestSide;
 
     return Scaffold(
-      backgroundColor: Colors.grey.shade100,
-      body: SizedBox(
+      body: Container(
         width: myWidth,
         height: myHeight,
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.blue, Colors.grey, Colors.black],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
         child: Stack(
           children: [
+            Positioned(
+              top: myWidth / 6,
+              left: myWidth / 14,
+              child: Image.asset("assets/icons/icon-1.png",
+                  width: 60, fit: BoxFit.cover),
+            ),
+            Positioned(
+              top: myWidth / 3,
+              right: myWidth / 12,
+              child: Image.asset("assets/icons/icon-2.png",
+                  width: 60, fit: BoxFit.cover),
+            ),
+            Positioned(
+              bottom: myWidth / 4,
+              left: myWidth / 12,
+              child: Image.asset(
+                "assets/icons/icon-3.png",
+                width: 60,
+                fit: BoxFit.cover,
+              ),
+            ),
+            
             Column(
               children: [
                 const Expanded(
                   flex: 1,
                   child: SizedBox(),
                 ),
-                 Icon(
-                  Icons.lock,
-                  size: sizeScreen * 0.2,
+                Text(
+                  "ATENATRUCK",
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontSize: sizeScreen * 0.07,
+                      fontWeight: FontWeight.w900),
                 ),
                 const SizedBox(
                   height: 50,
                 ),
                 //Welcome text
                 Text(
-                  "Bem Vindo\n Controle de acesso de véiculos",
+                  "Bem-vindo",
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    color: Colors.grey.shade700,
-                    fontSize: sizeScreen * 0.04,
+                    color: Colors.black87,
+                    fontSize: sizeScreen * 0.045,
+                    fontWeight: FontWeight.bold
+                  ),
+                ),
+                Text(
+                  "Informe seu email e senha para acessar.",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.black54,
+                    fontSize: sizeScreen * 0.035,
                   ),
                 ),
                 const SizedBox(
-                  height: 25,
+                  height: 15,
+                ),
+
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                  child: Align(
+                    alignment: Alignment.topLeft,
+                    child: Text("E-mail",
+                        style: TextStyle(
+                            color: Colors.black87,
+                            fontSize: sizeScreen * 0.045,
+                            fontWeight: FontWeight.bold)),
+                  ),
                 ),
 
                 //Usúario
@@ -73,13 +125,22 @@ class _LoginPageState extends State<LoginPage> {
                   child: Mytextfield(
                     myKey: userKey,
                     myController: userController,
-                    myLabelText: "Usuário",
+                    myLabelText: "",
                     myKeyboardType: TextInputType.emailAddress,
                     myTextInputAction: TextInputAction.next,
                   ),
                 ),
-                const SizedBox(
-                  height: 10,
+
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                  child: Align(
+                    alignment: Alignment.topLeft,
+                    child: Text("Senha",
+                        style: TextStyle(
+                            color: Colors.black87,
+                            fontSize: sizeScreen * 0.045,
+                            fontWeight: FontWeight.bold)),
+                  ),
                 ),
                 //Senha
                 Padding(
@@ -96,13 +157,13 @@ class _LoginPageState extends State<LoginPage> {
                     controller: passwordController,
                     obscureText: myObscureText,
                     style: const TextStyle(
-                        color: Colors.blue,
+                        color: Colors.black54,
                         fontWeight: FontWeight.bold,
                         fontSize: 16),
                     decoration: InputDecoration(
                       fillColor: Colors.grey.shade200,
                       filled: true,
-                      labelText: "Senha",
+                      labelText: "",
                       suffixIcon: IconButton(
                         onPressed: () {
                           setState(() {
@@ -118,15 +179,15 @@ class _LoginPageState extends State<LoginPage> {
                         fontSize: 16,
                         color: Colors.grey.shade700,
                       ),
-                      enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.grey.shade100),
-                        borderRadius: const BorderRadius.all(
+                      enabledBorder: const OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.white),
+                        borderRadius: BorderRadius.all(
                           Radius.circular(10.0),
                         ),
                       ),
-                      focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.grey.shade400),
-                        borderRadius: const BorderRadius.all(
+                      focusedBorder: const OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.white),
+                        borderRadius: BorderRadius.all(
                           Radius.circular(10.0),
                         ),
                       ),
@@ -143,9 +204,9 @@ class _LoginPageState extends State<LoginPage> {
                     children: [
                       TextButton(
                         onPressed: () {},
-                        child: Text(
+                        child: const Text(
                           "Esqueceu a senha?",
-                          style: TextStyle(color: Colors.grey.shade700),
+                          style: TextStyle(color: Colors.white),
                         ),
                       ),
                     ],
@@ -200,7 +261,7 @@ class _LoginPageState extends State<LoginPage> {
                       elevation: const WidgetStatePropertyAll<double>(8.0),
                       backgroundColor:
                           const WidgetStatePropertyAll<Color>(Colors.blue),
-                      padding:  WidgetStatePropertyAll<EdgeInsetsGeometry>(
+                      padding: WidgetStatePropertyAll<EdgeInsetsGeometry>(
                           EdgeInsets.symmetric(
                               horizontal: sizeScreen * 0.36, vertical: 16.0)),
                       shape: WidgetStatePropertyAll<RoundedRectangleBorder>(
@@ -224,6 +285,18 @@ class _LoginPageState extends State<LoginPage> {
                   child: SizedBox(
                     height: 25,
                   ),
+                ),
+                Text(
+                  "NATIVA MAQUINAS E IMPLEMENTOS LTDA",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.white30,
+                    fontWeight: FontWeight.w300,
+                    fontSize: sizeScreen * 0.03,
+                  ),
+                ),
+                const SizedBox(
+                  height: 10,
                 ),
               ],
             ),

@@ -1,4 +1,5 @@
 import 'package:app_concierge/features/domain/client/client_company.dart';
+import 'package:app_concierge/features/domain/client/client_company_provider.dart';
 import 'package:app_concierge/features/domain/user/user_attendant.dart';
 import 'package:app_concierge/features/domain/user/user_attendant_provider.dart';
 import 'package:app_concierge/features/domain/user/user_login.dart';
@@ -25,8 +26,7 @@ class _ClienteCompanyPageState extends State<ClienteCompanyPage> {
   double sizeScreen = 0;
   ValueNotifier<Future<List<ClientCompany>>> clients =
       ValueNotifier<Future<List<ClientCompany>>>(Future.value([]));
-  ValueNotifier<ClientCompany> selectClient =
-      ValueNotifier<ClientCompany>(ClientCompany());
+  ValueNotifier<ClientCompany> selectClient = ValueNotifier<ClientCompany>(ClientCompany());
 
   final TextEditingController clientCodeFilter = TextEditingController();
   final TextEditingController clientFantasiaFilter = TextEditingController();
@@ -48,9 +48,10 @@ class _ClienteCompanyPageState extends State<ClienteCompanyPage> {
   }
 
   init() async {
-    _attendants = await _attendantService.attendants(widget.userLogin.companyId!, widget.userLogin.resaleId!);
+    _attendants = await _attendantService.attendants(
+        widget.userLogin.companyId!, widget.userLogin.resaleId!);
     _models = await _vehicleService.vehicleModels();
-     if (_attendants.isEmpty || _models.isEmpty) {
+    if (_attendants.isEmpty || _models.isEmpty) {
       Navigator.pop(context);
     }
 
@@ -239,14 +240,31 @@ class _ClienteCompanyPageState extends State<ClienteCompanyPage> {
                       height: 50,
                       child: ElevatedButton(
                         onPressed: () {
-                          if (selectClient.value.id != null ||
-                              isChecked.value == true) {
-                            selectClient.value.companyId =
-                                widget.userLogin.companyId;
-                            selectClient.value.resaleId =
-                                widget.userLogin.resaleId;
+
+                          if (selectClient.value.id != null && isChecked.value == false ) {
+                            //Objeto completo
+                            selectClient.value.companyId = widget.userLogin.companyId;
+                            selectClient.value.resaleId = widget.userLogin.resaleId;
+                            selectClient.value.contactName ="";
+                            selectClient.value.contactEmail="";
+                            selectClient.value.contactDDDPhone="";
+                            selectClient.value.contactPhone="";
+                            selectClient.value.contactDDDCellphone="";
+                            selectClient.value.contactCellphone="";
+                                                       
+                            context.read<ClientCompanyProvider>().add(selectClient.value);
+                            //chama á próxima tela
                             Navigator.of(context).push(_createRouteDriver());
-                          } else {
+                          } 
+
+                          if(selectClient.value.id == null && isChecked.value == true){
+                            //Objeto vazio
+                            context.read<ClientCompanyProvider>().add(ClientCompany());
+                            //chama á próxima tela
+                            Navigator.of(context).push(_createRouteDriver());
+                          }
+
+                          if(selectClient.value.id == null && isChecked.value == false) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
                                 content: Text('Empresa não selecionada.'),
@@ -254,12 +272,12 @@ class _ClienteCompanyPageState extends State<ClienteCompanyPage> {
                               ),
                             );
                           }
+
                         },
                         style: ButtonStyle(
                           elevation: const WidgetStatePropertyAll<double>(8.0),
                           backgroundColor: WidgetStatePropertyAll<Color>(
                               Colors.blue.shade300),
-                          /*  padding: WidgetStatePropertyAll<EdgeInsetsGeometry>(EdgeInsets.symmetric(horizontal: sizeScreen * 0.35, vertical: 16.0)), */
                           shape: WidgetStatePropertyAll<RoundedRectangleBorder>(
                             RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8.0),
@@ -304,10 +322,7 @@ class _ClienteCompanyPageState extends State<ClienteCompanyPage> {
 
   Route _createRouteDriver() {
     return PageRouteBuilder(
-        pageBuilder: (context, animation, secondaryAnimation) => DriverPage(
-              userLogin: widget.userLogin,
-              clientCompany: selectClient.value,
-            ),
+        pageBuilder: (context, animation, secondaryAnimation) => DriverPage(userLogin: widget.userLogin),
         transitionDuration: const Duration(milliseconds: 600),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           const begin = Offset(1.0, 0.0);
@@ -710,6 +725,8 @@ class _ClienteCompanyPageState extends State<ClienteCompanyPage> {
                             onPressed: () {
                               if (selectClient.value.id != null) {
                                 Navigator.pop(context);
+
+                                //desmarcar empresa sem cadastro
                                 isChecked.value = false;
                               }
                             },

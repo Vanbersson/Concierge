@@ -1,9 +1,8 @@
 import 'package:app_concierge/features/domain/client/client_company.dart';
-import 'package:app_concierge/features/domain/user/user_attendant.dart';
+import 'package:app_concierge/features/domain/client/client_company_provider.dart';
 import 'package:app_concierge/features/domain/user/user_driver.dart';
 import 'package:app_concierge/features/domain/user/user_login.dart';
 import 'package:app_concierge/features/domain/vehicle/vehicle.dart';
-import 'package:app_concierge/features/domain/vehicle/vehicle_model.dart';
 import 'package:app_concierge/features/domain/vehicle/vehicle_provider.dart';
 import 'package:app_concierge/services/cliente/client_company_service.dart';
 import 'package:app_concierge/services/vehicle/vehicle_service.dart';
@@ -19,13 +18,13 @@ import 'package:provider/provider.dart';
 
 class VehicleAddPage extends StatefulWidget {
   UserLogin userLogin;
-  ClientCompany clientCompany;
+  //ClientCompany clientCompany;
   UserDriver userDriver;
 
   VehicleAddPage(
       {super.key,
       required this.userLogin,
-      required this.clientCompany,
+      //required this.clientCompany,
       required this.userDriver});
 
   @override
@@ -132,7 +131,6 @@ class _VehicleAddPageState extends State<VehicleAddPage> {
                                   MaterialPageRoute(
                                       builder: (context) => VehiclePage(
                                           userLogin: widget.userLogin,
-                                          clientCompany: widget.clientCompany,
                                           userDriver: widget.userDriver)));
                             },
                             child: Lottie.asset(
@@ -346,8 +344,9 @@ class _VehicleAddPageState extends State<VehicleAddPage> {
                 loadSave.value = true;
 
                 //Save Client
-                if (widget.clientCompany.id != null) {
-                  await saveClient(widget.clientCompany);
+
+                if (context.watch<ClientCompanyProvider>().client.id != null) {
+                  await saveClient(context.watch<ClientCompanyProvider>().client);
                 }
 
                 //Save Vehicles
@@ -413,16 +412,6 @@ class _VehicleAddPageState extends State<VehicleAddPage> {
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
-  String getFormatDataHora(String data) {
-    if (data == "") {
-      return "";
-    } else {
-      DateTime dt = DateTime.parse(data);
-      var formate = DateFormat('dd/MM/yyyy HH:mm').format(dt);
-      return formate.toString();
-    }
-  }
-
   String maskPlaca(String placa) {
     try {
       var mask = MaskTextInputFormatter(
@@ -435,13 +424,20 @@ class _VehicleAddPageState extends State<VehicleAddPage> {
     }
   }
 
+  String formatDate(String date) {
+    if (date == "") return "";
+
+    DateTime dateTime = DateTime.parse(date).toLocal();
+    return DateFormat("dd/MM/yyyy HH:mm").format(dateTime);
+  }
+
   shareVehicle(Vehicle vehicle) async {
     final result = await Share.share("Código: ${vehicle.id}\n"
         "Empresa código: ${vehicle.clientCompanyId != 0 ? vehicle.clientCompanyId : ""}\n"
         "Empresa nome: ${vehicle.clientCompanyName == "" ? "Empresa não cadastrada" : vehicle.clientCompanyName}\n"
         "Modelo: ${vehicle.modelDescription}\nCor: ${vehicle.color} \n"
         "Placa: ${maskPlaca(vehicle.placa!)}\nFrota: ${vehicle.frota}\nKM: ${vehicle.kmEntry}\n"
-        "Entrada: ${getFormatDataHora(vehicle.dateEntry.toString())}\nSaída: ${getFormatDataHora(vehicle.dateExit.toString())}\n"
+        "Entrada: ${formatDate(vehicle.dateEntry!)}\nSaída: ${formatDate(vehicle.dateExit!)}\n"
         "Porteiro Entrada: ${vehicle.nameUserEntry}\nPorteiro Saída: ${vehicle.userNameExit}\n"
         "Consultor: ${vehicle.nameUserAttendant ?? ''}\n"
         "O.S.: ${vehicle.numServiceOrder != 0 ? vehicle.numServiceOrder : ''}\n"
