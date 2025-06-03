@@ -7,6 +7,7 @@ import 'package:app_concierge/features/domain/vehicle/vehicle_entry.dart';
 import 'package:app_concierge/features/presentation/pages/client_company_page.dart';
 import 'package:app_concierge/features/presentation/pages/splash_page.dart';
 import 'package:app_concierge/features/presentation/pages/vehicle_details.dart';
+import 'package:app_concierge/features/presentation/widgets/vehicle_item_list.dart';
 import 'package:app_concierge/services/vehicle/vehicle_service.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
@@ -31,24 +32,31 @@ class _MainPageState extends State<MainPage> {
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
   final searchController = TextEditingController();
   final VehicleService _vehicleService = VehicleService();
-
-  final ValueNotifier<Future<List<VehicleEntry>>> _listVehicleEntry =
-      ValueNotifier<Future<List<VehicleEntry>>>(Future.value([]));
-
   late Timer timer;
 
-  late List<VehicleEntry> listVehicleEntryFilter;
+  late List<VehicleEntry> listVehicleEntryFilter = [];
+
+  final ValueNotifier<List<VehicleEntry>> listVehicles =
+      ValueNotifier<List<VehicleEntry>>([]);
+
   final ValueNotifier<int> _currIndexIconSearch = ValueNotifier<int>(0);
   final ValueNotifier<int> _allAuthorizedTotal = ValueNotifier<int>(0);
   ValueNotifier<bool> clickViewVehicle = ValueNotifier(false);
 
+  double myHeight = 0;
+  double myWidth = 0;
+
+  int companyId = 0;
+  int resaleId = 0;
+
   @override
   void initState() {
-    // Obter as listas de veículos pendente de autorização
-    _listVehicleEntry.value = _vehicleService.allPendingAuthorization(
-        widget.userLogin.companyId!, widget.userLogin.resaleId!);
+    companyId = widget.userLogin.companyId!;
+    resaleId = widget.userLogin.resaleId!;
 
+    initSearch();
     verifyVehicleAllAuthorized();
+
     super.initState();
   }
 
@@ -58,44 +66,55 @@ class _MainPageState extends State<MainPage> {
     super.dispose();
   }
 
-  void verifyVehicleAllAuthorized() async {
+  void initSearch() async {
+    clickViewVehicle.value = true;
     // Obter as listas de veículos autorizados
-    List<VehicleEntry> vehicleAuth = await _vehicleService.allAuthorized(
-        widget.userLogin.companyId!, widget.userLogin.resaleId!);
+    List<VehicleEntry> vehiclesAuth =
+        await _vehicleService.allAuthorized(companyId, resaleId);
+    listVehicles.value =
+        await _vehicleService.allPendingAuthorization(companyId, resaleId);
 
     //Total de veículos autorizados
-    _allAuthorizedTotal.value = vehicleAuth.length;
+    _allAuthorizedTotal.value = vehiclesAuth.length;
+    clickViewVehicle.value = false;
+  }
 
+  void verifyVehicleAllAuthorized() async {
     timer = Timer.periodic(const Duration(seconds: 30), (timer) async {
       try {
-        // Obter as listas de veículos autorizados
-        List<VehicleEntry> vehicleAuth1 = await _vehicleService.allAuthorized(
-            widget.userLogin.companyId!, widget.userLogin.resaleId!);
+        // Obter a lista de veículos autorizados
+        List<VehicleEntry> vehicleAuth1 =
+            await _vehicleService.allAuthorized(companyId, resaleId);
 
         //Total de veículos autorizados
         _allAuthorizedTotal.value = vehicleAuth1.length;
 
-        // Obter as listas de veículos pendente de autorização
-        _listVehicleEntry.value = _vehicleService.allPendingAuthorization(
-            widget.userLogin.companyId!, widget.userLogin.resaleId!);
+        // Obter a lista de veículos
+        listVehicles.value =
+            await _vehicleService.allPendingAuthorization(companyId, resaleId);
       } catch (e) {
         // print("Erro ao consultar e atualizar a lista: $e");
       }
     });
   }
 
-  Future<List<VehicleEntry>> filterSearchResults(String searchString) async {
+  void filterSearchResults(String searchString) async {
+    timer.cancel();
+
+    listVehicleEntryFilter = listVehicles.value;
     List<VehicleEntry> temp1 = [];
 
     if (searchString.isNotEmpty && _currIndexIconSearch.value == 0) {
       _currIndexIconSearch.value = 1;
 
       temp1 = listVehicleEntryFilter
-          .where((vehicle) => vehicle.placa.toString().contains(searchString))
+          .where((vehicle) => vehicle.placa.toString()
+          .contains(searchString))
           .toList();
       if (searchString == "novo") {
         temp1 += listVehicleEntryFilter
-            .where((vehicle) => vehicle.vehicleNew.toString().contains("yes"))
+            .where((vehicle) => vehicle.vehicleNew.toString()
+            .contains("yes"))
             .toList();
       }
       temp1 += listVehicleEntryFilter
@@ -104,43 +123,32 @@ class _MainPageState extends State<MainPage> {
               .contains(searchString.toUpperCase()))
           .toList();
 
-      return temp1;
+      temp1 += listVehicleEntryFilter
+          .where((vehicle) => vehicle.modelDescription.toString()
+          .contains(searchString))
+          .toList();
+
+      temp1 += listVehicleEntryFilter
+          .where((vehicle) => formatDate(vehicle.dateEntry.toString())
+          .contains(searchString))
+          .toList();
+
+      listVehicles.value = temp1;
     } else {
       _currIndexIconSearch.value = 0;
       searchController.text = "";
-      return _vehicleService.allPendingAuthorization(
-          widget.userLogin.companyId!, widget.userLogin.resaleId!);
-    }
-  }
+      listVehicleEntryFilter = [];
 
-  String formtDate(String date) {
-    if (date == "") return "";
-
-    DateTime dateTime = DateTime.parse(date).toLocal();
-    return DateFormat("dd/MM/yyyy HH:mm").format(dateTime);
-  }
-
-  abreviaName(String name) {
-    if (name.length <= 17) {
-      return name;
-    } else {
-      return name.substring(0, 17);
-    }
-  }
-
-  abreviaNameModel(String name) {
-    if (name.length <= 15) {
-      return name;
-    } else {
-      return name.substring(0, 15);
+      initSearch();
+      verifyVehicleAllAuthorized();
     }
   }
 
   @override
   Widget build(BuildContext context) {
     Uint8List userPhoto = base64Decode(widget.userLogin.photo!);
-    var myWidth = MediaQuery.of(context).size.width;
-    var myHeight = MediaQuery.of(context).size.height;
+    myWidth = MediaQuery.of(context).size.width;
+    myHeight = MediaQuery.of(context).size.height;
 
     sizeScreen = MediaQuery.of(context).size.shortestSide;
 
@@ -347,8 +355,7 @@ class _MainPageState extends State<MainPage> {
                           },
                         ),
                         onPressed: () {
-                          _listVehicleEntry.value =
-                              filterSearchResults(searchController.text);
+                          filterSearchResults(searchController.text);
 
                           //Fecha o teclado
                           FocusScope.of(context).unfocus();
@@ -386,53 +393,14 @@ class _MainPageState extends State<MainPage> {
                 child: Container(
                   padding: EdgeInsets.symmetric(horizontal: sizeScreen * 0.02),
                   decoration: BoxDecoration(
-                      color: Colors.grey.shade200,
-                      borderRadius:
-                          const BorderRadius.all(Radius.circular(20.0))),
-                  child: ValueListenableBuilder(
-                    valueListenable: _listVehicleEntry,
-                    builder: (BuildContext context,
-                        Future<List<VehicleEntry>> value, Widget? child) {
-                      return FutureBuilder<List<VehicleEntry>>(
-                        future: value,
-                        builder: (context, snapshot) {
-                          var status = snapshot.connectionState;
-                          if (snapshot.hasError) {
-                            return const Text("Error");
-                          }
-                          //load
-                          if (status == ConnectionState.waiting) {
-                            return const Center(
-                              child: SizedBox(
-                                height: 50,
-                                width: 50,
-                                child: CircularProgressIndicator(
-                                  color: Colors.blue,
-                                  strokeWidth: 2,
-                                ),
-                              ),
-                            );
-                          }
-                          //complete
-                          if (status == ConnectionState.done) {
-                            if (snapshot.data!.isNotEmpty) {
-                              listVehicleEntryFilter = snapshot.data!;
-                              return vehicles(snapshot.data!);
-                            }
-                          }
-                          return const Center(
-                            child: Text(
-                              'Não a veículos!',
-                              style: TextStyle(
-                                  color: Colors.black54,
-                                  fontSize: 24.0,
-                                  fontWeight: FontWeight.w300),
-                            ),
-                          );
-                        },
-                      );
-                    },
+                    color: Colors.grey.shade200,
+                    borderRadius: const BorderRadius.all(Radius.circular(20.0)),
                   ),
+                  child: ValueListenableBuilder(
+                      valueListenable: listVehicles,
+                      builder: (context, value, child) {
+                        return vehicles(value);
+                      }),
                 ),
               ),
               const SizedBox(
@@ -444,7 +412,6 @@ class _MainPageState extends State<MainPage> {
                 children: <Widget>[
                   FloatingActionButton.extended(
                     onPressed: () {
-                      //Navigator.pop(context);
                       Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -486,86 +453,33 @@ class _MainPageState extends State<MainPage> {
     );
   }
 
-  Widget vehicles(List<VehicleEntry> data) {
+  String formatDate(String date) {
+    if (date == "") return "";
+
+    DateTime dateTime = DateTime.parse(date).toLocal();
+    return DateFormat("dd/MM/yyyy HH:mm").format(dateTime);
+  }
+
+  Widget vehicles(List<VehicleEntry> vehicles) {
     return ListView.builder(
-        itemCount: data.length,
+        itemCount: vehicles.length,
         scrollDirection: Axis.vertical,
         itemBuilder: (_, index) {
-          VehicleEntry vei = data[index];
-
-          if (vei.vehicleNew == "yes") {
-            vei.placa = "NOVO";
-          }
+          VehicleEntry vei = vehicles[index];
 
           return Padding(
-            padding: const EdgeInsets.only(top: 8.0),
+            padding: const EdgeInsets.all(6.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Container(
-                  width: sizeScreen * 0.8,
-                  height: 60,
-                  decoration: BoxDecoration(
-                    color: vei.statusAuthExit == "Authorized"
-                        ? Colors.green.shade300
-                        : Colors.grey.shade300,
-                    borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(10.0),
-                      bottomLeft: Radius.circular(10.0),
-                    ),
-                  ),
-                  child: Row(
-                    children: [
-                      SizedBox(
-                        width: sizeScreen * 0.4,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              vei.placa.toString().toUpperCase(),
-                              style: const TextStyle(
-                                  color: Colors.black87,
-                                  fontWeight: FontWeight.w700),
-                            ),
-                            Text(
-                              vei.clientCompanyName != ""
-                                  ? abreviaName(
-                                      vei.clientCompanyName.toString())
-                                  : "FALTA",
-                              style: const TextStyle(
-                                  color: Colors.black87,
-                                  fontWeight: FontWeight.w300),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(
-                        width: 2,
-                      ),
-                      SizedBox(
-                        width: sizeScreen * 0.3,
-                        child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                formtDate(vei.dateEntry!),
-                                style: const TextStyle(
-                                    color: Colors.black87,
-                                    fontWeight: FontWeight.w300),
-                              ),
-                              Text(
-                                abreviaNameModel(vei.modelDescription!)
-                                    .toString()
-                                    .toUpperCase(),
-                                style: const TextStyle(
-                                    color: Colors.black87,
-                                    fontWeight: FontWeight.w300),
-                              ),
-                            ]),
-                      ),
-                    ],
-                  ),
+                VehicleItemList(
+                  myWidth: sizeScreen,
+                  myPlaca: vei.placa.toString(),
+                  myDodelDesc: vei.modelDescription.toString(),
+                  myClientName: vei.clientCompanyName.toString(),
+                  myStatusAuth: vei.statusAuthExit.toString(),
+                  myVehicleNew: vei.vehicleNew.toString(),
+                  myDateEntry: vei.dateEntry.toString(),
                 ),
                 Ink(
                   width: sizeScreen * 0.12,
@@ -600,7 +514,7 @@ class _MainPageState extends State<MainPage> {
                       ),
                     ),
                   ),
-                ),
+                )
               ],
             ),
           );

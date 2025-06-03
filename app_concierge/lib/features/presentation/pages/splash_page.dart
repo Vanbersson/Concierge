@@ -40,22 +40,30 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey.shade200,
-      body: Center(
-        child: Lottie.asset(
-          "assets/lotties/animation-loading.json",
-          width: 200.0,
-          controller: _controller,
-          onLoaded: (composition) {
-            _controller
-              ..duration = composition.duration
-              ..forward().then((value) {
-                if (userLogin.token == kERRORUNAUTHORIZED) {
-                  openLogin();
-                } else {
-                  openMain();
-                }
-              });
-          },
+      body: Container(
+        decoration: const BoxDecoration(
+            gradient: LinearGradient(
+          colors: [Colors.blue, Colors.grey, Colors.black],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        )),
+        child: Center(
+          child: Lottie.asset(
+            "assets/lotties/animation-loading.json",
+            width: 200.0,
+            controller: _controller,
+            onLoaded: (composition) {
+              _controller
+                ..duration = composition.duration
+                ..forward().then((value) {
+                  if (userLogin.token == kERRORUNAUTHORIZED) {
+                    openLogin();
+                  } else {
+                    openMain();
+                  }
+                });
+            },
+          ),
         ),
       ),
     );
