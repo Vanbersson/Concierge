@@ -185,19 +185,21 @@ export default class VehicleComponent implements OnInit,DoCheck {
     }
     return vehicle;
   }
-  public getSeverity(value: string): any {
+ getSeverity(value: string): any {
+
     switch (value) {
       case 'Pendente Aprovação':
-        return 'primary';
+        return 'warning';
       case 'Não Enviado':
         return 'info';
       case 'Sem Orçamento':
-        return 'warning';
+        return 'secondary';
       case 'Aprovado':
         return 'success';
       case 'Não Aprovado':
         return 'danger';
     }
+
     return 'warning';
   }
   public cleanform() {
