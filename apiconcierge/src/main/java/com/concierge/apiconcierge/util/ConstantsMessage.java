@@ -19,8 +19,12 @@ public class ConstantsMessage {
     public static final String ERROR_ID = "Id not informed.";
     public static final String ERROR_STATUS = "Status not informed.";
     public static final String ERROR_STATUS_DIFFERENT = "Status different.";
-    public static final String ERROR_FANTASIA = "FANTASIA not informed.";
+    public static final String ERROR_FANTASIA = "Fantasia not informed.";
     public static final String ERROR_NAME = "Name not informed.";
+
+    public static final String ERROR_TYPE_FISJUS = "FisJus not informed.";
+
+    public static final String ERROR_TYPE_CLIFOR = "CliFor not informed.";
     public static final String ERROR_PASSWORD = "Password not informed.";
     public static final String ERROR_EMAIL = "Email not informed.";
     public static final String ERROR_CELLPHONE = "Cellphone not informed.";

@@ -31,7 +31,7 @@ public class ClientCompanyService implements IClientCompanyService {
         try {
             String message = this.validation.save(client);
             if (message.equals(ConstantsMessage.SUCCESS)) {
-                if (client.getFisjur() == FisJurEnum.Fisica) {
+                if (client.getFisjur() == FisJurEnum.Física) {
                     client.setCnpj("");
                 } else {
                     client.setCpf("");

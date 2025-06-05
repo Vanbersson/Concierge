@@ -23,17 +23,24 @@ public class ClientCompanyValidation implements IClientCompanyValidation {
             return ConstantsMessage.ERROR_RESALE;
         if (client.getId() == null || client.getId() == 0)
             return ConstantsMessage.ERROR_ID;
-
-        if (client.getFisjur() == FisJurEnum.Fisica) {
+        if (client.getStatus() == null)
+            return ConstantsMessage.ERROR_STATUS;
+        if (client.getName().isBlank())
+            return ConstantsMessage.ERROR_NAME;
+        if (client.getFisjur() == null)
+            return ConstantsMessage.ERROR_TYPE_FISJUS;
+        if (client.getFisjur() == FisJurEnum.Física) {
             if (client.getCpf().isBlank())
                 return ConstantsMessage.ERROR_CPF;
         } else {
             if (client.getCnpj().isBlank())
                 return ConstantsMessage.ERROR_CNPJ;
         }
+        if (client.getClifor() == null)
+            return ConstantsMessage.ERROR_TYPE_CLIFOR;
 
-        Optional<ClientCompany> clientResult = this.repository.findById(client.getId());
-        if (!clientResult.isEmpty())
+        ClientCompany clientResult = this.repository.filterId(client.getCompanyId(), client.getResaleId(), client.getId());
+        if (clientResult != null)
             return ConstantsMessage.ERROR_CLIENT_EXISTS;
 
         return ConstantsMessage.SUCCESS;
@@ -48,14 +55,22 @@ public class ClientCompanyValidation implements IClientCompanyValidation {
             return ConstantsMessage.ERROR_RESALE;
         if (client.getId() == null || client.getId() == 0)
             return ConstantsMessage.ERROR_ID;
-
-        if (client.getFisjur() == FisJurEnum.Fisica) {
+        if (client.getStatus() == null)
+            return ConstantsMessage.ERROR_STATUS;
+        if (client.getName().isBlank())
+            return ConstantsMessage.ERROR_NAME;
+        if (client.getFisjur() == null)
+            return ConstantsMessage.ERROR_TYPE_FISJUS;
+        if (client.getFisjur() == FisJurEnum.Física) {
             if (client.getCpf().isBlank())
                 return ConstantsMessage.ERROR_CPF;
         } else {
             if (client.getCnpj().isBlank())
                 return ConstantsMessage.ERROR_CNPJ;
         }
+        if (client.getClifor() == null)
+            return ConstantsMessage.ERROR_TYPE_CLIFOR;
+
         return ConstantsMessage.SUCCESS;
     }
 
