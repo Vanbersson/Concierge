@@ -28,7 +28,6 @@ public class VehicleReportService implements IVehicleReportService {
             List<VehicleEntry> vehicles =   this.reportRepository.filterVehicles(vehicle);
 
             List<Object> list = new ArrayList();
-            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
 
             for (VehicleEntry item : vehicles) {
                 String placa = "";
@@ -41,9 +40,9 @@ public class VehicleReportService implements IVehicleReportService {
                 map.put("frota", item.getFrota());
                 map.put("vehicleNew", item.getVehicleNew());
                 map.put("modelDescription", item.getModelDescription());
-                map.put("dateEntry", dateFormat.format(item.getDateEntry()));
+                map.put("dateEntry", item.getDateEntry());
                 if (item.getDateExit() != null)
-                    map.put("dateExit", dateFormat.format(item.getDateExit()));
+                    map.put("dateExit", item.getDateExit());
                 map.put("nameUserAttendant", item.getNameUserAttendant());
                 map.put("clientCompanyName", item.getClientCompanyName());
                 map.put("budgetStatus", item.getBudgetStatus());
