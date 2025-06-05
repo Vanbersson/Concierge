@@ -1,4 +1,4 @@
-:host{
+:host {
 
     .layout-card-title {
         display: flex;
@@ -15,9 +15,18 @@
 
     }
 
-    ::ng-deep{
+    ::ng-deep {
         .p-button-label {
             font-weight: 400;
+        }
+
+        .p-tag {
+            font-weight: 400;
+        }
+
+        .p-tag.p-tag-secondary {
+            background-color: var(--color-grey-300);
+            color: var(--color-text-primary);
         }
     }
 

@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { Component, DoCheck, OnInit, signal } from '@angular/core';
 import { FormGroup, FormControl, ReactiveFormsModule, FormsModule, Validators } from '@angular/forms'
 import { HttpResponse } from '@angular/common/http';
@@ -12,7 +12,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { InputGroupModule } from 'primeng/inputgroup';
 import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
-import { MessageService } from 'primeng/api';
+import { MessageService, PrimeNGConfig } from 'primeng/api';
 import { TagModule } from 'primeng/tag';
 import { DialogModule } from 'primeng/dialog';
 import { InputNumberModule } from 'primeng/inputnumber';
@@ -85,13 +85,30 @@ export default class VehicleComponent implements OnInit,DoCheck {
     frota: new FormControl<string>('')
   });
 
-  constructor(private reportService: VehicleReportService,
+  constructor(
+    private primeNGConfig: PrimeNGConfig,
+    private reportService: VehicleReportService,
     private vehicleModelService: VehicleModelService,
     private busyService: BusyService,
     private storageService: StorageService) {
   }
   ngOnInit(): void {
     this.clientdisable();
+
+     this.primeNGConfig.setTranslation({
+      accept: 'Accept',
+      reject: 'Cancel',
+      firstDayOfWeek: 0,
+      dayNames: ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"],
+      dayNamesShort: ["dom", "seg", "ter", "qua", "qui", "sex", "sáb"],
+      dayNamesMin: ["D", "S", "T", "Q", "Q", "S", "S"],
+      monthNames: ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"],
+      monthNamesShort: ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"],
+      today: 'Hoje',
+      clear: 'Limpar',
+      dateFormat: 'dd/mm/yy',
+      weekHeader: 'Sm'
+    });
   }
   ngDoCheck(): void {
     if(this.selectClientCompany().id != 0){
@@ -111,7 +128,26 @@ export default class VehicleComponent implements OnInit,DoCheck {
     this.formFilter.get('clientCompanyName').disable();
 
   }
+  formatDateTime(date: Date): string {
+    const datePipe = new DatePipe('en-US');
+
+    // Obtém o fuso horário local no formato ±hh:mm
+    const tzOffset = -date.getTimezoneOffset();
+    const sign = tzOffset >= 0 ? '+' : '-';
+    const hours = Math.floor(Math.abs(tzOffset) / 60).toString().padStart(2, '0');
+    const minutes = (Math.abs(tzOffset) % 60).toString().padStart(2, '0');
+    const timezone = `${sign}${hours}:${minutes}`;
+
+    // Formata a data e adiciona o fuso horário
+    return datePipe.transform(date, "yyyy-MM-dd'T'HH:mm:ss.SSS") + timezone;
+  }
   private preList(vehicle: VehicleEntry): VehicleEntry {
+
+    //Format Date
+    const datePipe = new DatePipe('pt-BR');
+    vehicle.dateEntry = datePipe.transform(this.formatDateTime(new Date(vehicle.dateEntry)), 'dd/MM/yyyy HH:mm');
+    vehicle.dateExit =  vehicle.dateExit != "" ? datePipe.transform(this.formatDateTime(new Date(vehicle.dateExit)), 'dd/MM/yyyy HH:mm'):"";
+
     if (vehicle.vehicleNew == "yes") {
       vehicle.placa = "NOVO";
     }
@@ -125,18 +161,25 @@ export default class VehicleComponent implements OnInit,DoCheck {
 
     }
     switch (vehicle.budgetStatus) {
-      case 'pendenteAprovacao':
+      case 'PendingApproval':
         vehicle.budgetStatus = 'Pendente Aprovação';
         break;
-      case 'naoEnviado':
+      case 'OpenBudget':
         vehicle.budgetStatus = 'Não Enviado';
         break;
-      case 'semOrcamento':
+      case 'CompleteBudget':
+        vehicle.budgetStatus = 'Não Enviado';
+        break;
+      case 'NotSended':
+        vehicle.budgetStatus = 'Não Enviado';
+        break;
+      case 'NotBudget':
         vehicle.budgetStatus = 'Sem Orçamento';
         break;
-      case 'Aprovado':
+      case 'Approved':
+        vehicle.budgetStatus = 'Aprovado';
         break;
-      case 'naoAprovado':
+      case 'NotApproved':
         vehicle.budgetStatus = 'Não Aprovado';
         break;
     }
