@@ -30,6 +30,7 @@ import { VehicleModelService } from '../../../../services/vehicle-model/vehicle-
 import { User } from '../../../../models/user/user';
 import { ModelVehicle } from '../../../../models/vehicle-model/model-vehicle';
 import { IModelStatus } from '../../../../interfaces/vehicle-model/imodel-status';
+import { StatusEnabledDisabled } from '../../../../models/enum/status-enabled-disabled';
 
 
 
@@ -46,6 +47,8 @@ import { IModelStatus } from '../../../../interfaces/vehicle-model/imodel-status
 })
 export default class VehicleModelRegisterComponent implements OnInit, OnDestroy {
 
+  enabled = StatusEnabledDisabled.enabled;
+  disabled = StatusEnabledDisabled.disabled;
 
   RESPONSE_SUCCESS: string = "Success.";
   IMAGE_MAX_SIZE: number = 4243795;
@@ -78,8 +81,8 @@ export default class VehicleModelRegisterComponent implements OnInit, OnDestroy 
   ngOnInit(): void {
 
     this.statuses = [
-      { label: 'ativo', value: 'ativo' },
-      { label: 'inativo', value: 'inativo' }
+      { label: this.enabled, value: this.enabled },
+      { label: this.disabled, value: this.disabled }
     ];
 
     this.modelVehicle = new ModelVehicle();
@@ -96,9 +99,9 @@ export default class VehicleModelRegisterComponent implements OnInit, OnDestroy 
   }
   getSeverity(status: string): any {
     switch (status) {
-      case 'ativo':
+      case this.enabled:
         return 'success';
-      case 'inativo':
+      case this.disabled:
         return 'warning';
     }
     return 'warning';
@@ -112,7 +115,7 @@ export default class VehicleModelRegisterComponent implements OnInit, OnDestroy 
       resaleId: 0,
       id: 0,
       description: '',
-      status: 'ativo',
+      status: this.enabled,
       photo: ""
     });
     this.photoModel = "";

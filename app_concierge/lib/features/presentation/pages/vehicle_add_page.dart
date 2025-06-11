@@ -423,14 +423,11 @@ class _VehicleAddPageState extends State<VehicleAddPage> {
       return "";
     }
   }
-
   String formatDate(String date) {
     if (date == "") return "";
-
     DateTime dateTime = DateTime.parse(date).toLocal();
     return DateFormat("dd/MM/yyyy HH:mm").format(dateTime);
   }
-
   shareVehicle(Vehicle vehicle) async {
     final result = await Share.share("Código: ${vehicle.id}\n"
         "Empresa código: ${vehicle.clientCompanyId != 0 ? vehicle.clientCompanyId : ""}\n"

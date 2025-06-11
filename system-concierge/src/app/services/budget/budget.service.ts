@@ -10,6 +10,7 @@ import { BudgetServiceItem } from '../../models/budget/budget-item-service';
 import { Budget } from '../../models/budget/budget';
 import { BudgetItem } from '../../models/budget/budget-item';
 import { MessageResponse } from '../../models/message/message-response';
+import { BudgetToken } from '../../models/budget/budget-token';
 
 @Injectable({
   providedIn: 'root'
@@ -23,11 +24,24 @@ export class BudgetService {
   addBudget$(vehicleId: IBudgetNew): Observable<HttpResponse<Budget>> {
     return this.http.post<Budget>(environment.apiuUrl + "/vehicle/entry/budget/save", vehicleId, { headers: this.myHeaders(), observe: 'response' });
   }
-
   updateBudget(budget: Budget): Observable<HttpResponse<Budget>> {
     return this.http.post<Budget>(environment.apiuUrl + "/vehicle/entry/budget/update", budget, { headers: this.myHeaders(), observe: 'response' });
   }
-   statusUpdateBudget(budget: Budget): Observable<HttpResponse<MessageResponse>> {
+
+  tokenNew(budgettoken: BudgetToken): Observable<HttpResponse<BudgetToken>> {
+    return this.http.post<BudgetToken>(environment.apiuUrl + "/vehicle/entry/budget/token/new", budgettoken, { headers: this.myHeaders(), observe: 'response' });
+  }
+  tokenFilter(budgettoken: BudgetToken): Observable<HttpResponse<BudgetToken>> {
+    return this.http.post<BudgetToken>(environment.apiuUrl + "/vehicle/entry/budget/token/filter", budgettoken, { headers: this.myHeaders(), observe: 'response' });
+  }
+  tokenValid(token: string): Observable<HttpResponse<MessageResponse>> {
+    return this.http.get<MessageResponse>(environment.apiuUrl + "/vehicle/entry/budget/token/valid/" + token, { observe: 'response' });
+  }
+  tokenApprobation(token: string): Observable<HttpResponse<MessageResponse>> {
+    return this.http.post<MessageResponse>(environment.apiuUrl + "/vehicle/entry/budget/token/approbation", { "id": token }, { headers: this.myHeaders(), observe: 'response' });
+  }
+
+  statusUpdateBudget(budget: Budget): Observable<HttpResponse<MessageResponse>> {
     return this.http.post<MessageResponse>(environment.apiuUrl + "/vehicle/entry/budget/status/update", budget, { headers: this.myHeaders(), observe: 'response' });
   }
 

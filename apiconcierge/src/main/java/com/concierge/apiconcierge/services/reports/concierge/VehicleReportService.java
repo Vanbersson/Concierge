@@ -41,8 +41,11 @@ public class VehicleReportService implements IVehicleReportService {
                 map.put("vehicleNew", item.getVehicleNew());
                 map.put("modelDescription", item.getModelDescription());
                 map.put("dateEntry", item.getDateEntry());
-                if (item.getDateExit() != null)
+                if (item.getDateExit() != null){
                     map.put("dateExit", item.getDateExit());
+                }else{
+                    map.put("dateExit", "");
+                }
                 map.put("nameUserAttendant", item.getNameUserAttendant());
                 map.put("clientCompanyName", item.getClientCompanyName());
                 map.put("budgetStatus", item.getBudgetStatus());

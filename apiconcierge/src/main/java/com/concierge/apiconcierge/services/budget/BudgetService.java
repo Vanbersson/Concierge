@@ -3,10 +3,12 @@ package com.concierge.apiconcierge.services.budget;
 import com.concierge.apiconcierge.dtos.budget.BudgetNewDto;
 import com.concierge.apiconcierge.exceptions.budget.BudgetException;
 import com.concierge.apiconcierge.models.budget.Budget;
+import com.concierge.apiconcierge.models.budget.BudgetToken;
 import com.concierge.apiconcierge.models.budget.enums.StatusBudgetEnum;
 import com.concierge.apiconcierge.models.vehicle.VehicleEntry;
 import com.concierge.apiconcierge.models.vehicle.enums.StepVehicleEnum;
 import com.concierge.apiconcierge.repositories.budget.IBudgetRepository;
+import com.concierge.apiconcierge.repositories.budget.IBudgetTokenRepository;
 import com.concierge.apiconcierge.repositories.vehicle.entry.IVehicleEntryRepository;
 import com.concierge.apiconcierge.util.ConstantsMessage;
 import com.concierge.apiconcierge.validation.budget.BudgetValidation;
@@ -24,6 +26,9 @@ public class BudgetService implements IBudgetService {
 
     @Autowired
     private IBudgetRepository repository;
+
+    @Autowired
+    IBudgetTokenRepository repositoryToken;
 
     @Autowired
     private BudgetValidation validation;
@@ -83,6 +88,14 @@ public class BudgetService implements IBudgetService {
             String message = this.validation.update(budget, userEmail);
             if (ConstantsMessage.SUCCESS.equals(message)) {
                 this.repository.save(budget);
+
+
+                BudgetToken token = this.repositoryToken.filterToken(budget.getCompanyId(), budget.getResaleId(), budget.getId());
+                if(token != null){
+                    token.setDateValid(budget.getDateValidation());
+                    this.repositoryToken.save(token);
+                }
+
                 return true;
             } else {
                 throw new BudgetException(message);
@@ -163,6 +176,8 @@ public class BudgetService implements IBudgetService {
                 //update status budget
                 budget.setStatus(StatusBudgetEnum.OpenBudget);
                 this.repository.save(budget);
+
+                this.repositoryToken.deleteToken(budget.getCompanyId(), budget.getResaleId(), budget.getId());
                 return ConstantsMessage.SUCCESS;
             } else {
                 throw new BudgetException(message);
@@ -194,7 +209,6 @@ public class BudgetService implements IBudgetService {
             throw new BudgetException(ex.getMessage());
         }
     }
-
 
     @SneakyThrows
     @Override

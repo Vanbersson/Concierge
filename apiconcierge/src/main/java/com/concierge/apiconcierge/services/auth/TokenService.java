@@ -24,7 +24,7 @@ public class TokenService {
         try {
             Algorithm algorithm = Algorithm.HMAC256(secret);
             String token = JWT.create()
-                    .withIssuer("AutoPoint-api")
+                    .withIssuer("www.atenatruck.com.br")
                     .withSubject(user.getEmail())
                     .withExpiresAt(getExpirationToken())
                     .sign(algorithm);
@@ -40,7 +40,7 @@ public class TokenService {
             Algorithm algorithm = Algorithm.HMAC256(secret);
 
             return JWT.require(algorithm)
-                    .withIssuer("AutoPoint-api")
+                    .withIssuer("www.atenatruck.com.br")
                     .build()
                     .verify(token)
                     .getSubject();
@@ -50,7 +50,7 @@ public class TokenService {
     }
 
     private Instant getExpirationToken() {
-        return LocalDateTime.now().plusHours(10).toInstant(ZoneOffset.of("-03:00"));
+        return LocalDateTime.now().plusHours(12).toInstant(ZoneOffset.of("-03:00"));
     }
 
 }

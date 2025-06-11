@@ -34,13 +34,13 @@
                     <span>Situação</span>
 
                     <div class="flex align-items-center">
-                        <p-radioButton inputId="ativo" value="ativo" formControlName="status"></p-radioButton>
-                        <label for="ativo" class="ml-2">Ativado</label>
+                        <p-radioButton inputId="enabledId" [value]="enabled" formControlName="status"></p-radioButton>
+                        <label for="enabledId" class="ml-2">Ativado</label>
                     </div>
 
                     <div class="flex align-items-center">
-                        <p-radioButton inputId="inativo" value="inativo" formControlName="status"></p-radioButton>
-                        <label for="inativo" class="ml-2">Desativado</label>
+                        <p-radioButton inputId="disabledId" [value]="disabled" formControlName="status"></p-radioButton>
+                        <label for="disabledId" class="ml-2">Desativado</label>
                     </div>
 
                 </div>
@@ -100,13 +100,13 @@
                 <th>
                     @if (selectedItems.length > 0 ) {
 
-                    @if(selectedItems[0].status == "ativo"){
+                    @if(selectedItems[0].status == enabled){
                     <p-button icon="pi pi-times" label="Desativar" [rounded]="true" [raised]="true" [outlined]="true"
                         severity="warning" [style]="{width:'126.13px'}" size="small"
                         (click)="updateStatusSelected()"></p-button>
 
                     }
-                    @if(selectedItems[0].status == "inativo"){
+                    @if(selectedItems[0].status == disabled){
                     <p-button icon="pi pi-check" label="Ativar" [rounded]="true" [raised]="true" severity="success"
                         [style]="{width:'126.13px'}" size="small" (click)="updateStatusSelected()"></p-button>
 
@@ -140,13 +140,13 @@
                         (click)="showDialogEditar(modelo)"></p-button>
                 </td>
                 <td>
-                    @if (modelo.status =="ativo") {
+                    @if (modelo.status ==enabled) {
                     <p-button icon="pi pi-times" label="Desativar" [rounded]="true" [raised]="true" [outlined]="true"
                         severity="warning" [style]="{width:'126.13px'}" size="small"
                         (click)="updateStatus(modelo)"></p-button>
                     }
 
-                    @if(modelo.status =="inativo") {
+                    @if(modelo.status ==disabled) {
                     <p-button icon="pi pi-check" label="Ativar" [rounded]="true" [raised]="true" severity="success"
                         [style]="{width:'126.13px'}" size="small" (click)="updateStatus(modelo)"></p-button>
                     }

@@ -40,6 +40,8 @@ class _ClienteCompanyPageState extends State<ClienteCompanyPage> {
   final AttendantService _attendantService = AttendantService();
   List<UserAttendant> _attendants = [];
 
+  final String juridica = "Jurídica";
+
   @override
   void initState() {
     init();
@@ -226,7 +228,7 @@ class _ClienteCompanyPageState extends State<ClienteCompanyPage> {
                       builder: (context, value, child) {
                         return Mytext(
                           showLabel: "CNPJ/CPF",
-                          showText: value.fisjur == "Juridica"
+                          showText: value.fisjur == juridica
                               ? value.cnpj ?? ""
                               : value.cpf ?? "",
                           myWidth: sizeScreen * 0.86,
@@ -245,6 +247,8 @@ class _ClienteCompanyPageState extends State<ClienteCompanyPage> {
                             //Objeto completo
                             selectClient.value.companyId = widget.userLogin.companyId;
                             selectClient.value.resaleId = widget.userLogin.resaleId;
+                            selectClient.value.status = "Habilitado";
+
                             selectClient.value.contactName ="";
                             selectClient.value.contactEmail="";
                             selectClient.value.contactDDDPhone="";

@@ -20,11 +20,12 @@ import { BudgetItem } from '../../../../models/budget/budget-item';
 import { ClientCompany } from '../../../../models/clientcompany/client-company';
 import { VehicleEntry } from '../../../../models/vehicle/vehicle-entry';
 import { PrintBudgetComponent } from '../../../../components/print.budget/print.budget.component';
+import { BudgetService } from '../../../../services/budget/budget.service';
 
 @Component({
   selector: 'app-approbation',
   standalone: true,
-  imports: [CommonModule, ButtonModule, ToastModule,PrintBudgetComponent],
+  imports: [CommonModule, ButtonModule, ToastModule, PrintBudgetComponent],
   templateUrl: './approbation.component.html',
   styleUrl: './approbation.component.scss',
   providers: [MessageService]
@@ -33,6 +34,8 @@ export default class ApprobationComponent implements OnInit {
   private token: string = "";
   enabledSendApprobation = false;
   dateApprobation: Date = new Date();
+
+  visibleBudget: boolean = false;
 
   budget: Budget = new Budget();
   listBudgetRequisition: BudgetRequisition[] = [];
@@ -54,7 +57,7 @@ export default class ApprobationComponent implements OnInit {
     private activatedRoute: ActivatedRoute,
     private router: Router,
     private busyService: BusyService,
-    private emailClientService: EmailClientService) { }
+    private budgetService: BudgetService) { }
   ngOnInit(): void {
     console.log()
 
@@ -85,10 +88,12 @@ export default class ApprobationComponent implements OnInit {
     return placa.substring(0, 3) + "-" + placa.substring(3, 7);
   }
   maskCNPJ(cnpj: string): string {
+    if (cnpj == "") return "";
     const CNPJ = cnpj.substring(0, 2) + "." + cnpj.substring(2, 5) + "." + cnpj.substring(5, 8) + "/" + cnpj.substring(8, 12) + "-" + cnpj.substring(12, 14);
     return CNPJ;
   }
   maskCPF(cpf: string): string {
+    if (cpf == "") return "";
     const CPF = cpf.substring(0, 3) + "." + cpf.substring(3, 6) + "." + cpf.substring(6, 9) + "-" + cpf.substring(9, 11);
     return CPF;
   }
@@ -96,8 +101,10 @@ export default class ApprobationComponent implements OnInit {
   async valid() {
     this.busyService.busy();
     this.token = this.activatedRoute.snapshot.queryParamMap.get('token');
-    const resultValid = await this.validTokenEmail(this.token);
+    const resultValid = await this.validToken(this.token);
     if (resultValid.status == 200) {
+
+      this.visibleBudget = true;
       this.busyService.idle();
 
       this.budget = resultValid.body['Budget'];
@@ -141,17 +148,16 @@ export default class ApprobationComponent implements OnInit {
     }
   }
 
-
-  private async validTokenEmail(token: string): Promise<HttpResponse<MessageResponse>> {
+  private async validToken(token: string): Promise<HttpResponse<MessageResponse>> {
     try {
-      return await lastValueFrom(this.emailClientService.validTokenEmail(token));
+      return await lastValueFrom(this.budgetService.tokenValid(token));
     } catch (error) {
       return error;
     }
   }
 
   async approbation() {
-    const resultApprobation = await this.statusUpdateBudget();
+    const resultApprobation = await this.tokenApprobation();
     if (resultApprobation.status == 200) {
       this.messageService.add({ severity: 'success', summary: 'Aprovação', detail: 'Orçamento aprovado com sucesso', icon: 'pi pi-check', life: 3000 });
       this.enabledSendApprobation = true;
@@ -162,9 +168,9 @@ export default class ApprobationComponent implements OnInit {
 
   }
 
-  private async statusUpdateBudget(): Promise<HttpResponse<MessageResponse>> {
+  private async tokenApprobation(): Promise<HttpResponse<MessageResponse>> {
     try {
-      return await lastValueFrom(this.emailClientService.statusUpdateBudget(this.token));
+      return await lastValueFrom(this.budgetService.tokenApprobation(this.token));
     } catch (error) {
       return error;
     }

@@ -20,6 +20,7 @@ import { User } from '../../models/user/user';
 import { lastValueFrom } from 'rxjs';
 import { HttpResponse } from '@angular/common/http';
 import { IMAGE_MAX_SIZE } from '../../util/constants';
+import { StatusEnabledDisabled } from '../../models/enum/status-enabled-disabled';
 
 @Component({
   selector: 'app-userprofile',
@@ -37,6 +38,8 @@ export class UserProfileComponent {
   private user: User;
   @Output() public outputUser = new EventEmitter<User>();
 
+  enabled = StatusEnabledDisabled.enabled;
+  disabled = StatusEnabledDisabled.disabled;
 
   visibleDialogUser: boolean = false;
 

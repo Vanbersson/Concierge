@@ -23,7 +23,7 @@ public class VehicleModelController {
     IVehicleModelRepository IVehicleModelRepository;
 
     @PostMapping("/save")
-    public ResponseEntity<Object> saveModel(@RequestBody @Valid VehicleModelDto data) {
+    public ResponseEntity<Object> saveModel(@RequestBody VehicleModelDto data) {
 
         VehicleModel model = new VehicleModel();
         BeanUtils.copyProperties(data, model);
@@ -34,7 +34,7 @@ public class VehicleModelController {
     }
 
     @PostMapping("/update")
-    public ResponseEntity<Object> updateModel(@RequestBody @Valid VehicleModelDto data) {
+    public ResponseEntity<Object> updateModel(@RequestBody VehicleModelDto data) {
 
         Optional<VehicleModel> model0 = this.IVehicleModelRepository.findById(data.id());
 
@@ -50,17 +50,17 @@ public class VehicleModelController {
     }
 
     @PostMapping("/update/status")
-    public ResponseEntity<Object> updateStatus(@RequestBody @Valid UpdateStatusDto data) {
+    public ResponseEntity<Object> updateStatus(@RequestBody UpdateStatusDto data) {
 
         Optional<VehicleModel> model0 = IVehicleModelRepository.findById(data.id());
         if (model0.isEmpty()) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 
         VehicleModel model = model0.get();
 
-        if(model.getStatus() == StatusEnableDisable.ativo){
-            model.setStatus(StatusEnableDisable.inativo);
-        }else{
-            model.setStatus(StatusEnableDisable.ativo);
+        if (model.getStatus() == StatusEnableDisable.Habilitado) {
+            model.setStatus(StatusEnableDisable.Desabilitado);
+        } else {
+            model.setStatus(StatusEnableDisable.Habilitado);
         }
 
         this.IVehicleModelRepository.save(model);

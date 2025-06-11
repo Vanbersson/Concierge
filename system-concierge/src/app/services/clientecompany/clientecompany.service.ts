@@ -20,7 +20,7 @@ export class ClientecompanyService {
   update(client: ClientCompany): Observable<HttpResponse<ClientCompany>> {
     return this.http.post<ClientCompany>(environment.apiuUrl + "/clientcompany/update", client, { headers: this.myHeaders(), observe: 'response' });
   }
-  getAll$(): Observable<ClientCompany[]> {
+  getAll(): Observable<ClientCompany[]> {
     return this.http.get<ClientCompany[]>(environment.apiuUrl + "/clientcompany/" + this.companyResale + "/filter/all", { headers: this.myHeaders(), responseType: 'json' });
   }
   getId$(id: Number): Observable<HttpResponse<ClientCompany>> {

@@ -4,7 +4,7 @@
 
     <div class="layout-card-title">
         <span>Orçamento</span>
-        <div class="w-5">
+        <div class="w-6">
             <p-steps [model]="itemsStatus" [readonly]="true" [activeIndex]="activeIndexStatus" />
         </div>
         <p-button icon="pi pi-arrow-right" [text]="true" label="Voltar"
@@ -59,7 +59,7 @@
                         </span>
                     </div>
                 </div>
-                @if(clientCompany.fisjur == "Juridica"){
+                @if(clientCompany.fisjur == juridica){
                 <div class="col-12 md:col-4">
                     <span class="text-500">CNPJ</span>
                     <div class="layout-input-disabled">

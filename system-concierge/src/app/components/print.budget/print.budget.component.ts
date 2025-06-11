@@ -10,6 +10,7 @@ import { VehicleEntry } from '../../models/vehicle/vehicle-entry';
 import { BudgetRequisition } from '../../models/budget/budget-requisition';
 import { BudgetServiceItem } from '../../models/budget/budget-item-service';
 import { BudgetItem } from '../../models/budget/budget-item';
+import { ClientFisJurEnum } from '../../models/clientcompany/client-fisjur-enum';
 
 //Service
 
@@ -29,6 +30,8 @@ export class PrintBudgetComponent {
   listBudgetItem: BudgetItem[] = [];
   clientCompany: ClientCompany = new ClientCompany();
   vehicleEntry: VehicleEntry = new VehicleEntry();
+
+  juridica: string = ClientFisJurEnum.juridica;
 
   totalService: number;
   totalServiceDiscount: number;

@@ -84,22 +84,21 @@ public class User implements Serializable, UserDetails {
 
     @Override
     public boolean isAccountNonExpired() {
-        return status == StatusEnableDisable.ativo;
+        return status == StatusEnableDisable.Habilitado;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return status == StatusEnableDisable.ativo;
+        return status == StatusEnableDisable.Habilitado;
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return status == StatusEnableDisable.ativo;
+        return status == StatusEnableDisable.Habilitado;
     }
 
     @Override
     public boolean isEnabled() {
-
-        return status == StatusEnableDisable.ativo;
+        return status == StatusEnableDisable.Habilitado;
     }
 }

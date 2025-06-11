@@ -55,6 +55,8 @@ import { StatusBudgetEnum } from '../../../../models/budget/status-budget-enum';
 import { __await } from 'tslib';
 import { EmailClientService } from '../../../../services/email/email-client.service';
 import { EmailClient } from '../../../../models/email/email-client';
+import { ClientFisJurEnum } from '../../../../models/clientcompany/client-fisjur-enum';
+import { BudgetToken } from '../../../../models/budget/budget-token';
 
 export interface IPayment {
   payment: string,
@@ -81,6 +83,8 @@ export default class BudgetComponent implements OnInit, OnDestroy, DoCheck {
   budget: Budget = new Budget();
   clientCompany: ClientCompany = new ClientCompany();
   vehicleEntry: VehicleEntry = new VehicleEntry();
+
+  juridica: string = ClientFisJurEnum.juridica;
 
   vehicleId = signal<number>(0);
   listPayment: IPayment[] = [];
@@ -150,7 +154,6 @@ export default class BudgetComponent implements OnInit, OnDestroy, DoCheck {
   //Print
   @ViewChild("printComponent") printComponent!: PrintBudgetComponent;
 
-
   constructor(
     private primeNGConfig: PrimeNGConfig,
     private vehicleService: VehicleService,
@@ -170,21 +173,6 @@ export default class BudgetComponent implements OnInit, OnDestroy, DoCheck {
 
   ngOnInit(): void {
 
-    this.itemsStatus = [
-      {
-        label: 'Aberto',
-      },
-      {
-        label: 'Concluído',
-      },
-      {
-        label: 'Enviado',
-      },
-      {
-        label: 'Aprovado',
-      }
-    ];
-
     this.primeNGConfig.setTranslation({
       accept: 'Accept',
       reject: 'Cancel',
@@ -201,17 +189,34 @@ export default class BudgetComponent implements OnInit, OnDestroy, DoCheck {
     });
 
     try {
+
       this.vehicleId.set(Number.parseInt(this.activatedRoute.snapshot.params['vehicleid']));
 
+      this.itemsStatus = [
+        {
+          label: 'Aberto',
+        },
+        {
+          label: 'Concluído',
+        },
+        {
+          label: 'Enviado',
+        },
+        {
+          label: 'Aprovado',
+        }
+      ];
+
       this.listPayment = [
-        { payment: 'A Vista' },
-        { payment: 'Faturado' },
-        { payment: 'Cartão Debito' },
-        { payment: 'Cartão Credito' },
+        { payment: 'Dinheiro espécie' },
+        { payment: 'Faturamento especial' },
+        { payment: 'Cartão de débito' },
+        { payment: 'Cartão de crédito' },
         { payment: 'Pix' },
       ];
 
       this.init();
+
     } catch (error) {
       this.router.navigateByUrl("/portaria/lista-entrada-veiculo");
     }
@@ -453,8 +458,13 @@ export default class BudgetComponent implements OnInit, OnDestroy, DoCheck {
     }
   }
   async saveBudget() {
-
     const { value } = this.formBudget;
+
+    if (value.dateValidation != null) {
+      if (!this.onChangeDateValidation(value.dateValidation)) {
+        return;
+      }
+    }
 
     this.budget.dateValidation = value?.dateValidation == null ? "" : this.formatDateTime(value.dateValidation);
     this.budget.dateGeneration = this.formatDateTime(new Date(this.budget.dateGeneration));
@@ -463,11 +473,9 @@ export default class BudgetComponent implements OnInit, OnDestroy, DoCheck {
     this.budget.information = value.information;
 
     const resultBudget = await this.updateBudget(this.budget);
-
     if (resultBudget.status == 200) {
       this.messageService.add({ severity: 'success', summary: 'Orçamento', detail: 'Atualizado com sucesso', icon: 'pi pi-check' });
     }
-
   }
   private async updateBudget(bud: Budget): Promise<HttpResponse<Budget>> {
     try {
@@ -1383,15 +1391,16 @@ export default class BudgetComponent implements OnInit, OnDestroy, DoCheck {
     this.listBudgetItem[index] = this.clonedPartItem[item.id as string];
     delete this.clonedPartItem[item.id as string];
   }
-  onChangeDateValidation(date: any) {
+  onChangeDateValidation(date: any): boolean {
     const dtNow: Date = new Date();
     dtNow.setHours(0, 0, 0, 0);
 
     if (date < dtNow) {
       this.formBudget.patchValue({ dateValidation: null });
       this.messageService.add({ severity: 'info', summary: 'Data de Validade', detail: 'Menor que data atual.', icon: 'pi pi-info-circle' });
-      return;
+      return false;
     }
+    return true;
   }
 
   //Print Budget
@@ -1403,47 +1412,77 @@ export default class BudgetComponent implements OnInit, OnDestroy, DoCheck {
     }
   }
 
-  //Send Email
-  confirmSendEmail() {
-
-    var dtvalid = new Date(this.budget.dateValidation);
-    dtvalid.setHours(0, 0, 0, 0);
+  private validSendEmail(): boolean {
 
     //Date validation
+    var dtvalid = new Date(this.budget.dateValidation);
+    dtvalid.setHours(0, 0, 0, 0);
     if (this.budget.dateValidation == "") {
       this.messageService.add({ severity: 'info', summary: 'Data de Validade', detail: 'Não informado.', icon: 'pi pi-info-circle' });
-      return;
+      return false;
     }
 
+    if (this.budget.typePayment == "") {
+      this.messageService.add({ severity: 'info', summary: 'Form. Pagamento', detail: 'Não informado.', icon: 'pi pi-info-circle' });
+      return false;
+    }
+
+    return true;
+  }
+  //Send Email
+  confirmSendEmail() {
+    if (!this.validSendEmail()) {
+      return;
+    }
     this.confirmationService.confirm({
       key: 'confirmEmailId',
       header: 'Enviar orçamento?',
       message: 'Por favor confirme para enviar.',
       accept: () => {
         this.sendEmailClients();
-      },
-      reject: () => {
-        // this.messageService.add({ severity: 'info', summary: 'Cancelado', detail: 'Você não removeu os descontos', icon: 'pi pi-info-circle' });
       }
     });
+  }
+  private async tokenBudget(): Promise<string> {
+    var token: string = "";
+
+    var budgetToken: BudgetToken = new BudgetToken();
+    budgetToken.companyId = this.storageService.companyId;
+    budgetToken.resaleId = this.storageService.resaleId;
+    budgetToken.budgetId = this.budget.id;
+
+    if (this.budget.status == StatusBudgetEnum.CompleteBudget) {
+
+      budgetToken.dateValid = this.budget.dateValidation;
+      const resultToken = await this.tokenNew(budgetToken);
+      if (resultToken.status == 201) {
+        token = resultToken.body.id;
+      }
+    } else {
+      const resultToken = await this.tokenFilter(budgetToken);
+      if (resultToken.status == 200) {
+        token = resultToken.body.id;
+      }
+    }
+    return token;
   }
   async sendEmailClients() {
 
     this.busyService.busy();
-    var token: string = "";
+    var token = "?token=";
 
-    const resultToken = await this.tokenEmail();
-    if (resultToken.status == 200) {
-      token = "?token=" + resultToken.body.message;
-    } else {
+    const restultTo = await this.tokenBudget();
+    if (restultTo == "") {
       this.busyService.idle();
       return;
+    } else {
+      token += restultTo;
     }
 
     var emails: EmailClient = new EmailClient();
     emails.from = this.storageService.email;
     emails.to = this.inputSendEmailId.split(";");
-    emails.subject = "Orçamento " + this.budget.id + " - Nativa Maquinas";
+    emails.subject = "Orçamento " + this.budget.id + " - Nativa Librelato";
     emails.body = `
       <!DOCTYPE html>
     <html lang="pt-BR">
@@ -1533,7 +1572,6 @@ export default class BudgetComponent implements OnInit, OnDestroy, DoCheck {
     }
 
   }
-
   private async statusUpdateBudget(bud: Budget): Promise<HttpResponse<MessageResponse>> {
     try {
       return await lastValueFrom(this.budgetService.statusUpdateBudget(bud));
@@ -1541,7 +1579,6 @@ export default class BudgetComponent implements OnInit, OnDestroy, DoCheck {
       return error;
     }
   }
-
   private async sendEmail(emails: EmailClient): Promise<HttpResponse<MessageResponse>> {
     try {
       return await lastValueFrom(this.emailClientService.sendEmail(emails));
@@ -1549,14 +1586,20 @@ export default class BudgetComponent implements OnInit, OnDestroy, DoCheck {
       return error;
     }
   }
-  private async tokenEmail(): Promise<HttpResponse<MessageResponse>> {
+  private async tokenNew(budgetToken: BudgetToken): Promise<HttpResponse<BudgetToken>> {
     try {
-      return await lastValueFrom(this.emailClientService.tokenEmail(this.storageService.companyId, this.storageService.resaleId, this.budget.id));
+      return await lastValueFrom(this.budgetService.tokenNew(budgetToken));
     } catch (error) {
       return error;
     }
   }
-
+  private async tokenFilter(budgetToken: BudgetToken): Promise<HttpResponse<BudgetToken>> {
+    try {
+      return await lastValueFrom(this.budgetService.tokenFilter(budgetToken));
+    } catch (error) {
+      return error;
+    }
+  }
 
   alertShowRequisition0() {
     this.messageService.add({ severity: 'success', summary: 'Solicitação', detail: 'Adicionada com sucesso', icon: 'pi pi-plus' });
@@ -1573,7 +1616,6 @@ export default class BudgetComponent implements OnInit, OnDestroy, DoCheck {
   alertShowService0() {
     this.messageService.add({ severity: 'success', summary: 'Serviço', detail: 'Adicionado com sucesso', icon: 'pi pi-plus' });
   }
-
   alertShowService1() {
     this.messageService.add({ severity: 'success', summary: 'Serviço', detail: 'Atualizado com sucesso', icon: 'pi pi-check' });
   }

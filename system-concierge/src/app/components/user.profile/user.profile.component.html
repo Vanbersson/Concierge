@@ -63,11 +63,11 @@
                     <div class="">Situação</div>
                     <div class="flex gap-2 mt-2 " >
                         <div class="flex align-items-center mb-1">
-                            <p-radioButton inputId="ativo" value="ativo" formControlName="status"></p-radioButton>
+                            <p-radioButton inputId="ativo" [value]="enabled" formControlName="status"></p-radioButton>
                             <label for="ativo" class="ml-2">Ativado</label>
                         </div>
                         <div class="flex align-items-center">
-                            <p-radioButton inputId="inativo" value="inativo" formControlName="status"></p-radioButton>
+                            <p-radioButton inputId="inativo" [value]="disabled" formControlName="status"></p-radioButton>
                             <label for="inativo" class="ml-2">Desativado</label>
                         </div>
                     </div>

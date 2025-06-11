@@ -45,8 +45,8 @@ public class WebSecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers(HttpMethod.GET,"/email/token/valid/**").permitAll()
-                        .requestMatchers(HttpMethod.POST,"/email/status/update/**").permitAll()
+                        .requestMatchers(HttpMethod.GET,"/vehicle/entry/budget/token/valid/**").permitAll()
+                        .requestMatchers(HttpMethod.POST,"/vehicle/entry/budget/token/approbation/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/user").hasRole("ADMIN")
                         .anyRequest().authenticated()

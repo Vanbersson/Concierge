@@ -22,6 +22,7 @@ import { ClientecompanyService } from '../../services/clientecompany/clientecomp
 import { StorageService } from '../../services/storage/storage.service';
 import { HttpResponse } from '@angular/common/http';
 import { lastValueFrom } from 'rxjs';
+import { StatusEnabledDisabled } from '../../models/enum/status-enabled-disabled';
 
 @Component({
   selector: 'app-filterclient',
@@ -69,6 +70,7 @@ export class FilterClientComponent {
       //Emit 
       this.dialogSelectClientCompany.companyId = this.storageService.companyId;
       this.dialogSelectClientCompany.resaleId = this.storageService.resaleId;
+      this.dialogSelectClientCompany.status = StatusEnabledDisabled.enabled;
       this.dialogSelectClientCompany.contactName = "";
       this.dialogSelectClientCompany.contactEmail = "";
       this.dialogSelectClientCompany.contactDDDPhone = "";
