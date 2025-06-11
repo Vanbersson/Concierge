@@ -2,7 +2,6 @@ import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 
-
 //PrimeNG
 import { ButtonModule } from 'primeng/button';
 import { TableModule } from 'primeng/table';
@@ -22,8 +21,6 @@ import { PartsService } from '../../services/parts/parts.service';
 import { StorageService } from '../../services/storage/storage.service';
 import { StatusEnabledDisabled } from '../../models/enum/status-enabled-disabled';
 
-
-
 @Component({
   selector: 'app-filterparts',
   standalone: true,
@@ -31,11 +28,9 @@ import { StatusEnabledDisabled } from '../../models/enum/status-enabled-disabled
   templateUrl: './filter.parts.component.html',
   styleUrl: './filter.parts.component.scss'
 })
-export class FilterPartsComponent implements OnInit {
+export class FilterPartsComponent  {
   visibleParts: boolean = false;
   @Output() public outputPart = new EventEmitter<Part>();
-
-
   partsDisabledButton = true;
   listParts: Part[] = [];
   selectedParts!: Part;
@@ -48,20 +43,13 @@ export class FilterPartsComponent implements OnInit {
     selecDiscount: new FormControl<number>(0),
     selecQtdAvailable: new FormControl<number>(0)
   });
-
-
   constructor(private partsService: PartsService, private busyService: BusyService, private storageService: StorageService) { }
-
-  ngOnInit(): void {
-
-  }
   showDialogParts() {
     this.visibleParts = true;
   }
   hideDialogParts() {
     this.visibleParts = false;
   }
-
   async selectPartsConfirme() {
     if (this.selectedParts) {
       const { value } = this.formParts;
@@ -79,9 +67,7 @@ export class FilterPartsComponent implements OnInit {
       this.outputPart.emit(this.selectedParts);
       this.visibleParts = false;
     }
-
   }
-
   private async savePart(part: Part): Promise<HttpResponse<Part>> {
     try {
       return await lastValueFrom(this.partsService.save(part))
