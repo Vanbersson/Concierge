@@ -33,7 +33,7 @@
                 <td>{{user.email}}</td>
                 <td>{{user.roleDesc}}</td>
                 <td>
-                    @if(user.status== 'ativo'){
+                    @if(user.status== enabled){
                     <i class="pi text-green-500 pi-check-circle"></i>
                     }@else {
                     <i class="pi text-red-500 pi-times-circle"></i>
@@ -135,12 +135,12 @@
                 <div class="layout-card-status">
                     <span>Situação</span>
                     <div class="flex align-items-center">
-                        <p-radioButton inputId="ativo" value="ativo" formControlName="status"></p-radioButton>
+                        <p-radioButton inputId="ativo" [value]="enabled" formControlName="status"></p-radioButton>
                         <label for="ativo" class="ml-2">Ativado</label>
                     </div>
 
                     <div class="flex align-items-center">
-                        <p-radioButton inputId="inativo" value="inativo" formControlName="status"></p-radioButton>
+                        <p-radioButton inputId="inativo" [value]="disabled" formControlName="status"></p-radioButton>
                         <label for="inativo" class="ml-2">Desativado</label>
                     </div>
                 </div>

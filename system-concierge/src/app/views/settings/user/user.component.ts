@@ -36,18 +36,19 @@ import { MessageResponse } from '../../../models/message/message-response';
 import { IMAGE_MAX_SIZE, MESSAGE_RESPONSE_SUCCESS } from '../../../util/constants';
 import { NgxImageCompressService } from 'ngx-image-compress';
 import { StorageService } from '../../../services/storage/storage.service';
+import { StatusEnabledDisabled } from '../../../models/enum/status-enabled-disabled';
 
 @Component({
   selector: 'app-user',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule, TableModule, InputTextModule, TreeModule, InputNumberModule, InputMaskModule, MultiSelectModule, ToastModule, DialogModule, PasswordModule, ImageModule, ButtonModule, AvatarModule, RadioButtonModule],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, TableModule, InputTextModule, TreeModule, 
+    InputNumberModule, InputMaskModule, MultiSelectModule, ToastModule, DialogModule, PasswordModule, 
+    ImageModule, ButtonModule, AvatarModule, RadioButtonModule],
   templateUrl: './user.component.html',
   styleUrl: './user.component.scss',
   providers: [MessageService]
 })
 export default class UserComponent implements OnInit {
-
-
   private userSelect: User;
   users: User[] = [];
   roles: UserRole[] = [];
@@ -59,9 +60,12 @@ export default class UserComponent implements OnInit {
   userEmail!: string;
   userRoleDescription!: string;
 
+  enabled: string = StatusEnabledDisabled.enabled;
+  disabled: string = StatusEnabledDisabled.disabled;
+
   formUser = new FormGroup({
     id: new FormControl<number | null>(null),
-    status: new FormControl<string>({ value: 'ativo', disabled: false }),
+    status: new FormControl<string>({ value: this.enabled, disabled: false }),
     name: new FormControl<string>('', Validators.required),
     email: new FormControl<string>('', Validators.required),
     password: new FormControl<string>(''),
@@ -82,7 +86,6 @@ export default class UserComponent implements OnInit {
   visibleDialogMenu: boolean = false;
   menus: TreeNode[] = [];
   menuSelect: TreeNode[] = [];
-
 
   constructor(
     private userService: UserService,
@@ -132,7 +135,7 @@ export default class UserComponent implements OnInit {
             ]
           },
           {
-            key: '100_2', label: 'Peças', children:[
+            key: '100_2', label: 'Peças', children: [
               { key: '100_2_0', label: 'Pedidos de compras' },
             ]
           }
@@ -265,7 +268,7 @@ export default class UserComponent implements OnInit {
       passwordValid: '',
       roleDesc: null,
       roleFunc: 'USER',
-      status: 'ativo'
+      status: this.enabled
     });
   }
   public async selectPhoto() {
@@ -420,7 +423,6 @@ export default class UserComponent implements OnInit {
     }
 
   }
-
   private async savePermission(per: PermissionUser): Promise<HttpResponse<PermissionUser>> {
     try {
       return lastValueFrom(this.permissionService.saveUser(per));
@@ -428,7 +430,6 @@ export default class UserComponent implements OnInit {
       return error;
     }
   }
-
   private async deletePermissionUser(permissionUser: PermissionUser): Promise<HttpResponse<MessageResponse>> {
     try {
       return lastValueFrom(this.permissionService.deleteUser(permissionUser));
@@ -522,8 +523,5 @@ export default class UserComponent implements OnInit {
   private alertMenusSave() {
     this.messageService.add({ severity: 'success', summary: 'Menus', detail: 'Salvo com sucesso', icon: 'pi pi-check', life: 3000 });
   }
-
-
-
 
 }
