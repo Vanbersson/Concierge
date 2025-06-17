@@ -110,53 +110,13 @@ export class SidebarComponent implements OnInit {
             ]
           },
           {
-            key: '2_3',
-            label: 'Controle de equipamentos',
-            visible: false,
-            items: [
-              {
-                key: '2_3_0',
-                label: 'Pegar',
-                visible: false,
-              },
-              {
-                key: '2_3_1',
-                label: 'Devolver',
-                visible: false,
-              },
-              {
-                key: '2_3_2',
-                label: 'Cadastro',
-                visible: false,
-                items: [
-                  {
-                    key: '2_3_2_0',
-                    label: 'Material',
-                    visible: false,
-                  },
-                  {
-                    key: '2_3_2_1',
-                    label: 'Mecânico',
-                    visible: false,
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            key: '9_0',
+            key: '2_99',
             label: 'Cadastro',
             visible: false,
             items: [
-              {
-                key: '9_1',
-                label: 'Peças',
-                routerLink: 'pecas/cadastro/pecas',
-                visible: false,
-              }
+
             ]
           }
-
         ]
       },
       {
@@ -166,19 +126,48 @@ export class SidebarComponent implements OnInit {
         items: [
           {
             key: '3_1',
-            label: 'Orçamento',
+            label: 'Orçamentos',
+            visible: false
+          },
+          {
+            key: '3_2',
+            label: 'Controle de equipamentos',
             visible: false,
             items: [
               {
-                key: '3_1_0',
-                label: 'Atendimento',
+                key: '3_2_0',
+                label: 'Pegar/Devolver',
                 visible: false,
               },
               {
-                key: '3_1_1',
-                label: 'Consulta',
+                key: '3_2_1',
+                label: 'Cadastro',
                 visible: false,
-              },
+                items: [
+                  {
+                    key: '3_2_1_0',
+                    label: 'Categoria',
+                    visible: false,
+                  },
+                  {
+                    key: '3_2_1_1',
+                    label: 'Material',
+                    visible: false,
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            key: '3_99',
+            label: 'Cadastro',
+            visible: false,
+            items: [
+              {
+                key: '3_99_0',
+                label: 'Mecânico',
+                visible: false
+              }
             ]
           }
         ]

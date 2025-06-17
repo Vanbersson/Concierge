@@ -120,6 +120,26 @@ export default class UserComponent implements OnInit {
               { key: '2_2_0', label: 'Pedidos' },
             ]
           },
+          {
+            key:'2_99',label:'Cadastro',children:[]
+          }
+        ]
+      },
+      {
+        key:'3_0', label:'Oficina', children:[
+          {key:'3_1',label:'Orçamentos'},
+          {key:'3_2',label:'Controle de equipamentos',children:[
+            {key:'3_2_0',label:'Pegar/Devolver'},
+            {key:'3_2_1',label:'Cadastro',children:[
+              {key:'3_2_1_0',label:'Categoria'},
+              {key:'3_2_1_1',label:'Material'},
+            ]}
+          ]},
+          {
+            key:'3_99',label:'Cadastro',children:[
+               {key:'3_99_0',label:'Mecânico'},
+            ]
+          }
         ]
       },
       {
