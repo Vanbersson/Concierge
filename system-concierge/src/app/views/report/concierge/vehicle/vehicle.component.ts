@@ -36,6 +36,7 @@ import { VehicleModelService } from '../../../../services/vehicle-model/vehicle-
 import { FilterClientComponent } from '../../../../components/filter.client/filter.client.component';
 import { BusyService } from '../../../../components/loading/busy.service';
 import { StorageService } from '../../../../services/storage/storage.service';
+import { Router } from '@angular/router';
 
 export interface IFilterVehicles {
   type: string;
@@ -58,12 +59,12 @@ export interface IFilterVehicles {
     InputTextModule, IconFieldModule, InputIconModule, TagModule,
     DialogModule, ReactiveFormsModule, FormsModule, InputNumberModule,
     CalendarModule, InputGroupModule, MultiSelectModule, ImageModule,
-    InputMaskModule,RadioButtonModule, CheckboxModule],
+    InputMaskModule, RadioButtonModule, CheckboxModule],
   templateUrl: './vehicle.component.html',
   styleUrl: './vehicle.component.scss',
   providers: [MessageService]
 })
-export default class VehicleComponent implements OnInit,DoCheck {
+export default class VehicleComponent implements OnInit, DoCheck {
 
   dialogVisible: boolean = false;
   listVehicleEntry: VehicleEntry[] = [];
@@ -90,12 +91,13 @@ export default class VehicleComponent implements OnInit,DoCheck {
     private reportService: VehicleReportService,
     private vehicleModelService: VehicleModelService,
     private busyService: BusyService,
-    private storageService: StorageService) {
+    private storageService: StorageService,
+    private router: Router) {
   }
   ngOnInit(): void {
     this.clientdisable();
 
-     this.primeNGConfig.setTranslation({
+    this.primeNGConfig.setTranslation({
       accept: 'Accept',
       reject: 'Cancel',
       firstDayOfWeek: 0,
@@ -111,13 +113,13 @@ export default class VehicleComponent implements OnInit,DoCheck {
     });
   }
   ngDoCheck(): void {
-    if(this.selectClientCompany().id != 0){
+    if (this.selectClientCompany().id != 0) {
       this.formFilter.patchValue({
         clientCompanyId: this.selectClientCompany().id,
         clientCompanyName: this.selectClientCompany().name
       });
     }
-    
+
   }
   private clientEnable() {
     this.formFilter.get('clientCompanyId').enable();
@@ -146,7 +148,7 @@ export default class VehicleComponent implements OnInit,DoCheck {
     //Format Date
     const datePipe = new DatePipe('pt-BR');
     vehicle.dateEntry = datePipe.transform(this.formatDateTime(new Date(vehicle.dateEntry)), 'dd/MM/yyyy HH:mm');
-    vehicle.dateExit =  vehicle.dateExit != "" ? datePipe.transform(this.formatDateTime(new Date(vehicle.dateExit)), 'dd/MM/yyyy HH:mm'):"";
+    vehicle.dateExit = vehicle.dateExit != "" ? datePipe.transform(this.formatDateTime(new Date(vehicle.dateExit)), 'dd/MM/yyyy HH:mm') : "";
 
     if (vehicle.vehicleNew == "yes") {
       vehicle.placa = "NOVO";
@@ -185,7 +187,7 @@ export default class VehicleComponent implements OnInit,DoCheck {
     }
     return vehicle;
   }
- getSeverity(value: string): any {
+  getSeverity(value: string): any {
 
     switch (value) {
       case 'Pendente Aprovação':
@@ -204,8 +206,8 @@ export default class VehicleComponent implements OnInit,DoCheck {
   }
   public cleanform() {
     this.formFilter.patchValue({
-      type:'E',
-      vehicleNew:null,
+      type: 'E',
+      vehicleNew: null,
       dateInit: '',
       dateFinal: '',
       clientCompanyId: null,
@@ -246,8 +248,8 @@ export default class VehicleComponent implements OnInit,DoCheck {
       modelId: value.modelVehicle.at(0)?.id ?? 0,
       vehicleId: value?.vehicleId ?? 0,
       placa: value.placa,
-      frota:value.frota,
-      vehicleNew: value.vehicleNew?.at(0) ?? "not"       
+      frota: value.frota,
+      vehicleNew: value.vehicleNew?.at(0) ?? "not"
     }
     const resultFilter = await this.filterVehicles(filters);
 
@@ -268,6 +270,9 @@ export default class VehicleComponent implements OnInit,DoCheck {
     } catch (error) {
       return error;
     }
+  }
+  showVeiculo(id: number) {
+    this.router.navigateByUrl('portaria/mannutencao-entrada-veiculo/' + id);
   }
 
 }

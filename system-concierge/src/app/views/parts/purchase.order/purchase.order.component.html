@@ -86,7 +86,7 @@
                 }
             </div>
             <div class="field col-12 md:col-4">
-                <label for="purchaseOrderId">Resposavel</label>
+                <label for="purchaseOrderId">Responsável</label>
                 <p-multiSelect [options]="responsable" optionLabel="name" display="chip" [selectionLimit]="1"
                     placeholder="Selecione" formControlName="responsible" />
                 <small class="p-error block" *ngIf="formPurchase.get('responsible')?.invalid">
@@ -99,7 +99,7 @@
                     Campo obrigatório</small>
             </div>
             <div class="field col-12 md:col-3">
-                <label for="dateDeliveryId">Previsão Entrega</label>
+                <label for="dateDeliveryId">Previsão entrega</label>
                 <p-calendar [iconDisplay]="'input'" dateFormat="dd/mm/yy" [showIcon]="true" inputId="icondisplay"
                     formControlName="dateDelivery" />
                 <small class="p-error block" *ngIf="formPurchase.get('dateDelivery')?.invalid">
@@ -132,7 +132,7 @@
             <div class="md:col-2"></div>
 
             <div class="field col-12 md:col-4">
-                <label for="attendantNameId">Vendedor Nome</label>
+                <label for="attendantNameId">Vendedor nome</label>
                 <input pInputText id="attendantNameId" type="text" formControlName="attendantName" />
             </div>
             <div class="field col-12 md:col-4">
@@ -171,7 +171,7 @@
             }
             @if(nfNum()){
             <div class="field col-12 md:col-2">
-                <label for="">Fechar Pedido</label>
+                <label for="">Fechar pedido</label>
                 <p-button icon="pi pi-times" label="Fechar" severity="danger" (onClick)="showDialogDateclose()" />
             </div>
             }

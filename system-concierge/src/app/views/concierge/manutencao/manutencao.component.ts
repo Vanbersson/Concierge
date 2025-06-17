@@ -63,6 +63,7 @@ import { IBudget } from '../../../interfaces/budget/ibudget';
 //Components
 import { FilterClientComponent } from '../../../components/filter.client/filter.client.component';
 import { StatusBudgetEnum } from '../../../models/budget/status-budget-enum';
+import { StatusVehicle } from '../../../models/enum/status-vehicle';
 
 interface IModel {
   description: string,
@@ -149,6 +150,8 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
   photoVehicle4!: string;
   public dateExitAuth1 = signal<string>('');
   public dateExitAuth2 = signal<string>('');
+
+  vehicleExit = false;
 
   //Porteiro
   proteiroId: number = 0;
@@ -339,6 +342,12 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
 
     if (vehicleResult.status == 200) {
       this.vehicleEntry = vehicleResult.body;
+
+      //Vehicle has already left
+      if (this.vehicleEntry.status == StatusVehicle.exit) {
+        this.vehicleExit = true;
+      }
+
       this.loadForms();
     } else {
       setTimeout(() => {
@@ -1366,7 +1375,7 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
     this.enabledClientCnpj();
     this.enabledClientCpf();
     this.enabledClientRg();
-    
+
     if (this.validForms()) {
 
       //Loading data

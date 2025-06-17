@@ -17,14 +17,17 @@ import java.util.Date;
 @Service
 public class TokenService {
 
-    @Value("${token.secret}")
-    private String secret;
+    @Value("${token.secret.login}")
+    private String secretKey;
+
+    @Value("${site.access}")
+    private String site;
 
     public String generateToken(User user) {
         try {
-            Algorithm algorithm = Algorithm.HMAC256(secret);
+            Algorithm algorithm = Algorithm.HMAC256(secretKey);
             String token = JWT.create()
-                    .withIssuer("www.atenatruck.com.br")
+                    .withIssuer(this.site)
                     .withSubject(user.getEmail())
                     .withExpiresAt(getExpirationToken())
                     .sign(algorithm);
@@ -37,10 +40,10 @@ public class TokenService {
 
     public String validToken(String token) {
         try {
-            Algorithm algorithm = Algorithm.HMAC256(secret);
+            Algorithm algorithm = Algorithm.HMAC256(secretKey);
 
             return JWT.require(algorithm)
-                    .withIssuer("www.atenatruck.com.br")
+                    .withIssuer(this.site)
                     .build()
                     .verify(token)
                     .getSubject();

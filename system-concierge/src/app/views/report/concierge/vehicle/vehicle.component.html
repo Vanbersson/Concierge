@@ -81,7 +81,7 @@
                 </td>
                 <td><p-tag [value]="vehicle.budgetStatus" [severity]="getSeverity(vehicle.budgetStatus)"></p-tag></td>
                 <td>
-                    <p-button icon="pi pi-eye" severity="success" [text]="true" size="small" />
+                    <p-button icon="pi pi-eye" severity="success" [text]="true" size="small"  (onClick)="showVeiculo(vehicle.id)"/>
                 </td>
             </tr>
         </ng-template>
