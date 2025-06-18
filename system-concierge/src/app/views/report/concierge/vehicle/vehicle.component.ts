@@ -71,7 +71,7 @@ export default class VehicleComponent implements OnInit, DoCheck {
 
   selectClientCompany = signal<ClientCompany>(new ClientCompany());
 
-  vehicleModels$ = this.vehicleModelService.getAllEnabled$();
+  vehicleModels$ = this.vehicleModelService.getAllEnabled();
 
   formFilter = new FormGroup({
     type: new FormControl<string>('E'),

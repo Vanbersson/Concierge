@@ -108,7 +108,7 @@ export default class VehicleEntryComponent implements OnInit, OnDestroy, DoCheck
   photoVehicle2!: string;
   photoVehicle3!: string;
   photoVehicle4!: string;
-  vehicleModels$ = this.vehicleModelService.getAllEnabled$();
+  vehicleModels$ = this.vehicleModelService.getAllEnabled();
 
   formVehicle = new FormGroup({
     placa: new FormControl<string>(''),

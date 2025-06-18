@@ -13,9 +13,14 @@
         }
     }
 
-    .layout-tab-img {
+    .layout-img-small {
         background-color: var(--color-grey-200);
         border-radius: 100%;
+        object-fit: cover;
+    }
+    .layout-img-large {
+        background-color: var(--color-grey-200);
+        border-radius: 6px;
         object-fit: cover;
     }
 

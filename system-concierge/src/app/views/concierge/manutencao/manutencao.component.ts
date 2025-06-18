@@ -365,7 +365,7 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
   }
   private async getVehicleModel(): Promise<ModelVehicle[]> {
     try {
-      return await lastValueFrom(this.vehicleModelService.getAllEnabled$());
+      return await lastValueFrom(this.vehicleModelService.getAllEnabled());
     } catch (error) {
       return [];
     }

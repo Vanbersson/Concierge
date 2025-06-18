@@ -3,155 +3,104 @@
 
     <div class="layout-card-title">
         <span>Lista de modelos</span>
-        <p-button icon="pi pi-plus" [text]="true"  label="Adicionar" (onClick)="showDialog()"/>
+        <p-button icon="pi pi-plus" [text]="true" label="Adicionar" (onClick)="showDialog()" />
     </div>
 
-    <p-dialog header="Modelo" [(visible)]="dialogVisible" [style]="{width: '450px'}">
-        <form [formGroup]="formModel" (ngSubmit)="onSubmit()">
-
-            <div class="p-fluid p-formgrid grid">
-
-                <div class="mt-5 layout-dialog-img">
-                    @if(photoModel){
-                    <p-image src="data:image/png;base64,{{photoModel}}" alt="" height="140" width="140"
-                        [preview]="false" />
-                    }
-                </div>
-
-                <div class="field col-12">
-                    <label for="descricao">Descrição</label>
-                    <input pInputText id="descricao" formControlName="description" />
-                </div>
-
-                <div class="field col-10">
-                    <button pButton type="button" label="Selecionar imagem" (click)="onSelectFile()"></button>
-                </div>
-                <div class="field col-2 flex align-items-center">
-                    <button type="button" pButton icon="pi pi-trash" severity="danger" (click)="deleteFile()"></button>
-                </div>
-
-                <div class="field col-12 layout-card-status">
-                    <span>Situação</span>
-
-                    <div class="flex align-items-center">
-                        <p-radioButton inputId="enabledId" [value]="enabled" formControlName="status"></p-radioButton>
-                        <label for="enabledId" class="ml-2">Ativado</label>
-                    </div>
-
-                    <div class="flex align-items-center">
-                        <p-radioButton inputId="disabledId" [value]="disabled" formControlName="status"></p-radioButton>
-                        <label for="disabledId" class="ml-2">Desativado</label>
-                    </div>
-
-                </div>
-
+    <p-table #tableModel [value]="modelVehicles"
+        currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} Cadastros"
+        [globalFilterFields]="['id','description']" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 25, 50]"
+        styleClass="p-datatable-sm">
+        <ng-template pTemplate="caption">
+            <div class="flex justify-content-between">
+                <p-iconField iconPosition="left">
+                    <p-inputIcon>
+                        <i class="pi pi-search"></i>
+                    </p-inputIcon>
+                    <input pInputText type="text" (input)="tableModel.filterGlobal($event.target.value, 'contains')"
+                        placeholder="Pesquisar" />
+                </p-iconField>
             </div>
-
-            <div class="flex justify-content-end gap-2 mt-3">
-                <button pButton type="button" pRipple label="Cancelar" icon="pi pi-times" class="p-button-text"
-                    (click)=" hideDialog()"></button>
-                <button pButton type="submit" pRipple label="Salvar" icon="pi pi-check" class="p-button-text"></button>
-            </div>
-
-        </form>
-    </p-dialog>
-
-    <p-table #tableModel [value]="modelVehicles" [(selection)]="selectedItems" [paginator]="true" [rows]="10"
-        [rowsPerPageOptions]="[10, 25, 50]" styleClass="p-datatable-sm">
+        </ng-template>
         <ng-template pTemplate="header">
             <tr>
-                <th class="font-normal" style="width:5%">Sel.</th>
                 <th class="font-normal" pSortableColumn="id" style="width:10%">Código <p-sortIcon
                         field="id"></p-sortIcon></th>
-                <th class="font-normal" pSortableColumn="status" style="width:10%">Status <p-sortIcon
+                <th class="font-normal" pSortableColumn="status" style="width:10%">Status<p-sortIcon
                         field="status"></p-sortIcon></th>
-                <th class="font-normal" pSortableColumn="description" style="width:45%">Descrição <p-sortIcon
+                <th class="font-normal" pSortableColumn="image" style="width:10%">Foto<p-sortIcon
+                        field="image"></p-sortIcon></th>
+                <th class="font-normal" pSortableColumn="description" style="width:40%">Descrição <p-sortIcon
                         field="description"></p-sortIcon></th>
-                <th class="font-normal" pSortableColumn="image" style="width:10%">Imagem</th>
                 <th class="font-normal" style="width:10%">Editar</th>
-                <th class="font-normal" style="width:10%">Ação</th>
-            </tr>
-            <tr>
-                <th>
-                    <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
-                </th>
-                <th>
-                    <p-columnFilter type="text" field="id"></p-columnFilter>
-                </th>
-                <th>
-                    <p-columnFilter field="status" matchMode="equals" [showMenu]="false">
-
-                        <ng-template pTemplate="filter" let-value let-filter="filterCallback">
-                            <p-dropdown [ngModel]="value" [options]="statuses" (onChange)="filter($event.value)"
-                                [showClear]="true">
-                                <ng-template let-option pTemplate="item">
-                                    <p-tag [value]="option.value" [severity]="getSeverity(option.label)"></p-tag>
-                                </ng-template>
-                            </p-dropdown>
-                        </ng-template>
-                    </p-columnFilter>
-
-                </th>
-                <th>
-                    <p-columnFilter type="text" field="description"></p-columnFilter>
-                </th>
-                <th></th>
-                <th></th>
-                <th>
-                    @if (selectedItems.length > 0 ) {
-
-                    @if(selectedItems[0].status == enabled){
-                    <p-button icon="pi pi-times" label="Desativar" [rounded]="true" [raised]="true" [outlined]="true"
-                        severity="warning" [style]="{width:'126.13px'}" size="small"
-                        (click)="updateStatusSelected()"></p-button>
-
-                    }
-                    @if(selectedItems[0].status == disabled){
-                    <p-button icon="pi pi-check" label="Ativar" [rounded]="true" [raised]="true" severity="success"
-                        [style]="{width:'126.13px'}" size="small" (click)="updateStatusSelected()"></p-button>
-
-                    }
-
-                    }
-                </th>
-
             </tr>
         </ng-template>
         <ng-template pTemplate="body" let-modelo>
             <tr>
-                <td>
-                    <p-tableCheckbox [value]="modelo"></p-tableCheckbox>
-                </td>
                 <td>{{modelo.id}}</td>
-                <td> <p-tag [value]="modelo.status | titlecase" [severity]="getSeverity(modelo.status)"></p-tag> </td>
-                <td>{{modelo.description}}</td>
+                <td>
+                    <i class="pi " [ngClass]="{
+                        'pi-times-circle text-red-500':modelo.status == disabled,
+                        'pi-check-circle text-green-500':modelo.status == enabled}">
+                    </i>
+                </td>
                 <td>
                     @if (modelo.photo) {
-                    <img class="layout-tab-img" src="data:image/png;base64,{{modelo.photo}}" alt="Vehicle Model"
-                        width="50" height="50" loading="lazy">
-                    }@else {
-                    <img class="layout-tab-img" ngSrc="assets/layout/images/picture.png" alt="Vehicle Model" width="50"
-                        height="50" loading="lazy">
+                    <img class="layout-img-small" src="data:image/png;base64,{{modelo.photo}}" alt="Vehicle Model"
+                        width="32" height="32" loading="lazy">
                     }
-
                 </td>
-                <td>
-                    <p-button icon="pi pi-pencil" [rounded]="true" [text]="true" severity="primary"
-                        (click)="showDialogEditar(modelo)"></p-button>
-                </td>
-                <td>
-                    @if (modelo.status ==enabled) {
-                    <p-button icon="pi pi-times" label="Desativar" [rounded]="true" [raised]="true" [outlined]="true"
-                        severity="warning" [style]="{width:'126.13px'}" size="small"
-                        (click)="updateStatus(modelo)"></p-button>
-                    }
 
-                    @if(modelo.status ==disabled) {
-                    <p-button icon="pi pi-check" label="Ativar" [rounded]="true" [raised]="true" severity="success"
-                        [style]="{width:'126.13px'}" size="small" (click)="updateStatus(modelo)"></p-button>
-                    }
+                <td>{{modelo.description}}</td>
+
+                <td>
+                    <p-button icon="pi pi-pencil" label="Editar" zise="small" [text]="true" severity="primary"
+                        (click)="editModel(modelo)"></p-button>
                 </td>
             </tr>
         </ng-template>
     </p-table>
 </div>
+
+<p-dialog header="Modelo" [(visible)]="dialogVisible" [style]="{width: '450px'}">
+    <form [formGroup]="formModel" (ngSubmit)="saveMod()">
+
+        <div class="p-fluid p-formgrid grid">
+
+            <div class="mt-5 layout-dialog-img">
+                @if(photoModel){
+                <img class="layout-img-large" src="data:image/png;base64,{{photoModel}}" alt="Vehicle Model" width="140"
+                    height="140" loading="lazy">
+                }
+            </div>
+            <div class="field col-12">
+                <label for="descricao">Descrição</label>
+                <input pInputText id="descricao" formControlName="description" />
+                <small class="p-error block" *ngIf="formModel.get('description')?.invalid">Campo obrigatório</small>
+            </div>
+            <div class="field col-10">
+                <button pButton type="button" label="Selecionar imagem" (click)="onSelectFile()"></button>
+            </div>
+            <div class="field col-2 flex align-items-center">
+                <button type="button" pButton icon="pi pi-trash" severity="danger" (click)="deleteFile()"></button>
+            </div>
+            <div class="field col-12 layout-card-status">
+                <span>Situação</span>
+                <div class="flex align-items-center">
+                    <p-radioButton inputId="enabledId" [value]="enabled" formControlName="status"></p-radioButton>
+                    <label for="enabledId" class="ml-2">Ativado</label>
+                </div>
+                <div class="flex align-items-center">
+                    <p-radioButton inputId="disabledId" [value]="disabled" formControlName="status"></p-radioButton>
+                    <label for="disabledId" class="ml-2">Desativado</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex justify-content-end gap-2 mt-3">
+            <button pButton type="button" pRipple label="Fechar" icon="pi pi-times" class="p-button-text"
+                (click)=" hideDialog()"></button>
+            <button pButton type="submit" pRipple label="Salvar" icon="pi pi-check" class="p-button-text"></button>
+        </div>
+
+    </form>
+</p-dialog>

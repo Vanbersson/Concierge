@@ -1,11 +1,8 @@
 package com.concierge.apiconcierge.controllers.vehicle;
 
-import com.concierge.apiconcierge.dtos.UpdateStatusDto;
 import com.concierge.apiconcierge.dtos.vehicle.VehicleModelDto;
-import com.concierge.apiconcierge.models.status.StatusEnableDisable;
 import com.concierge.apiconcierge.models.vehicle.VehicleModel;
 import com.concierge.apiconcierge.repositories.vehicle.model.IVehicleModelRepository;
-import jakarta.validation.Valid;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -49,26 +46,6 @@ public class VehicleModelController {
 
     }
 
-    @PostMapping("/update/status")
-    public ResponseEntity<Object> updateStatus(@RequestBody UpdateStatusDto data) {
-
-        Optional<VehicleModel> model0 = IVehicleModelRepository.findById(data.id());
-        if (model0.isEmpty()) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-
-        VehicleModel model = model0.get();
-
-        if (model.getStatus() == StatusEnableDisable.Habilitado) {
-            model.setStatus(StatusEnableDisable.Desabilitado);
-        } else {
-            model.setStatus(StatusEnableDisable.Habilitado);
-        }
-
-        this.IVehicleModelRepository.save(model);
-
-        return ResponseEntity.ok().build();
-
-    }
-
     @GetMapping("/all")
     public ResponseEntity<List<VehicleModel>> getAll() {
         List<VehicleModel> list = this.IVehicleModelRepository.findAll();
@@ -81,7 +58,6 @@ public class VehicleModelController {
         List<VehicleModel> list = this.IVehicleModelRepository.listAllEnabled();
 
         return ResponseEntity.ok(list);
-
     }
 
 }
