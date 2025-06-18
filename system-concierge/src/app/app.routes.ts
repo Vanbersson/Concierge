@@ -11,7 +11,7 @@ export const routes: Routes = [
     {
         path: 'orcamento/aprovacao',
         title: 'Aprovação',
-        loadComponent: () => import('./views/oficina/budget/approbation/approbation.component'),
+        loadComponent: () => import('./views/workshop/budget/approbation/approbation.component'),
     },
     {
         path: '',
@@ -82,7 +82,17 @@ export const routes: Routes = [
                     {
                         path: 'manutencao-orcamento/:vehicleid',
                         title: 'Manutenção Orçamento',
-                        loadComponent: () => import('./views/oficina/budget/budget/budget.component')
+                        loadComponent: () => import('./views/workshop/budget/budget/budget.component')
+                    },
+                    {
+                        path: 'controle-equipamento',
+                        title: 'Controle de Equipamentos',
+                        loadComponent: () => import('./views/workshop/equipamento/pegar-devolver/pegar-devolver.component')
+                    },
+                    {
+                        path: 'cadastro/mecanico',
+                        title: 'Mecânico',
+                        loadComponent: () => import('./views/workshop/register/mechanic/mechanic.component')
                     }
                 ]
             },
