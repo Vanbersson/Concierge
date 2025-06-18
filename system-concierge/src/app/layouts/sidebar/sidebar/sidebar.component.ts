@@ -137,6 +137,7 @@ export class SidebarComponent implements OnInit {
               {
                 key: '3_2_0',
                 label: 'Pegar/Devolver',
+                routerLink:'oficina/controle-equipamento',
                 visible: false,
               },
               {
@@ -166,6 +167,7 @@ export class SidebarComponent implements OnInit {
               {
                 key: '3_99_0',
                 label: 'Mecânico',
+                routerLink:'oficina/cadastro/mecanico',
                 visible: false
               }
             ]
