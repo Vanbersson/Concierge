@@ -1,4 +1,4 @@
-package com.concierge.apiconcierge.dtos.vehicle;
+package com.concierge.apiconcierge.dtos.vehicle.entry;
 
 import java.util.Date;
 

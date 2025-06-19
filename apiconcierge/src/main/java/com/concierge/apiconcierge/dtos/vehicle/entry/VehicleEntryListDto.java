@@ -1,4 +1,4 @@
-package com.concierge.apiconcierge.dtos.vehicle;
+package com.concierge.apiconcierge.dtos.vehicle.entry;
 
 import com.concierge.apiconcierge.models.budget.enums.StatusBudgetEnum;
 import com.concierge.apiconcierge.models.vehicle.enums.StatusAuthExitEnum;

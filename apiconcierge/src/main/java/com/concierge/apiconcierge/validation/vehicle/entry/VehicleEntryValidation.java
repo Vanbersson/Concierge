@@ -1,11 +1,11 @@
-package com.concierge.apiconcierge.validation.vehicle;
+package com.concierge.apiconcierge.validation.vehicle.entry;
 
-import com.concierge.apiconcierge.dtos.vehicle.AuthExitDto;
-import com.concierge.apiconcierge.dtos.vehicle.ExistsPlacaDto;
-import com.concierge.apiconcierge.dtos.vehicle.VehicleExitSaveDto;
+import com.concierge.apiconcierge.dtos.vehicle.entry.AuthExitDto;
+import com.concierge.apiconcierge.dtos.vehicle.entry.ExistsPlacaDto;
+import com.concierge.apiconcierge.dtos.vehicle.exit.VehicleExitSaveDto;
 import com.concierge.apiconcierge.models.budget.enums.StatusBudgetEnum;
 import com.concierge.apiconcierge.models.permission.PermissionUser;
-import com.concierge.apiconcierge.models.vehicle.VehicleEntry;
+import com.concierge.apiconcierge.models.vehicle.entry.VehicleEntry;
 import com.concierge.apiconcierge.models.vehicle.enums.StatusAuthExitEnum;
 import com.concierge.apiconcierge.models.vehicle.enums.StatusVehicleEnum;
 import com.concierge.apiconcierge.models.vehicle.enums.StepVehicleEnum;

@@ -1,11 +1,10 @@
 package com.concierge.apiconcierge.repositories.vehicle.reports;
 
 import com.concierge.apiconcierge.dtos.reports.concierge.VehicleReportDto;
-import com.concierge.apiconcierge.models.vehicle.VehicleEntry;
+import com.concierge.apiconcierge.models.vehicle.entry.VehicleEntry;
 import com.concierge.apiconcierge.models.vehicle.enums.VehicleYesNotEnum;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;

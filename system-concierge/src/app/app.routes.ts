@@ -90,6 +90,11 @@ export const routes: Routes = [
                         loadComponent: () => import('./views/workshop/equipamento/pegar-devolver/pegar-devolver.component')
                     },
                     {
+                        path: 'controle-equipamento/cadastro/categoria',
+                        title: 'Categoria',
+                        loadComponent: () => import('./views/workshop/equipamento/cadastro/categoria/categoria.component')
+                    },
+                    {
                         path: 'cadastro/mecanico',
                         title: 'Mecânico',
                         loadComponent: () => import('./views/workshop/register/mechanic/mechanic.component')

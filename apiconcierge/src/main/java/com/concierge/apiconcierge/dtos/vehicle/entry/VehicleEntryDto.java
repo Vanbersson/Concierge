@@ -1,23 +1,24 @@
-package com.concierge.apiconcierge.dtos.vehicle;
+package com.concierge.apiconcierge.dtos.vehicle.entry;
 
 import com.concierge.apiconcierge.models.budget.enums.StatusBudgetEnum;
 import com.concierge.apiconcierge.models.vehicle.enums.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 
 import java.util.Date;
 
-public record VehicleEntryResponseDto(
-        @NotNull Integer companyId,
-        @NotNull Integer resaleId,
-        @NotNull Integer id,
-        String status,
-        String stepEntry,
-        String budgetStatus,
-        @NotNull Integer idUserEntry,
-        @NotBlank String nameUserEntry,
-        String dateEntry,
-        String datePrevisionExit,
+public record VehicleEntryDto(
+        Integer companyId,
+        Integer resaleId,
+        Integer id,
+        StatusVehicleEnum status,
+        StepVehicleEnum stepEntry,
+        StatusBudgetEnum budgetStatus,
+        Integer idUserEntry,
+        String nameUserEntry,
+        Date dateEntry,
+        Date datePrevisionExit,
+        Integer userIdExit,
+        String userNameExit,
+        Date dateExit,
         Integer idUserAttendant,
         String nameUserAttendant,
         Integer idUserExitAuth1,
@@ -26,15 +27,15 @@ public record VehicleEntryResponseDto(
         Integer idUserExitAuth2,
         String nameUserExitAuth2,
         Date dateExitAuth2,
-        @NotNull StatusAuthExitEnum statusAuthExit,
-        @NotNull Integer modelId,
-        @NotBlank String modelDescription,
-        @NotNull Integer clientCompanyId,
-        @NotBlank String clientCompanyName,
+        StatusAuthExitEnum statusAuthExit,
+        Integer modelId,
+        String modelDescription,
+        Integer clientCompanyId,
+        String clientCompanyName,
         String clientCompanyCnpj,
         String clientCompanyCpf,
         String clientCompanyRg,
-        @NotBlank String driverEntryName,
+        String driverEntryName,
         String driverEntryCpf,
         String driverEntryRg,
         byte[] driverEntryPhoto,
@@ -48,10 +49,11 @@ public record VehicleEntryResponseDto(
         byte[] driverExitSignature,
         byte[] driverExitPhotoDoc1,
         byte[] driverExitPhotoDoc2,
-        @NotNull ColorVehicleEnum color,
+        ColorVehicleEnum color,
         String placa,
+        String placasJunto,
         String frota,
-        @NotNull VehicleYesNotEnum vehicleNew,
+        VehicleYesNotEnum vehicleNew,
         String kmEntry,
         String kmExit,
         byte[] photo1,
@@ -63,7 +65,7 @@ public record VehicleEntryResponseDto(
         Integer quantityTire,
         Integer quantityTireComplete,
         Integer quantityToolBox,
-        @NotNull VehicleYesNotEnum serviceOrder,
+        VehicleYesNotEnum serviceOrder,
         String numServiceOrder,
         String numNfe,
         String numNfse,

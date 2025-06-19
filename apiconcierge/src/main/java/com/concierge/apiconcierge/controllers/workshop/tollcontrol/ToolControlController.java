@@ -1,9 +1,9 @@
-package com.concierge.apiconcierge.controllers.vehicle;
+package com.concierge.apiconcierge.controllers.workshop.tollcontrol;
 
 import com.concierge.apiconcierge.dtos.message.MessageResponseDto;
-import com.concierge.apiconcierge.dtos.vehicle.model.VehicleModelDto;
-import com.concierge.apiconcierge.models.vehicle.model.VehicleModel;
-import com.concierge.apiconcierge.services.vehicle.model.VehicleModelService;
+import com.concierge.apiconcierge.dtos.workshop.toolcontrol.ToolControlCategoryDto;
+import com.concierge.apiconcierge.models.workshop.toolcontrol.ToolControlCategory;
+import com.concierge.apiconcierge.services.workshop.toolcontrol.category.ToolControlCategoryService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,32 +14,30 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/vehicle/model")
-public class VehicleModelController {
+@RequestMapping("/workshop/tool/control/category")
+public class ToolControlController {
 
     @Autowired
-    VehicleModelService service;
+    ToolControlCategoryService service;
 
     @PostMapping("/save")
-    public ResponseEntity<Object> save(@RequestBody VehicleModelDto data) {
+    public ResponseEntity<Object> save(@RequestBody ToolControlCategoryDto data) {
         try {
-            VehicleModel model = new VehicleModel();
-            BeanUtils.copyProperties(data, model);
-            Map<String, Object> map = this.service.save(model);
-
-            return ResponseEntity.status(HttpStatus.CREATED).body(map);
+            ToolControlCategory cat = new ToolControlCategory();
+            BeanUtils.copyProperties(data, cat);
+            Map<String, Object> result = this.service.save(cat);
+            return ResponseEntity.status(HttpStatus.CREATED).body(result);
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
         }
     }
 
     @PostMapping("/update")
-    public ResponseEntity<Object> update(@RequestBody VehicleModelDto data) {
+    public ResponseEntity<Object> update(@RequestBody ToolControlCategoryDto data) {
         try {
-            VehicleModel model = new VehicleModel();
-            BeanUtils.copyProperties(data, model);
-            String message = this.service.update(model);
-
+            ToolControlCategory cat = new ToolControlCategory();
+            BeanUtils.copyProperties(data, cat);
+            String message = this.service.update(cat);
             return ResponseEntity.status(HttpStatus.OK).body(new MessageResponseDto(message));
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
@@ -50,8 +48,8 @@ public class VehicleModelController {
     public ResponseEntity<Object> listAll(@PathVariable(name = "companyId") Integer companyId,
                                           @PathVariable(name = "resaleId") Integer resaleId) {
         try {
-            List<Map<String, Object>> list = this.service.listAll(companyId, resaleId);
-            return ResponseEntity.status(HttpStatus.OK).body(list);
+            List<ToolControlCategory> result = this.service.listAll(companyId, resaleId);
+            return ResponseEntity.status(HttpStatus.OK).body(result);
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
         }
@@ -61,11 +59,10 @@ public class VehicleModelController {
     public ResponseEntity<Object> listAllEnabled(@PathVariable(name = "companyId") Integer companyId,
                                                  @PathVariable(name = "resaleId") Integer resaleId) {
         try {
-            List<Map<String, Object>> list = this.service.listAllEnabled(companyId, resaleId);
-            return ResponseEntity.status(HttpStatus.OK).body(list);
+            List<ToolControlCategory> result = this.service.listAllEnabled(companyId, resaleId);
+            return ResponseEntity.status(HttpStatus.OK).body(result);
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
         }
     }
-
 }

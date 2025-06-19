@@ -1,9 +1,9 @@
-package com.concierge.apiconcierge.validation.vehicle;
+package com.concierge.apiconcierge.validation.vehicle.entry;
 
-import com.concierge.apiconcierge.dtos.vehicle.AuthExitDto;
-import com.concierge.apiconcierge.dtos.vehicle.ExistsPlacaDto;
-import com.concierge.apiconcierge.dtos.vehicle.VehicleExitSaveDto;
-import com.concierge.apiconcierge.models.vehicle.VehicleEntry;
+import com.concierge.apiconcierge.dtos.vehicle.entry.AuthExitDto;
+import com.concierge.apiconcierge.dtos.vehicle.entry.ExistsPlacaDto;
+import com.concierge.apiconcierge.dtos.vehicle.exit.VehicleExitSaveDto;
+import com.concierge.apiconcierge.models.vehicle.entry.VehicleEntry;
 
 public interface IVehicleEntryValidation {
     public String save(VehicleEntry vehicle);

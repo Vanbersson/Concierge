@@ -2,14 +2,13 @@ package com.concierge.apiconcierge.services.reports.concierge;
 
 import com.concierge.apiconcierge.dtos.reports.concierge.VehicleReportDto;
 import com.concierge.apiconcierge.exceptions.vehicle.VehicleEntryException;
-import com.concierge.apiconcierge.models.vehicle.VehicleEntry;
+import com.concierge.apiconcierge.models.vehicle.entry.VehicleEntry;
 import com.concierge.apiconcierge.repositories.vehicle.entry.IVehicleEntryRepository;
 import com.concierge.apiconcierge.repositories.vehicle.reports.VehicleReportRepository;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Service

@@ -5,23 +5,23 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 public record VehicleDto(
-        @NotNull Integer companyId,
-        @NotNull Integer resaleId,
+        Integer companyId,
+        Integer resaleId,
 
         Integer id,
-        @NotBlank String placa,
+        String placa,
         String chassi,
         String frota,
-        @NotBlank String yearManufacture,
-        @NotBlank String yearModel,
+        String yearManufacture,
+        String yearModel,
 
         String kmCurrent,
 
         String kmLast,
 
-        @NotNull ColorVehicleEnum color,
+        ColorVehicleEnum color,
 
-        @NotNull Integer modelId,
+        Integer modelId,
 
-        @NotNull Integer ownerId) {
+        Integer ownerId) {
 }

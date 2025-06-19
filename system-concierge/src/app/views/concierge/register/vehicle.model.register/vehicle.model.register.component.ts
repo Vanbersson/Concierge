@@ -1,6 +1,8 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { CommonModule, NgOptimizedImage } from '@angular/common';
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, Validators, FormGroup, FormControl } from '@angular/forms';
+import { HttpResponse } from '@angular/common/http';
+import { lastValueFrom } from 'rxjs';
 
 //primeNG
 import { TableModule } from 'primeng/table';
@@ -20,16 +22,16 @@ import { VehicleModelService } from '../../../../services/vehicle-model/vehicle-
 import { NgxImageCompressService } from 'ngx-image-compress';
 //Class
 import { ModelVehicle } from '../../../../models/vehicle-model/model-vehicle';
-
+//Enum
 import { StatusEnabledDisabled } from '../../../../models/enum/status-enabled-disabled';
-import { HttpResponse } from '@angular/common/http';
-import { lastValueFrom } from 'rxjs';
+//Const
+import { IMAGE_MAX_SIZE } from '../../../../util/constants';
 
 @Component({
   selector: 'app-vehicle.model.register',
   standalone: true,
   imports: [CommonModule, FormsModule, ReactiveFormsModule, InputIconModule,
-    TableModule, NgOptimizedImage, TagModule,
+    TableModule, TagModule,
     ButtonModule, DialogModule, InputTextModule,
     RadioButtonModule, ToastModule, IconFieldModule],
   templateUrl: './vehicle.model.register.component.html',
@@ -40,7 +42,6 @@ export default class VehicleModelRegisterComponent implements OnInit {
 
   enabled = StatusEnabledDisabled.enabled;
   disabled = StatusEnabledDisabled.disabled;
-  IMAGE_MAX_SIZE: number = 4243795;
 
   modelVehicles: ModelVehicle[] = [];
   modelVehicle: ModelVehicle;
@@ -96,7 +97,7 @@ export default class VehicleModelRegisterComponent implements OnInit {
   }
   public async onSelectFile() {
     this.ngxImageCompressService.uploadFile().then(({ image, orientation }) => {
-      if (this.ngxImageCompressService.byteCount(image) > this.IMAGE_MAX_SIZE) {
+      if (this.ngxImageCompressService.byteCount(image) > IMAGE_MAX_SIZE) {
         this.messageService.add({ severity: 'error', summary: 'Imagem', detail: 'Tamanha máximo 3MB', icon: 'pi pi-times', life: 3000 });
       } else {
         this.ngxImageCompressService.compressFile(image, orientation, 50, 40).then((compressedImage) => {

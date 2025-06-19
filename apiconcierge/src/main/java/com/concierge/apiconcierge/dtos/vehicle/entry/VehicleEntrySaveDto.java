@@ -1,33 +1,19 @@
-package com.concierge.apiconcierge.dtos.vehicle;
+package com.concierge.apiconcierge.dtos.vehicle.entry;
 
 import com.concierge.apiconcierge.models.budget.enums.StatusBudgetEnum;
 import com.concierge.apiconcierge.models.vehicle.enums.*;
 
 import java.util.Date;
 
-public record VehicleEntryDto(
+public record VehicleEntrySaveDto(
         Integer companyId,
         Integer resaleId,
-        Integer id,
-        StatusVehicleEnum status,
-        StepVehicleEnum stepEntry,
-        StatusBudgetEnum budgetStatus,
         Integer idUserEntry,
         String nameUserEntry,
         Date dateEntry,
         Date datePrevisionExit,
-        Integer userIdExit,
-        String userNameExit,
-        Date dateExit,
         Integer idUserAttendant,
         String nameUserAttendant,
-        Integer idUserExitAuth1,
-        String nameUserExitAuth1,
-        Date dateExitAuth1,
-        Integer idUserExitAuth2,
-        String nameUserExitAuth2,
-        Date dateExitAuth2,
-        StatusAuthExitEnum statusAuthExit,
         Integer modelId,
         String modelDescription,
         Integer clientCompanyId,
@@ -51,7 +37,6 @@ public record VehicleEntryDto(
         byte[] driverExitPhotoDoc2,
         ColorVehicleEnum color,
         String placa,
-        String placasJunto,
         String frota,
         VehicleYesNotEnum vehicleNew,
         String kmEntry,

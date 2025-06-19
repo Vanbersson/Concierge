@@ -1,9 +1,13 @@
 package com.concierge.apiconcierge.controllers.vehicle;
 
 import com.concierge.apiconcierge.dtos.message.MessageResponseDto;
-import com.concierge.apiconcierge.dtos.vehicle.*;
-import com.concierge.apiconcierge.models.vehicle.VehicleEntry;
-import com.concierge.apiconcierge.services.vehicle.VehicleEntryService;
+import com.concierge.apiconcierge.dtos.vehicle.entry.AuthExitDto;
+import com.concierge.apiconcierge.dtos.vehicle.entry.ExistsPlacaDto;
+import com.concierge.apiconcierge.dtos.vehicle.entry.VehicleEntryDto;
+import com.concierge.apiconcierge.dtos.vehicle.entry.VehicleEntrySaveDto;
+import com.concierge.apiconcierge.dtos.vehicle.exit.VehicleExitSaveDto;
+import com.concierge.apiconcierge.models.vehicle.entry.VehicleEntry;
+import com.concierge.apiconcierge.services.vehicle.entry.VehicleEntryService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

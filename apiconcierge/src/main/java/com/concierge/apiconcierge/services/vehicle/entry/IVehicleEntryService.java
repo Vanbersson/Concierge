@@ -1,9 +1,9 @@
-package com.concierge.apiconcierge.services.vehicle;
+package com.concierge.apiconcierge.services.vehicle.entry;
 
-import com.concierge.apiconcierge.dtos.vehicle.AuthExitDto;
-import com.concierge.apiconcierge.dtos.vehicle.ExistsPlacaDto;
-import com.concierge.apiconcierge.dtos.vehicle.VehicleExitSaveDto;
-import com.concierge.apiconcierge.models.vehicle.VehicleEntry;
+import com.concierge.apiconcierge.dtos.vehicle.entry.AuthExitDto;
+import com.concierge.apiconcierge.dtos.vehicle.entry.ExistsPlacaDto;
+import com.concierge.apiconcierge.dtos.vehicle.exit.VehicleExitSaveDto;
+import com.concierge.apiconcierge.models.vehicle.entry.VehicleEntry;
 
 import java.util.List;
 import java.util.Map;

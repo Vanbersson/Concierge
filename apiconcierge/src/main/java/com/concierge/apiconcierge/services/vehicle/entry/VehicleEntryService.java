@@ -1,20 +1,20 @@
-package com.concierge.apiconcierge.services.vehicle;
+package com.concierge.apiconcierge.services.vehicle.entry;
 
-import com.concierge.apiconcierge.dtos.vehicle.AuthExitDto;
-import com.concierge.apiconcierge.dtos.vehicle.ExistsPlacaDto;
-import com.concierge.apiconcierge.dtos.vehicle.VehicleExitSaveDto;
+import com.concierge.apiconcierge.dtos.vehicle.entry.AuthExitDto;
+import com.concierge.apiconcierge.dtos.vehicle.entry.ExistsPlacaDto;
+import com.concierge.apiconcierge.dtos.vehicle.exit.VehicleExitSaveDto;
 import com.concierge.apiconcierge.exceptions.vehicle.VehicleEntryException;
 
 import com.concierge.apiconcierge.models.budget.Budget;
 import com.concierge.apiconcierge.models.budget.enums.StatusBudgetEnum;
-import com.concierge.apiconcierge.models.vehicle.VehicleEntry;
+import com.concierge.apiconcierge.models.vehicle.entry.VehicleEntry;
 import com.concierge.apiconcierge.models.vehicle.enums.StatusAuthExitEnum;
 import com.concierge.apiconcierge.models.vehicle.enums.StatusVehicleEnum;
 import com.concierge.apiconcierge.models.vehicle.enums.StepVehicleEnum;
 import com.concierge.apiconcierge.repositories.budget.IBudgetRepository;
 import com.concierge.apiconcierge.repositories.vehicle.entry.IVehicleEntryRepository;
 import com.concierge.apiconcierge.util.ConstantsMessage;
-import com.concierge.apiconcierge.validation.vehicle.VehicleEntryValidation;
+import com.concierge.apiconcierge.validation.vehicle.entry.VehicleEntryValidation;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

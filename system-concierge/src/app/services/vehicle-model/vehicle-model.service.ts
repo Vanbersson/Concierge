@@ -10,6 +10,8 @@ import { ModelVehicle } from '../../models/vehicle-model/model-vehicle';
 })
 export class VehicleModelService {
 
+  companyResale: string = this.storage.companyId + "/" + this.storage.resaleId;
+
   constructor(private http: HttpClient, private storage: StorageService) { }
 
   save(model: ModelVehicle): Observable<HttpResponse<ModelVehicle>> {
@@ -19,10 +21,10 @@ export class VehicleModelService {
     return this.http.post<ModelVehicle>(environment.apiuUrl + "/vehicle/model/update", model, { headers: this.myHeaders(), observe: 'response' });
   }
   listAll(): Observable<ModelVehicle[]> {
-    return this.http.get<ModelVehicle[]>(environment.apiuUrl + "/vehicle/model/all", { headers: this.myHeaders() });
+    return this.http.get<ModelVehicle[]>(environment.apiuUrl + "/vehicle/model/"+this.companyResale+"/all", { headers: this.myHeaders() });
   }
   getAllEnabled(): Observable<ModelVehicle[]> {
-    return this.http.get<ModelVehicle[]>(environment.apiuUrl + "/vehicle/model/all/enabled", { headers: this.myHeaders() });
+    return this.http.get<ModelVehicle[]>(environment.apiuUrl + "/vehicle/model/"+this.companyResale+"/all/enabled", { headers: this.myHeaders() });
   }
 
   private myHeaders(): HttpHeaders {

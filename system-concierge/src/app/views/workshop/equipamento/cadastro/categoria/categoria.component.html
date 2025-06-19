@@ -1,1 +1,79 @@
-<p>categoria works!</p>
+<div class="layout-card">
+
+    <p-toast />
+    <div class="layout-card-title">
+        <span>Categorias</span>
+        <p-button icon="pi pi-plus" [text]="true" label="Categoria" (onClick)="showDialog()" />
+    </div>
+    <p-table #dt dataKey="id" [value]="categories" [showCurrentPageReport]="true"
+        currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} Cadastros"
+        [globalFilterFields]="['id','description']" [tableStyle]="{ 'min-width': '50rem' }" [paginator]="true"
+        [rows]="10" [rowsPerPageOptions]="[10, 25, 50]" styleClass="p-datatable-sm">
+        <ng-template pTemplate="caption">
+            <div class="flex justify-content-between">
+                <p-iconField iconPosition="left">
+                    <p-inputIcon>
+                        <i class="pi pi-search"></i>
+                    </p-inputIcon>
+                    <input pInputText type="text" (input)="dt.filterGlobal($event.target.value, 'contains')"
+                        placeholder="Pesquisar" />
+                </p-iconField>
+            </div>
+        </ng-template>
+        <ng-template pTemplate="header">
+            <tr>
+                <th pSortableColumn="id" class="font-normal" style="width:10%">Código<p-sortIcon
+                        field="id"></p-sortIcon></th>
+                <th pSortableColumn="status" class="font-normal" style="width:10%">Ativo<p-sortIcon
+                        field="status"></p-sortIcon></th>
+                <th pSortableColumn="description" class="font-normal" style="width:60%">Descrição<p-sortIcon
+                        field="description"></p-sortIcon></th>
+                <th class="font-normal" style="width:10%">Editar</th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-cat>
+            <tr>
+                <td>{{cat.id}}</td>
+                <td>
+                    <i class="pi " [ngClass]="{
+                        'pi-times-circle text-red-500':cat.status == disabled,
+                        'pi-check-circle text-green-500':cat.status == enabled}">
+                    </i>
+                </td>
+                <td>{{cat.description | uppercase}}</td>
+                <td><p-button icon="pi pi-pencil" label="Editar" [text]="true" (onClick)="editCategory(cat)"
+                        size="small" /></td>
+            </tr>
+        </ng-template>
+    </p-table>
+</div>
+
+<p-dialog header="Cadastro" [(visible)]="visibleDialog" [style]="{width: '450px'}">
+    <form [formGroup]="formCat" (ngSubmit)="saveCategory()">
+        <div class="p-fluid p-formgrid grid">
+
+            <div class="field col-12">
+                <label for="descricao">Descrição</label>
+                <input pInputText id="descricao" formControlName="description" />
+                <small class="p-error block" *ngIf="formCat.get('description')?.invalid">Campo obrigatório</small>
+            </div>
+            <div class="field col-12 layout-card-status">
+                <span>Situação</span>
+                <div class="flex align-items-center">
+                    <p-radioButton inputId="enabledId" [value]="enabled" formControlName="status"></p-radioButton>
+                    <label for="enabledId" class="ml-2">Ativado</label>
+                </div>
+                <div class="flex align-items-center">
+                    <p-radioButton inputId="disabledId" [value]="disabled" formControlName="status"></p-radioButton>
+                    <label for="disabledId" class="ml-2">Desativado</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex justify-content-end gap-2 mt-3">
+            <button pButton type="button" pRipple label="Fechar" icon="pi pi-times" class="p-button-text"
+                (click)=" hideDialog()"></button>
+            <button pButton type="submit" pRipple label="Salvar" icon="pi pi-check" class="p-button-text"></button>
+        </div>
+    </form>
+</p-dialog>

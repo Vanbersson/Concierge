@@ -23,7 +23,7 @@
         <ng-template pTemplate="header">
             <tr>
                 <th pSortableColumn="id" class="font-normal" style="width:10%">Código<p-sortIcon field="id"></p-sortIcon></th>
-                <th pSortableColumn="status" class="font-normal" style="width:10%">Status<p-sortIcon field="status"></p-sortIcon></th>
+                <th pSortableColumn="status" class="font-normal" style="width:10%">Ativo<p-sortIcon field="status"></p-sortIcon></th>
                 <th pSortableColumn="photo" class="font-normal" style="width:10%">Foto<p-sortIcon field="photo"></p-sortIcon></th>
                 <th pSortableColumn="name" class="font-normal" style="width:60%">Nome<p-sortIcon field="name"></p-sortIcon></th>
                 <th class="font-normal" style="width:10%">Editar</th>
@@ -43,7 +43,7 @@
                         height="32" loading="lazy"/>
                     }
                 </td>
-                <td>{{mec.name}}</td>
+                <td>{{mec.name | uppercase}}</td>
                 <td><p-button icon="pi pi-pencil" label="Editar" [text]="true" (onClick)="editMecchanic(mec)"  size="small"/></td>
             </tr>
         </ng-template>
@@ -88,7 +88,7 @@
         </div>
 
         <div class="flex justify-content-end gap-2 mt-3">
-            <button pButton type="button" pRipple label="Cancelar" icon="pi pi-times" class="p-button-text"
+            <button pButton type="button" pRipple label="Fechar" icon="pi pi-times" class="p-button-text"
                 (click)=" hideDialog()"></button>
             <button pButton type="submit" pRipple label="Salvar" icon="pi pi-check" class="p-button-text"></button>
         </div>

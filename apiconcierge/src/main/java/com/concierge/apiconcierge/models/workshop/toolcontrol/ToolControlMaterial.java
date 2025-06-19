@@ -37,5 +37,6 @@ public class ToolControlMaterial {
 
     private Integer valid;
 
+    @Lob
     private byte[] photo;
 }

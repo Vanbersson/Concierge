@@ -1,4 +1,4 @@
-package com.concierge.apiconcierge.dtos.vehicle;
+package com.concierge.apiconcierge.dtos.vehicle.model;
 
 import com.concierge.apiconcierge.models.status.StatusEnableDisable;
 import jakarta.validation.constraints.NotNull;

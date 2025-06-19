@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/mechanic")
+@RequestMapping("/workshop/mechanic")
 public class MechanicController {
 
     @Autowired

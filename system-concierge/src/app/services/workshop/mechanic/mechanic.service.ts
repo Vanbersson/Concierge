@@ -9,18 +9,19 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class MechanicService {
+  companyResale: string = this.storage.companyId + "/" + this.storage.resaleId;
 
   constructor(private http: HttpClient, private storage: StorageService) { }
 
   saveMec(mec: Mechanic): Observable<HttpResponse<Mechanic>> {
-    return this.http.post<Mechanic>(environment.apiuUrl + "/mechanic/save", mec, { headers: this.myHeaders(), observe: 'response' });
+    return this.http.post<Mechanic>(environment.apiuUrl + "/workshop//mechanic/save", mec, { headers: this.myHeaders(), observe: 'response' });
   }
   updateMec(mec: Mechanic): Observable<HttpResponse<Mechanic>> {
-    return this.http.post<Mechanic>(environment.apiuUrl + "/mechanic/update", mec, { headers: this.myHeaders(), observe: 'response' });
+    return this.http.post<Mechanic>(environment.apiuUrl + "/workshop/mechanic/update", mec, { headers: this.myHeaders(), observe: 'response' });
   }
 
   listAll(): Observable<Mechanic[]> {
-    return this.http.get<Mechanic[]>(environment.apiuUrl + "/mechanic/1/1/all", { headers: this.myHeaders() });
+    return this.http.get<Mechanic[]>(environment.apiuUrl + "/workshop/mechanic/" + this.companyResale + "/all", { headers: this.myHeaders() });
   }
 
   private myHeaders(): HttpHeaders {

@@ -2,7 +2,7 @@ package com.concierge.apiconcierge.validation.budget;
 
 import com.concierge.apiconcierge.dtos.budget.BudgetNewDto;
 import com.concierge.apiconcierge.models.budget.Budget;
-import com.concierge.apiconcierge.models.vehicle.VehicleEntry;
+import com.concierge.apiconcierge.models.vehicle.entry.VehicleEntry;
 
 public interface IBudgetValidation {
     public String save(BudgetNewDto budgetNewDto, String userLoginEmail);

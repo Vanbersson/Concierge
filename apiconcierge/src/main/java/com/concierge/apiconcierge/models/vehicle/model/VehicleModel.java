@@ -1,4 +1,4 @@
-package com.concierge.apiconcierge.models.vehicle;
+package com.concierge.apiconcierge.models.vehicle.model;
 
 import com.concierge.apiconcierge.models.status.StatusEnableDisable;
 import jakarta.persistence.*;
@@ -32,6 +32,5 @@ public class VehicleModel {
     private String description;
 
     @Lob
-    @Column(columnDefinition = "BLOB")
     private byte[] photo;
 }

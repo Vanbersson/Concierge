@@ -11,7 +11,7 @@ import com.concierge.apiconcierge.services.budget.part.BudgetItemPartService;
 import com.concierge.apiconcierge.services.budget.requisition.BudgetItemRequisitionService;
 import com.concierge.apiconcierge.services.budget.service.BudgetItemServiceService;
 import com.concierge.apiconcierge.services.clientcompany.ClientCompanyService;
-import com.concierge.apiconcierge.services.vehicle.VehicleEntryService;
+import com.concierge.apiconcierge.services.vehicle.entry.VehicleEntryService;
 import com.concierge.apiconcierge.util.ConstantsMessage;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;

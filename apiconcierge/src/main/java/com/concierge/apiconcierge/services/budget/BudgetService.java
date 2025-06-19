@@ -5,7 +5,7 @@ import com.concierge.apiconcierge.exceptions.budget.BudgetException;
 import com.concierge.apiconcierge.models.budget.Budget;
 import com.concierge.apiconcierge.models.budget.BudgetToken;
 import com.concierge.apiconcierge.models.budget.enums.StatusBudgetEnum;
-import com.concierge.apiconcierge.models.vehicle.VehicleEntry;
+import com.concierge.apiconcierge.models.vehicle.entry.VehicleEntry;
 import com.concierge.apiconcierge.models.vehicle.enums.StepVehicleEnum;
 import com.concierge.apiconcierge.repositories.budget.IBudgetRepository;
 import com.concierge.apiconcierge.repositories.budget.IBudgetTokenRepository;
@@ -19,7 +19,6 @@ import org.springframework.stereotype.Service;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 @Service
 public class BudgetService implements IBudgetService {
