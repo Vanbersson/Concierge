@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-
+import { HttpResponse } from '@angular/common/http';
+import { lastValueFrom } from 'rxjs';
 //PrimeNG
 import { InputTextModule } from 'primeng/inputtext';
 import { InputNumberModule } from 'primeng/inputnumber';
@@ -15,7 +16,6 @@ import { DialogModule } from 'primeng/dialog';
 import { RadioButtonModule } from 'primeng/radiobutton';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
-
 //Class
 import { Mechanic } from '../../../../models/workshop/mechanic/Mechanic';
 //Enum
@@ -23,8 +23,6 @@ import { StatusEnabledDisabled } from '../../../../models/enum/status-enabled-di
 //Services
 import { MechanicService } from '../../../../services/workshop/mechanic/mechanic.service';
 import { NgxImageCompressService } from 'ngx-image-compress';
-import { HttpResponse } from '@angular/common/http';
-import { lastValueFrom } from 'rxjs';
 import { StorageService } from '../../../../services/storage/storage.service';
 
 @Component({
@@ -64,10 +62,8 @@ export default class MecanicoComponent implements OnInit {
     private ngxImageCompressService: NgxImageCompressService) { }
 
   ngOnInit(): void {
-
     this.listMechanics();
   }
-
   private listMechanics() {
     this.mechanicService.listAll().subscribe((data) => {
       this.mechanics = data;
@@ -80,7 +76,6 @@ export default class MecanicoComponent implements OnInit {
   hideDialog() {
     this.visibleDialog = false;
   }
-
   onSelectFile() {
     this.ngxImageCompressService.uploadFile().then(({ image, orientation }) => {
       if (this.ngxImageCompressService.byteCount(image) > this.IMAGE_MAX_SIZE) {
@@ -100,7 +95,6 @@ export default class MecanicoComponent implements OnInit {
     this.formMec.patchValue({ photo: "" });
     this.photoMec = "";
   }
-
   cleanForm() {
     this.formMec.patchValue({
       name: "",
@@ -111,7 +105,6 @@ export default class MecanicoComponent implements OnInit {
     this.photoMec = "";
     this.mechanic = null;
   }
-
   editMecchanic(mec: Mechanic) {
     this.showDialog();
 
@@ -124,7 +117,6 @@ export default class MecanicoComponent implements OnInit {
       photo: mec.photo
     });
   }
-
   async saveMechanic() {
 
 
@@ -147,6 +139,7 @@ export default class MecanicoComponent implements OnInit {
 
       const resultMec = await this.saveMec(this.mechanic);
       if (resultMec.status == 201) {
+        this.mechanic.id = resultMec.body.id;
         this.messageService.add({ severity: 'success', summary: 'Mecânico', detail: 'Salvo com sucesso', icon: 'pi pi-check' });
          this.listMechanics();
       }
@@ -166,7 +159,6 @@ export default class MecanicoComponent implements OnInit {
     }
 
   }
-
   private async saveMec(mec: Mechanic): Promise<HttpResponse<Mechanic>> {
     try {
       return await lastValueFrom(this.mechanicService.saveMec(mec));

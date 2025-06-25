@@ -103,7 +103,7 @@ public class VehicleModelService implements IVehicleModelService {
         Map<String, Object> map = new HashMap<>();
 
         map.put("companyId", mod.getCompanyId());
-        map.put("resaleId", mod.getId());
+        map.put("resaleId", mod.getResaleId());
         map.put("id", mod.getId());
         map.put("status", mod.getStatus());
         map.put("description", mod.getDescription());

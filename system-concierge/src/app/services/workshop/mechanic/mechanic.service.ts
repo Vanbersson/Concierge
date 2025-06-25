@@ -14,7 +14,7 @@ export class MechanicService {
   constructor(private http: HttpClient, private storage: StorageService) { }
 
   saveMec(mec: Mechanic): Observable<HttpResponse<Mechanic>> {
-    return this.http.post<Mechanic>(environment.apiuUrl + "/workshop//mechanic/save", mec, { headers: this.myHeaders(), observe: 'response' });
+    return this.http.post<Mechanic>(environment.apiuUrl + "/workshop/mechanic/save", mec, { headers: this.myHeaders(), observe: 'response' });
   }
   updateMec(mec: Mechanic): Observable<HttpResponse<Mechanic>> {
     return this.http.post<Mechanic>(environment.apiuUrl + "/workshop/mechanic/update", mec, { headers: this.myHeaders(), observe: 'response' });

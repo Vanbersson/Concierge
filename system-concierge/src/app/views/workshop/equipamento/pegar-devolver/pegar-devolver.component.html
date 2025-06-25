@@ -3,7 +3,7 @@
     <div class="layout-card-title">
         <span>Equipamentos</span>
         <div class="flex gap-2">
-            <p-button icon="pi pi-plus" [text]="true" label="Pegar" />
+            <p-button icon="pi pi-plus" [text]="true" label="Pegar" (onClick)="showDialog()"/>
             <p-button icon="pi pi-reply" [text]="true" label="Devolver" />
         </div>
 
@@ -37,3 +37,22 @@
         </ng-template>
     </p-table>
 </div>
+
+<!-- Pegar -->
+<p-dialog header="Pegar" [(visible)]="visibleDialogPegar" [style]="{width: '450px'}">
+    <form [formGroup]="formPegar">
+        <div class="p-fluid p-formgrid grid">
+            <div class="field col-12">
+                <label for="passId">Senha</label>
+                <p-inputNumber [useGrouping]="false" formControlName="codePassword" />
+                <small class="p-error block" *ngIf="formPegar.get('codePassword')?.invalid">Campo obrigatório</small>
+            </div>
+        </div>
+
+        <div class="flex justify-content-end gap-2 mt-3">
+            <button pButton type="button" pRipple label="Fechar" icon="pi pi-times" class="p-button-text"
+                (click)=" hideDialog()"></button>
+            <button pButton type="submit" pRipple label="Salvar" icon="pi pi-check" class="p-button-text"></button>
+        </div>
+    </form>
+</p-dialog>

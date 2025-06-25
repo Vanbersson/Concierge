@@ -35,7 +35,14 @@ public class ToolControlMaterial {
     @Column(name = "category_id")
     private Integer categoryId;
 
-    private Integer valid;
+    @Column(name = "quantity_accounting")
+    private float quantityAccounting;
+
+    @Column(name = "quantity_available")
+    private float quantityAvailable;
+
+    @Column(name = "validity_day")
+    private Integer validityDay;
 
     @Lob
     private byte[] photo;

@@ -133,6 +133,7 @@ export default class VehicleModelRegisterComponent implements OnInit {
 
       const resultSave = await this.saveModel(this.modelVehicle);
       if (resultSave.status == 201) {
+        this.modelVehicle.id = resultSave.body.id;
         this.messageService.add({ severity: 'success', summary: 'Modelo', detail: 'Salvo com sucesso', icon: 'pi pi-check' });
         this.listaModel();
       }

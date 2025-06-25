@@ -12,7 +12,7 @@ public class VehicleModelValidation implements IVehicleModelValidation {
             return ConstantsMessage.ERROR_COMPANY;
         if (mod.getResaleId() == null || mod.getResaleId() == 0)
             return ConstantsMessage.ERROR_RESALE;
-        if (mod.getStatus() != null)
+        if (mod.getStatus() == null)
             return ConstantsMessage.ERROR_STATUS;
         if (mod.getDescription().isBlank())
             return ConstantsMessage.ERROR_NAME;

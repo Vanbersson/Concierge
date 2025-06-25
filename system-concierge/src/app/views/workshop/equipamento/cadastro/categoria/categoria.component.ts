@@ -62,13 +62,11 @@ export default class CategoriaComponent implements OnInit {
   ngOnInit(): void {
     this.listAll();
   }
-
   private listAll() {
     this.categoryService.listAll().subscribe(data => {
       this.categories = data;
     });
   }
-
   showDialog() {
     this.cleanForm();
     this.visibleDialog = true;
@@ -76,9 +74,6 @@ export default class CategoriaComponent implements OnInit {
   hideDialog() {
     this.visibleDialog = false;
   }
-
-
-
   cleanForm() {
     this.formCat.patchValue({
       description: "",
@@ -112,6 +107,7 @@ export default class CategoriaComponent implements OnInit {
 
       const resultSave = await this.saveCat(this.category);
       if (resultSave.status == 201) {
+        this.category.id = resultSave.body.id;
         this.messageService.add({ severity: 'success', summary: 'Categoria', detail: 'Salva com sucesso', icon: 'pi pi-check' });
       }
 
@@ -128,7 +124,6 @@ export default class CategoriaComponent implements OnInit {
     this.listAll();
 
   }
-
   private async saveCat(cat: ToolControlCategory): Promise<HttpResponse<ToolControlCategory>> {
     try {
       return await lastValueFrom(this.categoryService.saveCat(cat));

@@ -45,16 +45,12 @@
                 </td>
                 <td>
                     @if (modelo.photo) {
-                    <img class="layout-img-small" src="data:image/png;base64,{{modelo.photo}}" alt="Vehicle Model"
-                        width="32" height="32" loading="lazy">
+                    <img class="layout-img-small" src="data:image/png;base64,{{modelo.photo}}" alt="Vehicle Model" width="32" height="32" loading="lazy">
                     }
                 </td>
-
                 <td>{{modelo.description}}</td>
-
                 <td>
-                    <p-button icon="pi pi-pencil" label="Editar" zise="small" [text]="true" severity="primary"
-                        (click)="editModel(modelo)"></p-button>
+                    <p-button icon="pi pi-pencil" label="Editar" zise="small" [text]="true" severity="primary" (click)="editModel(modelo)"></p-button>
                 </td>
             </tr>
         </ng-template>
