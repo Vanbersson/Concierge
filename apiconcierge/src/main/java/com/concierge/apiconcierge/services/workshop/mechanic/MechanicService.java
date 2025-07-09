@@ -78,6 +78,26 @@ public class MechanicService implements IMechanicService {
         }
     }
 
+    @SneakyThrows
+    @Override
+    public List<Map<String, Object>> listAllEnabled(Integer companyId, Integer resaleId) {
+        try {
+            String message = this.validation.listAll(companyId, resaleId);
+            if (ConstantsMessage.SUCCESS.equals(message)) {
+                List<Mechanic> resultList = this.repository.listAllEnabled(companyId, resaleId);
+                List<Map<String, Object>> mechanics = new ArrayList<>();
+                for (Mechanic mec : resultList) {
+                    mechanics.add(this.loadMec(mec));
+                }
+                return mechanics;
+            } else {
+                throw new MechanicException(message);
+            }
+        } catch (Exception ex) {
+            throw new MechanicException(ex.getMessage());
+        }
+    }
+
     @Override
     public Map<String, Object> filterCodePass(Mechanic mec) {
         return null;

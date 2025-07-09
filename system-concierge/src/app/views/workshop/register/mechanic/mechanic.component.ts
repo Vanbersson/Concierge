@@ -24,6 +24,7 @@ import { StatusEnabledDisabled } from '../../../../models/enum/status-enabled-di
 import { MechanicService } from '../../../../services/workshop/mechanic/mechanic.service';
 import { NgxImageCompressService } from 'ngx-image-compress';
 import { StorageService } from '../../../../services/storage/storage.service';
+import { IMAGE_MAX_SIZE } from '../../../../util/constants';
 
 @Component({
   selector: 'app-mechanic',
@@ -40,7 +41,6 @@ export default class MecanicoComponent implements OnInit {
   mechanics: Mechanic[] = [];
   mechanic: Mechanic;
 
-  IMAGE_MAX_SIZE: number = 4243795;
   enabled = StatusEnabledDisabled.enabled;
   disabled = StatusEnabledDisabled.disabled;
 
@@ -78,7 +78,7 @@ export default class MecanicoComponent implements OnInit {
   }
   onSelectFile() {
     this.ngxImageCompressService.uploadFile().then(({ image, orientation }) => {
-      if (this.ngxImageCompressService.byteCount(image) > this.IMAGE_MAX_SIZE) {
+      if (this.ngxImageCompressService.byteCount(image) > IMAGE_MAX_SIZE) {
         this.messageService.add({ severity: 'error', summary: 'Imagem', detail: 'Tamanha máximo 3MB', icon: 'pi pi-times', life: 3000 });
       } else {
         this.ngxImageCompressService.compressFile(image, orientation, 50, 40).then((compressedImage) => {
@@ -118,10 +118,7 @@ export default class MecanicoComponent implements OnInit {
     });
   }
   async saveMechanic() {
-
-
     const { value, valid } = this.formMec;
-
 
     if (!valid) {
       return;

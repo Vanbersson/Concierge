@@ -23,6 +23,9 @@ export class MechanicService {
   listAll(): Observable<Mechanic[]> {
     return this.http.get<Mechanic[]>(environment.apiuUrl + "/workshop/mechanic/" + this.companyResale + "/all", { headers: this.myHeaders() });
   }
+  listAllEnabled(): Observable<Mechanic[]> {
+    return this.http.get<Mechanic[]>(environment.apiuUrl + "/workshop/mechanic/" + this.companyResale + "/all/enabled", { headers: this.myHeaders() });
+  }
 
   private myHeaders(): HttpHeaders {
     const httpOptions = new HttpHeaders({

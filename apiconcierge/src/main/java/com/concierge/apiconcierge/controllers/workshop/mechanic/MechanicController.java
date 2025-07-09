@@ -1,6 +1,5 @@
 package com.concierge.apiconcierge.controllers.workshop.mechanic;
 
-import ch.qos.logback.core.joran.util.beans.BeanUtil;
 import com.concierge.apiconcierge.dtos.message.MessageResponseDto;
 import com.concierge.apiconcierge.dtos.workshop.mechanic.MechanicDto;
 import com.concierge.apiconcierge.models.workshop.mechanic.Mechanic;
@@ -50,6 +49,16 @@ public class MechanicController {
                                           @PathVariable(name = "resaleId") Integer resaleId) {
         try {
             List<Map<String, Object>> result = this.service.listAll(companyId, resaleId);
+            return ResponseEntity.status(HttpStatus.OK).body(result);
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
+        }
+    }
+    @GetMapping("/{companyId}/{resaleId}/all/enabled")
+    public ResponseEntity<Object> listAllEnabled(@PathVariable(name = "companyId") Integer companyId,
+                                          @PathVariable(name = "resaleId") Integer resaleId) {
+        try {
+            List<Map<String, Object>> result = this.service.listAllEnabled(companyId, resaleId);
             return ResponseEntity.status(HttpStatus.OK).body(result);
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
