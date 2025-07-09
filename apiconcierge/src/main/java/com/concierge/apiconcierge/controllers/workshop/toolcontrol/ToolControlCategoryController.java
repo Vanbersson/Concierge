@@ -1,4 +1,4 @@
-package com.concierge.apiconcierge.controllers.workshop.tollcontrol;
+package com.concierge.apiconcierge.controllers.workshop.toolcontrol;
 
 import com.concierge.apiconcierge.dtos.message.MessageResponseDto;
 import com.concierge.apiconcierge.dtos.workshop.toolcontrol.ToolControlCategoryDto;
@@ -15,7 +15,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/workshop/tool/control/category")
-public class ToolControlController {
+public class ToolControlCategoryController {
 
     @Autowired
     ToolControlCategoryService service;

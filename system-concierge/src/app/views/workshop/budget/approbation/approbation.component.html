@@ -1,9 +1,10 @@
 <div *ngIf="visibleBudget" class="flex justify-content-center bg-auto surface-500">
-    <p-toast/>
+    <p-toast />
     <div class="card-budget">
         <div *ngIf="!enabledSendApprobation" class="flex justify-content-end flex-column m-3 gap-1">
             <label for="btnApprobation">Click aqui para provar seu orçamento</label>
-            <button id="btnApprobation" pButton label="Aprovar Orçamento" size="large" severity="success" (click)="approbation()"></button>
+            <button id="btnApprobation" pButton label="Aprovar Orçamento" size="large" severity="success"
+                (click)="approbation()"></button>
         </div>
 
         <img src="../../../../assets/image/barra-nativa.jpg" alt="" width="880">
@@ -109,7 +110,8 @@
             <div class="flex border-left-1 border-bottom-1 border-right-1">
                 <div class="flex flex-column gap-1 pl-1">
                     <span class="text-small">ENDEREÇO</span>
-                    <span class="text-normal">{{clientCompany.address | uppercase}} {{clientCompany.addressNumber}}</span>
+                    <span class="text-normal">{{clientCompany.address | uppercase}}
+                        {{clientCompany.addressNumber}}</span>
                 </div>
             </div>
         </div>
@@ -244,6 +246,16 @@
         </div>
         <div class="flex border-1 w-full h-4rem p-1 text-normal">
             {{budget.information | uppercase}}
+        </div>
+        <div class="mt-2">
+            <p>Orçamento esta sujeito a alteração após o prazo de validade; serviço será iniciado após aprovação; não
+                aprovação será cobrado
+                desmont/montagem e estacionamento; caso haja fornecim. peças será acrescido 20% ao valor total da mão de
+                obra; materiais substit.
+                deverão ser retirados em 48h após conclusão do serviço, caso contrário nativa dará devido destino, não
+                cabendo
+                indenização/pagamento.
+            </p>
         </div>
 
         <div class="flex justify-content-center mt-4 ">

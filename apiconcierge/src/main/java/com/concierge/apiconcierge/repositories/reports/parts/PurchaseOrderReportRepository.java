@@ -53,10 +53,8 @@ public class PurchaseOrderReportRepository {
         if (purchaseFilters.nfNum() != null && purchaseFilters.nfNum() != 0)
             predicates.add(cb.equal(purchaseOrder.get("nfNum"), purchaseFilters.nfNum()));
 
-
         cq.where(predicates.toArray(new Predicate[0]));
         return em.createQuery(cq).getResultList();
-
     }
 
 

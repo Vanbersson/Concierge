@@ -154,6 +154,7 @@ export class SidebarComponent implements OnInit {
                   {
                     key: '3_2_1_1',
                     label: 'Material',
+                    routerLink:"oficina/controle-equipamento/cadastro/material",
                     visible: false,
                   }
                 ]

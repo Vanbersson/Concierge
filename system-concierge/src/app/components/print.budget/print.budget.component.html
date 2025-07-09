@@ -2,7 +2,12 @@
     <img src="../../../../assets/image/barra-nativa.jpg" alt="" width="800">
     <div class="flex justify-content-between w-screen mt-2 ">
         <span>NATIVA MAQUINAS E IMPLEMENTO LTDA</span>
-        <span>ORÇAMENTO: <strong>Nº {{formatNumberBudget(budget.id)}}</strong></span>
+
+        <div class="flex gap-2">
+            <span>VALIDADE: <strong>{{budget.dateValidation| date:'dd/MM/yyyy'}}</strong></span>
+            <span>ORÇAMENTO: <strong>Nº {{formatNumberBudget(budget.id)}}</strong></span>
+        </div>
+
     </div>
     <div class="border-bottom-1 w-screen"></div>
 
@@ -16,15 +21,10 @@
                 <span class="text-small mr-1">Consutor:</span>
                 <span class="text-normal">{{vehicleEntry.nameUserAttendant | uppercase}}</span>
             </div>
-            <div class="w-3">
+            <div class="w-6">
                 <span class="text-small mr-1">Pagamento:</span>
                 <span class="text-normal">{{budget.typePayment | uppercase}}</span>
             </div>
-            <div class="w-3">
-                <span class="text-small mr-1">Validade:</span>
-                <span class="text-normal">{{budget.dateValidation| date:'dd/MM/yyyy'}}</span>
-            </div>
-
         </div>
     </div>
     <div class="flex mb-1 w-screen">
@@ -251,5 +251,11 @@
     </div>
     <div class="flex border-1 w-screen h-4rem p-1 text-normal">
         {{budget.information}}
+    </div>
+    <div class="mt-2">
+        <p>Orçamento esta sujeito a alteração após o prazo de validade; serviço será iniciado após aprovação; não
+            aprovação será cobrado desmont/montagem e estacionamento; caso haja fornecim. peças será acrescido 20% ao
+            valor total da mão de obra; materiais substit. deverão ser retirados em 48h após conclusão do serviço, caso
+            contrário nativa dará devido destino, não cabendo indenização/pagamento.</p>
     </div>
 </div>

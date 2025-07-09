@@ -95,6 +95,11 @@ export const routes: Routes = [
                         loadComponent: () => import('./views/workshop/equipamento/cadastro/categoria/categoria.component')
                     },
                     {
+                        path: 'controle-equipamento/cadastro/material',
+                        title: 'Material',
+                        loadComponent: () => import('./views/workshop/equipamento/cadastro/material/material.component')
+                    },
+                    {
                         path: 'cadastro/mecanico',
                         title: 'Mecânico',
                         loadComponent: () => import('./views/workshop/register/mechanic/mechanic.component')

@@ -28,39 +28,32 @@ import { StepsModule } from 'primeng/steps';
 //Service
 import { StorageService } from '../../../../services/storage/storage.service';
 import { BudgetService } from '../../../../services/budget/budget.service';
-
+import { TypePaymentService } from '../../../../services/payment/type-payment.service';
+import { BusyService } from '../../../../components/loading/busy.service';
+import { ClientecompanyService } from '../../../../services/clientecompany/clientecompany.service';
+import { VehicleService } from '../../../../services/vehicle/vehicle.service';
+import { EmailClientService } from '../../../../services/email/email-client.service';
 //class
 import { BudgetRequisition } from '../../../../models/budget/budget-requisition';
 import { BudgetServiceItem } from '../../../../models/budget/budget-item-service';
 import { BudgetItem } from '../../../../models/budget/budget-item';
 import { lastValueFrom } from 'rxjs';
 import { Budget } from '../../../../models/budget/budget';
-import { ClientecompanyService } from '../../../../services/clientecompany/clientecompany.service';
 import { Part } from '../../../../models/parts/Part';
 import { HttpResponse } from '@angular/common/http';
 import { ClientCompany } from '../../../../models/clientcompany/client-company';
-import { BusyService } from '../../../../components/loading/busy.service';
-
 //Component
 import { FilterPartsComponent } from '../../../../components/filter.parts/filter.parts.component';
 import { MessageResponse } from '../../../../models/message/message-response';
-import { VehicleService } from '../../../../services/vehicle/vehicle.service';
 import { VehicleEntry } from '../../../../models/vehicle/vehicle-entry';
-
 //Print
 import { PrintBudgetComponent } from '../../../../components/print.budget/print.budget.component';
-
 //Enum
 import { StatusBudgetEnum } from '../../../../models/budget/status-budget-enum';
-import { __await } from 'tslib';
-import { EmailClientService } from '../../../../services/email/email-client.service';
 import { EmailClient } from '../../../../models/email/email-client';
 import { ClientFisJurEnum } from '../../../../models/clientcompany/client-fisjur-enum';
 import { BudgetToken } from '../../../../models/budget/budget-token';
-
-export interface IPayment {
-  payment: string,
-}
+import { TypePayment } from '../../../../models/payment/type-payment';
 
 export enum StatusBudget {
   open = "Open",
@@ -87,7 +80,7 @@ export default class BudgetComponent implements OnInit, OnDestroy, DoCheck {
   juridica: string = ClientFisJurEnum.juridica;
 
   vehicleId = signal<number>(0);
-  listPayment: IPayment[] = [];
+  listPayment: TypePayment[] = [];
   visibleBudget: boolean = false;
   itemsStatus: MenuItem[] | undefined;
   activeIndexStatus: number = 0;
@@ -96,7 +89,7 @@ export default class BudgetComponent implements OnInit, OnDestroy, DoCheck {
   formBudget = new FormGroup({
     dateValidation: new FormControl<Date | null>(null),
     nameResponsible: new FormControl<string>(""),
-    typePayment: new FormControl<IPayment[]>([]),
+    typePayment: new FormControl<TypePayment[]>([]),
     information: new FormControl<string>(""),
   });
 
@@ -166,7 +159,8 @@ export default class BudgetComponent implements OnInit, OnDestroy, DoCheck {
     private activatedRoute: ActivatedRoute,
     private cdr: ChangeDetectorRef,
     private busyService: BusyService,
-    private emailClientService: EmailClientService
+    private emailClientService: EmailClientService,
+    private typePaymentService: TypePaymentService
   ) {
 
   }
@@ -207,14 +201,6 @@ export default class BudgetComponent implements OnInit, OnDestroy, DoCheck {
         }
       ];
 
-      this.listPayment = [
-        { payment: 'Dinheiro espécie' },
-        { payment: 'Faturamento especial' },
-        { payment: 'Cartão de débito' },
-        { payment: 'Cartão de crédito' },
-        { payment: 'Pix' },
-      ];
-
       this.init();
 
     } catch (error) {
@@ -238,6 +224,8 @@ export default class BudgetComponent implements OnInit, OnDestroy, DoCheck {
 
     if (bugetResult.status == 200) {
       this.budget = bugetResult.body;
+      //Type Payment
+      this.listPayments();
 
       //Client
       const clientResult = await this.getClient(this.budget.clientCompanyId);
@@ -282,7 +270,7 @@ export default class BudgetComponent implements OnInit, OnDestroy, DoCheck {
       this.formBudget.patchValue({
         dateValidation: this.budget.dateValidation != "" ? new Date(this.budget.dateValidation) : null,
         nameResponsible: this.budget.nameResponsible,
-        typePayment: this.budget.typePayment != "" ? [{ payment: this.budget.typePayment }] : [],
+        typePayment: this.budget.typePayment != "" ? [this.getPayment(this.budget.typePayment)] : [],
         information: this.budget.information,
       });
 
@@ -308,6 +296,21 @@ export default class BudgetComponent implements OnInit, OnDestroy, DoCheck {
       this.busyService.idle();
       this.router.navigateByUrl("/portaria/lista-entrada-veiculo");
     }
+  }
+
+  private listPayments() {
+    this.typePaymentService.listAllEnabled().subscribe(data => {
+      this.listPayment = data;
+    });
+  }
+  private getPayment(desc: string): TypePayment{
+
+    for(var pay of this.listPayment ){
+        if(desc == pay.description){
+          return pay;
+        }
+    }
+    return null;
   }
   maskCNPJ(cnpj: string): string {
     const CNPJ = cnpj.substring(0, 2) + "." + cnpj.substring(2, 5) + "." + cnpj.substring(5, 8) + "/" + cnpj.substring(8, 12) + "-" + cnpj.substring(12, 14);
@@ -469,7 +472,7 @@ export default class BudgetComponent implements OnInit, OnDestroy, DoCheck {
     this.budget.dateValidation = value?.dateValidation == null ? "" : this.formatDateTime(value.dateValidation);
     this.budget.dateGeneration = this.formatDateTime(new Date(this.budget.dateGeneration));
     this.budget.nameResponsible = value.nameResponsible;
-    this.budget.typePayment = value.typePayment.at(0)?.payment ?? "";
+    this.budget.typePayment = value.typePayment.at(0)?.description ?? "";
     this.budget.information = value.information;
 
     const resultBudget = await this.updateBudget(this.budget);
