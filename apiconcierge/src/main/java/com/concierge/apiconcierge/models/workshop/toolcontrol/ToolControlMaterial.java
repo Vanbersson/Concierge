@@ -1,6 +1,7 @@
 package com.concierge.apiconcierge.models.workshop.toolcontrol;
 
 import com.concierge.apiconcierge.models.status.StatusEnableDisable;
+import com.concierge.apiconcierge.models.workshop.toolcontrol.enums.TypeMaterial;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -29,17 +30,25 @@ public class ToolControlMaterial {
 
     private StatusEnableDisable status;
 
+    private TypeMaterial type;
+
     private String description;
 
     @JoinColumn(table = "tb_tool_control_category",referencedColumnName = "id")
     @Column(name = "category_id")
     private Integer categoryId;
 
-    @Column(name = "quantity_accounting")
-    private float quantityAccounting;
+    @Column(name = "quantity_accounting_loan")
+    private float quantityAccountingLoan;
 
-    @Column(name = "quantity_available")
-    private float quantityAvailable;
+    @Column(name = "quantity_available_loan")
+    private float quantityAvailableLoan;
+
+    @Column(name = "quantity_accounting_kit")
+    private float quantityAccountingKit;
+
+    @Column(name = "quantity_available_kit")
+    private float quantityAvailableKit;
 
     @Column(name = "validity_day")
     private Integer validityDay;

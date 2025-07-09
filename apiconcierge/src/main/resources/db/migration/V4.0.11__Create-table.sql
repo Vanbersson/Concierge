@@ -14,10 +14,13 @@ CREATE TABLE tb_tool_control_material(
     resale_id int not null,
     id int not null AUTO_INCREMENT,
     status tinyint not null,
+    type tinyint not null,
     description varchar(100) not null,
     category_id int not null,
-    quantity_accounting float not null,
-    quantity_available float not null,
+    quantity_accounting_loan float not null,
+    quantity_available_loan float not null,
+    quantity_accounting_kit float not null,
+    quantity_available_kit float not null,
     validity_day int,
     photo longblob,
     FOREIGN KEY(company_id) REFERENCES tb_company(id),
@@ -39,25 +42,35 @@ CREATE TABLE tb_mechanic(
     PRIMARY KEY(id)
 );
 
+CREATE TABLE tb_tool_control_request(
+    company_id int not null,
+    resale_id int not null,
+    id int not null AUTO_INCREMENT,
+    status tinyint not null,
+    user_id_req int not null,
+    date_req datetime not null,
+    user_id_dev int,
+    date_dev datetime,
+    mechanic_id int not null,
+    FOREIGN KEY(user_id_req) REFERENCES tb_user(id),
+    FOREIGN KEY(user_id_dev) REFERENCES tb_user(id),
+    FOREIGN KEY(mechanic_id) REFERENCES tb_mechanic(id),
+    PRIMARY KEY(id)
+);
+
 CREATE TABLE tb_tool_control_mat_mec(
     company_id int not null,
     resale_id int not null,
     id binary(16) unique,
-    user_id_req int not null,
-    quantity_req int not null,
-    date_req datetime not null,
+    request_id int not null,
+    quantity_req float not null,
     information_req varchar(255),
-    user_id_dev int,
-    quantity_dev int,
-    date_dev datetime,
+    quantity_dev float,
     information_dev varchar(255),
-    mechanic_id int not null,
     material_id int not null,
     FOREIGN KEY(company_id) REFERENCES tb_company(id),
     FOREIGN KEY(resale_id) REFERENCES tb_resale(id),
-    FOREIGN KEY(user_id_req) REFERENCES tb_user(id),
-    FOREIGN KEY(user_id_dev) REFERENCES tb_user(id),
-    FOREIGN KEY(mechanic_id) REFERENCES tb_mechanic(id),
+    FOREIGN KEY(request_id) REFERENCES tb_tool_control_request(id),
     FOREIGN KEY(material_id) REFERENCES tb_tool_control_material(id),
     PRIMARY KEY(id)
 );
