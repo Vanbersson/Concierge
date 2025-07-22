@@ -48,7 +48,7 @@
     </p-table>
 </div>
 
-<p-dialog header="Cadastro" [(visible)]="visibleDialog" [style]="{width: '450px'}">
+<p-dialog header="Cadastro" [(visible)]="visibleDialog" modal="true" [style]="{width: '450px'}">
     <form [formGroup]="formCat" (ngSubmit)="saveCategory()">
         <div class="p-fluid p-formgrid grid">
 
@@ -56,6 +56,34 @@
                 <label for="descricao">Descrição</label>
                 <input pInputText id="descricao" formControlName="description" />
                 <small class="p-error block" *ngIf="formCat.get('description')?.invalid">Campo obrigatório</small>
+            </div>
+            <div class="field col-12 md:col-4">
+                <label>Qtd. Requisição</label>
+                <p-inputNumber  [useGrouping]="false" formControlName="quantityReq"/>
+            </div>
+            <div class="md:col-8">
+
+            </div>
+            <div class="col-12 flex flex-column gap-2 border-1 border-round-md border-200 mb-2">
+                <span>Tipo</span>
+                <div class="flex gap-2">
+                    <div class="flex align-items-center">
+                        <p-radioButton inputId="typeFerrId" [value]="typeFerr" formControlName="type"></p-radioButton>
+                        <label for="typeFerrId" class="ml-2">Ferramenta</label>
+                    </div>
+                    <div class="flex align-items-center">
+                        <p-radioButton inputId="typeEpiId" [value]="typeEPI" formControlName="type"></p-radioButton>
+                        <label for="typeEpiId" class="ml-2">EPI</label>
+                    </div>
+                    <div class="flex align-items-center">
+                        <p-radioButton inputId="typeUnifId" [value]="typeUnif" formControlName="type"></p-radioButton>
+                        <label for="typeUnifId" class="ml-2">Uniforme</label>
+                    </div>
+                    <div class="flex align-items-center">
+                        <p-radioButton inputId="typeOutroId" [value]="typeOutro" formControlName="type"></p-radioButton>
+                        <label for="typeOutroId" class="ml-2">Outro</label>
+                    </div>
+                </div>
             </div>
             <div class="field col-12 layout-card-status">
                 <span>Situação</span>

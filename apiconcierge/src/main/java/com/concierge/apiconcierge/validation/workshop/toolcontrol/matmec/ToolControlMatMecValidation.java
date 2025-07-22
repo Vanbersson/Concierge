@@ -4,6 +4,8 @@ import com.concierge.apiconcierge.models.workshop.toolcontrol.ToolControlMatMec;
 import com.concierge.apiconcierge.util.ConstantsMessage;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @Service
 public class ToolControlMatMecValidation implements IToolControlMatMecValidation {
     @Override
@@ -12,13 +14,13 @@ public class ToolControlMatMecValidation implements IToolControlMatMecValidation
             return ConstantsMessage.ERROR_COMPANY;
         if (matMec.getResaleId() == null || matMec.getResaleId() == 0)
             return ConstantsMessage.ERROR_RESALE;
-        if(matMec.getRequestId() == null || matMec.getRequestId() == 0)
+        if (matMec.getRequestId() == null || matMec.getRequestId() == 0)
             return "Request not informed.";
-        if ( matMec.getQuantityReq() == 0)
+        if (matMec.getQuantityReq() == 0)
             return "Quantity not informed.";
         if (matMec.getMaterialId() == null || matMec.getMaterialId() == 0)
             return "Material Id not informed.";
-        if(matMec.getQuantityReq() > 1)
+        if (matMec.getQuantityReq() < 0)
             return "Quantity invalid.";
 
 
@@ -33,17 +35,28 @@ public class ToolControlMatMecValidation implements IToolControlMatMecValidation
             return ConstantsMessage.ERROR_RESALE;
         if (matMec.getId() == null)
             return ConstantsMessage.ERROR_ID;
-        if(matMec.getRequestId() == null || matMec.getRequestId() == 0)
+        if (matMec.getRequestId() == null || matMec.getRequestId() == 0)
             return "Request not informed.";
-        if ( matMec.getQuantityReq() == 0)
+        if (matMec.getQuantityReq() == 0)
             return "Quantity not informed.";
-        if ( matMec.getQuantityDev() == 0)
-            return "Quantity not informed.";
-        if (matMec.getQuantityReq() != matMec.getQuantityDev())
-            return "Quantity different.";
+//        if ( matMec.getQuantityDev() == 0)
+//            return "Quantity not informed.";
+//        if (matMec.getQuantityReq() != matMec.getQuantityDev())
+//            return "Quantity different.";
         if (matMec.getMaterialId() == null || matMec.getMaterialId() == 0)
             return "Material Id not informed.";
 
+        return ConstantsMessage.SUCCESS;
+    }
+
+    @Override
+    public String filterId(Integer companyId, Integer resaleId, UUID id) {
+        if (companyId == null || companyId == 0)
+            return ConstantsMessage.ERROR_COMPANY;
+        if (resaleId == null || resaleId == 0)
+            return ConstantsMessage.ERROR_RESALE;
+        if (id == null)
+            return "Id not informed.";
         return ConstantsMessage.SUCCESS;
     }
 

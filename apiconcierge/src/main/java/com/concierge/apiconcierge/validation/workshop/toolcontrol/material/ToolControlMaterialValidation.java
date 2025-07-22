@@ -46,8 +46,6 @@ public class ToolControlMaterialValidation implements IToolControlMaterialValida
             return "Quantity Accounting not informed.";
         if (mat.getQuantityAvailableLoan() < 0.0)
             return "Quantity Available not informed.";
-        if (mat.getQuantityAvailableLoan() > mat.getQuantityAccountingLoan())
-            return "Error quantity.";
 
         return ConstantsMessage.SUCCESS;
     }

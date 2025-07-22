@@ -3,7 +3,7 @@ package com.concierge.apiconcierge.dtos.workshop.toolcontrol;
 import java.util.Date;
 import java.util.UUID;
 
-public record ToolControlMatMecDto(Integer companyId,
+public record ToolControlKitMecDto(Integer companyId,
                                    Integer resaleId,
                                    UUID id,
                                    Integer requestId,

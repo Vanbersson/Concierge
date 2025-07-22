@@ -1,6 +1,5 @@
 package com.concierge.apiconcierge.models.workshop.toolcontrol;
 
-
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -18,8 +17,8 @@ import java.util.UUID;
 @SecondaryTable(name = "tb_user", pkJoinColumns = @PrimaryKeyJoinColumn(name = "id"))
 @SecondaryTable(name = "tb_tool_control_material", pkJoinColumns = @PrimaryKeyJoinColumn(name = "id"))
 @Entity
-@Table(name = "tb_tool_control_mat_mec")
-public class ToolControlMatMec {
+@Table(name = "tb_tool_control_kit_mec")
+public class ToolControlKitMec {
 
     @JoinColumn(table = "tb_company", referencedColumnName = "id")
     @Column(name = "company_id")

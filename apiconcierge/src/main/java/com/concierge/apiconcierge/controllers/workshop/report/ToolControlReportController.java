@@ -19,7 +19,7 @@ public class ToolControlReportController {
     @Autowired
     ToolControlReportService service;
 
-    @GetMapping("/{companyId}/{resaleId}/all/filter/{mechanicId}/report")
+    @GetMapping("/{companyId}/{resaleId}/all/filter/{mechanicId}/mec")
     public ResponseEntity<Object> filterMec(@PathVariable(name = "companyId") Integer companyId,
                                                      @PathVariable(name = "resaleId") Integer resaleId,
                                                      @PathVariable(name = "mechanicId") Integer mechanicId) {
@@ -31,15 +31,4 @@ public class ToolControlReportController {
         }
     }
 
-    @GetMapping("/{companyId}/{resaleId}/all/filter/req/{requestId}/report")
-    public ResponseEntity<Object> filterRequest(@PathVariable(name = "companyId") Integer companyId,
-                                            @PathVariable(name = "resaleId") Integer resaleId,
-                                            @PathVariable(name = "requestId") Integer requestId) {
-        try {
-            Map<String, Object> result = this.service.filterRequest(companyId, resaleId, requestId);
-            return ResponseEntity.status(HttpStatus.OK).body(result);
-        } catch (Exception ex) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
-        }
-    }
 }

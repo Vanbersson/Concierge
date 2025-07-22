@@ -4,11 +4,14 @@ import com.concierge.apiconcierge.models.workshop.toolcontrol.ToolControlMatMec;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 public interface IToolControlMatMecService {
-    Map<String, Object> save(ToolControlMatMec matMec);
+    String save(ToolControlMatMec matMec);
 
     String update(ToolControlMatMec matMec);
+
+    Map<String, Object>  filterId(Integer companyId, Integer resaleId, UUID id);
 
     List<Map<String, Object>> filterMatIdDevPend(Integer companyId, Integer resaleId, Integer materialId);
 

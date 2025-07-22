@@ -22,27 +22,27 @@ public class ToolControlRequestController {
     @Autowired
     ToolControlRequestService service;
 
-    @PostMapping("/save")
-    public ResponseEntity<Object> save(@RequestBody ToolControlRequestDto data) {
+    @PostMapping("/loan")
+    public ResponseEntity<Object> loanRequest(@RequestBody ToolControlRequestDto data) {
         try {
             ToolControlRequest req = new ToolControlRequest();
             BeanUtils.copyProperties(data, req);
-            Map<String, Object> result = this.service.save(req);
+            Map<String, Object> result = this.service.loanRequest(req);
+            return ResponseEntity.status(HttpStatus.CREATED).body(result);
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
+        }
+    }
+    @PostMapping("/loan/return")
+    public ResponseEntity<Object> loanReturn(@RequestBody ToolControlRequestDto data) {
+        try {
+            ToolControlRequest req = new ToolControlRequest();
+            BeanUtils.copyProperties(data, req);
+            Map<String, Object> result = this.service.loanReturn(req);
             return ResponseEntity.status(HttpStatus.CREATED).body(result);
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
         }
     }
 
-    @PostMapping("/update")
-    public ResponseEntity<Object> update(@RequestBody ToolControlRequestDto data) {
-        try {
-            ToolControlRequest req = new ToolControlRequest();
-            BeanUtils.copyProperties(data, req);
-            String result = this.service.update(req);
-            return ResponseEntity.status(HttpStatus.OK).body(new MessageResponseDto(result));
-        } catch (Exception ex) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
-        }
-    }
 }

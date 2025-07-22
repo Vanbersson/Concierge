@@ -1,24 +1,33 @@
+import { Mechanic } from "../mechanic/Mechanic";
+import { ToolControlMatMec } from "../toolcontrol/tool-control-matmec";
+import { ToolControlRequest } from "../toolcontrol/tool-control-request";
+
 export class ToolControlReport {
+
     companyId: number = 0;
     resaleId: number = 0;
     mecId: number = 0;
-    mecName: string = "";
-    mecPhoto: string = "";
-
+    mechanic: Mechanic;
     materials: [
         {
+            requestStatus: string;
+            requestTypeMaterial: string;
+            requestUserId: number;
             requestId: number;
-            requestDateReq: string;
-            matMecId: string;
+            requestInformation: string;
+            requestDate: string;
             categoryId: number;
             categoryDesc: string;
-            materialId: number;
+            matMecId: string;
+            matMecQuantityReq: number;
+            matMecQuantityRet: number;
+            matMecUserRet: number;
+            matMecDateRet: string;
+            matMecInformationRet:string;
+            matMecMaterialId: number;
             materialDesc: string;
             materialPhoto: string;
-            materialQuantReq: number;
-            materialInfReq: string;
         }
-    ]
-
+    ];
 
 }

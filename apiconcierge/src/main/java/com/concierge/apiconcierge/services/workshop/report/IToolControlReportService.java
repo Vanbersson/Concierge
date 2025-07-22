@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 
 public interface IToolControlReportService {
-    Map<String, Object>filterRequest(Integer companyId, Integer resaleId,Integer requestId);
 
     Map<String, Object> filterMechanic(Integer companyId,Integer resaleId,Integer mechanicId);
 }

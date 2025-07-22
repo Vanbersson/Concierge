@@ -13,12 +13,13 @@ export class ToolControlRequestService {
 
     constructor(private http: HttpClient, private storage: StorageService) { }
     
-    save(req: ToolControlRequest): Observable<HttpResponse<ToolControlRequest>> {
-        return this.http.post<ToolControlRequest>(environment.apiuUrl + "/workshop/tool/control/request/save", req, { headers: this.myHeaders(), observe: 'response' });
+    loanRequest(req: ToolControlRequest): Observable<HttpResponse<ToolControlRequest>> {
+        return this.http.post<ToolControlRequest>(environment.apiuUrl + "/workshop/tool/control/request/loan", req, { headers: this.myHeaders(), observe: 'response' });
     }
-    update(req: ToolControlRequest): Observable<HttpResponse<ToolControlRequest>> {
-        return this.http.post<ToolControlRequest>(environment.apiuUrl + "/workshop/tool/control/request/update", req, { headers: this.myHeaders(), observe: 'response' });
+    loanReturn(req: ToolControlRequest): Observable<HttpResponse<ToolControlRequest>> {
+        return this.http.post<ToolControlRequest>(environment.apiuUrl + "/workshop/tool/control/request/loan/return", req, { headers: this.myHeaders(), observe: 'response' });
     }
+    
     private myHeaders(): HttpHeaders {
         const httpOptions = new HttpHeaders({
             'Content-Type': 'application/json',

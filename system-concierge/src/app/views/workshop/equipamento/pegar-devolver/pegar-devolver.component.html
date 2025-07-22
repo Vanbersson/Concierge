@@ -5,7 +5,7 @@
         <div class="flex gap-2">
             <p-button icon="pi pi-plus" [text]="true" label="Empréstimo" (onClick)="showDialog()" />
             <p-button icon="pi pi-reply" label="Devolver" severity="danger" [disabled]="selectedMaterials.length == 0"
-                (onClick)=" listReq()" />
+                (onClick)=" returnMaterial()" />
         </div>
     </div>
     <p-table #dt dataKey="mecId" [value]="listfilterMec" [expandedRowKeys]="expandedRows"
@@ -34,57 +34,54 @@
         <ng-template pTemplate="body" let-mec let-expanded="expanded">
             <tr>
                 <td>
-                    <p-button type="button" pRipple [pRowToggler]="mec" [text]="true" [rounded]="true" size="small"
-                        [plain]="true" [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'" />
+                    <p-button type="button" pRipple [pRowToggler]="mec" [text]="true" [rounded]="true" size="small" [plain]="true" [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'" />
                 </td>
                 <td>
-                    <img class="layout-img-small" src="data:image/png;base64,{{mec.mecPhoto}}" alt="photo mechanic"
-                        width="50" height="50" loading="lazy" />
+                    <img class="layout-img-small" src="data:image/png;base64,{{mec.mechanic.photo}}" alt="photo mechanic" width="50" height="50" loading="lazy" />
                 </td>
-                <td class="font-bold text-lg">{{mec.mecName | titlecase}}</td>
+                <td class="font-bold text-lg">{{mec.mechanic.name | titlecase}}</td>
             </tr>
         </ng-template>
-        <ng-template pTemplate="rowexpansion" let-mec>
+         <ng-template pTemplate="rowexpansion" let-mec>
             <tr>
                 <td colspan="7">
                     <div class="p-3">
                         <p-table #dt1 [value]="mec.materials" dataKey="matMecId" [(selection)]="selectedMaterials"
                             styleClass="p-datatable-sm">
                             <ng-template pTemplate="header">
-            <tr>
-                <th><p-tableHeaderCheckbox /></th>
-                <th class="font-normal" style="width: 10%">Requisição</th>
-                <th class="font-normal" style="width: 10%">Entregue</th>
-                <th class="font-normal" style="width: 10%">Categoria</th>
-                <th class="font-normal" style="width: 10%">Foto</th>
-                <th class="font-normal" style="width: 30%">Descrição</th>
-                <th class="font-normal" style="width: 10%">Quant.</th>
-                <th class="font-normal" style="width: 10%">Inf.</th>
-                <th class="font-normal" style="width: 10%">Ver</th>
-            </tr>
-        </ng-template>
-        <ng-template pTemplate="body" let-mat>
-            <tr>
-                <td>
-                    <p-tableCheckbox [value]="mat" />
+                                <tr>
+                                    <th></th>
+                                    <th pSortableColumn="requestId" class="font-normal" style="width: 10%">Requisição<p-sortIcon field="requestId"></p-sortIcon></th>
+                                    <th pSortableColumn="requestDate" class="font-normal" style="width: 10%">Entregue<p-sortIcon field="requestDate"></p-sortIcon></th>
+                                    <th pSortableColumn="categoryDesc" class="font-normal" style="width: 10%">Categoria<p-sortIcon field="categoryDesc"></p-sortIcon></th>
+                                    <th pSortableColumn="materialPhoto" class="font-normal" style="width: 10%">Foto<p-sortIcon field="materialPhoto"></p-sortIcon></th>
+                                    <th pSortableColumn="materialDesc" class="font-normal" style="width: 30%">Descrição<p-sortIcon field="materialDesc"></p-sortIcon></th>
+                                    <th pSortableColumn="materialQuantReq" class="font-normal" style="width: 10%">Quant.<p-sortIcon field="materialQuantReq"></p-sortIcon></th>
+                                    <th pSortableColumn="requestInf" class="font-normal" style="width: 10%">Inf.<p-sortIcon field="requestInf"></p-sortIcon></th>
+                                    <th class="font-normal" style="width: 10%">Ver</th>
+                                </tr>
+                            </ng-template>
+                            <ng-template pTemplate="body" let-mat>
+                                <tr *ngIf="!mat.matMecDateRet">
+                                    <td>
+                                        <p-tableCheckbox [value]="mat" />
+                                    </td>
+                                    <td>{{mat.requestId}}</td>
+                                    <td>{{mat.requestDate | date:'dd/MM/yyyy'}}</td>
+                                     <td>{{mat.categoryDesc | uppercase}}</td>
+                                    <td><img class="layout-img-small" src="data:image/png;base64,{{mat.materialPhoto}}" alt="photo material" width="42" height="42" loading="lazy" /></td>
+                                    <td>{{mat.materialDesc | uppercase}}</td>
+                                    <td>{{mat.matMecQuantityReq | number:'1.2-2'}}</td>
+                                    <td>{{mat.requestInformation | uppercase}}</td>
+                                    <td><p-button icon="pi pi-book" [rounded]="true" [text]="true" severity="secondary" /></td> 
+                                </tr>
+                            </ng-template>
+                        </p-table>
+                    </div>
                 </td>
-                <td>{{mat.requestId}}</td>
-                <td>{{mat.requestDateReq | date:'dd/MM/yyyy'}}</td>
-                <td>{{mat.categoryDesc | uppercase}}</td>
-                <td><img class="layout-img-small" src="data:image/png;base64,{{mat.materialPhoto}}" alt="photo material"
-                        width="42" height="42" loading="lazy" /></td>
-                <td>{{mat.materialDesc | uppercase}}</td>
-                <td>{{mat.materialQuantReq}}</td>
-                <td>{{mat.materialInfReq | uppercase}}</td>
-                <td><p-button icon="pi pi-book" [rounded]="true" [text]="true" severity="secondary" /></td>
             </tr>
-        </ng-template>
+        </ng-template> 
     </p-table>
-</div>
-</td>
-</tr>
-</ng-template>
-</p-table>
 </div>
 
 <!-- Pegar -->
@@ -132,9 +129,9 @@
             </div>
             <div class="field col-12 p-0">
                 <label for="mechanicId">Materiais</label>
-                <p-multiSelect [options]="listMatTemp" display="chip" [selectionLimit]="5" placeholder="Selecione"
-                    optionLabel="description" formControlName="material" (onChange)="selectMaterial()"
-                    [style]="{height:'45.5px'}">
+                <p-multiSelect [options]="listMatTemp" (onChange)="selectMaterial()" display="chip" [disabled]="disabledSelectMat"
+                    [selectionLimit]="quantitySelectDefaultMat()" placeholder="Selecione" optionLabel="description"
+                    formControlName="material" [style]="{height:'45.5px'}">
                     <ng-template let-value pTemplate="selectedItems">
                         <div class="inline-flex align-items-center gap-2" *ngFor="let mat of value">
                             <img *ngIf="mat.photo" class="layout-img-small" [src]="'data:image/png;base64,'+mat.photo"
@@ -154,41 +151,86 @@
                 </p-multiSelect>
                 <small class="p-error block" *ngIf="formPegar.get('material')?.invalid">Campo obrigatório</small>
             </div>
-            <div class="field col-12 p-0" style="height: 280px;">
-                <p-table [value]="formPegar.get('material').value" styleClass="p-datatable-sm">
-                    <ng-template pTemplate="header">
-                        <tr>
-                            <th class="font-normal" style="width:10%">Código</th>
-                            <th class="font-normal" style="width:10%">Foto</th>
-                            <th class="font-normal" style="width:70%">Descrição</th>
-                            <th class="font-normal" style="width:10%">Quant.</th>
-                        </tr>
-                    </ng-template>
-                    <ng-template pTemplate="body" let-mat>
-                        <tr>
-                            <td>{{mat.id}}</td>
-                            <td>
-                                <img *ngIf="mat.photo" class="layout-img-small"
-                                    src="data:image/png;base64,{{mat.photo}}" [alt]="mat.description" width="32"
-                                    height="32" loading="lazy" />
-                            </td>
-                            <td>{{mat.description | uppercase}}</td>
-                            <td>{{quantityReqDefault}}</td>
-                        </tr>
-                    </ng-template>
-                </p-table>
-            </div>
+            
         </div>
-        <div class="flex justify-content-between mt-1">
-            <p-button icon="pi pi-info-circle" (onClick)="showDialogInf()" />
-            <div class="gap-2">
-                <button pButton type="button" pRipple label="Fechar" icon="pi pi-times" class="p-button-text"
-                    (click)=" hideDialog()"></button>
-                <button pButton type="button" pRipple label="Confirmar" icon="pi pi-check" class="p-button-text"
-                    [disabled]="formPegar.get('material').invalid" (click)="confirm()"></button>
-            </div>
-        </div>
+        
     </form>
+    <div class="field col-12 p-0" style="height: 280px;">
+        <p-table [value]="formPegar.get('material').value" dataKey="id" editMode="row" [scrollable]="true" scrollHeight="280px"
+            styleClass="p-datatable-sm">
+            <ng-template pTemplate="header">
+                <tr>
+                    <th class="font-normal" style="width:10%">Código</th>
+                    <th class="font-normal" style="width:10%">Foto</th>
+                    <th class="font-normal" style="width:50%">Descrição</th>
+                    <th class="font-normal" style="width:20%">Quant.</th>
+                    <th class="font-normal" style="width:10%"></th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-mat let-editing="editing" let-ri="rowIndex">
+                <tr [pEditableRow]="mat">
+                    <td>{{mat.id}}</td>
+                    <td>
+                        <img *ngIf="mat.photo" class="layout-img-small" src="data:image/png;base64,{{mat.photo}}" [alt]="mat.description" width="32" height="32" loading="lazy" />
+                    </td>
+                    <td>{{mat.description | uppercase}}</td>
+                    <td>
+                        <p-cellEditor>
+                            <ng-template pTemplate="input">
+                                <p-inputNumber model="decimal" [useGrouping]="false" [(ngModel)]="mat.quantityLoan"/>
+                            </ng-template>
+                            <ng-template pTemplate="output">
+                                {{mat.quantityLoan | number:'1.2-2'}}
+                            </ng-template>
+                        </p-cellEditor>
+                    </td>
+                    <td *ngIf="formPegar.get('categories').value.at(0).type == UNIFORME">
+                        <div class="flex align-items-center justify-content-center gap-2">
+                            <button 
+                                *ngIf="!editing" 
+                                pButton 
+                                pRipple 
+                                type="button" 
+                                pInitEditableRow 
+                                icon="pi pi-pencil" 
+                                (click)="onRowEditInit(mat)" 
+                                class="p-button-rounded p-button-text">
+                            </button>
+                            <button 
+                                *ngIf="editing" 
+                                pButton 
+                                pRipple 
+                                type="button" 
+                                pSaveEditableRow 
+                                icon="pi pi-check" 
+                                (click)="onRowEditSave(mat)" 
+                                class="p-button-rounded p-button-text p-button-success mr-1">
+                            </button>
+                            <button 
+                                *ngIf="editing" 
+                                pButton pRipple 
+                                type="button" 
+                                pCancelEditableRow 
+                                icon="pi pi-times" 
+                                (click)="onRowEditCancel(mat, ri)" 
+                                class="p-button-rounded p-button-text p-button-danger">
+                            </button>
+                        </div>
+                    </td>
+                    <td *ngIf="formPegar.get('categories').value.at(0).type != UNIFORME"></td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+    <div class="flex justify-content-between mt-1">
+        <p-button icon="pi pi-info-circle" (onClick)="showDialogInf()" />
+        <div class="gap-2">
+            <button pButton type="button" pRipple label="Fechar" icon="pi pi-times" class="p-button-text"
+                (click)=" hideDialog()"></button>
+            <button pButton type="button" pRipple label="Confirmar" icon="pi pi-check" class="p-button-text"
+                [disabled]="formPegar.get('material').invalid" (click)="confirm()"></button>
+        </div>
+    </div>
 </p-dialog>
 
 <!-- Dialog info -->
@@ -207,38 +249,70 @@
     </div>
 </p-dialog>
 
+<!-- Retorno de material -->
 <p-dialog header="Devolver Materiais" [(visible)]="visibleDialogDev" modal="true"
-    [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }" [style]="{width: '60rem', height:'40rem'}">
+    [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }" [style]="{width: '80rem', height:'40rem'}">
     <div style="min-height: 30rem;">
-        <p-table [value]="listDev"  [tableStyle]="{ 'min-width': '40rem'}" [tableStyle]="{ 'min-width': '50rem' }">
+        <p-table [value]="listReturnMaterial" [tableStyle]="{ 'min-width': '40rem'}" [tableStyle]="{ 'min-width': '50rem' }">
             <ng-template pTemplate="header">
                 <tr>
-                   
-                    <th class="font-normal" style="width: 10%">Querisição</th>
-                    <th class="font-normal" style="width: 40%">Mecânico</th>
+                    <th class="font-normal" style="width: 10%">Requisição</th>
+                    <th class="font-normal" style="width: 35%">Mecânico</th>
                     <th class="font-normal" style="width: 10%">Categoria</th>
+                    <th class="font-normal" style="width: 5%">Quantidade</th>
                     <th class="font-normal" style="width: 40%">Material</th>
+                    <th class="font-normal" style="width: 10%">Inf</th>
                 </tr>
             </ng-template>
             <ng-template pTemplate="body" let-mat>
                 <tr>
                     <td>{{mat.requestId}}</td>
-                    <td class="flex align-items-center gap-2"> 
-                       <img class="layout-img-small" src="data:image/png;base64,{{mat.mecPhoto}}" alt="photo material" width="42" height="42" loading="lazy" /> {{mat.mecName | uppercase}}
+                    <td class="flex align-items-center gap-2">
+                        <img class="layout-img-small" src="data:image/png;base64,{{mat.mechanic.photo}}" alt="photo material" width="42" height="42" loading="lazy" /> {{mat.mechanic.name | uppercase}}
                     </td>
                     <td>{{mat.categoryDesc | uppercase}}</td>
+                    <td>{{mat.matMecQuantityReq}}</td>
                     <td class="flex align-items-center gap-2">
                         <img class="layout-img-small" src="data:image/png;base64,{{mat.materialPhoto}}" alt="photo material" width="42" height="42" loading="lazy" /> {{mat.materialDesc | uppercase}}
                     </td>
+                    <td><input pInputText type="text" [(ngModel)]="mat.matMecInformationRet"/></td>
                 </tr>
             </ng-template>
         </p-table>
     </div>
-
     <div class="flex justify-content-center">
-        <button pButton type="button" pRipple label="Confirmar devolução" icon="pi pi-check" class="p-button-text"></button>
+        <button pButton type="button" pRipple label="Confirmar devolução" icon="pi pi-check" class="p-button-text" (click)="confirmReturnMaterial()"></button>
     </div>
 </p-dialog>
+
+<!-- Confirm password mechanic -->
+<p-confirmDialog #dv key="confimMecCodePass">
+    <ng-template pTemplate="headless" let-message>
+        <div class="flex flex-column align-items-center p-5 surface-overlay border-round">
+             <span class="font-bold text-2xl block mb-2 mt-4">
+                {{ message.header }}
+            </span>
+            <div class="mt-2 layout-dialog-img">
+                <img *ngIf="photoMecDev"  class="layout-img-large" src="data:image/png;base64,{{photoMecDev}}" loading="lazy" />
+            </div>
+            <span class="font-bold text-2xl block mb-2">
+                {{ message.message }}
+            </span>
+            <p class="mb-0">Por favor digite sua senha.</p>
+            <div class="mt-2 flex">
+                <form [formGroup]="formCodePass" (ngSubmit)="onConfirmCodePass(dv)">
+                     <p-password formControlName="codePass" [feedback]="false" [style]="{height:'60px'}" />
+                </form>
+            </div>
+            <div class="flex align-items-center gap-2 mt-4">
+                <button pButton type="button" label="Confirmar" (click)="onConfirmCodePass(dv)" class="w-8rem">
+                </button>
+                <button pButton label="Cancelar" (click)="dv.reject()" class="p-button-outlined w-8rem ">
+                </button>
+            </div>
+        </div>
+    </ng-template>
+</p-confirmDialog>
 
 <!-- Comfirm -->
 <p-confirmDialog #cd>
@@ -252,10 +326,12 @@
             </span>
             <p class="mb-0">{{ message.message }}</p>
             <div class="mt-2 flex">
-                <input type="password" pInputText [style]="{height:'60px'}" [(ngModel)]="codePass" />
+                <form [formGroup]="formCodePass" (ngSubmit)="cd.accept()">
+                    <p-password formControlName="codePass" [feedback]="false" [style]="{height:'60px'}" />
+                </form>
             </div>
             <div class="flex align-items-center gap-2 mt-4">
-                <button pButton label="Confirmar" (click)="cd.accept()" class="w-8rem">
+                <button pButton type="submit" label="Confirmar" (click)="cd.accept()" class="w-8rem">
                 </button>
                 <button pButton label="Cancelar" (click)="cd.reject()" class="p-button-outlined w-8rem ">
                 </button>

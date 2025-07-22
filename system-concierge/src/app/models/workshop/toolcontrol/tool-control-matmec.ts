@@ -4,8 +4,9 @@ export class ToolControlMatMec {
     id: string = "";
     requestId: number = 0;
     quantityReq: number = 0;
-    informationReq: string = "";
-    quantityDev: number = 0;
-    informationDev: string = "";
+    quantityRet: number = 0;
+    userIdRet: number = 0;
+    dateRet: string = "";
+    informationRet: string = "";
     materialId: number = 0;
 }

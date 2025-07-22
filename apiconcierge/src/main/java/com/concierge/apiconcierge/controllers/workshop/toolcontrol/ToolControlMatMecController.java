@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/workshop/tool/control/matmec")
@@ -25,8 +26,8 @@ public class ToolControlMatMecController {
         try {
             ToolControlMatMec matMec = new ToolControlMatMec();
             BeanUtils.copyProperties(data, matMec);
-            Map<String, Object> result = this.service.save(matMec);
-            return ResponseEntity.status(HttpStatus.CREATED).body(result);
+            String message = this.service.save(matMec);
+            return ResponseEntity.status(HttpStatus.CREATED).body(new MessageResponseDto(message));
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
         }
@@ -37,8 +38,20 @@ public class ToolControlMatMecController {
         try {
             ToolControlMatMec matMec = new ToolControlMatMec();
             BeanUtils.copyProperties(data, matMec);
-            String result = this.service.update(matMec);
-            return ResponseEntity.status(HttpStatus.CREATED).body(new MessageResponseDto(result));
+            String message = this.service.update(matMec);
+            return ResponseEntity.status(HttpStatus.CREATED).body(new MessageResponseDto(message));
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
+        }
+    }
+
+    @GetMapping("/{companyId}/{resaleId}/all/filter/{id}/id")
+    public ResponseEntity<Object> filterId(@PathVariable(name = "companyId") Integer companyId,
+                                           @PathVariable(name = "resaleId") Integer resaleId,
+                                           @PathVariable(name = "id") UUID id) {
+        try {
+            Map<String, Object> result = this.service.filterId(companyId, resaleId, id);
+            return ResponseEntity.status(HttpStatus.OK).body(result);
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
         }
@@ -61,7 +74,7 @@ public class ToolControlMatMecController {
                                                      @PathVariable(name = "resaleId") Integer resaleId,
                                                      @PathVariable(name = "mechanicId") Integer mechanicId) {
         try {
-            List<Map<String, Object>> result = this.service.filterMecIdDevPend(companyId, resaleId,mechanicId);
+            List<Map<String, Object>> result = this.service.filterMecIdDevPend(companyId, resaleId, mechanicId);
             return ResponseEntity.status(HttpStatus.OK).body(result);
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));

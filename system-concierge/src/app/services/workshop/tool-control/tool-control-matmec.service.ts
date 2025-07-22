@@ -12,12 +12,16 @@ export class ToolControlMatMecService {
     companyResale: string = this.storage.companyId + "/" + this.storage.resaleId;
 
     constructor(private http: HttpClient, private storage: StorageService) { }
-    
+
     save(matMec: ToolControlMatMec): Observable<HttpResponse<ToolControlMatMec>> {
         return this.http.post<ToolControlMatMec>(environment.apiuUrl + "/workshop/tool/control/matmec/save", matMec, { headers: this.myHeaders(), observe: 'response' });
     }
     update(matMec: ToolControlMatMec): Observable<HttpResponse<ToolControlMatMec>> {
         return this.http.post<ToolControlMatMec>(environment.apiuUrl + "/workshop/tool/control/matmec/update", matMec, { headers: this.myHeaders(), observe: 'response' });
+    }
+
+    filterId(id: string): Observable<HttpResponse<ToolControlMatMec>> {
+        return this.http.get<ToolControlMatMec>(environment.apiuUrl + "/workshop/tool/control/matmec/" + this.companyResale + "/all/filter/" + id + "/id", { headers: this.myHeaders(), observe: 'response' });
     }
 
     private myHeaders(): HttpHeaders {

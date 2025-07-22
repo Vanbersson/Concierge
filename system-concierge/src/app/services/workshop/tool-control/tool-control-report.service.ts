@@ -14,12 +14,9 @@ export class ToolcontrolReportService {
     constructor(private http: HttpClient, private storage: StorageService) { }
     
     filterMec(mechanicId: number): Observable<ToolControlReport> {
-        return this.http.get<ToolControlReport>(environment.apiuUrl + "/workshop/tool/control/report/" + this.companyResale + "/all/filter/"+mechanicId+"/report", { headers: this.myHeaders() });
+        return this.http.get<ToolControlReport>(environment.apiuUrl + "/workshop/tool/control/report/" + this.companyResale + "/all/filter/"+mechanicId+"/mec", { headers: this.myHeaders() });
     }
-    filterRequest(requestId: number): Observable<any> {
-        return this.http.get<any>(environment.apiuUrl + "/workshop/tool/control/report/" + this.companyResale + "/all/filter/req/"+requestId+"/report", { headers: this.myHeaders() });
-    }
-
+    
     private myHeaders(): HttpHeaders {
         const httpOptions = new HttpHeaders({
             'Content-Type': 'application/json',

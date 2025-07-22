@@ -27,6 +27,9 @@ import { ToolControlCategoryService } from '../../../../../services/workshop/too
 import { HttpResponse } from '@angular/common/http';
 import { lastValueFrom } from 'rxjs';
 
+enum TypeCategory {
+  FERRAMENTA = "Ferramenta", EPI = "EPI", UNIFORME = "Uniforme", OUTRO = "Outro"
+}
 
 @Component({
   selector: 'app-categoria',
@@ -45,6 +48,12 @@ export default class CategoriaComponent implements OnInit {
   enabled = StatusEnabledDisabled.enabled;
   disabled = StatusEnabledDisabled.disabled;
 
+  typeOutro = TypeCategory.OUTRO;
+  typeFerr = TypeCategory.FERRAMENTA;
+  typeEPI = TypeCategory.EPI;
+  typeUnif = TypeCategory.UNIFORME;
+
+
   categories: ToolControlCategory[] = []
 
   //Dialog
@@ -52,7 +61,10 @@ export default class CategoriaComponent implements OnInit {
 
   formCat = new FormGroup({
     status: new FormControl<string>(this.enabled, Validators.required),
-    description: new FormControl<string>("", Validators.required)
+    description: new FormControl<string>("", Validators.required),
+    quantityReq: new FormControl<number | null>(null),
+    type: new FormControl<string>(TypeCategory.OUTRO, Validators.required),
+
   });
 
   constructor(
@@ -77,7 +89,9 @@ export default class CategoriaComponent implements OnInit {
   cleanForm() {
     this.formCat.patchValue({
       description: "",
-      status: this.enabled
+      status: this.enabled,
+      quantityReq: null,
+      type: this.typeOutro
     });
     this.category = null;
   }
@@ -88,7 +102,9 @@ export default class CategoriaComponent implements OnInit {
 
     this.formCat.patchValue({
       description: cat.description,
-      status: cat.status
+      status: cat.status,
+      type: cat.type,
+      quantityReq: cat.quantityReq != 0 ? cat.quantityReq : null
     });
   }
   async saveCategory() {
@@ -104,6 +120,8 @@ export default class CategoriaComponent implements OnInit {
       this.category.resaleId = this.storageService.resaleId;
       this.category.description = value.description;
       this.category.status = value.status;
+      this.category.type = value.type;
+      this.category.quantityReq = value.quantityReq != null ? value.quantityReq : 0;
 
       const resultSave = await this.saveCat(this.category);
       if (resultSave.status == 201) {
@@ -115,6 +133,8 @@ export default class CategoriaComponent implements OnInit {
       //Update
       this.category.description = value.description;
       this.category.status = value.status;
+      this.category.type = value.type;
+      this.category.quantityReq = value.quantityReq != null ? value.quantityReq : 0;
       const resultUpdate = await this.updateCat(this.category);
       if (resultUpdate.status == 200) {
         this.messageService.add({ severity: 'success', summary: 'Categoria', detail: 'Atualizada com sucesso', icon: 'pi pi-check' });

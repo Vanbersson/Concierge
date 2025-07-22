@@ -14,6 +14,10 @@ public class ToolControlCategoryValidation implements IToolControlCategoryValida
             return ConstantsMessage.ERROR_RESALE;
         if (cat.getStatus() == null)
             return ConstantsMessage.ERROR_STATUS;
+        if (cat.getType() == null)
+            return "Type not informed.";
+        if (cat.getQuantityReq() == null)
+            return "Quantity request not informed.";
         if (cat.getDescription().isBlank())
             return ConstantsMessage.ERROR_NAME;
 

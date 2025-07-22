@@ -258,6 +258,14 @@ export default class MaterialComponent implements OnInit {
       photo: mat.photo
     });
     this.photoMat = mat.photo;
+
+    this.disableQuantityAccountingLoan();
+    this.disableQuantityAvailableLoan();
+    this.editQuantityLoan = false;
+
+    this.disableQuantityAccountingKit();
+    this.disableQuantityAvailableKit();
+    this.editQuantityKit = false;
   }
   async saveMaterial() {
     this.enableQuantityAccountingLoan();
@@ -269,6 +277,13 @@ export default class MaterialComponent implements OnInit {
     const { value, valid } = this.formMat;
 
     if (!valid) {
+      this.disableQuantityAccountingLoan();
+      this.disableQuantityAvailableLoan();
+      this.editQuantityLoan = false;
+
+      this.disableQuantityAccountingKit();
+      this.disableQuantityAvailableKit();
+      this.editQuantityKit = false;
       return;
     }
 
@@ -304,6 +319,9 @@ export default class MaterialComponent implements OnInit {
         });
 
         this.messageService.add({ severity: 'success', summary: 'Material', detail: 'Salvo com sucesso', icon: 'pi pi-check' });
+      }else{
+        this.hideDialog();
+        this.messageService.add({ severity: 'error', summary: 'Material', detail: 'Inválido', icon: 'pi pi-times' });
       }
     } else {
       //Update
@@ -329,6 +347,9 @@ export default class MaterialComponent implements OnInit {
           quantityAvailableKit: resultSave.body.quantityAvailableKit
         });
         this.messageService.add({ severity: 'success', summary: 'Material', detail: 'Atualizado com sucesso', icon: 'pi pi-check' });
+      }else{
+        this.hideDialog();
+        this.messageService.add({ severity: 'error', summary: 'Material', detail: 'Inválido', icon: 'pi pi-times' });
       }
     }
 

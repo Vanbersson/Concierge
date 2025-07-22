@@ -1,6 +1,7 @@
 package com.concierge.apiconcierge.models.workshop.toolcontrol;
 
 import com.concierge.apiconcierge.models.status.StatusEnableDisable;
+import com.concierge.apiconcierge.models.workshop.toolcontrol.enums.TypeCategory;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -27,6 +28,11 @@ public class ToolControlCategory {
     private Integer id;
 
     private StatusEnableDisable status;
+
+    private TypeCategory type;
+
+    @Column(name = "quantity_req")
+    private Integer quantityReq;
 
     private String description;
 }

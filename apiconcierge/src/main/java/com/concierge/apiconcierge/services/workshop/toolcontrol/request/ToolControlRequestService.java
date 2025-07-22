@@ -23,13 +23,11 @@ public class ToolControlRequestService implements IToolControlRequestService {
 
     @SneakyThrows
     @Override
-    public Map<String, Object> save(ToolControlRequest req) {
+    public Map<String, Object> loanRequest(ToolControlRequest req) {
         try {
-            String message = this.validation.save(req);
+            String message = this.validation.loanRequest(req);
             if (ConstantsMessage.SUCCESS.equals(message)) {
                 req.setId(null);
-                req.setDateDev(null);
-                req.setUserIdDev(null);
 
                 ToolControlRequest result = this.repository.save(req);
                 Map<String, Object> map = new HashMap<>();
@@ -45,16 +43,15 @@ public class ToolControlRequestService implements IToolControlRequestService {
 
     @SneakyThrows
     @Override
-    public String update(ToolControlRequest req) {
+    public Map<String, Object> loanReturn(ToolControlRequest req) {
         try {
-            String message = this.validation.update(req);
+            String message = this.validation.loanReturn(req);
             if (ConstantsMessage.SUCCESS.equals(message)) {
                 req.setId(null);
-                req.setDateDev(null);
-                req.setUserIdDev(null);
-
-                this.repository.save(req);
-                return ConstantsMessage.SUCCESS;
+                ToolControlRequest result = this.repository.save(req);
+                Map<String, Object> map = new HashMap<>();
+                map.put("id", result.getId());
+                return map;
             } else {
                 throw new ToolControlException(message);
             }
@@ -62,4 +59,6 @@ public class ToolControlRequestService implements IToolControlRequestService {
             throw new ToolControlException(ex.getMessage());
         }
     }
+
+
 }

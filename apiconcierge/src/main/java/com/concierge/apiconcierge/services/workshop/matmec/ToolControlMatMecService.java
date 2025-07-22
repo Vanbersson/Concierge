@@ -3,9 +3,11 @@ package com.concierge.apiconcierge.services.workshop.matmec;
 import com.concierge.apiconcierge.exceptions.workshop.toolcontrol.ToolControlException;
 import com.concierge.apiconcierge.models.workshop.toolcontrol.ToolControlMatMec;
 import com.concierge.apiconcierge.models.workshop.toolcontrol.ToolControlMaterial;
+import com.concierge.apiconcierge.models.workshop.toolcontrol.ToolControlRequest;
 import com.concierge.apiconcierge.models.workshop.toolcontrol.enums.TypeMaterial;
 import com.concierge.apiconcierge.repositories.workshop.toolcontrol.IToolControlMatMecRepository;
 import com.concierge.apiconcierge.repositories.workshop.toolcontrol.IToolControlMaterialRepository;
+import com.concierge.apiconcierge.repositories.workshop.toolcontrol.IToolControlRequestRepository;
 import com.concierge.apiconcierge.util.ConstantsMessage;
 import com.concierge.apiconcierge.validation.workshop.toolcontrol.matmec.ToolControlMatMecValidation;
 import lombok.SneakyThrows;
@@ -15,6 +17,7 @@ import org.springframework.stereotype.Service;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @Service
 public class ToolControlMatMecService implements IToolControlMatMecService {
@@ -30,24 +33,30 @@ public class ToolControlMatMecService implements IToolControlMatMecService {
 
     @SneakyThrows
     @Override
-    public Map<String, Object> save(ToolControlMatMec matMec) {
+    public String save(ToolControlMatMec matMec) {
         try {
             String message = this.validation.save(matMec);
             if (ConstantsMessage.SUCCESS.equals(message)) {
+                float quant = matMec.getQuantityReq();
+                for (int i = 0; i < quant; i++) {
+                    ToolControlMatMec newMatMec = new ToolControlMatMec();
+                    newMatMec.setCompanyId(matMec.getCompanyId());
+                    newMatMec.setResaleId(matMec.getResaleId());
+                    newMatMec.setRequestId(matMec.getRequestId());
+                    newMatMec.setQuantityReq(1);
+                    newMatMec.setQuantityRet(0);
+                    newMatMec.setUserIdRet(null);
+                    newMatMec.setDateRet(null);
+                    newMatMec.setInformationRet("");
+                    newMatMec.setMaterialId(matMec.getMaterialId());
+                    ToolControlMatMec resultSave = this.repository.save(newMatMec);
+                }
 
-                matMec.setId(null);
-                matMec.setQuantityDev(0);
-                matMec.setInformationDev("");
-
-                ToolControlMatMec resultSave = this.repository.save(matMec);
-                String resultMessage = this.updateQuantityMaterial(matMec);
+                String resultMessage = this.updateQuantityMaterial(matMec, "Loan");
                 if (!ConstantsMessage.SUCCESS.equals(resultMessage)) {
                     //Error
                 }
-
-                Map<String, Object> map = new HashMap<>();
-                map.put("id", resultSave.getId());
-                return map;
+                return ConstantsMessage.SUCCESS;
             } else {
                 throw new ToolControlException(message);
             }
@@ -56,26 +65,15 @@ public class ToolControlMatMecService implements IToolControlMatMecService {
         }
     }
 
-    private String updateQuantityMaterial(ToolControlMatMec matMec) {
-        ToolControlMaterial mat = this.materialRepository.filterMaterial(matMec.getCompanyId(), matMec.getResaleId(), matMec.getMaterialId());
-        if (mat == null)
-            return "Material not found.";
-
-        if (mat.getType().equals(TypeMaterial.Loan)) {
-            if (mat.getQuantityAvailableLoan() < 1)
-                return "Material not available.";
-            mat.setQuantityAvailableLoan(mat.getQuantityAvailableLoan() - 1);
-        } else if (mat.getType().equals(TypeMaterial.Kit)) {
-//            if (mat.getQuantityAvailableKit() < 1)
-//                return "Material not available.";
-//            mat.setQuantityAvailableKit(mat.getQuantityAvailableKit() - 1);
-        } else if (mat.getType().equals(TypeMaterial.Ambos)) {
-            if (mat.getQuantityAvailableLoan() < 1)
-                return "Material not available.";
-            mat.setQuantityAvailableLoan(mat.getQuantityAvailableLoan() - 1);
+    private String updateQuantityMaterial(ToolControlMatMec matMec, String type) {
+        List<ToolControlMatMec> mats = this.repository.filterMatIdDevPend(matMec.getCompanyId(), matMec.getResaleId(), matMec.getMaterialId());
+        ToolControlMaterial material = this.materialRepository.filterId(matMec.getCompanyId(), matMec.getResaleId(), matMec.getMaterialId());
+        if (type.equals("Loan")) {
+            material.setQuantityAvailableLoan(material.getQuantityAccountingLoan() - mats.size());
+        } else if (type.equals("Return")) {
+            material.setQuantityAvailableLoan(material.getQuantityAvailableLoan() + matMec.getQuantityRet());
         }
-
-        this.materialRepository.save(mat);
+        this.materialRepository.save(material);
         return ConstantsMessage.SUCCESS;
     }
 
@@ -86,7 +84,30 @@ public class ToolControlMatMecService implements IToolControlMatMecService {
             String message = this.validation.update(matMec);
             if (ConstantsMessage.SUCCESS.equals(message)) {
                 this.repository.save(matMec);
+                String resultMessage = this.updateQuantityMaterial(matMec, "Return");
+                if (!ConstantsMessage.SUCCESS.equals(resultMessage)) {
+                    //Error
+                }
                 return ConstantsMessage.SUCCESS;
+            } else {
+                throw new ToolControlException(message);
+            }
+        } catch (Exception ex) {
+            throw new ToolControlException(ex.getMessage());
+        }
+    }
+
+    @SneakyThrows
+    @Override
+    public Map<String, Object> filterId(Integer companyId, Integer resaleId, UUID id) {
+        try {
+            String message = this.validation.filterId(companyId, resaleId, id);
+            if (ConstantsMessage.SUCCESS.equals(message)) {
+                ToolControlMatMec matmec = this.repository.filterId(companyId, resaleId, id);
+                if (matmec == null)
+                    throw new ToolControlException("Material not found.");
+
+                return this.loadMatMec(matmec);
             } else {
                 throw new ToolControlException(message);
             }
@@ -118,5 +139,20 @@ public class ToolControlMatMecService implements IToolControlMatMecService {
     @Override
     public List<Map<String, Object>> listAllDevComp(Integer companyId, Integer resaleId) {
         return null;
+    }
+
+    private Map<String, Object> loadMatMec(ToolControlMatMec matMec) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("companyId", matMec.getCompanyId());
+        map.put("resaleId", matMec.getResaleId());
+        map.put("id", matMec.getId());
+        map.put("requestId", matMec.getRequestId());
+        map.put("quantityReq", matMec.getQuantityReq());
+        map.put("quantityRet", matMec.getQuantityRet());
+        map.put("userIdRet", matMec.getUserIdRet() != null ? matMec.getUserIdRet() : "");
+        map.put("dateRet", matMec.getDateRet() != null ? matMec.getDateRet() : "");
+        map.put("informationRet", matMec.getInformationRet());
+        map.put("materialId", matMec.getMaterialId());
+        return map;
     }
 }

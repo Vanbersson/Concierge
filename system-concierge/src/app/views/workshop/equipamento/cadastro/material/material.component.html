@@ -24,17 +24,21 @@
             <tr>
                 <th pSortableColumn="id" class="font-normal" style="width:10%">Código<p-sortIcon
                         field="id"></p-sortIcon></th>
-                <th pSortableColumn="status" class="font-normal" style="width:10%">Ativo<p-sortIcon
+                <th pSortableColumn="status" class="font-normal" style="width:5%">Ativo<p-sortIcon
                         field="status"></p-sortIcon></th>
                 <th pSortableColumn="categoryId" class="font-normal" style="width:10%">Categoria<p-sortIcon
                         field="categoryId"></p-sortIcon></th>
-                <th pSortableColumn="photo" class="font-normal" style="width:10%">Foto<p-sortIcon
+                <th pSortableColumn="photo" class="font-normal" style="width:5%">Foto<p-sortIcon
                         field="photo"></p-sortIcon></th>
-                <th pSortableColumn="description" class="font-normal" style="width:40%">Descrição<p-sortIcon
+                <th pSortableColumn="description" class="font-normal" style="width:30%">Descrição<p-sortIcon
                         field="description"></p-sortIcon></th>
+                <th pSortableColumn="quantityAvailableLoan" class="font-normal" style="width:10%">Empréstimo<p-sortIcon
+                        field="quantityAvailableLoan"></p-sortIcon></th>
+                <th pSortableColumn="quantityAvailableKit" class="font-normal" style="width:5%">Kit<p-sortIcon
+                        field="quantityAvailableKit"></p-sortIcon></th>
                 <th pSortableColumn="validityDay" class="font-normal" style="width:10%">Validade<p-sortIcon
                         field="validityDay"></p-sortIcon></th>
-                <th class="font-normal" style="width:10%">Editar</th>
+                <th class="font-normal" style="width:5%">Editar</th>
             </tr>
         </ng-template>
         <ng-template pTemplate="body" let-mat>
@@ -53,6 +57,8 @@
                     }
                 </td>
                 <td>{{mat.description | uppercase}}</td>
+                <td>{{mat.quantityAvailableLoan}}</td>
+                 <td>{{mat.quantityAvailableKit}}</td>
                 <td>@if (mat.validityDay != 0) { {{mat.validityDay}} }</td>
                 <td><p-button icon="pi pi-pencil" label="Editar" [text]="true" (onClick)="editMat(mat)" size="small" />
                 </td>
@@ -61,7 +67,7 @@
     </p-table>
 </div>
 
-<p-dialog header="Cadastro" [(visible)]="visibleDialog" [style]="{width: '50rem'}">
+<p-dialog header="Cadastro" [(visible)]="visibleDialog" [modal]="true" [style]="{width: '50rem'}">
     <form [formGroup]="formMat" (ngSubmit)="saveMaterial()">
         <div class="p-fluid p-formgrid grid">
             <div class="mt-2 layout-dialog-img">
@@ -120,12 +126,15 @@
                 <div class="flex gap-2 w-6 p-1 pt-2 pb-2 border-1 border-round-md border-200">
                     <div class="flex flex-column field">
                         <label for="quantityAccountingId">Contábil</label>
-                        <p-inputNumber *ngIf="editQuantityLoan" [minFractionDigits]="2" formControlName="quantityAccountingLoan" />
+                        <p-inputNumber *ngIf="editQuantityLoan" [minFractionDigits]="2"
+                            formControlName="quantityAccountingLoan" />
                         <p-inputGroup *ngIf="!editQuantityLoan">
                             <p-inputNumber [minFractionDigits]="2" formControlName="quantityAccountingLoan" />
-                            <button type="button" pButton icon="pi pi-lock" class="p-button-secondary" (click)="confirmEditQuant()"></button>
+                            <button type="button" pButton icon="pi pi-lock" class="p-button-secondary"
+                                (click)="confirmEditQuant()"></button>
                         </p-inputGroup>
-                        <small class="p-error block" *ngIf="formMat.get('quantityAccountingLoan')?.invalid">Campo obrigatório</small>
+                        <small class="p-error block" *ngIf="formMat.get('quantityAccountingLoan')?.invalid">Campo
+                            obrigatório</small>
                     </div>
                     <div class="flex flex-column field">
                         <label for="quantityAvailableId">Disponível</label>
@@ -136,7 +145,8 @@
                 <div class="flex gap-2 w-6 p-1 pt-2 pb-2 border-1 border-round-md border-200">
                     <div class="flex flex-column field">
                         <label for="quantityAccountingId">Contábil</label>
-                        <p-inputNumber *ngIf="editQuantityKit" [minFractionDigits]="2" formControlName="quantityAccountingKit" />
+                        <p-inputNumber *ngIf="editQuantityKit" [minFractionDigits]="2"
+                            formControlName="quantityAccountingKit" />
                         <p-inputGroup *ngIf="!editQuantityKit">
                             <p-inputNumber [minFractionDigits]="2" formControlName="quantityAccountingKit" />
                             <button type="button" pButton icon="pi pi-lock" class="p-button-secondary"

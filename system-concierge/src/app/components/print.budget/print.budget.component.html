@@ -2,15 +2,13 @@
     <img src="../../../../assets/image/barra-nativa.jpg" alt="" width="800">
     <div class="flex justify-content-between w-screen mt-2 ">
         <span>NATIVA MAQUINAS E IMPLEMENTO LTDA</span>
-
         <div class="flex gap-2">
+            <span>DATA: <strong>{{budget.dateGeneration| date:'dd/MM/yyyy'}}</strong></span>
             <span>VALIDADE: <strong>{{budget.dateValidation| date:'dd/MM/yyyy'}}</strong></span>
             <span>ORÇAMENTO: <strong>Nº {{formatNumberBudget(budget.id)}}</strong></span>
         </div>
-
     </div>
     <div class="border-bottom-1 w-screen"></div>
-
     <div class="flex mb-1 mt-2 w-screen">
         <div class="flex justify-content-between w-screen">
             <div class="w-2">
@@ -253,9 +251,12 @@
         {{budget.information}}
     </div>
     <div class="mt-2">
-        <p>Orçamento esta sujeito a alteração após o prazo de validade; serviço será iniciado após aprovação; não
-            aprovação será cobrado desmont/montagem e estacionamento; caso haja fornecim. peças será acrescido 20% ao
-            valor total da mão de obra; materiais substit. deverão ser retirados em 48h após conclusão do serviço, caso
-            contrário nativa dará devido destino, não cabendo indenização/pagamento.</p>
+        <p class="text-xs" style="font-size: 8px;">Orçamento está sujeito a alteração após o prazo de validade; serviço será iniciado após aprovação;
+            A elaboração do orçamento é uma cortesia da Nativa para orçamentos aprovados;
+            após o envio do orçamento, concedemos ate 5 dias de estacionamento sem custo em nosso patio e depois será cobrado R$ 30,00 por placa por dia;
+            concedemos 90 dias de garantia em nossos serviços;
+            caso haja fornecimento de peças pelo cliente será acrescido 20% ao valor total da mão de obra e perda da garantia;
+            materiais substituidos deverão ser retirados em 48h após conclusão do serviço, caso
+            contrário Nativa dará devido destino, não caberá indenização.</p>
     </div>
 </div>
