@@ -30,6 +30,7 @@ import { ToolControlCategoryService } from '../../../../../services/workshop/too
 import { ToolControlMaterialService } from '../../../../../services/workshop/tool-control/tool-control-material.service';
 import { HttpResponse } from '@angular/common/http';
 import { lastValueFrom } from 'rxjs';
+import { BusyService } from '../../../../../components/loading/busy.service';
 
 
 enum typeMaterial {
@@ -52,12 +53,9 @@ export default class MaterialComponent implements OnInit {
   visibleDialog = false;
   enabled = StatusEnabledDisabled.enabled;
   disabled = StatusEnabledDisabled.disabled;
-
   material: ToolControlMaterial;
-
   listMat: ToolControlMaterial[] = [];
   listCat: ToolControlCategory[] = [];
-
   photoMat: string = "";
 
   //Dialog
@@ -67,7 +65,6 @@ export default class MaterialComponent implements OnInit {
   loan = typeMaterial.loan;
   kit = typeMaterial.kit;
   ambos = typeMaterial.ambos;
-
 
   formMat = new FormGroup({
     status: new FormControl<string>(this.enabled, Validators.required),
@@ -83,6 +80,7 @@ export default class MaterialComponent implements OnInit {
   });
 
   constructor(
+    private busyService: BusyService,
     private materialService: ToolControlMaterialService,
     private messageService: MessageService,
     private confirmationService: ConfirmationService,
@@ -91,8 +89,10 @@ export default class MaterialComponent implements OnInit {
     private categoryService: ToolControlCategoryService) { }
 
   ngOnInit(): void {
-    this.listAllMaterial();
+    //Inicia o loading
+    this.busyService.busy();
     this.listAllCategory();
+    this.listAllMaterial();
     this.disableQuantityAccountingLoan();
     this.disableQuantityAvailableLoan();
     this.disableQuantityAccountingKit();
@@ -127,6 +127,8 @@ export default class MaterialComponent implements OnInit {
   private listAllMaterial() {
     this.materialService.listAll().subscribe(data => {
       this.listMat = data;
+      //Fecha o loading
+      this.busyService.idle();
     });
   }
   cleanForm() {

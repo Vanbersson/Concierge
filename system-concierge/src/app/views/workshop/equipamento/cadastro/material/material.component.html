@@ -51,16 +51,15 @@
                     </i>
                 </td>
                 <td>{{allCategoriesDesc(mat.categoryId) | uppercase }}</td>
-                <td>@if (mat.photo) {
-                    <img class="layout-img-small" src="data:image/png;base64,{{mat.photo}}" alt="photo mechanic"
-                        width="32" height="32" loading="lazy" />
-                    }
+                <td>
+                    <img *ngIf="mat.photo" class="layout-img-small" src="data:image/png;base64,{{mat.photo}}" alt="photo mechanic" width="32" height="32" loading="lazy" />
                 </td>
                 <td>{{mat.description | uppercase}}</td>
                 <td>{{mat.quantityAvailableLoan}}</td>
                  <td>{{mat.quantityAvailableKit}}</td>
                 <td>@if (mat.validityDay != 0) { {{mat.validityDay}} }</td>
-                <td><p-button icon="pi pi-pencil" label="Editar" [text]="true" (onClick)="editMat(mat)" size="small" />
+                <td>
+                    <p-button icon="pi pi-pencil" label="Editar" [text]="true" (onClick)="editMat(mat)" size="small" />
                 </td>
             </tr>
         </ng-template>

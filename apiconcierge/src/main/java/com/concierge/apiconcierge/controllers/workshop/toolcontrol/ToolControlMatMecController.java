@@ -39,7 +39,7 @@ public class ToolControlMatMecController {
             ToolControlMatMec matMec = new ToolControlMatMec();
             BeanUtils.copyProperties(data, matMec);
             String message = this.service.update(matMec);
-            return ResponseEntity.status(HttpStatus.CREATED).body(new MessageResponseDto(message));
+            return ResponseEntity.status(HttpStatus.OK).body(new MessageResponseDto(message));
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
         }

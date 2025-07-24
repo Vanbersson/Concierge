@@ -1,6 +1,6 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
-import { FormControl, FormsModule, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormControl, FormsModule, FormGroup, ReactiveFormsModule, Validators, FormBuilder } from '@angular/forms';
 //PrimeNG
 import { InputTextModule } from 'primeng/inputtext';
 import { InputNumberModule } from 'primeng/inputnumber';
@@ -35,6 +35,7 @@ import { ToolControlRequestService } from '../../../../services/workshop/tool-co
 import { ToolControlRequest } from '../../../../models/workshop/toolcontrol/tool-control-request';
 import { ToolcontrolReportService } from '../../../../services/workshop/tool-control/tool-control-report.service';
 import { ToolControlReport } from '../../../../models/workshop/report/tool-control-report';
+import { BusyService } from '../../../../components/loading/busy.service';
 
 enum StatusRequest {
   PENDING = "Pending", COMPLETE = "Complete"
@@ -75,10 +76,10 @@ class MatItem {
   providers: [ConfirmationService, MessageService]
 })
 export default class PegarDevolverComponent implements OnInit {
-
   expandedRows = {};
   listfilterMec: ToolControlReport[] = [];
   selectedMaterials: MatItem[] = [];
+realPassword = '';
   //Dialog Pegar
   visibleDialogPegar = false;
   visibleDialogPegarInf = false;
@@ -86,8 +87,9 @@ export default class PegarDevolverComponent implements OnInit {
   quantityReqDefault = 1;
   quantitySelectDefaultMat = signal<number>(0);
   formCodePass = new FormGroup({
-    codePass: new FormControl<number | null>(null, Validators.required)
+    maskedPassword: new FormControl<any>([''], Validators.required)
   });
+  
   listMec: Mechanic[] = [];
   listCat: ToolControlCategory[] = [];
   private listMat: ToolControlMaterial[] = [];
@@ -107,12 +109,12 @@ export default class PegarDevolverComponent implements OnInit {
     categories: new FormControl<ToolControlCategory[] | null>([], Validators.required),
     inforReq: new FormControl<string>(""),
   });
-
   //Edit
   clonedMaterial: { [s: number]: ToolControlMaterial } = {};
   UNIFORME = TypeCategory.UNIFORME;
 
   constructor(
+    private busyService: BusyService,
     private storageService: StorageService,
     private mechanicService: MechanicService,
     private categoryService: ToolControlCategoryService,
@@ -124,9 +126,28 @@ export default class PegarDevolverComponent implements OnInit {
     private reportService: ToolcontrolReportService) { }
 
   ngOnInit(): void {
+    //Inicia o loading
+    this.busyService.busy();
     this.listMecEnabled();
     this.listCategory();
     this.listMaterial();
+  }
+
+  onInput(): void {
+    const masked = this.formCodePass.get('maskedPassword')?.value;
+    const realLength = this.realPassword.length;
+    const maskedLength = masked.length;
+    if (maskedLength < realLength) {
+      // backspace ou remoção
+      this.realPassword = this.realPassword.substring(0, maskedLength);
+    } else {
+      const newChar = masked.charAt(maskedLength - 1);
+      this.realPassword += newChar;
+    }
+    // atualiza o campo com asteriscos
+    this.formCodePass.get('maskedPassword')?.setValue('*'.repeat(this.realPassword.length), {
+      emitEvent: false // evita loop de input
+    });
   }
   private async filterMaterialMec() {
     for (let index = 0; index < this.listMec.length; index++) {
@@ -148,6 +169,8 @@ export default class PegarDevolverComponent implements OnInit {
   private async listMaterial() {
     this.materialService.listAllEnabled().subscribe(data => {
       this.listMat = data;
+      //Facha o loading
+      this.busyService.idle();
     });
   }
   private listCategory() {
@@ -215,8 +238,7 @@ export default class PegarDevolverComponent implements OnInit {
       this.formPegar.patchValue({ material: [] });
     }
   }
-  selectMaterial(){
-
+  selectMaterial() {
   }
   cleanFormPegar() {
     this.formPegar.patchValue({
@@ -246,6 +268,12 @@ export default class PegarDevolverComponent implements OnInit {
   }
   hideDialogDev() {
     this.visibleDialogDev = false;
+
+    this.selectedMaterials = [];
+    this.listMec = [];
+    this.listfilterMec = [];
+    this.listMecEnabled();
+    this.listMaterial();
   }
   async returnMaterial() {
     //Vefica se a material selecionado
@@ -254,6 +282,7 @@ export default class PegarDevolverComponent implements OnInit {
     }
     this.listReturnMaterial = [];
     this.listMechanicDev = [];
+
     for (let index = 0; index < this.selectedMaterials.length; index++) {
       const element = this.selectedMaterials[index];
       const mecSelecionado = this.listfilterMec.filter(mec => {
@@ -264,13 +293,18 @@ export default class PegarDevolverComponent implements OnInit {
       item.mechanic.id = mecSelecionado.at(0).mechanic.id;
       item.mechanic.name = mecSelecionado.at(0).mechanic.name;
       item.mechanic.photo = mecSelecionado.at(0).mechanic.photo;
+
       item.requestId = element.requestId;
-      item.materialPhoto = element.materialPhoto;
+
       item.matMecId = element.matMecId;
       item.matMecMaterialId = element.matMecMaterialId;
-      item.materialDesc = element.materialDesc;
-      item.categoryDesc = element.categoryDesc;
       item.matMecQuantityReq = element.matMecQuantityReq;
+
+      item.materialDesc = element.materialDesc;
+      item.materialPhoto = element.materialPhoto;
+      item.categoryDesc = element.categoryDesc;
+
+      //Adiciona a lista de devolução
       this.listReturnMaterial.push(item);
       //Lista de mecânicos que estão devolvendo os materiais
       const mecFind = this.listMechanicDev.find(mec => mec.id === mecSelecionado.at(0).mechanic.id);
@@ -285,12 +319,13 @@ export default class PegarDevolverComponent implements OnInit {
     var errorMec: Mechanic[] = [];
     for (var mec of this.listMechanicDev) {
       //Chama o confirma o código do mecânico
-      const result = await this.confirmCodePass(mec.name, mec.photo, mec.codePassword);
+      const resultConfirm = await this.confirmCodePass(mec.name, mec.photo, mec.codePassword);
       //Materiais do mecânico
       const materialsMec = this.listReturnMaterial.filter(mechanic => mechanic.mechanic.id == mec.id);
-      if (result) {
+      if (resultConfirm) {
         //Savar a devolução dos materiais
-        for (var item of materialsMec) {
+        for (var i = 0; i < materialsMec.length; i++) {
+          const item = materialsMec[i];
           var matmec: ToolControlMatMec = new ToolControlMatMec();
           matmec.companyId = mec.companyId;
           matmec.resaleId = mec.resaleId;
@@ -302,7 +337,18 @@ export default class PegarDevolverComponent implements OnInit {
           matmec.userIdRet = this.storageService.id;
           matmec.informationRet = item.matMecInformationRet;
           matmec.materialId = item.matMecMaterialId;
-          this.updateMatMec(matmec);
+          //Save
+          const resultUpdateMat = await this.updateMatMec(matmec);
+          if (resultUpdateMat.status == 200) {
+            //Remove o material salvo
+            this.listReturnMaterial = this.listReturnMaterial.filter(material => material.matMecId != matmec.id);
+          }
+          //Último
+          if (i == (materialsMec.length - 1)) {
+            //Remove o mecânico
+            this.listMechanicDev = this.listMechanicDev.filter(mechanic => mechanic.id != mec.id);
+            this.messageService.add({ severity: 'success', summary: 'Materiais', detail: 'Devolução realizada com sucesso', icon: 'pi pi-check' });
+          }
         }
       } else {
         errorMec = this.listMechanicDev;
@@ -311,12 +357,9 @@ export default class PegarDevolverComponent implements OnInit {
     }
 
     if (errorMec.length == 0) {
+      //Inicia o loading
+      this.busyService.busy();
       this.hideDialogDev();
-      this.selectedMaterials = [];
-      this.listMec = [];
-      this.listfilterMec = [];
-      this.listMecEnabled();
-      this.listMaterial();
     }
   }
   async confirmCodePass(name: string, photo: string, code: number): Promise<boolean> {
@@ -324,7 +367,10 @@ export default class PegarDevolverComponent implements OnInit {
     this.photoMecDev = photo;
     //Código atual
     this.currentCodePassExpected = code;
+    //Limpa campo da senha
+    this.cleanFormCodePass();
     //Aguarda a confirmação
+
     return new Promise<boolean>((resolve) => {
       this.confirmationService.confirm({
         key: 'confimMecCodePass',
@@ -332,7 +378,7 @@ export default class PegarDevolverComponent implements OnInit {
         message: name,
         acceptLabel: 'Comfirmar',
         accept: () => {
-          resolve(true);
+          setTimeout(() => resolve(true), 300);
         },
         reject: () => {
           resolve(false);
@@ -341,11 +387,9 @@ export default class PegarDevolverComponent implements OnInit {
     });
   }
   onConfirmCodePass(dv: ConfirmDialog) {
-    const codeInput = this.formCodePass.value.codePass;
-
-    if (codeInput == this.currentCodePassExpected) {
+    if (Number.parseInt(this.realPassword) == this.currentCodePassExpected) {
       //Limpa código
-      this.formCodePass.patchValue({ codePass: null });
+      this.cleanFormCodePass();
       this.currentCodePassExpected = 0;
       dv.accept(); // Vai cair na lógica do `accept` da Promise
     } else {
@@ -371,7 +415,14 @@ export default class PegarDevolverComponent implements OnInit {
     // Formata a data e adiciona o fuso horário
     return datePipe.transform(date, "yyyy-MM-dd'T'HH:mm:ss.SSS") + timezone;
   }
+  cleanFormCodePass() {
+    this.formCodePass.patchValue({ maskedPassword: "" });
+    this.realPassword="";
+  }
   confirm() {
+    //Limpa campo da senha
+    this.cleanFormCodePass();
+    //Aguarda a confirmação
     this.confirmationService.confirm({
       header: 'Senha Colaborador',
       message: 'Por favor digite sua senha.',
@@ -380,18 +431,18 @@ export default class PegarDevolverComponent implements OnInit {
         this.validMechanicCodePass();
       },
       reject: () => {
-
       }
     });
   }
   private async validMechanicCodePass() {
     const { value } = this.formPegar;
 
-    if (this.formCodePass.value.codePass != value.mechanic.at(0).codePassword) {
+    if (Number.parseInt(this.realPassword) != value.mechanic.at(0).codePassword) {
       this.messageService.add({ severity: 'error', summary: 'Senha', detail: "Senha incoreta.", icon: 'pi pi-times', life: 3000 });
       return;
     }
-
+    //Inicia o loading
+    this.busyService.busy();
     this.save();
   }
   private async save() {

@@ -134,16 +134,14 @@
                     formControlName="material" [style]="{height:'45.5px'}">
                     <ng-template let-value pTemplate="selectedItems">
                         <div class="inline-flex align-items-center gap-2" *ngFor="let mat of value">
-                            <img *ngIf="mat.photo" class="layout-img-small" [src]="'data:image/png;base64,'+mat.photo"
-                                height="32" width="32" />
+                            <img *ngIf="mat.photo" class="layout-img-small" [src]="'data:image/png;base64,'+mat.photo" height="32" width="32" />
                             <div style="margin: 0.42rem;">{{ mat.description | uppercase }}</div>
                         </div>
                         <div *ngIf="!value || value.length === 0">Selecione</div>
                     </ng-template>
                     <ng-template let-mat pTemplate="item">
                         <div class="flex align-items-center gap-2">
-                            <img *ngIf="mat.photo" class="layout-img-small" [src]="'data:image/png;base64,'+mat.photo"
-                                height="32" width="32" />
+                            <img *ngIf="mat.photo" class="layout-img-small" [src]="'data:image/png;base64,'+mat.photo" height="32" width="32" />
                             <div>{{ mat.description | uppercase}}</div>
                             <div class="font-bold"> - {{mat.quantityAvailableLoan}}</div>
                         </div>
@@ -244,13 +242,12 @@
         </div>
     </form>
     <div class="flex justify-content-center">
-        <button pButton type="button" pRipple label="Fechar" icon="pi pi-times" class="p-button-text"
-            (click)="hideDialogInf()"></button>
+        <button pButton type="button" pRipple label="Fechar" icon="pi pi-times" class="p-button-text" (click)="hideDialogInf()"></button>
     </div>
 </p-dialog>
 
 <!-- Retorno de material -->
-<p-dialog header="Devolver Materiais" [(visible)]="visibleDialogDev" modal="true"
+<p-dialog header="Devolver Materiais" [(visible)]="visibleDialogDev" modal="true" closable="false"
     [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }" [style]="{width: '80rem', height:'40rem'}">
     <div style="min-height: 30rem;">
         <p-table [value]="listReturnMaterial" [tableStyle]="{ 'min-width': '40rem'}" [tableStyle]="{ 'min-width': '50rem' }">
@@ -268,20 +265,21 @@
                 <tr>
                     <td>{{mat.requestId}}</td>
                     <td class="flex align-items-center gap-2">
-                        <img class="layout-img-small" src="data:image/png;base64,{{mat.mechanic.photo}}" alt="photo material" width="42" height="42" loading="lazy" /> {{mat.mechanic.name | uppercase}}
+                        <img *ngIf="mat.mechanic.photo" class="layout-img-small" src="data:image/png;base64,{{mat.mechanic.photo}}" alt="photo material" width="42" height="42" loading="lazy" /> {{mat.mechanic.name | uppercase}}
                     </td>
                     <td>{{mat.categoryDesc | uppercase}}</td>
                     <td>{{mat.matMecQuantityReq}}</td>
                     <td class="flex align-items-center gap-2">
-                        <img class="layout-img-small" src="data:image/png;base64,{{mat.materialPhoto}}" alt="photo material" width="42" height="42" loading="lazy" /> {{mat.materialDesc | uppercase}}
+                        <img *ngIf="mat.materialPhoto" class="layout-img-small" src="data:image/png;base64,{{mat.materialPhoto}}" alt="photo material" width="42" height="42" loading="lazy" /> {{mat.materialDesc | uppercase}}
                     </td>
                     <td><input pInputText type="text" [(ngModel)]="mat.matMecInformationRet"/></td>
                 </tr>
             </ng-template>
         </p-table>
     </div>
-    <div class="flex justify-content-center">
-        <button pButton type="button" pRipple label="Confirmar devolução" icon="pi pi-check" class="p-button-text" (click)="confirmReturnMaterial()"></button>
+    <div class="flex justify-content-end">
+        <button pButton type="button" pRipple label="Fechar" icon="pi pi-times" class="p-button-text" (click)=" hideDialogDev()"></button>
+        <button pButton type="button" pRipple label="Confirmar" icon="pi pi-check" class="p-button-text" (click)="confirmReturnMaterial()"></button>
     </div>
 </p-dialog>
 
@@ -301,7 +299,7 @@
             <p class="mb-0">Por favor digite sua senha.</p>
             <div class="mt-2 flex">
                 <form [formGroup]="formCodePass" (ngSubmit)="onConfirmCodePass(dv)">
-                     <p-password formControlName="codePass" [feedback]="false" [style]="{height:'60px'}" />
+                     <input pInputText id="maskedPassword" type="text" formControlName="maskedPassword" (input)="onInput()" autocomplete="off" [style]="{'height':'60px'}"/>
                 </form>
             </div>
             <div class="flex align-items-center gap-2 mt-4">
@@ -327,7 +325,7 @@
             <p class="mb-0">{{ message.message }}</p>
             <div class="mt-2 flex">
                 <form [formGroup]="formCodePass" (ngSubmit)="cd.accept()">
-                    <p-password formControlName="codePass" [feedback]="false" [style]="{height:'60px'}" />
+                    <input pInputText id="maskedPassword" type="text" formControlName="maskedPassword" (input)="onInput()" autocomplete="off" [style]="{'height':'60px'}"/>
                 </form>
             </div>
             <div class="flex align-items-center gap-2 mt-4">

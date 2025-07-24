@@ -26,6 +26,7 @@ import { StorageService } from '../../../../../services/storage/storage.service'
 import { ToolControlCategoryService } from '../../../../../services/workshop/tool-control/tool-control-category.service';
 import { HttpResponse } from '@angular/common/http';
 import { lastValueFrom } from 'rxjs';
+import { BusyService } from '../../../../../components/loading/busy.service';
 
 enum TypeCategory {
   FERRAMENTA = "Ferramenta", EPI = "EPI", UNIFORME = "Uniforme", OUTRO = "Outro"
@@ -44,39 +45,37 @@ enum TypeCategory {
 export default class CategoriaComponent implements OnInit {
 
   category: ToolControlCategory;
-
   enabled = StatusEnabledDisabled.enabled;
   disabled = StatusEnabledDisabled.disabled;
-
   typeOutro = TypeCategory.OUTRO;
   typeFerr = TypeCategory.FERRAMENTA;
   typeEPI = TypeCategory.EPI;
   typeUnif = TypeCategory.UNIFORME;
-
-
   categories: ToolControlCategory[] = []
-
   //Dialog
   visibleDialog: boolean = false;
-
   formCat = new FormGroup({
     status: new FormControl<string>(this.enabled, Validators.required),
     description: new FormControl<string>("", Validators.required),
     quantityReq: new FormControl<number | null>(null),
     type: new FormControl<string>(TypeCategory.OUTRO, Validators.required),
-
   });
 
   constructor(
+    private busyService: BusyService,
     private messageService: MessageService,
     private storageService: StorageService,
     private categoryService: ToolControlCategoryService) { }
   ngOnInit(): void {
+    //Inicia o loading
+    this.busyService.busy();
     this.listAll();
   }
   private listAll() {
     this.categoryService.listAll().subscribe(data => {
       this.categories = data;
+      //Fecha o loading
+      this.busyService.idle();
     });
   }
   showDialog() {
@@ -96,7 +95,6 @@ export default class CategoriaComponent implements OnInit {
     this.category = null;
   }
   editCategory(cat: ToolControlCategory) {
-
     this.showDialog();
     this.category = cat;
 
@@ -158,8 +156,5 @@ export default class CategoriaComponent implements OnInit {
       return error;
     }
   }
-
-
-
 
 }

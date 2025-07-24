@@ -25,6 +25,7 @@ import { MechanicService } from '../../../../services/workshop/mechanic/mechanic
 import { NgxImageCompressService } from 'ngx-image-compress';
 import { StorageService } from '../../../../services/storage/storage.service';
 import { IMAGE_MAX_SIZE } from '../../../../util/constants';
+import { BusyService } from '../../../../components/loading/busy.service';
 
 @Component({
   selector: 'app-mechanic',
@@ -56,17 +57,22 @@ export default class MecanicoComponent implements OnInit {
   });
 
   constructor(
+    private busyService: BusyService,
     private mechanicService: MechanicService,
     private messageService: MessageService,
     private storageService: StorageService,
     private ngxImageCompressService: NgxImageCompressService) { }
 
   ngOnInit(): void {
+    //Inicia o loading
+    this.busyService.busy();
     this.listMechanics();
   }
   private listMechanics() {
     this.mechanicService.listAll().subscribe((data) => {
       this.mechanics = data;
+      //Fecha o loading
+      this.busyService.idle();
     });
   }
   showDialog() {
@@ -138,7 +144,7 @@ export default class MecanicoComponent implements OnInit {
       if (resultMec.status == 201) {
         this.mechanic.id = resultMec.body.id;
         this.messageService.add({ severity: 'success', summary: 'Mecânico', detail: 'Salvo com sucesso', icon: 'pi pi-check' });
-         this.listMechanics();
+        this.listMechanics();
       }
     } else {
       //Update
@@ -150,7 +156,7 @@ export default class MecanicoComponent implements OnInit {
       const resultMec = await this.updateMec(this.mechanic);
       if (resultMec.status == 200) {
         this.messageService.add({ severity: 'success', summary: 'Mecânico', detail: 'Atualizado com sucesso', icon: 'pi pi-check' });
-         this.listMechanics();
+        this.listMechanics();
       }
 
     }
