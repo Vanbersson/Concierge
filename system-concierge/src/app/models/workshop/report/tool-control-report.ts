@@ -26,7 +26,6 @@ export class ToolControlReport {
             matMecInformationRet:string;
             matMecMaterialId: number;
             materialDesc: string;
-            materialPhoto: string;
         }
     ];
 

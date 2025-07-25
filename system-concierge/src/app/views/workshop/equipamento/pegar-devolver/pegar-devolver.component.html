@@ -69,7 +69,7 @@
                                     <td>{{mat.requestId}}</td>
                                     <td>{{mat.requestDate | date:'dd/MM/yyyy'}}</td>
                                      <td>{{mat.categoryDesc | uppercase}}</td>
-                                    <td><img class="layout-img-small" src="data:image/png;base64,{{mat.materialPhoto}}" alt="photo material" width="42" height="42" loading="lazy" /></td>
+                                    <td><img class="layout-img-small" src="data:image/png;base64,{{getMaterialPhoto(mat.matMecMaterialId)}}" alt="photo material" width="42" height="42" loading="lazy" /></td>
                                     <td>{{mat.materialDesc | uppercase}}</td>
                                     <td>{{mat.matMecQuantityReq | number:'1.2-2'}}</td>
                                     <td>{{mat.requestInformation | uppercase}}</td>

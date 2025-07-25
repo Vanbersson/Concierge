@@ -56,6 +56,7 @@ class MatItem {
   requestDate: string;
   categoryId: number;
   categoryDesc: string;
+  categoryType: string;
   matMecId: string;
   matMecQuantityReq: number;
   matMecMaterialId: number;
@@ -79,7 +80,7 @@ export default class PegarDevolverComponent implements OnInit {
   expandedRows = {};
   listfilterMec: ToolControlReport[] = [];
   selectedMaterials: MatItem[] = [];
-realPassword = '';
+  realPassword = '';
   //Dialog Pegar
   visibleDialogPegar = false;
   visibleDialogPegarInf = false;
@@ -89,13 +90,14 @@ realPassword = '';
   formCodePass = new FormGroup({
     maskedPassword: new FormControl<any>([''], Validators.required)
   });
-  
+
   listMec: Mechanic[] = [];
   listCat: ToolControlCategory[] = [];
   private listMat: ToolControlMaterial[] = [];
   listMatTemp: ToolControlMaterial[] = [];
   listMatMec: ToolControlMatMec[] = [];
   //Dialog Devolver
+  matereialReturned: boolean = false;
   visibleDialogDev = false;
   listReturnMaterial: MatItem[] = [];
   disabledSelectMat = false;
@@ -240,6 +242,9 @@ realPassword = '';
   }
   selectMaterial() {
   }
+  getMaterialPhoto(id: number): string {
+    return this.listMat.find(material => material.id == id).photo;
+  }
   cleanFormPegar() {
     this.formPegar.patchValue({
       mechanic: [],
@@ -267,13 +272,17 @@ realPassword = '';
     this.visibleDialogDev = true;
   }
   hideDialogDev() {
+    if (this.matereialReturned) {
+      //Inicia o loading
+      this.busyService.busy();
+      this.selectedMaterials = [];
+      this.listMec = [];
+      this.listfilterMec = [];
+      this.listMecEnabled();
+      this.listMaterial();
+      this.matereialReturned = false;
+    }
     this.visibleDialogDev = false;
-
-    this.selectedMaterials = [];
-    this.listMec = [];
-    this.listfilterMec = [];
-    this.listMecEnabled();
-    this.listMaterial();
   }
   async returnMaterial() {
     //Vefica se a material selecionado
@@ -301,9 +310,10 @@ realPassword = '';
       item.matMecQuantityReq = element.matMecQuantityReq;
 
       item.materialDesc = element.materialDesc;
-      item.materialPhoto = element.materialPhoto;
+      item.materialPhoto = this.getMaterialPhoto(element.matMecMaterialId)
+      item.categoryId = element.categoryId;
       item.categoryDesc = element.categoryDesc;
-
+      item.categoryType = this.listCat.find(cat => cat.id == element.categoryId).type;
       //Adiciona a lista de devolução
       this.listReturnMaterial.push(item);
       //Lista de mecânicos que estão devolvendo os materiais
@@ -326,6 +336,15 @@ realPassword = '';
         //Savar a devolução dos materiais
         for (var i = 0; i < materialsMec.length; i++) {
           const item = materialsMec[i];
+          //Informações obrigatoria para EPI
+          if (item.matMecInformationRet == null && item.categoryType == TypeCategory.EPI) {
+            this.messageService.add({ severity: 'info', summary: 'EPI', detail: 'Informação não adicionada', icon: 'pi pi-info-circle' });
+            return;
+          } else if (item.matMecInformationRet == "" && item.categoryType == TypeCategory.EPI) {
+            this.messageService.add({ severity: 'info', summary: 'EPI', detail: 'Informação não adicionada', icon: 'pi pi-info-circle' });
+            return;
+          }
+
           var matmec: ToolControlMatMec = new ToolControlMatMec();
           matmec.companyId = mec.companyId;
           matmec.resaleId = mec.resaleId;
@@ -342,6 +361,7 @@ realPassword = '';
           if (resultUpdateMat.status == 200) {
             //Remove o material salvo
             this.listReturnMaterial = this.listReturnMaterial.filter(material => material.matMecId != matmec.id);
+            this.matereialReturned = true;
           }
           //Último
           if (i == (materialsMec.length - 1)) {
@@ -357,8 +377,6 @@ realPassword = '';
     }
 
     if (errorMec.length == 0) {
-      //Inicia o loading
-      this.busyService.busy();
       this.hideDialogDev();
     }
   }
@@ -370,7 +388,6 @@ realPassword = '';
     //Limpa campo da senha
     this.cleanFormCodePass();
     //Aguarda a confirmação
-
     return new Promise<boolean>((resolve) => {
       this.confirmationService.confirm({
         key: 'confimMecCodePass',
@@ -417,7 +434,7 @@ realPassword = '';
   }
   cleanFormCodePass() {
     this.formCodePass.patchValue({ maskedPassword: "" });
-    this.realPassword="";
+    this.realPassword = "";
   }
   confirm() {
     //Limpa campo da senha

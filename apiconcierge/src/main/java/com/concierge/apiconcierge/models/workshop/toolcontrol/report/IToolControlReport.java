@@ -28,8 +28,6 @@ public interface IToolControlReport {
 
     String getCategoryDesc();
 
-
-
     byte[] getMatMecId();
 
     float getMatMecQuantityReq();
@@ -45,7 +43,5 @@ public interface IToolControlReport {
     Integer getMatMecMaterialId();
 
     String getMaterialDesc();
-
-    byte[] getMaterialPhoto();
 
 }

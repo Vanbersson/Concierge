@@ -63,7 +63,6 @@ public class ToolControlReportService implements IToolControlReportService {
                 map1.put("matMecInformationRet", item.getMatMecInformationRet());
                 map1.put("matMecMaterialId", item.getMatMecMaterialId());
                 map1.put("materialDesc", item.getMaterialDesc());
-                map1.put("materialPhoto", item.getMaterialPhoto());
                 listItems.add(map1);
             }
             map.put("materials", listItems);
