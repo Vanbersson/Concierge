@@ -10,7 +10,7 @@
     </div>
     <p-table #dt dataKey="mecId" [value]="listfilterMec" [expandedRowKeys]="expandedRows"
         (onRowExpand)="onRowExpand($event)" (onRowCollapse)="onRowCollapse($event)" [paginator]="true" [rows]="10"
-        [rowsPerPageOptions]="[10, 25, 50]" [globalFilterFields]="['mecName']" [tableStyle]="{ 'min-width': '50rem' }"
+        [rowsPerPageOptions]="[10, 25, 50]" [globalFilterFields]="['mechanic.name']" [tableStyle]="{ 'min-width': '50rem' }"
         styleClass="p-datatable-sm">
         <ng-template pTemplate="caption">
             <div class="flex justify-content-between">
@@ -19,7 +19,7 @@
                         <i class="pi pi-search"></i>
                     </p-inputIcon>
                     <input pInputText type="text" (input)="dt.filterGlobal($event.target.value, 'contains')"
-                        placeholder="Pesquisar mecânico" />
+                        placeholder="Pesquisar mecânicos" />
                 </p-iconField>
             </div>
         </ng-template>
@@ -37,7 +37,8 @@
                     <p-button type="button" pRipple [pRowToggler]="mec" [text]="true" [rounded]="true" size="small" [plain]="true" [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'" />
                 </td>
                 <td>
-                    <img class="layout-img-small" src="data:image/png;base64,{{mec.mechanic.photo}}" alt="photo mechanic" width="50" height="50" loading="lazy" />
+                    <img *ngIf="mec.mechanic.photo" class="layout-img-small" src="data:image/png;base64,{{mec.mechanic.photo}}" alt="photo mechanic" width="50" height="50" loading="lazy" />
+                    <img *ngIf="!mec.mechanic.photo" class="layout-img-small" src="assets/icons/iconmecanico.png" alt="photo mechanic" width="50" height="50" />
                 </td>
                 <td class="font-bold text-lg">{{mec.mechanic.name | titlecase}}</td>
             </tr>
@@ -69,7 +70,10 @@
                                     <td>{{mat.requestId}}</td>
                                     <td>{{mat.requestDate | date:'dd/MM/yyyy'}}</td>
                                      <td>{{mat.categoryDesc | uppercase}}</td>
-                                    <td><img class="layout-img-small" src="data:image/png;base64,{{getMaterialPhoto(mat.matMecMaterialId)}}" alt="photo material" width="42" height="42" loading="lazy" /></td>
+                                    <td>
+                                        <img *ngIf="getMaterialPhoto(mat.matMecMaterialId)" class="layout-img-small" src="data:image/png;base64,{{getMaterialPhoto(mat.matMecMaterialId)}}" alt="photo material" width="42" height="42" loading="lazy" />
+                                        <img *ngIf="!getMaterialPhoto(mat.matMecMaterialId)" class="layout-img-small" src="assets/icons/icontool.jpg" alt="photo material" width="42" height="42" />
+                                    </td>
                                     <td>{{mat.materialDesc | uppercase}}</td>
                                     <td>{{mat.matMecQuantityReq | number:'1.2-2'}}</td>
                                     <td>{{mat.requestInformation | uppercase}}</td>
@@ -99,21 +103,16 @@
                     [style]="{height:'45.5px'}">
                     <ng-template let-value pTemplate="selectedItems">
                         <div class="inline-flex align-items-center gap-2" *ngFor="let mec of value">
-
-                            @if(mec.photo){
-                            <img class="layout-img-small" [src]="'data:image/png;base64,'+mec.photo" alt="" height="32"
-                                width="32" />
-                            }
+                            <img *ngIf="!mec.photo" class="layout-img-small" src="assets/icons/iconmecanico.png" alt="photo mechanic" width="32" height="32" />
+                            <img *ngIf="mec.photo" class="layout-img-small" src="data:image/png;base64,{{mec.photo}}" alt="" height="32" width="32" />
                             <div style="margin: 0.42rem;">{{ mec.name | uppercase }}</div>
                         </div>
                         <div *ngIf="!value || value.length === 0">Selecione</div>
                     </ng-template>
                     <ng-template let-mec pTemplate="item">
                         <div class="flex align-items-center gap-2">
-                            @if(mec.photo){
-                            <img class="layout-img-small" [src]="'data:image/png;base64,'+mec.photo" alt="" height="32"
-                                width="32" />
-                            }
+                             <img *ngIf="!mec.photo" class="layout-img-small" src="assets/icons/iconmecanico.png" alt="photo mechanic" width="32" height="32" />
+                             <img *ngIf="mec.photo" class="layout-img-small" src="data:image/png;base64,{{mec.photo}}" alt="" height="32" width="32" />
                             <div>{{ mec.name | uppercase}}</div>
                         </div>
                     </ng-template>
@@ -134,14 +133,16 @@
                     formControlName="material" [style]="{height:'45.5px'}">
                     <ng-template let-value pTemplate="selectedItems">
                         <div class="inline-flex align-items-center gap-2" *ngFor="let mat of value">
-                            <img *ngIf="mat.photo" class="layout-img-small" [src]="'data:image/png;base64,'+mat.photo" height="32" width="32" />
+                            <img *ngIf="mat.photo" class="layout-img-small" src="data:image/png;base64,{{mat.photo}}" height="32" width="32" />
+                            <img *ngIf="!mat.photo" class="layout-img-small" src="assets/icons/icontool.jpg" alt="photo material" width="32" height="32" />
                             <div style="margin: 0.42rem;">{{ mat.description | uppercase }}</div>
                         </div>
                         <div *ngIf="!value || value.length === 0">Selecione</div>
                     </ng-template>
                     <ng-template let-mat pTemplate="item">
                         <div class="flex align-items-center gap-2">
-                            <img *ngIf="mat.photo" class="layout-img-small" [src]="'data:image/png;base64,'+mat.photo" height="32" width="32" />
+                            <img *ngIf="mat.photo" class="layout-img-small" src="data:image/png;base64,{{mat.photo}}" height="32" width="32" />
+                            <img *ngIf="!mat.photo" class="layout-img-small" src="assets/icons/icontool.jpg" alt="photo material" width="32" height="32" />
                             <div>{{ mat.description | uppercase}}</div>
                             <div class="font-bold"> - {{mat.quantityAvailableLoan}}</div>
                         </div>
@@ -170,6 +171,7 @@
                     <td>{{mat.id}}</td>
                     <td>
                         <img *ngIf="mat.photo" class="layout-img-small" src="data:image/png;base64,{{mat.photo}}" [alt]="mat.description" width="32" height="32" loading="lazy" />
+                        <img *ngIf="!mat.photo" class="layout-img-small" src="assets/icons/icontool.jpg" alt="photo material" width="32" height="32" />
                     </td>
                     <td>{{mat.description | uppercase}}</td>
                     <td>
@@ -265,12 +267,14 @@
                 <tr>
                     <td>{{mat.requestId}}</td>
                     <td class="flex align-items-center gap-2">
-                        <img *ngIf="mat.mechanic.photo" class="layout-img-small" src="data:image/png;base64,{{mat.mechanic.photo}}" alt="photo material" width="42" height="42" loading="lazy" /> {{mat.mechanic.name | uppercase}}
+                        <img *ngIf="mat.mechanic.photo" class="layout-img-small" src="data:image/png;base64,{{mat.mechanic.photo}}" alt="photo mechanic" width="42" height="42" loading="lazy" />
+                        <img *ngIf="!mat.mechanic.photo" class="layout-img-small" src="assets/icons/iconmecanico.png" alt="photo mechanic" width="42" height="42" /> {{mat.mechanic.name | uppercase}}
                     </td>
                     <td>{{mat.categoryDesc | uppercase}}</td>
                     <td>{{mat.matMecQuantityReq}}</td>
                     <td class="flex align-items-center gap-2">
-                        <img *ngIf="mat.materialPhoto" class="layout-img-small" src="data:image/png;base64,{{mat.materialPhoto}}" alt="photo material" width="42" height="42" loading="lazy" /> {{mat.materialDesc | uppercase}}
+                        <img *ngIf="mat.materialPhoto" class="layout-img-small" src="data:image/png;base64,{{mat.materialPhoto}}" alt="photo material" width="42" height="42" loading="lazy" />
+                        <img *ngIf="!mat.materialPhoto" class="layout-img-small" src="assets/icons/icontool.jpg" alt="photo material" width="42" height="42" /> {{mat.materialDesc | uppercase}}
                     </td>
                     <td><input pInputText type="text" [(ngModel)]="mat.matMecInformationRet"/></td>
                 </tr>
@@ -291,7 +295,8 @@
                 {{ message.header }}
             </span>
             <div class="mt-2 layout-dialog-img">
-                <img *ngIf="photoMecDev"  class="layout-img-large" src="data:image/png;base64,{{photoMecDev}}" loading="lazy" />
+                <img *ngIf="photoMecDev"  class="layout-img-large" src="data:image/png;base64,{{photoMecDev}}" alt="photo mechanic" loading="lazy" />
+                <img *ngIf="!photoMecDev" class="layout-img-large" src="assets/icons/iconmecanico.png" />
             </div>
             <span class="font-bold text-2xl block mb-2">
                 {{ message.message }}

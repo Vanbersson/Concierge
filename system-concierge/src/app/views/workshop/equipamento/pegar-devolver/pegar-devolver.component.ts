@@ -182,9 +182,9 @@ export default class PegarDevolverComponent implements OnInit {
   }
   selectMechanic() {
     const { value } = this.formPegar;
-    if (value.mechanic.length == 1 && this.photoMec == "") {
+    if (value.mechanic.length == 1) {
       this.photoMec = value.mechanic.at(0).photo;
-    } else if (value.mechanic.length == 0 && this.photoMec != "") {
+    } else {
       this.photoMec = "";
       this.formPegar.patchValue({ categories: [], material: [] });
       this.listMatTemp = [];
