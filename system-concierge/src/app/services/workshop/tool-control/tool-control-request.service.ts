@@ -12,7 +12,9 @@ export class ToolControlRequestService {
     companyResale: string = this.storage.companyId + "/" + this.storage.resaleId;
 
     constructor(private http: HttpClient, private storage: StorageService) { }
-    
+     newRequest(req: ToolControlRequest): Observable<HttpResponse<ToolControlRequest>> {
+        return this.http.post<ToolControlRequest>(environment.apiuUrl + "/workshop/tool/control/request/new", req, { headers: this.myHeaders(), observe: 'response' });
+    }
     loanRequest(req: ToolControlRequest): Observable<HttpResponse<ToolControlRequest>> {
         return this.http.post<ToolControlRequest>(environment.apiuUrl + "/workshop/tool/control/request/loan", req, { headers: this.myHeaders(), observe: 'response' });
     }

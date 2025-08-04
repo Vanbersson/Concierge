@@ -1,7 +1,7 @@
 package com.concierge.apiconcierge.models.workshop.toolcontrol;
 
 import com.concierge.apiconcierge.models.status.StatusEnableDisable;
-import com.concierge.apiconcierge.models.workshop.toolcontrol.enums.TypeMaterial;
+import com.concierge.apiconcierge.models.workshop.toolcontrol.enums.TypeRequest;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -30,7 +30,10 @@ public class ToolControlMaterial {
 
     private StatusEnableDisable status;
 
-    private TypeMaterial type;
+    private TypeRequest type;
+
+    @Column(name = "number_ca")
+    private Integer numberCA;
 
     private String description;
 

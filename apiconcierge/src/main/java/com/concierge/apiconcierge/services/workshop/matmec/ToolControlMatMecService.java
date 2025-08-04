@@ -3,11 +3,8 @@ package com.concierge.apiconcierge.services.workshop.matmec;
 import com.concierge.apiconcierge.exceptions.workshop.toolcontrol.ToolControlException;
 import com.concierge.apiconcierge.models.workshop.toolcontrol.ToolControlMatMec;
 import com.concierge.apiconcierge.models.workshop.toolcontrol.ToolControlMaterial;
-import com.concierge.apiconcierge.models.workshop.toolcontrol.ToolControlRequest;
-import com.concierge.apiconcierge.models.workshop.toolcontrol.enums.TypeMaterial;
 import com.concierge.apiconcierge.repositories.workshop.toolcontrol.IToolControlMatMecRepository;
 import com.concierge.apiconcierge.repositories.workshop.toolcontrol.IToolControlMaterialRepository;
-import com.concierge.apiconcierge.repositories.workshop.toolcontrol.IToolControlRequestRepository;
 import com.concierge.apiconcierge.util.ConstantsMessage;
 import com.concierge.apiconcierge.validation.workshop.toolcontrol.matmec.ToolControlMatMecValidation;
 import lombok.SneakyThrows;
@@ -37,25 +34,21 @@ public class ToolControlMatMecService implements IToolControlMatMecService {
         try {
             String message = this.validation.save(matMec);
             if (ConstantsMessage.SUCCESS.equals(message)) {
-                float quant = matMec.getQuantityReq();
+                float quant = matMec.getDeliveryQuantity();
                 for (int i = 0; i < quant; i++) {
                     ToolControlMatMec newMatMec = new ToolControlMatMec();
-                    newMatMec.setCompanyId(matMec.getCompanyId());
-                    newMatMec.setResaleId(matMec.getResaleId());
-                    newMatMec.setRequestId(matMec.getRequestId());
-                    newMatMec.setQuantityReq(1);
-                    newMatMec.setQuantityRet(0);
-                    newMatMec.setUserIdRet(null);
-                    newMatMec.setDateRet(null);
-                    newMatMec.setInformationRet("");
-                    newMatMec.setMaterialId(matMec.getMaterialId());
+                    newMatMec = matMec;
+                    newMatMec.setDeliveryQuantity(1);
+                    newMatMec.setReturnQuantity(0);
+                    newMatMec.setReturnUserId(null);
+                    newMatMec.setReturnDate(null);
                     ToolControlMatMec resultSave = this.repository.save(newMatMec);
                 }
 
-                String resultMessage = this.updateQuantityMaterial(matMec, "Loan");
-                if (!ConstantsMessage.SUCCESS.equals(resultMessage)) {
-                    //Error
-                }
+//                String resultMessage = this.updateQuantityMaterial(matMec, "Loan");
+//                if (!ConstantsMessage.SUCCESS.equals(resultMessage)) {
+//                    //Error
+//                }
                 return ConstantsMessage.SUCCESS;
             } else {
                 throw new ToolControlException(message);
@@ -71,7 +64,7 @@ public class ToolControlMatMecService implements IToolControlMatMecService {
         if (type.equals("Loan")) {
             material.setQuantityAvailableLoan(material.getQuantityAccountingLoan() - mats.size());
         } else if (type.equals("Return")) {
-            material.setQuantityAvailableLoan(material.getQuantityAvailableLoan() + matMec.getQuantityRet());
+           // material.setQuantityAvailableLoan(material.getQuantityAvailableLoan() + matMec.getQuantityRet());
         }
         this.materialRepository.save(material);
         return ConstantsMessage.SUCCESS;
@@ -147,11 +140,11 @@ public class ToolControlMatMecService implements IToolControlMatMecService {
         map.put("resaleId", matMec.getResaleId());
         map.put("id", matMec.getId());
         map.put("requestId", matMec.getRequestId());
-        map.put("quantityReq", matMec.getQuantityReq());
-        map.put("quantityRet", matMec.getQuantityRet());
-        map.put("userIdRet", matMec.getUserIdRet() != null ? matMec.getUserIdRet() : "");
-        map.put("dateRet", matMec.getDateRet() != null ? matMec.getDateRet() : "");
-        map.put("informationRet", matMec.getInformationRet());
+//        map.put("quantityReq", matMec.getQuantityReq());
+//        map.put("quantityRet", matMec.getQuantityRet());
+//        map.put("userIdRet", matMec.getUserIdRet() != null ? matMec.getUserIdRet() : "");
+//        map.put("dateRet", matMec.getDateRet() != null ? matMec.getDateRet() : "");
+//        map.put("informationRet", matMec.getInformationRet());
         map.put("materialId", matMec.getMaterialId());
         return map;
     }

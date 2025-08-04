@@ -1,5 +1,5 @@
 package com.concierge.apiconcierge.models.workshop.toolcontrol.enums;
 
-public enum TypeMaterial {
+public enum TypeRequest {
     Loan, Kit, Ambos;
 }

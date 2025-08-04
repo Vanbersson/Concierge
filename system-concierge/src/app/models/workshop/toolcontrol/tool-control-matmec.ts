@@ -3,10 +3,17 @@ export class ToolControlMatMec {
     resaleId: number = 0;
     id: string = "";
     requestId: number = 0;
-    quantityReq: number = 0;
-    quantityRet: number = 0;
-    userIdRet: number = 0;
-    dateRet: string = "";
-    informationRet: string = "";
+    deliveryUserId: number = 0;
+    deliveryUserName: string = "";
+    deliveryDate: string = "";
+    deliveryQuantity: number = 0;
+    deliveryInformation: string = "";
+    returnUserId: number = 0;
+    returnUserName: string = "";
+    returnDate: string = "";
+    returnQuantity: number = 0;
+    returnInformation: string = "";
     materialId: number = 0;
+    materialDescription: String = "";
+    materialNumberCA: number = 0;
 }

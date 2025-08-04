@@ -1,10 +1,6 @@
 package com.concierge.apiconcierge.models.workshop.toolcontrol.report;
 
-import com.concierge.apiconcierge.models.workshop.toolcontrol.enums.StatusRequest;
-import com.concierge.apiconcierge.models.workshop.toolcontrol.enums.TypeMaterial;
-
 import java.util.Date;
-import java.util.UUID;
 
 public interface IToolControlReport {
 

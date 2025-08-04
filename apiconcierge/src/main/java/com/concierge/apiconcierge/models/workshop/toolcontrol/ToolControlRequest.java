@@ -1,7 +1,8 @@
 package com.concierge.apiconcierge.models.workshop.toolcontrol;
 
 import com.concierge.apiconcierge.models.workshop.toolcontrol.enums.StatusRequest;
-import com.concierge.apiconcierge.models.workshop.toolcontrol.enums.TypeMaterial;
+import com.concierge.apiconcierge.models.workshop.toolcontrol.enums.TypeCategory;
+import com.concierge.apiconcierge.models.workshop.toolcontrol.enums.TypeRequest;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -34,21 +35,26 @@ public class ToolControlRequest {
 
     private StatusRequest status;
 
-    @Column(name = "type_material")
-    private TypeMaterial typeMaterial;
+    @Column(name = "request_type")
+    private TypeRequest requestType;
+
+    @Column(name = "request_date")
+    private Date requestDate;
+
+    @Column(name = "request_information")
+    private String requestInformation;
 
     @JoinColumn(table = "tb_user", referencedColumnName = "id")
-    @Column(name = "user_id_req")
-    private Integer userIdReq;
+    @Column(name = "request_user_id")
+    private Integer requestUserId;
 
-    @Column(name = "date_req")
-    private Date dateReq;
+    @Column(name = "request_user_name")
+    private String requestUserName;
 
-    @Column(name = "information_req")
-    private String informationReq;
+    @Column(name = "category_type")
+    private TypeCategory categoryType;
 
     @JoinColumn(table = "tb_mechanic", referencedColumnName = "id")
     @Column(name = "mechanic_id")
     private Integer mechanicId;
-
 }

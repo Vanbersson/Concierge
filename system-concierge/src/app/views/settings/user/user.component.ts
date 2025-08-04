@@ -97,6 +97,7 @@ export default class UserComponent implements OnInit {
     private ngxImageCompressService: NgxImageCompressService) { }
 
   ngOnInit(): void {
+
     this.menus = [
       { key: '0_0', label: 'Dashboard', icon: 'pi pi-home' },
       {
@@ -129,7 +130,7 @@ export default class UserComponent implements OnInit {
         key:'3_0', label:'Oficina', children:[
           {key:'3_1',label:'Orçamentos'},
           {key:'3_2',label:'Controle de equipamentos',children:[
-            {key:'3_2_0',label:'Pegar/Devolver'},
+            {key:'3_2_0',label:'Requisições'},
             {key:'3_2_1',label:'Cadastro',children:[
               {key:'3_2_1_0',label:'Categoria'},
               {key:'3_2_1_1',label:'Material'},

@@ -37,24 +37,45 @@ public class ToolControlMatMec {
     @Column(name = "request_id")
     private Integer requestId;
 
-    @Column(name = "quantity_req")
-    private float quantityReq;
+    @JoinColumn(table = "tb_user", referencedColumnName = "id")
+    @Column(name = "delivery_user_id")
+    private Integer deliveryUserId;
 
-    @Column(name = "quantity_ret")
-    private float quantityRet;
+    @Column(name = "delivery_user_name")
+    private String deliveryUserName;
+
+    @Column(name = "delivery_date")
+    private Date deliveryDate;
+
+    @Column(name = "delivery_quantity")
+    private float deliveryQuantity;
+
+    @Column(name = "delivery_information")
+    private String deliveryInformation;
 
     @JoinColumn(table = "tb_user", referencedColumnName = "id")
-    @Column(name = "user_id_ret")
-    private Integer userIdRet;
+    @Column(name = "return_user_id")
+    private Integer returnUserId;
 
-    @Column(name = "date_ret")
-    private Date dateRet;
+    @Column(name = "return_user_name")
+    private String returnUserName;
 
-    @Column(name = "information_ret")
-    private String informationRet;
+    @Column(name = "return_date")
+    private Date returnDate;
+
+    @Column(name = "return_quantity")
+    private float returnQuantity;
+
+    @Column(name = "return_information")
+    private String returnInformation;
 
     @JoinColumn(table = "tb_tool_control_material", referencedColumnName = "id")
     @Column(name = "material_id")
     private Integer materialId;
 
+    @Column(name = "material_description")
+    private String materialDescription;
+
+    @Column(name = "material_number_ca")
+    private Integer materialNumberCA;
 }

@@ -1,17 +1,11 @@
 package com.concierge.apiconcierge.services.workshop.report;
 
 import com.concierge.apiconcierge.exceptions.workshop.toolcontrol.ToolControlException;
-import com.concierge.apiconcierge.models.workshop.mechanic.Mechanic;
-import com.concierge.apiconcierge.models.workshop.toolcontrol.ToolControlMatMec;
-import com.concierge.apiconcierge.models.workshop.toolcontrol.ToolControlMaterial;
-import com.concierge.apiconcierge.models.workshop.toolcontrol.ToolControlRequest;
 import com.concierge.apiconcierge.models.workshop.toolcontrol.enums.StatusRequest;
-import com.concierge.apiconcierge.models.workshop.toolcontrol.enums.TypeMaterial;
+import com.concierge.apiconcierge.models.workshop.toolcontrol.enums.TypeRequest;
 import com.concierge.apiconcierge.models.workshop.toolcontrol.report.IToolControlReport;
-import com.concierge.apiconcierge.repositories.workshop.mechanic.IMechanicRepository;
 import com.concierge.apiconcierge.repositories.workshop.report.IToolControlReportRepository;
 import com.concierge.apiconcierge.repositories.workshop.toolcontrol.IToolControlMatMecRepository;
-import com.concierge.apiconcierge.repositories.workshop.toolcontrol.IToolControlMaterialRepository;
 import com.concierge.apiconcierge.repositories.workshop.toolcontrol.IToolControlRequestRepository;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,8 +43,8 @@ public class ToolControlReportService implements IToolControlReportService {
                 Map<String, Object> map1 = new HashMap<>();
                 map1.put("requestId", item.getRequestId());
                 map1.put("requestDate", item.getRequestDate());
-                map.put("requestStatus", item.getRequestStatus() == 0 ? StatusRequest.Pending : StatusRequest.Complete);
-                map.put("requestTypeMaterial", item.getRequestTypeMaterial() == 0 ? TypeMaterial.Loan : TypeMaterial.Kit);
+                map.put("requestStatus", item.getRequestStatus());
+                map.put("requestTypeMaterial", item.getRequestTypeMaterial() == 0 ? TypeRequest.Loan : TypeRequest.Kit);
                 map.put("requestUserId", item.getRequestUserId());
                 map1.put("requestInformation", item.getRequestInformation());
                 map1.put("categoryId", item.getCategoryId());
@@ -63,6 +57,7 @@ public class ToolControlReportService implements IToolControlReportService {
                 map1.put("matMecInformationRet", item.getMatMecInformationRet());
                 map1.put("matMecMaterialId", item.getMatMecMaterialId());
                 map1.put("materialDesc", item.getMaterialDesc());
+                map1.put("rowSpan",4);
                 listItems.add(map1);
             }
             map.put("materials", listItems);

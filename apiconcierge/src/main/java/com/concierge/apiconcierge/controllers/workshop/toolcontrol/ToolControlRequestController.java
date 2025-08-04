@@ -22,13 +22,25 @@ public class ToolControlRequestController {
     @Autowired
     ToolControlRequestService service;
 
-    @PostMapping("/loan")
-    public ResponseEntity<Object> loanRequest(@RequestBody ToolControlRequestDto data) {
+    @PostMapping("/new")
+    public ResponseEntity<Object> newRequest(@RequestBody ToolControlRequestDto data) {
         try {
             ToolControlRequest req = new ToolControlRequest();
             BeanUtils.copyProperties(data, req);
-            Map<String, Object> result = this.service.loanRequest(req);
+            ToolControlRequest result = this.service.newRequest(req);
             return ResponseEntity.status(HttpStatus.CREATED).body(result);
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
+        }
+    }
+
+    @PostMapping("/update")
+    public ResponseEntity<Object> updateRequest(@RequestBody ToolControlRequestDto data) {
+        try {
+            ToolControlRequest req = new ToolControlRequest();
+            BeanUtils.copyProperties(data, req);
+            ToolControlRequest result = this.service.updateRequest(req);
+            return ResponseEntity.status(HttpStatus.OK).body(result);
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
         }

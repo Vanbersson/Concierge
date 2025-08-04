@@ -14,20 +14,7 @@
         }
     }
 
-    .layout-card-status {
-        display: flex;
-        flex-direction: column;
-        height: 7rem;
-        padding: 1rem 0 1rem 1rem;
-        border-radius: 8px;
-        border: 1px solid var(--color-grey-300);
-        gap: 6px;
-
-        span {
-            font-weight: 400;
-
-        }
-    }
+    
 
     .layout-dialog-img {
         width: 100%;

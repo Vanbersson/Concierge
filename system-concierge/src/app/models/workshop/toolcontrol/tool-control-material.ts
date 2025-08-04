@@ -4,6 +4,7 @@ export class ToolControlMaterial {
     id: number = 0;
     status: string = "";
     type: string = "";
+    numberCA: number = 0;
     description: string = "";
     categoryId: number = 0;
     quantityAccountingLoan: number = 0;

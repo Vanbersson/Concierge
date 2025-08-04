@@ -69,11 +69,8 @@
 <p-dialog header="Cadastro" [(visible)]="visibleDialog" [modal]="true" [style]="{width: '50rem'}">
     <form [formGroup]="formMat" (ngSubmit)="saveMaterial()">
         <div class="p-fluid p-formgrid grid">
-            <div class="mt-2 layout-dialog-img">
-                @if(photoMat){
-                <img class="layout-img-large" src="data:image/png;base64,{{photoMat}}" alt="photo material" width="140"
-                    height="140" loading="lazy" />
-                }
+            <div class="mt-2 layout-dialog-img">  
+                <img *ngIf="photoMat" class="layout-img-large" src="data:image/png;base64,{{photoMat}}" alt="photo material" width="140" height="140" loading="lazy" />
             </div>
             <div class="field col-12 md:col-6">
                 <label for="description">Descrição</label>
@@ -90,7 +87,6 @@
                 <label for="validityDayId">Dias valid.</label>
                 <p-inputNumber [useGrouping]="false" formControlName="validityDay" />
             </div>
-
             <div class="field col-10 md:col-4">
                 <button pButton type="button" label="Selecionar imagem" (click)="onSelectFile()"></button>
             </div>
@@ -98,7 +94,7 @@
                 <button type="button" pButton icon="pi pi-trash" severity="danger" (click)="deleteFile()"></button>
             </div>
             <div class="col-12 md:col-6 flex flex-column gap-2 border-1 border-round-md border-200">
-                <span>Tipo</span>
+                <span>Tipo requisição</span>
                 <div class="flex gap-2">
                     <div class="flex align-items-center">
                         <p-radioButton inputId="typeLoanId" [value]="loan" formControlName="type"></p-radioButton>
@@ -114,15 +110,14 @@
                     </div>
                 </div>
             </div>
-
             <div class="col-6 p-0 pl-3 pt-3">
                 <label for="">Empréstimo</label>
             </div>
             <div class="col-6 p-0 pl-3 pt-3">
                 <label for="">Kit Mecânico</label>
             </div>
-            <div class="field col-12 flex gap-3">
-                <div class="flex gap-2 w-6 p-1 pt-2 pb-2 border-1 border-round-md border-200">
+            <div class="field col-12 flex gap-3 m-0">
+                <div class="flex gap-2 w-6 p-1 pt-2  border-1 border-round-md border-200">
                     <div class="flex flex-column field">
                         <label for="quantityAccountingId">Contábil</label>
                         <p-inputNumber *ngIf="editQuantityLoan" [minFractionDigits]="2"
@@ -140,8 +135,7 @@
                         <p-inputNumber [minFractionDigits]="2" formControlName="quantityAvailableLoan" />
                     </div>
                 </div>
-
-                <div class="flex gap-2 w-6 p-1 pt-2 pb-2 border-1 border-round-md border-200">
+                <div class="flex gap-2 w-6 p-1 pt-2 border-1 border-round-md border-200">
                     <div class="flex flex-column field">
                         <label for="quantityAccountingId">Contábil</label>
                         <p-inputNumber *ngIf="editQuantityKit" [minFractionDigits]="2"
@@ -160,18 +154,24 @@
                     </div>
                 </div>
             </div>
-
-            <div class="field col-12 layout-card-status">
+            <div class="field col-12 md:col-6 flex flex-column gap-2">
                 <span>Situação</span>
-                <div class="flex align-items-center">
-                    <p-radioButton inputId="enabledId" [value]="enabled" formControlName="status"></p-radioButton>
-                    <label for="enabledId" class="ml-2">Ativado</label>
-                </div>
-                <div class="flex align-items-center">
-                    <p-radioButton inputId="disabledId" [value]="disabled" formControlName="status"></p-radioButton>
-                    <label for="disabledId" class="ml-2">Desativado</label>
+                <div class="flex gap-2 pl-2 border-1 border-round-md border-200" style="height: 40px;">
+                    <div class="flex align-items-center gap-1">
+                        <p-radioButton inputId="enabledId" [value]="enabled" formControlName="status"></p-radioButton>
+                        <label for="enabledId">Ativado</label>
+                    </div>
+                    <div class="flex align-items-center gap-1">
+                        <p-radioButton inputId="disabledId" [value]="disabled" formControlName="status"></p-radioButton>
+                        <label for="disabledId">Desativado</label>
+                    </div>
                 </div>
             </div>
+            <div class="field col-12 md:col-4 m-0">
+                 <label for="numberCAId">Nº CA</label>
+                <p-inputNumber [useGrouping]="false" formControlName="numberCA"/>
+            </div>
+            <div class="md:col-2"></div>
         </div>
 
         <div class="flex justify-content-end gap-2 mt-3">

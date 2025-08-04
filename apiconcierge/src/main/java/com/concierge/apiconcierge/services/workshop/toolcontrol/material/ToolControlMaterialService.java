@@ -4,7 +4,7 @@ import com.concierge.apiconcierge.exceptions.workshop.toolcontrol.ToolControlExc
 import com.concierge.apiconcierge.models.workshop.toolcontrol.ToolControlKitMec;
 import com.concierge.apiconcierge.models.workshop.toolcontrol.ToolControlMatMec;
 import com.concierge.apiconcierge.models.workshop.toolcontrol.ToolControlMaterial;
-import com.concierge.apiconcierge.models.workshop.toolcontrol.enums.TypeMaterial;
+import com.concierge.apiconcierge.models.workshop.toolcontrol.enums.TypeRequest;
 import com.concierge.apiconcierge.repositories.workshop.toolcontrol.IToolControlKitMecRepository;
 import com.concierge.apiconcierge.repositories.workshop.toolcontrol.IToolControlMatMecRepository;
 import com.concierge.apiconcierge.repositories.workshop.toolcontrol.IToolControlMaterialRepository;
@@ -59,7 +59,6 @@ public class ToolControlMaterialService implements IToolControlMaterialService {
         try {
             String message = this.validation.update(mat);
             if (ConstantsMessage.SUCCESS.equals(message)) {
-
                 ToolControlMaterial resultRole = this.calQuantity(mat);
 
                 //Loan
@@ -78,30 +77,30 @@ public class ToolControlMaterialService implements IToolControlMaterialService {
 
     private ToolControlMaterial calQuantity(ToolControlMaterial mat) {
 
-        if (mat.getType().equals(TypeMaterial.Loan)) {
+        if (mat.getType().equals(TypeRequest.Loan)) {
             float quantityLoan = (float) this.repositoryMatMec.filterMatIdDevPend(mat.getCompanyId(), mat.getResaleId(), mat.getId())
                     .stream()
-                    .mapToDouble(ToolControlMatMec::getQuantityReq)
+                    .mapToDouble(ToolControlMatMec::getDeliveryQuantity)
                     .sum();
             mat.setQuantityAvailableLoan(mat.getQuantityAccountingLoan() - quantityLoan);
-        } else if (mat.getType().equals(TypeMaterial.Kit)) {
-            float quantityKit = (float) this.repositoryKitMec.filterMatIdDevPend(mat.getCompanyId(), mat.getResaleId(), mat.getId())
-                    .stream()
-                    .mapToDouble(ToolControlKitMec::getQuantityReq)
-                    .sum();
-            mat.setQuantityAvailableKit(mat.getQuantityAccountingKit() - quantityKit);
-        } else if (mat.getType().equals(TypeMaterial.Ambos)) {
+        } else if (mat.getType().equals(TypeRequest.Kit)) {
+//            float quantityKit = (float) this.repositoryKitMec.filterMatIdDevPend(mat.getCompanyId(), mat.getResaleId(), mat.getId())
+//                    .stream()
+//                    .mapToDouble(ToolControlKitMec::getQuantityReq)
+//                    .sum();
+//            mat.setQuantityAvailableKit(mat.getQuantityAccountingKit() - quantityKit);
+        } else if (mat.getType().equals(TypeRequest.Ambos)) {
             float quantityLoan = (float) this.repositoryMatMec.filterMatIdDevPend(mat.getCompanyId(), mat.getResaleId(), mat.getId())
                     .stream()
-                    .mapToDouble(ToolControlMatMec::getQuantityReq)
+                    .mapToDouble(ToolControlMatMec::getDeliveryQuantity)
                     .sum();
             mat.setQuantityAvailableLoan(mat.getQuantityAccountingLoan() - quantityLoan);
 
-            float quantityKit = (float) this.repositoryKitMec.filterMatIdDevPend(mat.getCompanyId(), mat.getResaleId(), mat.getId())
-                    .stream()
-                    .mapToDouble(ToolControlKitMec::getQuantityReq)
-                    .sum();
-            mat.setQuantityAvailableKit(mat.getQuantityAccountingKit() - quantityKit);
+//            float quantityKit = (float) this.repositoryKitMec.filterMatIdDevPend(mat.getCompanyId(), mat.getResaleId(), mat.getId())
+//                    .stream()
+//                    .mapToDouble(ToolControlKitMec::getQuantityReq)
+//                    .sum();
+//            mat.setQuantityAvailableKit(mat.getQuantityAccountingKit() - quantityKit);
         }
         return mat;
     }
@@ -155,6 +154,7 @@ public class ToolControlMaterialService implements IToolControlMaterialService {
         map.put("id", mat.getId());
         map.put("status", mat.getStatus());
         map.put("type", mat.getType());
+        map.put("numberCA",mat.getNumberCA());
         map.put("description", mat.getDescription());
         map.put("categoryId", mat.getCategoryId());
         map.put("quantityAccountingLoan", mat.getQuantityAccountingLoan());

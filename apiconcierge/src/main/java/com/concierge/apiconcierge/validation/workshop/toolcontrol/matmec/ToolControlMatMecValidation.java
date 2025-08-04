@@ -16,12 +16,12 @@ public class ToolControlMatMecValidation implements IToolControlMatMecValidation
             return ConstantsMessage.ERROR_RESALE;
         if (matMec.getRequestId() == null || matMec.getRequestId() == 0)
             return "Request not informed.";
-        if (matMec.getQuantityReq() == 0)
-            return "Quantity not informed.";
-        if (matMec.getMaterialId() == null || matMec.getMaterialId() == 0)
-            return "Material Id not informed.";
-        if (matMec.getQuantityReq() < 0)
-            return "Quantity invalid.";
+//        if (matMec.getQuantityReq() == 0)
+//            return "Quantity not informed.";
+//        if (matMec.getMaterialId() == null || matMec.getMaterialId() == 0)
+//            return "Material Id not informed.";
+//        if (matMec.getQuantityReq() < 0)
+//            return "Quantity invalid.";
 
 
         return ConstantsMessage.SUCCESS;
@@ -37,8 +37,8 @@ public class ToolControlMatMecValidation implements IToolControlMatMecValidation
             return ConstantsMessage.ERROR_ID;
         if (matMec.getRequestId() == null || matMec.getRequestId() == 0)
             return "Request not informed.";
-        if (matMec.getQuantityReq() == 0)
-            return "Quantity not informed.";
+//        if (matMec.getQuantityReq() == 0)
+//            return "Quantity not informed.";
 //        if ( matMec.getQuantityDev() == 0)
 //            return "Quantity not informed.";
 //        if (matMec.getQuantityReq() != matMec.getQuantityDev())

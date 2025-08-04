@@ -136,7 +136,7 @@ export class SidebarComponent implements OnInit {
             items: [
               {
                 key: '3_2_0',
-                label: 'Pegar/Devolver',
+                label: 'Requisições',
                 routerLink:'oficina/controle-equipamento',
                 visible: false,
               },

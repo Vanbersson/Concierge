@@ -69,6 +69,7 @@ export default class MaterialComponent implements OnInit {
   formMat = new FormGroup({
     status: new FormControl<string>(this.enabled, Validators.required),
     type: new FormControl<string>(this.loan, Validators.required),
+    numberCA: new FormControl<number | null>(null),
     description: new FormControl<string>("", Validators.required),
     quantityAccountingLoan: new FormControl<number>(0, Validators.required),
     quantityAvailableLoan: new FormControl<number>(0, Validators.required),
@@ -143,22 +144,17 @@ export default class MaterialComponent implements OnInit {
       photo: "",
       type: this.loan
     });
-
     this.photoMat = "";
     this.material = null;
   }
-
   newMaterial() {
     this.showDialog();
-
     this.disableQuantityAccountingLoan();
     this.disableQuantityAvailableLoan();
     this.editQuantityLoan = false;
-
     this.disableQuantityAccountingKit();
     this.disableQuantityAvailableKit();
     this.editQuantityKit = false;
-
   }
   showDialog() {
     this.cleanForm();
@@ -243,7 +239,6 @@ export default class MaterialComponent implements OnInit {
       }
     });
   }
-
   editMat(mat: ToolControlMaterial) {
     this.showDialog();
     this.material = mat;
@@ -251,6 +246,7 @@ export default class MaterialComponent implements OnInit {
       description: mat.description,
       status: mat.status,
       type: mat.type,
+      numberCA: mat.numberCA != 0 ? mat.numberCA : null,
       categories: [this.getCategory(mat.categoryId)],
       validityDay: mat.validityDay != 0 ? mat.validityDay : null,
       quantityAccountingLoan: mat.quantityAccountingLoan,
@@ -260,11 +256,9 @@ export default class MaterialComponent implements OnInit {
       photo: mat.photo
     });
     this.photoMat = mat.photo;
-
     this.disableQuantityAccountingLoan();
     this.disableQuantityAvailableLoan();
     this.editQuantityLoan = false;
-
     this.disableQuantityAccountingKit();
     this.disableQuantityAvailableKit();
     this.editQuantityKit = false;
@@ -272,17 +266,13 @@ export default class MaterialComponent implements OnInit {
   async saveMaterial() {
     this.enableQuantityAccountingLoan();
     this.enableQuantityAvailableLoan();
-
     this.enableQuantityAccountingKit();
     this.enableQuantityAvailableKit();
-
     const { value, valid } = this.formMat;
-
     if (!valid) {
       this.disableQuantityAccountingLoan();
       this.disableQuantityAvailableLoan();
       this.editQuantityLoan = false;
-
       this.disableQuantityAccountingKit();
       this.disableQuantityAvailableKit();
       this.editQuantityKit = false;
@@ -296,6 +286,7 @@ export default class MaterialComponent implements OnInit {
       this.material.resaleId = this.storageService.resaleId;
       this.material.status = value.status;
       this.material.type = value.type;
+      this.material.numberCA = value.numberCA ?? 0;
       this.material.description = value.description;
       this.material.categoryId = value.categories.at(0).id;
       this.material.validityDay = value.validityDay ?? 0;
@@ -321,15 +312,15 @@ export default class MaterialComponent implements OnInit {
         });
 
         this.messageService.add({ severity: 'success', summary: 'Material', detail: 'Salvo com sucesso', icon: 'pi pi-check' });
-      }else{
+      } else {
         this.hideDialog();
         this.messageService.add({ severity: 'error', summary: 'Material', detail: 'Inválido', icon: 'pi pi-times' });
       }
     } else {
       //Update
-
       this.material.status = value.status;
       this.material.type = value.type;
+      this.material.numberCA = value.numberCA ?? 0;
       this.material.description = value.description;
       this.material.categoryId = value.categories.at(0).id;
       this.material.validityDay = value.validityDay ?? 0;
@@ -349,20 +340,17 @@ export default class MaterialComponent implements OnInit {
           quantityAvailableKit: resultSave.body.quantityAvailableKit
         });
         this.messageService.add({ severity: 'success', summary: 'Material', detail: 'Atualizado com sucesso', icon: 'pi pi-check' });
-      }else{
+      } else {
         this.hideDialog();
         this.messageService.add({ severity: 'error', summary: 'Material', detail: 'Inválido', icon: 'pi pi-times' });
       }
     }
-
     this.disableQuantityAccountingLoan();
     this.disableQuantityAvailableLoan();
     this.editQuantityLoan = false;
-
     this.disableQuantityAccountingKit();
     this.disableQuantityAvailableKit();
     this.editQuantityKit = false;
-
     this.listAllMaterial();
   }
   private async saveMat(mat: ToolControlMaterial): Promise<HttpResponse<ToolControlMaterial>> {

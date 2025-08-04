@@ -6,7 +6,8 @@ import java.util.Map;
 
 public interface IToolControlRequestService {
 
-    Map<String , Object> loanRequest(ToolControlRequest req);
+    ToolControlRequest newRequest(ToolControlRequest req);
+    ToolControlRequest updateRequest(ToolControlRequest req);
     Map<String , Object> loanReturn(ToolControlRequest req);
 
 

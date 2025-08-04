@@ -12,11 +12,11 @@ export class ToolcontrolReportService {
     companyResale: string = this.storage.companyId + "/" + this.storage.resaleId;
 
     constructor(private http: HttpClient, private storage: StorageService) { }
-    
-    filterMec(mechanicId: number): Observable<ToolControlReport> {
-        return this.http.get<ToolControlReport>(environment.apiuUrl + "/workshop/tool/control/report/" + this.companyResale + "/all/filter/"+mechanicId+"/mec", { headers: this.myHeaders() });
+
+    filterMec(mechanicId: number): Observable<HttpResponse<ToolControlReport>> {
+        return this.http.get<ToolControlReport>(environment.apiuUrl + "/workshop/tool/control/report/" + this.companyResale + "/all/filter/" + mechanicId + "/mec", { headers: this.myHeaders(), observe: 'response' });
     }
-    
+
     private myHeaders(): HttpHeaders {
         const httpOptions = new HttpHeaders({
             'Content-Type': 'application/json',
