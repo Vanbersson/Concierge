@@ -148,7 +148,6 @@ export default class VehicleEntryComponent implements OnInit, OnDestroy, DoCheck
     private serviceClienteCompany: ClientecompanyService,
     private ngxImageCompressService: NgxImageCompressService) { }
 
-
   ngOnInit(): void {
     this.cores = [
       { color: 'Branco' },
@@ -164,19 +163,13 @@ export default class VehicleEntryComponent implements OnInit, OnDestroy, DoCheck
     ];
 
     this.addRequireInit();
-
-    //Prorietário
-    this.disableClientId();
-    this.disableClientName();
-    this.disableClientCnpj();
-    this.disableClientCpf();
-    this.disableClientRg();
   }
   ngOnDestroy(): void {
 
   }
   ngDoCheck(): void {
     if (this.selectClientCompany().id != 0) {
+
       this.formClientCompany.patchValue({
         clientCompanyNot: [],
         clientCompanyId: this.selectClientCompany().id,
@@ -185,6 +178,7 @@ export default class VehicleEntryComponent implements OnInit, OnDestroy, DoCheck
         clientCompanyCpf: this.selectClientCompany().cpf,
         clientCompanyRg: this.selectClientCompany().rg
       });
+
       if (this.selectClientCompany().fisjur == ClientFisJurEnum.juridica) {
         this.removeValidClientCompanyCpf();
         this.addValidClientCompanyCnpj();
@@ -192,6 +186,13 @@ export default class VehicleEntryComponent implements OnInit, OnDestroy, DoCheck
         this.removeValidClientCompanyCnpj();
         this.addValidClientCompanyCpf();
       }
+
+      //Prorietário
+      this.disableClientId();
+      this.disableClientName();
+      this.disableClientCnpj();
+      this.disableClientCpf();
+      this.disableClientRg();
       //Limpa
       this.selectClientCompany.set(new ClientCompany());
     }
@@ -275,22 +276,23 @@ export default class VehicleEntryComponent implements OnInit, OnDestroy, DoCheck
     this.formClientCompany.controls['clientCompanyCpf'].updateValueAndValidity();
   }
   public validationClientCompany() {
-    if (this.formClientCompany.value.clientCompanyNot.length == 0) {
-      this.removeValidClientCompanyId();
-      this.removeValidClientCompanyName();
-      this.removeValidClientCompanyCnpj();
-      this.removeValidClientCompanyCpf();
+    if (this.formClientCompany.get('clientCompanyNot').value.length == 0) {
+      this.disableClientId();
+      this.disableClientName();
+      this.disableClientCnpj();
+      this.disableClientCpf();
+      this.disableClientRg();
 
       this.cleanFormClientCompany();
     } else {
-      this.addValidClientCompanyId();
-      this.addValidClientCompanyName();
-      this.addValidClientCompanyCnpj();
-      this.addValidClientCompanyCpf();
+      this.enabledClientId();
+      this.enabledClientName();
+      this.enabledClientCnpj();
+      this.enabledClientCpf();
+      this.enabledClientRg();
     }
   }
-  public nextStepperClientCompany() {
-
+  public async nextStepperClientCompany() {
     if (this.formClientCompany.valid) {
       this.activeStepper = 1;
     } else {
@@ -301,7 +303,6 @@ export default class VehicleEntryComponent implements OnInit, OnDestroy, DoCheck
     this.activeStepper = 0;
   }
   private cleanFormClientCompany() {
-    this.selectClientCompany.set(new ClientCompany());
     this.formClientCompany.patchValue({
       clientCompanyNot: [],
       clientCompanyId: null,
@@ -693,7 +694,6 @@ export default class VehicleEntryComponent implements OnInit, OnDestroy, DoCheck
   }
   //save
   private loadVehicleEntry() {
-    const clientValue = this.formClientCompany.value;
     const driverValue = this.formDriver.value;
     const vehicleValue = this.formVehicle.value;
 
@@ -712,7 +712,7 @@ export default class VehicleEntryComponent implements OnInit, OnDestroy, DoCheck
     } else {
       this.vehicleEntry.clientCompanyId = 0;
     }
-  
+
     this.vehicleEntry.driverEntryName = driverValue.driverEntryName;
     this.vehicleEntry.driverEntryCpf = driverValue?.driverEntryCpf ?? "";
     this.vehicleEntry.driverEntryRg = driverValue?.driverEntryRg ?? "";
@@ -752,9 +752,6 @@ export default class VehicleEntryComponent implements OnInit, OnDestroy, DoCheck
     this.cleanFormVehicle();
   }
   public async saveVehicleEntry() {
-    //Save Client
-    //const clientResult = await this.saveClient(this.selectClientCompany());
-
     //Save vehicles
     for (let index = 0; index < this.listVehicleEntry.length; index++) {
       const vehicle = this.listVehicleEntry[index];

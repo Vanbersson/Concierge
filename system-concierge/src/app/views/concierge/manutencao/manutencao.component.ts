@@ -64,6 +64,7 @@ import { IBudget } from '../../../interfaces/budget/ibudget';
 import { FilterClientComponent } from '../../../components/filter.client/filter.client.component';
 import { StatusBudgetEnum } from '../../../models/budget/status-budget-enum';
 import { StatusVehicle } from '../../../models/enum/status-vehicle';
+import { ClientFisJurEnum } from '../../../models/clientcompany/client-fisjur-enum';
 
 interface IModel {
   description: string,
@@ -314,7 +315,7 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
         clientCompanyRg: this.selectClientCompany().rg
       });
 
-      if (this.selectClientCompany().fisjur == "Juridica") {
+      if (this.selectClientCompany().fisjur == ClientFisJurEnum.juridica) {
         this.deleteRequireClientCompanyCpf();
         this.addRequireClientCompanyCnpj();
       } else {
