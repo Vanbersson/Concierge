@@ -45,13 +45,12 @@ import { ClientCompany } from '../../../models/clientcompany/client-company';
 import { VehicleEntry } from '../../../models/vehicle/vehicle-entry';
 import { IColor } from '../../../interfaces/icolor';
 import { MESSAGE_RESPONSE_NOT_COLOR, MESSAGE_RESPONSE_NOT_MODEL, MESSAGE_RESPONSE_NOT_PLACA, MESSAGE_RESPONSE_PLACAEXISTS } from '../../../util/constants';
-
-
 //Components
 import { FilterClientComponent } from '../../../components/filter.client/filter.client.component';
 import { MessageResponse } from '../../../models/message/message-response';
 import { ExistsPlaca } from '../../../models/vehicle/exists-placa';
-
+//Enum
+import { ClientFisJurEnum } from '../../../models/clientcompany/client-fisjur-enum';
 
 @Component({
   selector: 'app-vehicle.entry',
@@ -186,16 +185,16 @@ export default class VehicleEntryComponent implements OnInit, OnDestroy, DoCheck
         clientCompanyCpf: this.selectClientCompany().cpf,
         clientCompanyRg: this.selectClientCompany().rg
       });
-
-      if (this.selectClientCompany().fisjur == "Juridica") {
+      if (this.selectClientCompany().fisjur == ClientFisJurEnum.juridica) {
         this.removeValidClientCompanyCpf();
         this.addValidClientCompanyCnpj();
       } else {
         this.removeValidClientCompanyCnpj();
         this.addValidClientCompanyCpf();
       }
+      //Limpa
+      this.selectClientCompany.set(new ClientCompany());
     }
-
   }
   private addRequireInit() {
     this.addValidClientCompanyId();
@@ -215,7 +214,6 @@ export default class VehicleEntryComponent implements OnInit, OnDestroy, DoCheck
   enabledClientId() {
     this.formClientCompany.get('clientCompanyId').enable();
   }
-
   disableClientName() {
     this.formClientCompany.get('clientCompanyName').disable();
   }
@@ -228,21 +226,18 @@ export default class VehicleEntryComponent implements OnInit, OnDestroy, DoCheck
   enabledClientCnpj() {
     this.formClientCompany.get('clientCompanyCnpj').enable();
   }
-
   disableClientCpf() {
     this.formClientCompany.get('clientCompanyCpf').disable();
   }
   enabledClientCpf() {
     this.formClientCompany.get('clientCompanyCpf').enable();
   }
-
   disableClientRg() {
     this.formClientCompany.get('clientCompanyRg').disable();
   }
   enabledClientRg() {
     this.formClientCompany.get('clientCompanyRg').enable();
   }
-
   //Valid Id
   private addValidClientCompanyId() {
     this.formClientCompany.controls['clientCompanyId'].addValidators(Validators.required);
@@ -316,7 +311,6 @@ export default class VehicleEntryComponent implements OnInit, OnDestroy, DoCheck
       clientCompanyRg: null
     });
   }
-
   //Driver
   public async photoPersonDriver() {
     this.ngxImageCompressService.uploadFile().then(({ image, orientation }) => {
@@ -642,8 +636,6 @@ export default class VehicleEntryComponent implements OnInit, OnDestroy, DoCheck
     }
 
   }
-
-
   //Add or Delete Vehicle entry
   public async addVehicleEntry() {
 
@@ -711,16 +703,16 @@ export default class VehicleEntryComponent implements OnInit, OnDestroy, DoCheck
     this.vehicleEntry.idUserEntry = this.storageService.id;
     this.vehicleEntry.nameUserEntry = this.storageService.name;
 
-    if (clientValue.clientCompanyNot.length == 0) {
-      this.vehicleEntry.clientCompanyId = clientValue.clientCompanyId;
-      this.vehicleEntry.clientCompanyName = clientValue.clientCompanyName;
-      this.vehicleEntry.clientCompanyCnpj = clientValue?.clientCompanyCnpj ?? "";
-      this.vehicleEntry.clientCompanyCpf = clientValue?.clientCompanyCpf ?? "";
-      this.vehicleEntry.clientCompanyRg = clientValue?.clientCompanyRg ?? "";
+    if (this.formClientCompany.get('clientCompanyNot').value.length == 0) {
+      this.vehicleEntry.clientCompanyId = this.formClientCompany.get('clientCompanyId').value;
+      this.vehicleEntry.clientCompanyName = this.formClientCompany.get('clientCompanyName').value;
+      this.vehicleEntry.clientCompanyCnpj = this.formClientCompany.get('clientCompanyCnpj').value ?? "";
+      this.vehicleEntry.clientCompanyCpf = this.formClientCompany.get('clientCompanyCpf').value ?? "";
+      this.vehicleEntry.clientCompanyRg = this.formClientCompany.get('clientCompanyRg').value ?? "";
     } else {
       this.vehicleEntry.clientCompanyId = 0;
     }
-
+  
     this.vehicleEntry.driverEntryName = driverValue.driverEntryName;
     this.vehicleEntry.driverEntryCpf = driverValue?.driverEntryCpf ?? "";
     this.vehicleEntry.driverEntryRg = driverValue?.driverEntryRg ?? "";
@@ -761,7 +753,7 @@ export default class VehicleEntryComponent implements OnInit, OnDestroy, DoCheck
   }
   public async saveVehicleEntry() {
     //Save Client
-    const clientResult = await this.saveClient(this.selectClientCompany());
+    //const clientResult = await this.saveClient(this.selectClientCompany());
 
     //Save vehicles
     for (let index = 0; index < this.listVehicleEntry.length; index++) {
