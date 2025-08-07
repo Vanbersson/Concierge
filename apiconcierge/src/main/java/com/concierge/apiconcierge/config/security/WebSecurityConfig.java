@@ -3,7 +3,6 @@ package com.concierge.apiconcierge.config.security;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -15,8 +14,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.cors.CorsConfigurationSource;
+
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -25,28 +27,46 @@ public class WebSecurityConfig {
     @Autowired
     SecurityFilter securityFilter;
 
+    /**
+     * CorsConfigurationSource - usado pelo .cors() do Spring Security
+     */
     @Bean
-    public WebMvcConfigurer corsConfig() {
-        return new WebMvcConfigurer() {
-            @Override
-            public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/**")
-                        .allowedOrigins("*")
-                        .allowedMethods(HttpMethod.POST.name(), HttpMethod.GET.name())
-                        .allowedHeaders(HttpHeaders.CONTENT_TYPE, HttpHeaders.AUTHORIZATION);
-            }
-        };
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
 
+        // Em dev: defina explicitamente sua origem do frontend.
+        // NÃO use "*" se setAllowCredentials(true).
+        config.setAllowedOrigins(List.of("http://localhost:4200"));
+        //config.setAllowedOrigins(List.of("https://www.atenatruck.com.br"));
+
+        // Métodos permitidos, incluir OPTIONS
+        config.setAllowedMethods(List.of("GET", "POST"));
+
+        // Headers permitidos (pode limitar se desejar)
+        config.setAllowedHeaders(List.of("*"));
+
+        // Se você precisa enviar credenciais (cookies/authorization via credentials)
+        config.setAllowCredentials(true);
+
+        config.setMaxAge(3600L);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+        return source;
     }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity
+                .cors() // <- importante: habilita CORS para Spring Security (usa o CorsConfigurationSource acima)
+                .and()
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers(HttpMethod.GET,"/vehicle/entry/budget/token/valid/**").permitAll()
-                        .requestMatchers(HttpMethod.POST,"/vehicle/entry/budget/token/approbation/**").permitAll()
+                        // liberar pré-flight OPTIONS (opcional, mas garante)
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/vehicle/entry/budget/token/valid/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/vehicle/entry/budget/token/approbation/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/user").hasRole("ADMIN")
                         .anyRequest().authenticated()
