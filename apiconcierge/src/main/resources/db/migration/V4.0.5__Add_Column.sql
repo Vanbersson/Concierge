@@ -1,1 +1,0 @@
-alter table tb_purchase_order add column date_received datetime;

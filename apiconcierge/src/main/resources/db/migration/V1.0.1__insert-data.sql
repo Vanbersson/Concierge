@@ -65,11 +65,83 @@ VALUES
 INSERT INTO tb_type_payment
 (`company_id`, `resale_id`, `status`, `description`)
 VALUE
-(1,1,0,'Dinheiro espécie'),
-(1,1,0,'Faturamento especial'),
-(1,1,0,'Pix'),
+(1,1,0,'À vista (dinheiro)'),
+(1,1,0,'À vista (pix)'),
+(1,1,0,'À vista (transferência)'),
+(1,1,0,'Cartão de débito'),
 (1,1,0,'Cartão de crédito'),
-(1,1,0,'Cartão de débito');
+(1,1,0,'Cartão de crédito parcelado 2x'),
+(1,1,0,'Cartão de crédito parcelado 3x'),
+(1,1,0,'Cartão de crédito parcelado 4x'),
+(1,1,0,'Cartão de crédito parcelado 5x'),
+(1,1,0,'Cartão de crédito parcelado 6x'),
+(1,1,0,'Cartão de crédito parcelado 7x'),
+(1,1,0,'Cartão de crédito parcelado 8x'),
+(1,1,0,'Cartão de crédito parcelado 9x'),
+(1,1,0,'Cartão de crédito parcelado 10x'),
+(1,1,0,'Cartão de crédito parcelado 11x'),
+(1,1,0,'Cartão de crédito parcelado 12x'),
+(1,1,0,'Faturamento especial'),
+(1,1,0,'Faturamento 30 dias'),
+(1,1,0,'Faturamento 30/60 dias'),
+(1,1,0,'Faturamento 30/60/90 dias'),
+(1,1,0,'Faturamento 30/60/90/120 dias'),
+(1,1,0,'Faturamento 30/60/90/120/150 dias'),
+(1,1,0,'Faturamento 30/60/90/120/150/180 dias');
+
+INSERT INTO `tb_menu`
+(`id`, `description`)
+VALUES
+('0_0','Dashboard'),
+('1_0','Portaria'),
+('1_1','Atendimento'),
+('1_2','Veículos'),
+('1_3','Manutenção'),
+('1_4','Cadastros'),
+('1_4_0','Modelo'),
+('1_4_1','Veículo'),
+('2_0','Peças'),
+('2_1','Consulta peças'),
+('2_2','Pedidos de compras'),
+('2_2_0','Pedidos'),
+('2_2_1','Consulta'),
+('2_99','Cadastro'),
+('3_0','Oficina'),
+('3_1','Orçamentos'),
+('3_1_0','Atendimento'),
+('3_1_1','Consulta'),
+('3_2','Controle de equipamentos'),
+('3_2_0','Requisições'),
+('3_2_1','Cadastro'),
+('3_2_1_0','Categoria'),
+('3_2_1_1','Material'),
+('3_99','Cadastro'),
+('3_99_0','Mecânico'),
+('4_0','Faturamento'),
+('4_1','Manutenção Clientes'),
+('100_0','Relatório'),
+('100_1','Portaria'),
+('100_1_0','Veículos'),
+('100_2','Peças'),
+('100_2_0','Pedidos de compras'),
+('999_0','Configurações'),
+('999_1','Empresa'),
+('999_2','Cadastro Usuários');
+
+INSERT INTO tb_permission
+(id,description)
+VALUES
+(100,'Autorizar entrada de veículo'),
+(101,'Autorizar saída de veículo'),
+(102,'Autorizar saída de veículo - 1ª'),
+(103,'Autorizar saída de veículo - 2ª'),
+(104,'Remover autorização de saída de veículo - 1ª'),
+(105,'Remover autorização de saída de veículo - 2ª'),
+(106,'Autorizar saída de veículo sem O.S.'),
+(107,'Remover autorização de saída de veículo sem O.S.'),
+(150,'Gerar orçamento'),
+(151,'Manutenção orçamento'),
+(152,'Visualizar orçamento');
 
 
 
