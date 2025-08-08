@@ -142,7 +142,8 @@ export default class MaterialComponent implements OnInit {
       quantityAccountingKit: 0,
       quantityAvailableKit: 0,
       photo: "",
-      type: this.loan
+      type: this.loan,
+      numberCA:null
     });
     this.photoMat = "";
     this.material = null;

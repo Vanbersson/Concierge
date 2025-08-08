@@ -17,4 +17,7 @@ public interface IToolControlRequestRepository extends JpaRepository<ToolControl
 
     @Query(value = "SELECT * FROM `tb_tool_control_request` WHERE Company_id=?1 AND resale_id=?2 AND status=?3 AND mechanic_id=?4",nativeQuery = true)
     List<ToolControlRequest> filterMechanicId(Integer companyId, Integer resaleId, StatusRequest status, Integer mechanicId);
+
+    @Query(value = "SELECT * FROM `tb_tool_control_request` WHERE Company_id=?1 AND resale_id=?2 AND status=?3 ",nativeQuery = true)
+    List<ToolControlRequest>  listAllStatus(Integer companyId, Integer resaleId, StatusRequest status);
 }

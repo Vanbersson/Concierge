@@ -20,6 +20,7 @@ import { InputTextareaModule } from 'primeng/inputtextarea';
 import { PasswordModule } from 'primeng/password';
 import { DividerModule } from 'primeng/divider';
 import { RadioButtonModule } from 'primeng/radiobutton';
+import { CheckboxModule } from 'primeng/checkbox';
 
 //Service
 import { MechanicService } from '../../../../services/workshop/mechanic/mechanic.service';
@@ -72,7 +73,7 @@ class MatItem {
 @Component({
   selector: 'app-pegar-devolver',
   standalone: true,
-  imports: [CommonModule, ButtonModule, TableModule, InputTextModule, InputNumberModule, MultiSelectModule, DividerModule,
+  imports: [CommonModule, ButtonModule, TableModule, InputTextModule, InputNumberModule, MultiSelectModule, DividerModule, CheckboxModule,
     IconFieldModule, InputMaskModule, InputGroupModule, InputIconModule, DialogModule, ReactiveFormsModule, FormsModule, PasswordModule, RadioButtonModule,
     ConfirmDialogModule, ToastModule, InputTextareaModule],
   templateUrl: './pegar-devolver.component.html',
@@ -83,8 +84,12 @@ export default class PegarDevolverComponent implements OnInit {
   expandedRows = {};
   listfilterMec: ToolControlReport[] = [];
   selectedMaterials: MatItem[] = [];
-  realPassword = '';
-  //Dialog Pegar
+  currentCodePassReal = '';
+  currentCodePassExpected: number;
+  request: ToolControlRequest;
+  isDeliveryMaterial: boolean = false;
+  //Dialog Requisição de mateiais
+  listRequest: ToolControlRequest[] = [];
   visibleDialogPegar = false;
   visibleDialogPegarInf = false;
   photoMec: string = "";
@@ -105,10 +110,12 @@ export default class PegarDevolverComponent implements OnInit {
   listReturnMaterial: MatItem[] = [];
   disabledSelectMat = false;
   listMechanicDev: Mechanic[] = [];
-  photoMecDev: string = "";
-  currentCodePassExpected: number;
+  // photoMecDev: string = "";
+
 
   formPegar = new FormGroup({
+    requestComplete: new FormControl<string | null>(null),
+    request: new FormControl<ToolControlRequest[]>([]),
     mechanic: new FormControl<Mechanic[] | null>([], Validators.required),
     material: new FormControl<ToolControlMaterial[] | null>([], Validators.required),
     categories: new FormControl<ToolControlCategory[] | null>([], Validators.required),
@@ -123,6 +130,7 @@ export default class PegarDevolverComponent implements OnInit {
   selectTypeCategory: string = "";
 
   //Dialog request
+  listRequestPendent: ToolControlRequest[] = [];
   visibleDialogRequest = false;
   formRequest = new FormGroup({
     mechanic: new FormControl<Mechanic[] | null>([], Validators.required),
@@ -147,17 +155,17 @@ export default class PegarDevolverComponent implements OnInit {
   }
   onInput(): void {
     const masked = this.formCodePass.get('maskedPassword')?.value;
-    const realLength = this.realPassword.length;
+    const realLength = this.currentCodePassReal.length;
     const maskedLength = masked.length;
     if (maskedLength < realLength) {
       // backspace ou remoção
-      this.realPassword = this.realPassword.substring(0, maskedLength);
+      this.currentCodePassReal = this.currentCodePassReal.substring(0, maskedLength);
     } else {
       const newChar = masked.charAt(maskedLength - 1);
-      this.realPassword += newChar;
+      this.currentCodePassReal += newChar;
     }
     // atualiza o campo com asteriscos
-    this.formCodePass.get('maskedPassword')?.setValue('*'.repeat(this.realPassword.length), {
+    this.formCodePass.get('maskedPassword')?.setValue('*'.repeat(this.currentCodePassReal.length), {
       emitEvent: false // evita loop de input
     });
   }
@@ -166,7 +174,7 @@ export default class PegarDevolverComponent implements OnInit {
     this.busyService.busy();
     const resultCat = await this.listCategory();
     this.listCat = resultCat;
-    const resultMat = await this.listMaterial();
+    const resultMat = await this.listMaterialEnabled();
     this.listMat = resultMat;
     const resultMec = await this.listMecEnabled();
     this.listMec = resultMec;
@@ -174,6 +182,104 @@ export default class PegarDevolverComponent implements OnInit {
     //Facha o loading
     this.busyService.idle();
   }
+  //Request
+  private async saveNewRequest(req: ToolControlRequest): Promise<HttpResponse<ToolControlRequest>> {
+    try {
+      return await lastValueFrom(this.requestService.newRequest(req));
+    } catch (error) {
+      return error;
+    }
+  }
+  private async updateRequest(req: ToolControlRequest): Promise<HttpResponse<ToolControlRequest>> {
+    try {
+      return await lastValueFrom(this.requestService.updateRequest(req));
+    } catch (error) {
+      return error;
+    }
+  }
+  private async listRequestStatus(status: string): Promise<ToolControlRequest[]> {
+    try {
+      return await lastValueFrom(this.requestService.listRequestStatus(status));
+    } catch (error) {
+      return [];
+    }
+  }
+  //Material
+  private async listMaterialEnabled(): Promise<ToolControlMaterial[]> {
+    try {
+      return await lastValueFrom(this.materialService.listAllEnabled());
+    } catch (error) {
+      return [];
+    }
+  }
+  getMaterialPhoto(id: number): string {
+    return this.listMat.find(material => material.id == id).photo;
+  }
+  //Categoria
+  private async listCategory(): Promise<ToolControlCategory[]> {
+    try {
+      return await lastValueFrom(this.categoryService.listAllEnabled());
+    } catch (error) {
+      return [];
+    }
+  }
+  getCategoryDesc(id: number): string {
+    return this.listCat.find(cat => cat.id == id).description;
+  }
+  //Mecânicos
+  private async listMecEnabled(): Promise<Mechanic[]> {
+    try {
+      return await lastValueFrom(this.mechanicService.listAllEnabled());
+    } catch (error) {
+      return [];
+    }
+  }
+  getMechanicName(id: number): string {
+    return this.listMec.find(mec => mec.id == id).name;
+  }
+  onConfirmCodePassMechanic(dv: ConfirmDialog) {
+    if (Number.parseInt(this.currentCodePassReal) == this.currentCodePassExpected) {
+      //Limpa código
+      this.cleanFormCodePass();
+      this.currentCodePassExpected = 0;
+      dv.accept(); // Vai cair na lógica do `accept` da Promise
+    } else {
+      this.messageService.add({ severity: 'error', summary: 'Senha', detail: 'Senha incorreta', icon: 'pi pi-times', life: 3000 });
+    }
+  }
+  async confirmCodePassMechanic(name: string, photo: string, code: number): Promise<boolean> {
+    //Foto do mecânico
+    this.photoMec = photo;
+    //Código atual
+    this.currentCodePassExpected = code;
+    //Limpa campo da senha
+    this.cleanFormCodePass();
+    //Aguarda a confirmação
+    return new Promise<boolean>((resolve) => {
+      this.confirmationService.confirm({
+        key: 'confimMecCodePass',
+        header: 'Colaborador',
+        message: name,
+        acceptLabel: 'Comfirmar',
+        accept: () => {
+          setTimeout(() => resolve(true), 300);
+        },
+        reject: () => {
+          resolve(false);
+        }
+      });
+    });
+  }
+  private cleanFormCodePass() {
+    this.formCodePass.patchValue({ maskedPassword: "" });
+    this.currentCodePassReal = "";
+  }
+  //
+
+
+
+
+
   private async filterMaterialMec() {
     for (let index = 0; index < this.listMec.length; index++) {
       const mechanic = this.listMec.at(index);
@@ -194,35 +300,23 @@ export default class PegarDevolverComponent implements OnInit {
       return error;
     }
   }
-  private async listMecEnabled(): Promise<Mechanic[]> {
-    try {
-      return await lastValueFrom(this.mechanicService.listAllEnabled());
-    } catch (error) {
-      return [];
-    }
-  }
-  private async listMaterial(): Promise<ToolControlMaterial[]> {
-    try {
-      return await lastValueFrom(this.materialService.listAllEnabled());
-    } catch (error) {
-      return [];
-    }
-  }
-  private async listCategory(): Promise<ToolControlCategory[]> {
-    try {
-      return await lastValueFrom(this.categoryService.listAllEnabled());
-    } catch (error) {
-      return [];
-    }
-  }
-  selectMechanic() {
+
+  async selectMechanic() {
     const { value } = this.formPegar;
     if (value.mechanic.length == 1) {
       this.photoMec = value.mechanic.at(0).photo;
+      this.listRequest = await this.listRequestMechanic(value.mechanic.at(0).id);
     } else {
       this.photoMec = "";
       this.formPegar.patchValue({ categories: [], material: [] });
       this.listMatTemp = [];
+    }
+  }
+  private async listRequestMechanic(id: number): Promise<ToolControlRequest[]> {
+    try {
+      return await lastValueFrom(this.requestService.filterMechanicId(id));
+    } catch (error) {
+      return [];
     }
   }
   selectCategory() {
@@ -239,12 +333,12 @@ export default class PegarDevolverComponent implements OnInit {
       //limpa a lista temporaria
       this.listMatTemp = [];
       for (var mat of this.listMat) {
-         if (value.categories.at(0).id == mat.categoryId && (mat.type == TypeRequest.LOAN || mat.type == TypeRequest.AMBOS) && mat.quantityAvailableLoan > 0) {
+        if (value.categories.at(0).id == mat.categoryId && (mat.type == TypeRequest.LOAN || mat.type == TypeRequest.AMBOS) && mat.quantityAvailableLoan > 0) {
           //Quantidade padrão de requisição
           mat.quantityLoan = this.quantityReqDefault;
           //Adiciona o material
           this.listMatTemp.push(mat);
-        } 
+        }
       }
 
       if (value.categories.at(0).type == TypeCategory.FERRAMENTA || value.categories.at(0).type == TypeCategory.EPI) {
@@ -280,9 +374,6 @@ export default class PegarDevolverComponent implements OnInit {
   }
   selectMaterial() {
   }
-  getMaterialPhoto(id: number): string {
-    return this.listMat.find(material => material.id == id).photo;
-  }
   cleanFormPegar() {
     this.formPegar.patchValue({
       mechanic: [],
@@ -292,25 +383,25 @@ export default class PegarDevolverComponent implements OnInit {
     });
     this.photoMec = "";
   }
-  showDialog() {
-    this.cleanFormPegar();
-    this.visibleDialogPegar = true;
-  }
-  hideDialog() {
-    this.visibleDialogPegar = false;
-  }
+
   showDialogInf() {
     this.visibleDialogPegarInf = true;
   }
   hideDialogInf() {
     this.visibleDialogPegarInf = false;
   }
-
-
   //Nova solicitação
-  showDialogReq() {
+  public showDialogReq() {
     this.cleanFormRequest();
+    this.listRequestPend();
     this.visibleDialogRequest = true;
+  }
+  private async listRequestPend() {
+    this.listRequestPendent = await this.listRequestStatus(StatusRequest.OPEN);
+    const resultDeli = await this.listRequestStatus(StatusRequest.DELIVERY);
+    resultDeli.map(d => {
+      this.listRequestPendent.push(d);
+    });
   }
   hideDialogReq() {
     this.visibleDialogRequest = false;
@@ -338,16 +429,22 @@ export default class PegarDevolverComponent implements OnInit {
     const resultReq = await this.saveNewRequest(req);
     if (resultReq.status == 201) {
       this.messageService.add({ severity: 'success', summary: 'Requisição', detail: 'Aberta com sucesso', icon: 'pi pi-check' });
-      this.hideDialogReq();
+      this.listRequestPend();
     }
   }
-  private async saveNewRequest(req: ToolControlRequest): Promise<HttpResponse<ToolControlRequest>> {
-    try {
-      return await lastValueFrom(this.requestService.newRequest(req));
-    } catch (error) {
-      return error;
+  async completeRequest(req: ToolControlRequest) {
+    req.status = StatusRequest.COMPLETE;
+    const resultUpdate = await this.updateRequest(req);
+    if (resultUpdate.status == 200) {
+      this.messageService.add({ severity: 'success', summary: 'Solicitação', detail: 'Encerrada com sucesso', icon: 'pi pi-check' });
+      this.listRequestPend();
     }
   }
+  //
+
+
+
+
   //Retorno de material
   showDialogDev() {
     this.visibleDialogDev = true;
@@ -413,7 +510,7 @@ export default class PegarDevolverComponent implements OnInit {
     var errorMec: Mechanic[] = [];
     for (var mec of this.listMechanicDev) {
       //Chama o confirma o código do mecânico
-      const resultConfirm = await this.confirmCodePass(mec.name, mec.photo, mec.codePassword);
+      const resultConfirm = await this.confirmCodePassMechanic(mec.name, mec.photo, mec.codePassword);
       //Materiais do mecânico
       const materialsMec = this.listReturnMaterial.filter(mechanic => mechanic.mechanic.id == mec.id);
       if (resultConfirm) {
@@ -434,11 +531,11 @@ export default class PegarDevolverComponent implements OnInit {
           matmec.resaleId = mec.resaleId;
           matmec.id = item.matMecId;
           matmec.requestId = item.requestId;
-         /*  matmec.quantityReq = item.matMecQuantityReq;
-          matmec.quantityRet = item.matMecQuantityReq;
-          matmec.dateRet = this.formatDateTime(new Date());
-          matmec.userIdRet = this.storageService.id;
-          matmec.informationRet = item.matMecInformationRet; */
+          /*  matmec.quantityReq = item.matMecQuantityReq;
+           matmec.quantityRet = item.matMecQuantityReq;
+           matmec.dateRet = this.formatDateTime(new Date());
+           matmec.userIdRet = this.storageService.id;
+           matmec.informationRet = item.matMecInformationRet; */
           matmec.materialId = item.matMecMaterialId;
           //Save
           const resultUpdateMat = await this.updateMatMec(matmec);
@@ -464,39 +561,6 @@ export default class PegarDevolverComponent implements OnInit {
       this.hideDialogDev();
     }
   }
-  async confirmCodePass(name: string, photo: string, code: number): Promise<boolean> {
-    //Foto do mecânico
-    this.photoMecDev = photo;
-    //Código atual
-    this.currentCodePassExpected = code;
-    //Limpa campo da senha
-    this.cleanFormCodePass();
-    //Aguarda a confirmação
-    return new Promise<boolean>((resolve) => {
-      this.confirmationService.confirm({
-        key: 'confimMecCodePass',
-        header: 'Colaborador',
-        message: name,
-        acceptLabel: 'Comfirmar',
-        accept: () => {
-          setTimeout(() => resolve(true), 300);
-        },
-        reject: () => {
-          resolve(false);
-        }
-      });
-    });
-  }
-  onConfirmCodePass(dv: ConfirmDialog) {
-    if (Number.parseInt(this.realPassword) == this.currentCodePassExpected) {
-      //Limpa código
-      this.cleanFormCodePass();
-      this.currentCodePassExpected = 0;
-      dv.accept(); // Vai cair na lógica do `accept` da Promise
-    } else {
-      this.messageService.add({ severity: 'error', summary: 'Senha', detail: 'Senha incorreta', icon: 'pi pi-times', life: 3000 });
-    }
-  }
   //
   onRowCollapse(event: TableRowCollapseEvent) {
     //this.messageService.add({ severity: 'success', summary: 'Product Collapsed', detail: event.data.name, life: 3000 });
@@ -506,77 +570,81 @@ export default class PegarDevolverComponent implements OnInit {
   }
   formatDateTime(date: Date): string {
     const datePipe = new DatePipe('en-US');
-
     // Obtém o fuso horário local no formato ±hh:mm
     const tzOffset = -date.getTimezoneOffset();
     const sign = tzOffset >= 0 ? '+' : '-';
     const hours = Math.floor(Math.abs(tzOffset) / 60).toString().padStart(2, '0');
     const minutes = (Math.abs(tzOffset) % 60).toString().padStart(2, '0');
     const timezone = `${sign}${hours}:${minutes}`;
-
     // Formata a data e adiciona o fuso horário
     return datePipe.transform(date, "yyyy-MM-dd'T'HH:mm:ss.SSS") + timezone;
   }
-
   //Entrega de Material
-  cleanFormCodePass() {
-    this.formCodePass.patchValue({ maskedPassword: "" });
-    this.realPassword = "";
+  showDialogDeliveryMat() {
+    this.cleanFormPegar();
+    this.visibleDialogPegar = true;
   }
-  confirm() {
-    //Limpa campo da senha
-    this.cleanFormCodePass();
-    //Aguarda a confirmação
-    this.confirmationService.confirm({
-      header: 'Senha Colaborador',
-      message: 'Por favor digite sua senha.',
-      acceptLabel: 'Comfirmar',
-      accept: () => {
-        this.validMechanicCodePass();
-      },
-      reject: () => {
+  async hideDialogDeliveryMat() {
+    this.visibleDialogPegar = false;
+    //Verifica se teve maerial salvo e alterar o status da solicitação
+    if (this.isDeliveryMaterial) {
+      //Inicia o loading
+      this.busyService.busy();
+      this.isDeliveryMaterial = false;
+      //Atualiza status
+      this.request.status = StatusRequest.DELIVERY;
+      const resultStatus = await this.updateRequest(this.request);
+      if (resultStatus.status == 200) {
+        this.messageService.add({ severity: 'success', summary: 'Solicitação', detail: 'Atualizada com sucesso', icon: 'pi pi-check' });
       }
-    });
-  }
-  private async validMechanicCodePass() {
-    const { value } = this.formPegar;
-    if (Number.parseInt(this.realPassword) != value.mechanic.at(0).codePassword) {
-      this.messageService.add({ severity: 'error', summary: 'Senha', detail: "Senha incoreta.", icon: 'pi pi-times', life: 3000 });
-      return;
+      //lista mecânicos
+      this.listfilterMec = [];
+      this.filterMaterialMec();
+      this.request = null;
+      //Facha o loading
+      this.busyService.idle();
     }
-    this.save();
+  }
+  async confirmDeliveryMaterial() {
+    const { value } = this.formPegar;
+    const result = await this.confirmCodePassMechanic(value.mechanic.at(0).name, value.mechanic.at(0).photo, value.mechanic.at(0).codePassword);
+    if (result)
+      this.save();
   }
   private async save() {
     const { value } = this.formPegar;
-    var req: ToolControlRequest = new ToolControlRequest();
-    req.companyId = this.storageService.companyId;
-    req.resaleId = this.storageService.resaleId;
-    req.status = StatusRequest.OPEN;
-    req.requestType = TypeRequest.LOAN;
-    req.requestDate = this.formatDateTime(new Date());
-    req.requestInformation = value.inforReq;
-    req.requestUserId = this.storageService.id;
-    req.requestUserName = this.storageService.name;
-    req.categoryType = value.categories.at(0).type;
-    req.mechanicId = value.mechanic.at(0).id;
-    const resultReq = await this.saveNewRequest(req);
-    if (resultReq.status == 201) {
-      req.id = resultReq.body.id;
-      this.messageService.add({ severity: 'success', summary: 'Requisição', detail: 'Aberta com sucesso', icon: 'pi pi-check' });
-    } else {
-      return;
+    //nova solicitação
+    if (this.request == null) {
+      this.request = new ToolControlRequest();
+      this.request.companyId = this.storageService.companyId;
+      this.request.resaleId = this.storageService.resaleId;
+      this.request.status = StatusRequest.OPEN;
+      this.request.requestType = TypeRequest.LOAN;
+      this.request.requestDate = this.formatDateTime(new Date());
+      this.request.requestInformation = value.inforReq;
+      this.request.requestUserId = this.storageService.id;
+      this.request.requestUserName = this.storageService.name;
+      this.request.categoryType = value.categories.at(0).type;
+      this.request.mechanicId = value.mechanic.at(0).id;
+      const resultReq = await this.saveNewRequest(this.request);
+      if (resultReq.status == 201) {
+        this.request.id = resultReq.body.id;
+        this.messageService.add({ severity: 'success', summary: 'Requisição', detail: 'Aberta com sucesso', icon: 'pi pi-check' });
+      } else {
+        return;
+      }
     }
+    //Salvar materiais
     for (var item of value.material) {
-      
       var matMec: ToolControlMatMec = new ToolControlMatMec();
       matMec.companyId = this.storageService.companyId;
       matMec.resaleId = this.storageService.resaleId;
-      matMec.requestId = req.id;
+      matMec.requestId = this.request.id;
       matMec.deliveryUserId = this.storageService.id;
       matMec.deliveryUserName = this.storageService.name;
       matMec.deliveryDate = this.formatDateTime(new Date());
       matMec.deliveryQuantity = item.quantityLoan;
-      matMec.deliveryInformation="";
+      matMec.deliveryInformation = "";
       matMec.materialId = item.id;
       matMec.materialDescription = item.description;
       matMec.materialNumberCA = item.numberCA ?? 0;
@@ -585,22 +653,18 @@ export default class PegarDevolverComponent implements OnInit {
         this.messageService.add({ severity: 'info', summary: 'EPI', detail: 'C.A. não adicionado', icon: 'pi pi-info-circle' });
         return;
       }
-
       const resultMatMec = await this.saveMatMec(matMec);
       if (resultMatMec.status == 201) {
+        this.isDeliveryMaterial = true;
         this.messageService.add({ severity: 'success', summary: 'Material', detail: item.description + ' salvo com sucesso', icon: 'pi pi-check' });
+        //Remover os materiais salvo
+        const mats = value.material.filter(mat => mat.id != matMec.materialId);
+        this.formPegar.patchValue({
+          material: mats
+        });
       }
     }
-    this.hideDialog();
-    //Inicia o loading
-    this.busyService.busy();
-    this.listMec = [];
-    this.listfilterMec = [];
-    const resultMec = await this.listMecEnabled();
-    this.listMec = resultMec;
-    this.filterMaterialMec();
-    //Facha o loading
-    this.busyService.idle();
+    this.hideDialogDeliveryMat();
   }
   private async loanRequest(req: ToolControlRequest): Promise<HttpResponse<ToolControlRequest>> {
     try {
@@ -623,18 +687,6 @@ export default class PegarDevolverComponent implements OnInit {
       return error;
     }
   }
-  countRequest = 0;
-  countRequestTotal = 0;
-  countItem(req: number): number {
-    const list = this.listfilterMec.filter(mec => {
-      return mec.materials.find(mat => mat.requestId == req);
-    });
-
-    console.log(list.at(0).materials);
-
-    return 4;
-
-  }
   //Editar quantidade de material no empréstimo
   onRowEditInit(mat: ToolControlMaterial) {
     this.clonedMaterial[mat.id as number] = { ...mat };
@@ -650,5 +702,9 @@ export default class PegarDevolverComponent implements OnInit {
 
     delete this.clonedMaterial[mat.id as number];
   }
+
+
+
+
 
 }

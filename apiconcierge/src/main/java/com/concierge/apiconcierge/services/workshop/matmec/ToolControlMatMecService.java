@@ -11,10 +11,8 @@ import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
+
 
 @Service
 public class ToolControlMatMecService implements IToolControlMatMecService {
@@ -37,18 +35,24 @@ public class ToolControlMatMecService implements IToolControlMatMecService {
                 float quant = matMec.getDeliveryQuantity();
                 for (int i = 0; i < quant; i++) {
                     ToolControlMatMec newMatMec = new ToolControlMatMec();
-                    newMatMec = matMec;
+                    newMatMec.setCompanyId(matMec.getCompanyId());
+                    newMatMec.setResaleId(matMec.getResaleId());
+                    newMatMec.setRequestId(matMec.getRequestId());
+                    newMatMec.setDeliveryUserId(matMec.getDeliveryUserId());
+                    newMatMec.setDeliveryUserName(matMec.getDeliveryUserName());
+                    newMatMec.setDeliveryDate(matMec.getDeliveryDate());
                     newMatMec.setDeliveryQuantity(1);
-                    newMatMec.setReturnQuantity(0);
+                    newMatMec.setDeliveryInformation(matMec.getDeliveryInformation());
                     newMatMec.setReturnUserId(null);
                     newMatMec.setReturnDate(null);
+                    newMatMec.setReturnQuantity(0);
+                    newMatMec.setMaterialId(matMec.getMaterialId());
+                    newMatMec.setMaterialDescription(matMec.getMaterialDescription());
+                    newMatMec.setMaterialNumberCA(matMec.getMaterialNumberCA());
+
                     ToolControlMatMec resultSave = this.repository.save(newMatMec);
                 }
-
-//                String resultMessage = this.updateQuantityMaterial(matMec, "Loan");
-//                if (!ConstantsMessage.SUCCESS.equals(resultMessage)) {
-//                    //Error
-//                }
+                String resultMessage = this.updateQuantityMaterial(matMec, "Loan");
                 return ConstantsMessage.SUCCESS;
             } else {
                 throw new ToolControlException(message);

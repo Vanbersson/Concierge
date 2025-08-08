@@ -15,14 +15,13 @@ public class ToolControlMatMecValidation implements IToolControlMatMecValidation
         if (matMec.getResaleId() == null || matMec.getResaleId() == 0)
             return ConstantsMessage.ERROR_RESALE;
         if (matMec.getRequestId() == null || matMec.getRequestId() == 0)
-            return "Request not informed.";
-//        if (matMec.getQuantityReq() == 0)
-//            return "Quantity not informed.";
-//        if (matMec.getMaterialId() == null || matMec.getMaterialId() == 0)
-//            return "Material Id not informed.";
-//        if (matMec.getQuantityReq() < 0)
-//            return "Quantity invalid.";
-
+            return "Id Request not informed.";
+        if(matMec.getDeliveryDate() ==null)
+            return "Date not informed.";
+        if(matMec.getDeliveryQuantity() < 0 || matMec.getDeliveryQuantity() == 0 )
+            return "Quantity not informed.";
+        if(matMec.getMaterialId() == null || matMec.getMaterialId() == 0)
+            return "Id Material not informed.";
 
         return ConstantsMessage.SUCCESS;
     }
@@ -36,15 +35,13 @@ public class ToolControlMatMecValidation implements IToolControlMatMecValidation
         if (matMec.getId() == null)
             return ConstantsMessage.ERROR_ID;
         if (matMec.getRequestId() == null || matMec.getRequestId() == 0)
-            return "Request not informed.";
-//        if (matMec.getQuantityReq() == 0)
-//            return "Quantity not informed.";
-//        if ( matMec.getQuantityDev() == 0)
-//            return "Quantity not informed.";
-//        if (matMec.getQuantityReq() != matMec.getQuantityDev())
-//            return "Quantity different.";
-        if (matMec.getMaterialId() == null || matMec.getMaterialId() == 0)
-            return "Material Id not informed.";
+            return "Id Request not informed.";
+        if(matMec.getDeliveryDate() ==null)
+            return "Date not informed.";
+        if(matMec.getDeliveryQuantity() < 0 || matMec.getDeliveryQuantity() == 0 )
+            return "Quantity not informed.";
+        if(matMec.getMaterialId() == null || matMec.getMaterialId() == 0)
+            return "Id Material not informed.";
 
         return ConstantsMessage.SUCCESS;
     }

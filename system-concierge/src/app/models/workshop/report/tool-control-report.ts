@@ -19,15 +19,16 @@ export class ToolControlReport {
             categoryId: number;
             categoryDesc: string;
             matMecId: string;
-            matMecQuantityReq: number;
-            matMecQuantityRet: number;
-            matMecUserRet: number;
-            matMecDateRet: string;
-            matMecInformationRet:string;
+            matMecDelivUserId: number;
+            matMecDelivUserName: string;
+            matMecDelivQuantity: number;
+            matMecDelivDate: string;
+            matMecReturUserId: number;
+            matMecReturUserName: string;
+            matMecReturQuantity: number;
+            matMecReturDate: string;
             matMecMaterialId: number;
-            materialDesc: string;
-            rowSpan: number;
+            matMecMaterialDesc: string;
         }
     ];
-
 }

@@ -1,12 +1,12 @@
  CREATE TABLE IF NOT EXISTS tb_address(
- id int not null auto_increment,
- zip_code varchar(8) not null,
- state varchar(2) not null,
- city varchar(100) not null,
- neighborhood varchar(100) not null,
- address varchar(100) not null,
- address_complement varchar(100),
- primary key(id)
+     id int not null auto_increment,
+     zip_code varchar(8) not null,
+     state varchar(2) not null,
+     city varchar(100) not null,
+     neighborhood varchar(100) not null,
+     address varchar(100) not null,
+     address_complement varchar(100),
+     primary key(id)
  );
 
  CREATE TABLE IF NOT EXISTS tb_permission(
@@ -15,7 +15,7 @@
      PRIMARY KEY(id)
  );
 
- CREATE TABLE tb_menu(
+ CREATE TABLE IF NOT EXISTS tb_menu(
       id varchar(10) not null,
       description varchar(100) not null,
       PRIMARY KEY(id)
@@ -91,7 +91,7 @@
      PRIMARY KEY(id)
  );
 
- create table IF NOT EXISTS tb_user_permission(
+ CREATE TABLE IF NOT EXISTS tb_user_permission(
      company_id int not null,
      resale_id int not null,
      id binary(16) unique,
@@ -104,7 +104,7 @@
      PRIMARY KEY(id)
  );
 
- create table IF NOT EXISTS tb_user_menu(
+ CREATE TABLE IF NOT EXISTS tb_user_menu(
       company_id int not null,
       resale_id int not null,
       id binary(16) unique,
@@ -308,7 +308,7 @@
 
  );
 
- CREATE TABLE tb_type_payment(
+ CREATE TABLE IF NOT EXISTS tb_type_payment(
       company_id int not null,
       resale_id int not null,
       id int not null AUTO_INCREMENT,
@@ -318,7 +318,7 @@
  );
 
 
- CREATE TABLE tb_budget(
+ CREATE TABLE IF NOT EXISTS tb_budget(
       company_id int not null,
       resale_id int not null,
       id int not null AUTO_INCREMENT,
@@ -342,7 +342,7 @@
       primary key(id)
   );
 
- CREATE TABLE tb_budget_requisition(
+ CREATE TABLE IF NOT EXISTS tb_budget_requisition(
     company_id int not null,
     resale_id int not null,
     id binary(16) unique,
@@ -375,7 +375,7 @@
       primary key(id)
   );
 
- CREATE TABLE tb_budget_service(
+ CREATE TABLE IF NOT EXISTS tb_budget_service(
         company_id int not null,
         resale_id int not null,
         id binary(16) unique,
@@ -522,11 +522,11 @@
  CREATE TABLE IF NOT EXISTS tb_tool_control_mat_mec(
     company_id int not null,
     resale_id int not null,
-    id binary(16) unique,
+    id binary(16) unique not null,
     request_id int not null,
     delivery_user_id int,
     delivery_user_name varchar(100),
-    delivery_date int not null,
+    delivery_date datetime not null,
     delivery_quantity float not null,
     delivery_information varchar(255),
     return_user_id int,

@@ -12,32 +12,42 @@ public interface IToolControlReport {
 
     Integer getRequestStatus();
 
-    Integer getRequestTypeMaterial();
+    Integer getRequestType();
 
     Integer getRequestUserId();
+
+    String getRequestUserName();
 
     Date getRequestDate();
 
     String getRequestInformation();
 
+
     Integer getCategoryId();
 
     String getCategoryDesc();
 
+
     byte[] getMatMecId();
 
-    float getMatMecQuantityReq();
+    Integer getMatMecDelivUserId();
 
-    float getMatMecQuantityRet();
+    String getMatMecDelivUserName();
 
-    Integer getMatMecUserRet();
+    float getMatMecDelivQuantity();
 
-    Date getMatMecDateRet();
+    Date getMatMecDelivDate();
 
-    String getMatMecInformationRet();
+    Integer getMatMecReturUserId();
+
+    String getMatMecReturUserName();
+
+    float getMatMecReturQuantity();
+
+    Date getMatMecReturDate();
 
     Integer getMatMecMaterialId();
 
-    String getMaterialDesc();
+    String getMatMecMaterialDesc();
 
 }

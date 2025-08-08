@@ -5,7 +5,7 @@
         <div class="flex gap-2">
             <p-button icon="pi pi-plus" [text]="true" label="Solicitação" (onClick)=" showDialogReq()" />
             <p-divider layout="vertical" />
-            <p-button icon="pi pi-plus" [text]="true" label="Entrega de Materiais" (onClick)="showDialog()" />
+            <p-button icon="pi pi-plus" [text]="true" label="Entrega de Materiais" (onClick)="showDialogDeliveryMat()" />
             <p-divider layout="vertical" />
             <p-button icon="pi pi-reply" [text]="true" label="Devolver" severity="danger" [disabled]="selectedMaterials.length == 0"
                 (onClick)=" returnMaterial()" />
@@ -79,14 +79,14 @@
                                     <td>
                                         <p-tableCheckbox [value]="mat" />
                                     </td>
-                                    <td>{{mat.requestDate | date:'dd/MM/yyyy'}}</td>
+                                    <td>{{mat.matMecDelivDate | date:'dd/MM/yyyy'}}</td>
                                      <td>{{mat.categoryDesc | uppercase}}</td>
                                     <td>
                                         <img *ngIf="getMaterialPhoto(mat.matMecMaterialId)" class="layout-img-small" src="data:image/png;base64,{{getMaterialPhoto(mat.matMecMaterialId)}}" alt="photo material" width="42" height="42" loading="lazy" />
                                         <img *ngIf="!getMaterialPhoto(mat.matMecMaterialId)" class="layout-img-small" src="assets/icons/icontool.jpg" alt="photo material" width="42" height="42" />
                                     </td>
-                                    <td>{{mat.materialDesc | uppercase}}</td>
-                                    <td>{{mat.matMecQuantityReq | number:'1.2-2'}}</td>
+                                    <td>{{mat.matMecMaterialDesc | uppercase}}</td>
+                                    <td>{{mat.matMecDelivQuantity | number:'1.2-2'}}</td>
                                     <td *ngIf="rowgroup" [attr.rowspan]="rowspan">
                                         {{mat.requestInformation | uppercase}}
                                     </td>
@@ -103,7 +103,7 @@
     </p-table>
 </div>
 
-<!-- Pegar -->
+<!-- Requisição de materiais -->
 <p-dialog header="Entrega de Materiais" [(visible)]="visibleDialogPegar" modal="true"
     [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }" [style]="{width: '60rem', height:'60rem'}">
     <form [formGroup]="formPegar">
@@ -114,9 +114,7 @@
         <div class="p-fluid p-formgrid grid">
             <div class="field col-12 md:col-6 p-1">
                 <label for="mechanicId">Mecânicos</label>
-                <p-multiSelect [options]="listMec" display="chip" [selectionLimit]="1" placeholder="Selecione"
-                    optionLabel="name" formControlName="mechanic" (onChange)="selectMechanic()"
-                    [style]="{height:'45.5px'}">
+                <p-multiSelect [options]="listMec" display="chip" [selectionLimit]="1" optionLabel="name" formControlName="mechanic" (onChange)="selectMechanic()" [style]="{height:'45.5px'}">
                     <ng-template let-value pTemplate="selectedItems">
                         <div class="inline-flex align-items-center gap-2" *ngFor="let mec of value">
                             <img *ngIf="!mec.photo" class="layout-img-small" src="assets/icons/iconmecanico.png" alt="photo mechanic" width="32" height="32" />
@@ -137,10 +135,28 @@
             </div>
             <div class="field col-12 md:col-6 p-1">
                 <label for="categoryId">Categoria</label>
-                <p-multiSelect [options]="listCat" optionLabel="description" placeholder="Categorias" display="chip"
-                    [selectionLimit]="1" formControlName="categories" (onChange)="selectCategory()"
-                    [style]="{height:'45.5px'}" />
+                <p-multiSelect [options]="listCat" optionLabel="description" placeholder="Categorias" display="chip" [selectionLimit]="1" formControlName="categories" (onChange)="selectCategory()" [style]="{height:'45.5px'}" />
                 <small class="p-error block" *ngIf="formPegar.get('categories')?.invalid">Campo obrigatório</small>
+            </div>
+            <div *ngIf="listRequest.length" class="field col-10 p-1">
+                <label for="categoryId">Requisições pedentes</label>
+                <p-multiSelect [options]="listRequest"  display="chip" [selectionLimit]="1" optionLabel="id" formControlName="request" [style]="{height:'45.5px'}" >
+                    <ng-template let-value pTemplate="selectedItems">
+                        <div class="inline-flex align-items-center gap-2" *ngFor="let req of value">
+                            <div style="margin: 0.42rem;"><span><strong>Nº. {{ req.id }}</strong></span> - {{ req.requestInformation | uppercase }}</div>
+                        </div>
+                        <div *ngIf="!value || value.length === 0">Selecione</div>
+                    </ng-template>
+                    <ng-template let-req pTemplate="item">
+                        <div class="flex align-items-center gap-2">
+                                <div><span><strong>Nº. {{ req.id }}</strong></span> - {{ req.requestInformation | uppercase }}</div>
+                        </div>
+                    </ng-template>
+                </p-multiSelect>
+            </div>
+            <div *ngIf="listRequest.length" class="filed col-2 flex align-items-center gap-2">
+                <p-checkbox inputId="requestCompleteId" value="yes" formControlName="requestComplete"/>
+                <label for="requestCompleteId">Encerrar</label>
             </div>
             <div class="field col-12 p-0">
                 <label for="mechanicId">Materiais</label>
@@ -166,9 +182,7 @@
                 </p-multiSelect>
                 <small class="p-error block" *ngIf="formPegar.get('material')?.invalid">Campo obrigatório</small>
             </div>
-            
         </div>
-        
     </form>
     <div class="field col-12 p-0" style="height: 280px;">
         <p-table [value]="formPegar.get('material').value" dataKey="id" editMode="row" [scrollable]="true" scrollHeight="280px"
@@ -256,10 +270,8 @@
     <div class="flex justify-content-between mt-1">
         <p-button icon="pi pi-info-circle" (onClick)="showDialogInf()" />
         <div class="gap-2">
-            <button pButton type="button" pRipple label="Fechar" icon="pi pi-times" class="p-button-text"
-                (click)=" hideDialog()"></button>
-            <button pButton type="button" pRipple label="Confirmar" icon="pi pi-check" class="p-button-text"
-                [disabled]="formPegar.get('material').invalid" (click)="confirm()"></button>
+            <button pButton type="button" pRipple label="Fechar" icon="pi pi-times" class="p-button-text" (click)=" hideDialogDeliveryMat()"></button>
+            <button pButton type="button" pRipple label="Confirmar" icon="pi pi-check" class="p-button-text" [disabled]="formPegar.get('material').invalid" (click)="confirmDeliveryMaterial()"></button>
         </div>
     </div>
 </p-dialog>
@@ -326,20 +338,20 @@
                 {{ message.header }}
             </span>
             <div class="mt-2 layout-dialog-img">
-                <img *ngIf="photoMecDev"  class="layout-img-large" src="data:image/png;base64,{{photoMecDev}}" alt="photo mechanic" loading="lazy" />
-                <img *ngIf="!photoMecDev" class="layout-img-large" src="assets/icons/iconmecanico.png" />
+                <img *ngIf="photoMec"  class="layout-img-large" src="data:image/png;base64,{{photoMec}}" alt="photo mechanic" loading="lazy" />
+                <img *ngIf="!photoMec" class="layout-img-large" src="assets/icons/iconmecanico.png" />
             </div>
             <span class="font-bold text-2xl block mb-2">
                 {{ message.message }}
             </span>
             <p class="mb-0">Por favor digite sua senha.</p>
             <div class="mt-2 flex">
-                <form [formGroup]="formCodePass" (ngSubmit)="onConfirmCodePass(dv)">
+                <form [formGroup]="formCodePass" (ngSubmit)="onConfirmCodePassMechanic(dv)">
                      <input pInputText id="maskedPassword" type="text" formControlName="maskedPassword" (input)="onInput()" autocomplete="off" [style]="{'height':'60px'}"/>
                 </form>
             </div>
             <div class="flex align-items-center gap-2 mt-4">
-                <button pButton type="button" label="Confirmar" (click)="onConfirmCodePass(dv)" class="w-8rem">
+                <button pButton type="button" label="Confirmar" (click)="onConfirmCodePassMechanic(dv)" class="w-8rem">
                 </button>
                 <button pButton label="Cancelar" (click)="dv.reject()" class="p-button-outlined w-8rem ">
                 </button>
@@ -348,35 +360,9 @@
     </ng-template>
 </p-confirmDialog>
 
-<!-- Comfirm -->
-<p-confirmDialog #cd>
-    <ng-template pTemplate="headless" let-message>
-        <div class="flex flex-column align-items-center p-5 surface-overlay border-round">
-            <div class="border-circle bg-primary inline-flex justify-content-center align-items-center h-6rem w-6rem">
-                <i class="pi pi-lock text-5xl"></i>
-            </div>
-            <span class="font-bold text-2xl block mb-2 mt-4">
-                {{ message.header }}
-            </span>
-            <p class="mb-0">{{ message.message }}</p>
-            <div class="mt-2 flex">
-                <form [formGroup]="formCodePass" (ngSubmit)="cd.accept()">
-                    <input pInputText id="maskedPassword" type="text" formControlName="maskedPassword" (input)="onInput()" autocomplete="off" [style]="{'height':'60px'}"/>
-                </form>
-            </div>
-            <div class="flex align-items-center gap-2 mt-4">
-                <button pButton type="submit" label="Confirmar" (click)="cd.accept()" class="w-8rem">
-                </button>
-                <button pButton label="Cancelar" (click)="cd.reject()" class="p-button-outlined w-8rem ">
-                </button>
-            </div>
-        </div>
-    </ng-template>
-</p-confirmDialog>
-
 <!-- Solicitação -->
 <p-dialog header="Solicitação de Materiais" [(visible)]="visibleDialogRequest" modal="true" 
-    [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }" [style]="{width: '60rem', height:'35rem'}">
+    [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }" [style]="{width: '60rem', height:'54rem'}">
     <form [formGroup]="formRequest">
          <div class="p-fluid p-formgrid grid">
             <div class="field col-12 md:col-6 p-1">
@@ -402,7 +388,7 @@
                 </p-multiSelect>
             </div>
             <div class="md:col-6"></div>
-            <div class="col-12 md:col-6 flex flex-column gap-2 border-1 border-round-md border-200 mb-2">
+            <div class="col-12 md:col-6 flex flex-column gap-2 border-1 border-round-md border-200">
                 <span>Tipo</span>
                 <div class="flex gap-2">
                     <div class="flex align-items-center">
@@ -425,11 +411,37 @@
             </div>
             <div class="field col-12">
                 <label for="inforReqId">Informação da solicitação</label>
-                <textarea rows="7" cols="30" pInputTextarea formControlName="inforReq"></textarea>
+                <textarea rows="5" cols="30" pInputTextarea formControlName="inforReq"></textarea>
             </div>
         </div>
     </form>
     <div class="flex justify-content-end">
         <button pButton type="button" pRipple label="Solicitar materiais" class="p-button" (click)="newRequest()"></button>
+    </div>
+    <div class="pt-2 w-full">
+        <p-table [value]="listRequestPendent"  styleClass="p-datatable-sm" [scrollable]="true" scrollHeight="280px">
+            <ng-template pTemplate="header">
+                <tr>
+                    <th class="font-normal" style="width: 5%">Nº</th>
+                    <th class="font-normal" style="width: 20%">Mecânico</th>
+                    <th class="font-normal" style="width: 70%">Solicitação</th>
+                    <th class="font-normal" style="width: 5%">Encerrar</th>
+                    <th class="font-normal" style="width: 5%">Ver</th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-req>
+                <tr>
+                    <td>{{req.id}}</td>
+                    <td>{{getMechanicName(req.mechanicId) | uppercase }}</td>
+                    <td>{{req.requestInformation | uppercase}}</td>
+                    <td>
+                        <p-button label="Encerrar" icon="pi pi-check" size="small" severity="danger" [text]="true" (onClick)="completeRequest(req)"/>
+                    </td>
+                    <td>
+                        <p-button icon="pi pi-eye" size="small" severity="secondary" [text]="true"/>
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
     </div>
 </p-dialog>

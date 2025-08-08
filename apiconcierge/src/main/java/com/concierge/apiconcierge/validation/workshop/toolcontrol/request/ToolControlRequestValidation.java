@@ -72,4 +72,26 @@ public class ToolControlRequestValidation implements IToolControlRequestValidati
         return ConstantsMessage.SUCCESS;
     }
 
+    public String filterMechanicId(Integer companyId, Integer resaleId, Integer mechanicId) {
+        if (companyId == null || companyId == 0)
+            return ConstantsMessage.ERROR_COMPANY;
+        if (resaleId == null || resaleId == 0)
+            return ConstantsMessage.ERROR_RESALE;
+        if (mechanicId == null || mechanicId == 0)
+            return ConstantsMessage.ERROR_ID;
+
+        return ConstantsMessage.SUCCESS;
+    }
+
+    public String listAllStatus(Integer companyId, Integer resaleId, StatusRequest status){
+        if (companyId == null || companyId == 0)
+            return ConstantsMessage.ERROR_COMPANY;
+        if (resaleId == null || resaleId == 0)
+            return ConstantsMessage.ERROR_RESALE;
+        if (status == null)
+            return ConstantsMessage.ERROR_STATUS;
+
+        return ConstantsMessage.SUCCESS;
+    }
+
 }

@@ -3,17 +3,17 @@ package com.concierge.apiconcierge.controllers.workshop.toolcontrol;
 import com.concierge.apiconcierge.dtos.message.MessageResponseDto;
 import com.concierge.apiconcierge.dtos.workshop.toolcontrol.ToolControlRequestDto;
 import com.concierge.apiconcierge.models.workshop.toolcontrol.ToolControlRequest;
+import com.concierge.apiconcierge.models.workshop.toolcontrol.enums.StatusRequest;
 import com.concierge.apiconcierge.services.workshop.toolcontrol.request.ToolControlRequestService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/workshop/tool/control/request")
@@ -45,13 +45,38 @@ public class ToolControlRequestController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
         }
     }
+
     @PostMapping("/loan/return")
     public ResponseEntity<Object> loanReturn(@RequestBody ToolControlRequestDto data) {
         try {
             ToolControlRequest req = new ToolControlRequest();
             BeanUtils.copyProperties(data, req);
             Map<String, Object> result = this.service.loanReturn(req);
-            return ResponseEntity.status(HttpStatus.CREATED).body(result);
+            return ResponseEntity.status(HttpStatus.OK).body(result);
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
+        }
+    }
+
+    @GetMapping("/{companyId}/{resaleId}/filter/mechanic/{id}")
+    public ResponseEntity<Object> filterMechanicId(@PathVariable(name = "companyId") Integer companyId,
+                                                   @PathVariable(name = "resaleId") Integer resaleId,
+                                                   @PathVariable(name = "id") Integer id) {
+        try {
+            List<ToolControlRequest> result = this.service.filterMechanicId(companyId, resaleId, id);
+            return ResponseEntity.status(HttpStatus.OK).body(result);
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
+        }
+    }
+
+    @GetMapping("/{companyId}/{resaleId}/filter/status/{status}")
+    public ResponseEntity<Object> listAllStatus(@PathVariable(name = "companyId") Integer companyId,
+                                                @PathVariable(name = "resaleId") Integer resaleId,
+                                                @PathVariable(name = "status") StatusRequest status) {
+        try {
+            List<ToolControlRequest> result = this.service.listAllStatus(companyId, resaleId, status);
+            return ResponseEntity.status(HttpStatus.OK).body(result);
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
         }
