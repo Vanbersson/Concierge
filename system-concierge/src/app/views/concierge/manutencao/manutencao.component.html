@@ -22,27 +22,18 @@
                         </div>
                         <div class="field col-12 md:col-2">
                             <label for="dateEntry">Data Entrada</label>
-
-                            <p-calendar [iconDisplay]="'input'" [showIcon]="true" [showTime]="true"
-                                dateFormat="dd/mm/yy " formControlName="dateEntry" />
-
-                            <small class="p-error block" *ngIf="formVehicle.get('dateEntry')?.invalid">
-                                Campo obrigatório</small>
+                            <p-calendar [iconDisplay]="'input'" [showIcon]="true" [showTime]="true" dateFormat="dd/mm/yy" formControlName="dateEntry" />
+                            <small class="p-error block" *ngIf="formVehicle.get('dateEntry')?.invalid">Campo obrigatório</small>
                         </div>
-
                         <div class="field col-12 md:col-2">
                             <label for="datePrevisionExit">Previsão saída</label>
-                            <p-calendar [iconDisplay]="'input'" [showIcon]="true" [showTime]="true"
-                                dateFormat="dd/mm/yy" inputId="datePrevisionExit" formControlName="datePrevisionExit" />
+                            <p-calendar [iconDisplay]="'input'" [showIcon]="true" [showTime]="true" dateFormat="dd/mm/yy" inputId="datePrevisionExit" formControlName="datePrevisionExit" />
                         </div>
                         <div class="field col-12 md:col-2">
                             <label for="placa">Placa</label>
-                            <p-inputMask id="placa" mask="***-****" [unmask]="true"
-                                [style]="{'text-transform':'uppercase'}" formControlName="placa" />
-                            <small class="p-error block" *ngIf="formVehicle.get('placa')?.invalid">
-                                Campo obrigatório</small>
+                            <p-inputMask id="placa" mask="***-****" [unmask]="true" [style]="{'text-transform':'uppercase'}" formControlName="placa" />
+                            <small class="p-error block" *ngIf="formVehicle.get('placa')?.invalid">Campo obrigatório</small>
                         </div>
-
                         <div class="field col-12 md:col-2">
                             <label for="frota">Frota</label>
                             <input pInputText id="frota" type="text" [style]="{'text-transform':'uppercase'}"

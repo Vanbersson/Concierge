@@ -14,6 +14,8 @@ public interface IToolControlRequestService {
 
     Map<String, Object> loanReturn(ToolControlRequest req);
 
+    ToolControlRequest filterId(Integer companyId, Integer resaleId, Integer requestId);
+
     List<ToolControlRequest> filterMechanicId(Integer companyId, Integer resaleId, Integer mechanicId);
 
     List<ToolControlRequest> listAllStatus(Integer companyId, Integer resaleId, StatusRequest status);

@@ -40,9 +40,22 @@
         object-fit: cover;
     }
 
-    ::ng-deep {
-        .p-button-label {
-            font-weight: 400;
-        }
+     .layout-input-disabled {
+        display: flex;
+        min-height: 33px;
+        font-size: 1rem;
+        padding: 0.5rem 0.5rem;
+        border-radius: 6px;
+        border: 1px solid var(--color-grey-300);
     }
+    .layout-input-disabled-area-text {
+        display: flex;
+        height: 6rem;
+        width: 100%;
+        font-size: 1rem;
+        padding: 0.5rem 0.5rem;
+        border-radius: 6px;
+        border: 1px solid var(--color-grey-300);
+    }
+
 }

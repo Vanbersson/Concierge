@@ -14,5 +14,6 @@ export class ToolControlMaterial {
     validityDay: number = 0;
     photo: string = "";
 
-    quantityLoan: number=0;
+    quantityLoan: number = 0;
+    informationLoan: string = "";
 }

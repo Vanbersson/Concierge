@@ -87,11 +87,11 @@
                                     </td>
                                     <td>{{mat.matMecMaterialDesc | uppercase}}</td>
                                     <td>{{mat.matMecDelivQuantity | number:'1.2-2'}}</td>
-                                    <td *ngIf="rowgroup" [attr.rowspan]="rowspan">
-                                        {{mat.requestInformation | uppercase}}
+                                    <td>
+                                        {{mat.matMecDelivInfor | uppercase}}
                                     </td>
                                     <td *ngIf="rowgroup" [attr.rowspan]="rowspan">
-                                        <p-button icon="pi pi-eye" label="Visualizar" [rounded]="true" [text]="true" severity="secondary"  size="large"/>
+                                        <p-button icon="pi pi-eye" label="Visualizar" [rounded]="true" [text]="true" severity="secondary"  size="large" (onClick)="showDialogDetails(mat.requestId)"/>
                                     </td> 
                                 </tr>
                             </ng-template>
@@ -139,8 +139,8 @@
                 <small class="p-error block" *ngIf="formPegar.get('categories')?.invalid">Campo obrigatório</small>
             </div>
             <div *ngIf="listRequest.length" class="field col-10 p-1">
-                <label for="categoryId">Requisições pedentes</label>
-                <p-multiSelect [options]="listRequest"  display="chip" [selectionLimit]="1" optionLabel="id" formControlName="request" [style]="{height:'45.5px'}" >
+                <label for="categoryId">Solicitações pedentes</label>
+                <p-multiSelect [options]="listRequest"  display="chip" [selectionLimit]="1" optionLabel="id" formControlName="request" (onChange)="selectRequest()" [style]="{height:'45.5px'}" >
                     <ng-template let-value pTemplate="selectedItems">
                         <div class="inline-flex align-items-center gap-2" *ngFor="let req of value">
                             <div style="margin: 0.42rem;"><span><strong>Nº. {{ req.id }}</strong></span> - {{ req.requestInformation | uppercase }}</div>
@@ -155,8 +155,8 @@
                 </p-multiSelect>
             </div>
             <div *ngIf="listRequest.length" class="filed col-2 flex align-items-center gap-2">
-                <p-checkbox inputId="requestCompleteId" value="yes" formControlName="requestComplete"/>
-                <label for="requestCompleteId">Encerrar</label>
+                <p-checkbox inputId="requestCompleteId" value="not" formControlName="requestComplete"/>
+                <label for="requestCompleteId">Manter Aberto</label>
             </div>
             <div class="field col-12 p-0">
                 <label for="mechanicId">Materiais</label>
@@ -185,7 +185,7 @@
         </div>
     </form>
     <div class="field col-12 p-0" style="height: 280px;">
-        <p-table [value]="formPegar.get('material').value" dataKey="id" editMode="row" [scrollable]="true" scrollHeight="280px"
+        <p-table [value]="tempListMarSelected" dataKey="id" editMode="row" [scrollable]="true" scrollHeight="280px"
             styleClass="p-datatable-sm">
             <ng-template pTemplate="header">
                 <tr>
@@ -194,6 +194,7 @@
                     <th class="font-normal" style="width:50%">Descrição</th>
                     <th *ngIf="selectTypeCategory == EPI" class="font-normal" style="width:15%">Nº CA</th>
                     <th class="font-normal" style="width:10%">Quant.</th>
+                    <th class="font-normal" style="width:10%">Informações</th>
                     <th class="font-normal"></th>
                 </tr>
             </ng-template>
@@ -229,6 +230,9 @@
                             </ng-template>
                         </p-cellEditor>
                     </td>
+                    <td>
+                        <input type="text" pInputText [(ngModel)]="mat.informationLoan"/>
+                    </td>
                     <td *ngIf="selectTypeCategory == UNIFORME || selectTypeCategory == EPI">
                         <div class="flex align-items-center justify-content-center gap-2">
                             <button 
@@ -248,7 +252,7 @@
                                 type="button" 
                                 pSaveEditableRow 
                                 icon="pi pi-check" 
-                                (click)="onRowEditSave(mat)" 
+                                (click)="onRowEditSave(mat, ri)" 
                                 class="p-button-rounded p-button-text p-button-success mr-1">
                             </button>
                             <button 
@@ -267,27 +271,9 @@
             </ng-template>
         </p-table>
     </div>
-    <div class="flex justify-content-between mt-1">
-        <p-button icon="pi pi-info-circle" (onClick)="showDialogInf()" />
-        <div class="gap-2">
-            <button pButton type="button" pRipple label="Fechar" icon="pi pi-times" class="p-button-text" (click)=" hideDialogDeliveryMat()"></button>
-            <button pButton type="button" pRipple label="Confirmar" icon="pi pi-check" class="p-button-text" [disabled]="formPegar.get('material').invalid" (click)="confirmDeliveryMaterial()"></button>
-        </div>
-    </div>
-</p-dialog>
-
-<!-- Dialog info -->
-<p-dialog header="Informações" [(visible)]="visibleDialogPegarInf" modal="true"
-    [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }" [style]="{width: '40rem', height:'20rem'}">
-    <form [formGroup]="formPegar">
-        <div class="p-fluid p-formgrid grid">
-            <div class="field col-12">
-                <textarea rows="5" cols="30" pInputTextarea formControlName="inforReq"></textarea>
-            </div>
-        </div>
-    </form>
-    <div class="flex justify-content-center">
-        <button pButton type="button" pRipple label="Fechar" icon="pi pi-times" class="p-button-text" (click)="hideDialogInf()"></button>
+    <div class="flex justify-content-end mt-1">
+        <button pButton type="button" pRipple label="Fechar" icon="pi pi-times" class="p-button-text" (click)=" hideDialogDeliveryMat()"></button>
+        <button pButton type="button" pRipple label="Confirmar" icon="pi pi-check" class="p-button-text" [disabled]="formPegar.get('material').invalid" (click)="confirmDeliveryMaterial()"></button>
     </div>
 </p-dialog>
 
@@ -303,7 +289,7 @@
                     <th class="font-normal" style="width: 10%">Categoria</th>
                     <th class="font-normal" style="width: 5%">Quantidade</th>
                     <th class="font-normal" style="width: 40%">Material</th>
-                    <th class="font-normal" style="width: 10%">Inf</th>
+                    <th class="font-normal" style="width: 10%">Informações</th>
                 </tr>
             </ng-template>
             <ng-template pTemplate="body" let-mat>
@@ -314,12 +300,12 @@
                         <img *ngIf="!mat.mechanic.photo" class="layout-img-small" src="assets/icons/iconmecanico.png" alt="photo mechanic" width="42" height="42" /> {{mat.mechanic.name | uppercase}}
                     </td>
                     <td>{{mat.categoryDesc | uppercase}}</td>
-                    <td>{{mat.matMecQuantityReq}}</td>
+                    <td>{{mat.matMecDelivQuantity | number:'1.2-2'}}</td>
                     <td class="flex align-items-center gap-2">
                         <img *ngIf="mat.materialPhoto" class="layout-img-small" src="data:image/png;base64,{{mat.materialPhoto}}" alt="photo material" width="42" height="42" loading="lazy" />
-                        <img *ngIf="!mat.materialPhoto" class="layout-img-small" src="assets/icons/icontool.jpg" alt="photo material" width="42" height="42" /> {{mat.materialDesc | uppercase}}
+                        <img *ngIf="!mat.materialPhoto" class="layout-img-small" src="assets/icons/icontool.jpg" alt="photo material" width="42" height="42" /> {{mat.matMecMaterialDesc | uppercase}}
                     </td>
-                    <td><input pInputText type="text" [(ngModel)]="mat.matMecInformationRet"/></td>
+                    <td><input pInputText type="text" [(ngModel)]="mat.matMecReturInfor"/></td>
                 </tr>
             </ng-template>
         </p-table>
@@ -445,3 +431,91 @@
         </p-table>
     </div>
 </p-dialog>
+
+<!-- Visualizar Requisição -->
+ <p-dialog header="Detalhe da requisição" [(visible)]="visibleDialogDetailsRequest" modal="true" [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }" [style]="{width: '60rem', height:'60rem'}">
+    <form [formGroup]="formDetailsRequest">
+        <div class="p-fluid p-formgrid grid">
+            <div class="col-12 md:col-2">
+                <label for="">Requisição</label>
+                <div class="layout-input-disabled">
+                    <span class="text-500 font-medium"><strong>{{formDetailsRequest.get('requestId').value}}</strong></span>
+                </div>
+            </div>
+            <div class="col-12 md:col-4">
+                <label for="">Status</label>
+                <div class="layout-input-disabled">
+                    <span class="text-500 font-medium"><strong>{{formDetailsRequest.get('requestStatus').value | uppercase}}</strong></span>
+                </div>
+            </div>
+             <div class="col-12 md:col-4">
+                <label for="">Tipo</label>
+                <div class="layout-input-disabled">
+                    <span class="text-500 font-medium"><strong>{{formDetailsRequest.get('requestType').value | uppercase}}</strong></span>
+                </div>
+            </div>
+            
+            <div class="col-12"><p-divider layout="horizontal" /></div>
+            <div class="col-12">
+                <label for="">Mecânico</label>
+                <div class="layout-input-disabled">
+                    <span class="text-500 font-medium ">{{formDetailsRequest.get('requestMechanicName').value | uppercase}}</span>
+                </div>
+            </div> 
+            <div class="col-12 md:col-2">
+                <label for="">Usuário</label>
+                <div class="layout-input-disabled">
+                    <span class="text-500 font-medium ">{{formDetailsRequest.get('requestUserId').value}}</span>
+                </div>
+            </div>
+            <div class="col-12 md:col-6">
+                <label for="">Nome</label>
+                <div class="layout-input-disabled">
+                    <span class="text-500 font-medium ">{{formDetailsRequest.get('requestUserName').value | uppercase}}</span>
+                </div>
+            </div> 
+            <div class="col-12 md:col-4">
+                <label for="">Data</label>
+                <div class="layout-input-disabled">
+                    <span class="text-500 font-medium ">{{formDetailsRequest.get('requestDate').value | date:'dd/MM/yyyy hh:mm'}}</span>
+                </div>
+            </div>  
+             <div class="col-12">
+                <label for="">Solicitação</label>
+                <div class="layout-input-disabled-area-text">
+                    <span class="text-500 font-medium ">{{formDetailsRequest.get('requestInformation').value | uppercase}}</span>
+                </div>
+            </div>        
+        </div>
+    </form>
+    <p-table [value]="listMaterialDetailsRequest" [tableStyle]="{'min-width': '120rem'}" [scrollable]="true" scrollWidht="400px" scrollHeight="300px"  styleClass="p-datatable-sm">
+        <ng-template pTemplate="header">
+            <tr>
+                <th>Código</th>
+                <th>Descrição</th>
+                <th>Entregue Quant.</th>
+                <th>Entregue Usuá.</th>
+                <th>Entregue Data</th>
+                <th>Entregue Inf.</th>
+                <th>Retorno Quant.</th>
+                <th>Retorno Usuá.</th>
+                <th>Retorno Data</th>
+                <th>Retorno Inf.</th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-mat>
+            <tr>
+                <td>{{mat.materialId}}</td>
+                <td>{{mat.materialDescription | uppercase}}</td>
+                <td>{{mat.deliveryQuantity | number: '1.2-2'}}</td>
+                <td>{{mat.deliveryUserName | uppercase}}</td>
+                <td>{{mat.deliveryDate | date:'dd/MM/yyyy hh:mm'}}</td>
+                <td>{{mat.deliveryInformation | uppercase}}</td>
+                <td>{{mat.returnQuantity | number: '1.2-2' }}</td>
+                <td>{{mat.returnUserName | uppercase}}</td>
+                <td>{{mat.returnDate | date:'dd/MM/yyyy hh:mm'}}</td>
+                <td>{{mat.returnInformation | uppercase}}</td>
+            </tr>
+        </ng-template>
+    </p-table>
+ </p-dialog>

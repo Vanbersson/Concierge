@@ -24,6 +24,9 @@ export class ToolControlRequestService {
     loanReturn(req: ToolControlRequest): Observable<HttpResponse<ToolControlRequest>> {
         return this.http.post<ToolControlRequest>(environment.apiuUrl + "/workshop/tool/control/request/loan/return", req, { headers: this.myHeaders(), observe: 'response' });
     }
+    filterRequestId(id: number): Observable<HttpResponse<ToolControlRequest>> {
+        return this.http.get<ToolControlRequest>(environment.apiuUrl + "/workshop/tool/control/request/" + this.companyResale + "/filter/id/" + id, { headers: this.myHeaders(), observe: 'response' });
+    }
     filterMechanicId(id: number): Observable<ToolControlRequest[]> {
         return this.http.get<ToolControlRequest[]>(environment.apiuUrl + "/workshop/tool/control/request/" + this.companyResale + "/filter/mechanic/" + id, { headers: this.myHeaders() });
     }

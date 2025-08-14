@@ -38,6 +38,8 @@ public interface IToolControlReport {
 
     Date getMatMecDelivDate();
 
+    String getMatMecDelivInfor();
+
     Integer getMatMecReturUserId();
 
     String getMatMecReturUserName();
@@ -45,6 +47,8 @@ public interface IToolControlReport {
     float getMatMecReturQuantity();
 
     Date getMatMecReturDate();
+
+    String getMatMecReturInfor();
 
     Integer getMatMecMaterialId();
 

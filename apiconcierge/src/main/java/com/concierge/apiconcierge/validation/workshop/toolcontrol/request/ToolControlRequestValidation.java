@@ -72,6 +72,18 @@ public class ToolControlRequestValidation implements IToolControlRequestValidati
         return ConstantsMessage.SUCCESS;
     }
 
+    @Override
+    public String filterId(Integer companyId, Integer resaleId, Integer requestId) {
+        if (companyId == null || companyId == 0)
+            return ConstantsMessage.ERROR_COMPANY;
+        if (resaleId == null || resaleId == 0)
+            return ConstantsMessage.ERROR_RESALE;
+        if (requestId == null || requestId == 0)
+            return ConstantsMessage.ERROR_RESALE;
+
+        return ConstantsMessage.SUCCESS;
+    }
+
     public String filterMechanicId(Integer companyId, Integer resaleId, Integer mechanicId) {
         if (companyId == null || companyId == 0)
             return ConstantsMessage.ERROR_COMPANY;
@@ -83,7 +95,7 @@ public class ToolControlRequestValidation implements IToolControlRequestValidati
         return ConstantsMessage.SUCCESS;
     }
 
-    public String listAllStatus(Integer companyId, Integer resaleId, StatusRequest status){
+    public String listAllStatus(Integer companyId, Integer resaleId, StatusRequest status) {
         if (companyId == null || companyId == 0)
             return ConstantsMessage.ERROR_COMPANY;
         if (resaleId == null || resaleId == 0)

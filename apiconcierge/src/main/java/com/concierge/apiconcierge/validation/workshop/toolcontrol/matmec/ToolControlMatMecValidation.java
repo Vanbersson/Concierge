@@ -16,11 +16,11 @@ public class ToolControlMatMecValidation implements IToolControlMatMecValidation
             return ConstantsMessage.ERROR_RESALE;
         if (matMec.getRequestId() == null || matMec.getRequestId() == 0)
             return "Id Request not informed.";
-        if(matMec.getDeliveryDate() ==null)
+        if (matMec.getDeliveryDate() == null)
             return "Date not informed.";
-        if(matMec.getDeliveryQuantity() < 0 || matMec.getDeliveryQuantity() == 0 )
+        if (matMec.getDeliveryQuantity() < 0 || matMec.getDeliveryQuantity() == 0)
             return "Quantity not informed.";
-        if(matMec.getMaterialId() == null || matMec.getMaterialId() == 0)
+        if (matMec.getMaterialId() == null || matMec.getMaterialId() == 0)
             return "Id Material not informed.";
 
         return ConstantsMessage.SUCCESS;
@@ -36,11 +36,11 @@ public class ToolControlMatMecValidation implements IToolControlMatMecValidation
             return ConstantsMessage.ERROR_ID;
         if (matMec.getRequestId() == null || matMec.getRequestId() == 0)
             return "Id Request not informed.";
-        if(matMec.getDeliveryDate() ==null)
+        if (matMec.getDeliveryDate() == null)
             return "Date not informed.";
-        if(matMec.getDeliveryQuantity() < 0 || matMec.getDeliveryQuantity() == 0 )
+        if (matMec.getDeliveryQuantity() < 0 || matMec.getDeliveryQuantity() == 0)
             return "Quantity not informed.";
-        if(matMec.getMaterialId() == null || matMec.getMaterialId() == 0)
+        if (matMec.getMaterialId() == null || matMec.getMaterialId() == 0)
             return "Id Material not informed.";
 
         return ConstantsMessage.SUCCESS;
@@ -54,6 +54,17 @@ public class ToolControlMatMecValidation implements IToolControlMatMecValidation
             return ConstantsMessage.ERROR_RESALE;
         if (id == null)
             return "Id not informed.";
+        return ConstantsMessage.SUCCESS;
+    }
+
+    public String filterRequestId(Integer companyId, Integer resaleId, Integer requestId) {
+        if (companyId == null || companyId == 0)
+            return ConstantsMessage.ERROR_COMPANY;
+        if (resaleId == null || resaleId == 0)
+            return ConstantsMessage.ERROR_RESALE;
+        if (requestId == null)
+            return "Request not informed.";
+
         return ConstantsMessage.SUCCESS;
     }
 

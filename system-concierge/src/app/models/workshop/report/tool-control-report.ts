@@ -23,10 +23,12 @@ export class ToolControlReport {
             matMecDelivUserName: string;
             matMecDelivQuantity: number;
             matMecDelivDate: string;
+            matMecDelivInfor: string;
             matMecReturUserId: number;
             matMecReturUserName: string;
             matMecReturQuantity: number;
             matMecReturDate: string;
+            matMecReturInfor: string;
             matMecMaterialId: number;
             matMecMaterialDesc: string;
         }

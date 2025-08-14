@@ -78,13 +78,29 @@ public class ToolControlRequestService implements IToolControlRequestService {
 
     @SneakyThrows
     @Override
+    public ToolControlRequest filterId(Integer companyId, Integer resaleId, Integer requestId) {
+        try {
+            String message = this.validation.filterId(companyId, resaleId, requestId);
+            if (ConstantsMessage.SUCCESS.equals(message)) {
+                ToolControlRequest request = this.repository.filterId(companyId, resaleId, requestId);
+                return request;
+            } else {
+                throw new ToolControlException(message);
+            }
+        } catch (Exception ex) {
+            throw new ToolControlException(ex.getMessage());
+        }
+    }
+
+    @SneakyThrows
+    @Override
     public List<ToolControlRequest> filterMechanicId(Integer companyId, Integer resaleId, Integer mechanicId) {
         try {
             String message = this.validation.filterMechanicId(companyId, resaleId, mechanicId);
             if (ConstantsMessage.SUCCESS.equals(message)) {
                 List<ToolControlRequest> listResult = new ArrayList<>();
                 List<ToolControlRequest> listOpen = this.repository.filterMechanicId(companyId, resaleId, StatusRequest.Open, mechanicId);
-                List<ToolControlRequest> listDelivery = this.repository.filterMechanicId(companyId, resaleId, StatusRequest.Delivery, mechanicId);
+                List<ToolControlRequest> listDelivery = this.repository.filterMechanicId(companyId, resaleId, StatusRequest.Delivered, mechanicId);
                 listResult.addAll(listOpen);
                 listResult.addAll(listDelivery);
                 return listResult;

@@ -23,6 +23,9 @@ export class ToolControlMatMecService {
     filterId(id: string): Observable<HttpResponse<ToolControlMatMec>> {
         return this.http.get<ToolControlMatMec>(environment.apiuUrl + "/workshop/tool/control/matmec/" + this.companyResale + "/all/filter/" + id + "/id", { headers: this.myHeaders(), observe: 'response' });
     }
+    filterRequesId(id: number): Observable<ToolControlMatMec[]> {
+        return this.http.get<ToolControlMatMec[]>(environment.apiuUrl + "/workshop/tool/control/matmec/" + this.companyResale + "/all/filter/" + id + "/request", { headers: this.myHeaders() });
+    }
 
     private myHeaders(): HttpHeaders {
         const httpOptions = new HttpHeaders({

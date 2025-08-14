@@ -57,6 +57,18 @@ public class ToolControlMatMecController {
         }
     }
 
+    @GetMapping("/{companyId}/{resaleId}/all/filter/{request}/request")
+    public ResponseEntity<Object> filterRequestId(@PathVariable(name = "companyId") Integer companyId,
+                                                  @PathVariable(name = "resaleId") Integer resaleId,
+                                                  @PathVariable(name = "request") Integer requestId) {
+        try {
+            List<Map<String, Object>> result = this.service.filterRequestId(companyId, resaleId, requestId);
+            return ResponseEntity.status(HttpStatus.OK).body(result);
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
+        }
+    }
+
     @GetMapping("/{companyId}/{resaleId}/all/filter/{materialId}/mat")
     public ResponseEntity<Object> filterMatIdDevPend(@PathVariable(name = "companyId") Integer companyId,
                                                      @PathVariable(name = "resaleId") Integer resaleId,

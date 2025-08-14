@@ -11,6 +11,8 @@ public interface IToolControlMatMecValidation {
 
     String filterId(Integer companyId, Integer resaleId, UUID id);
 
+    String filterRequestId(Integer companyId, Integer resaleId, Integer requestId);
+
     String filterMatIdDevPend(Integer companyId, Integer resaleId, Integer materialId);
 
     String filterMecIdDevPend(Integer companyId, Integer resaleId, Integer mechanicId);

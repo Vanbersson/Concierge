@@ -81,5 +81,16 @@ public class ToolControlRequestController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
         }
     }
+    @GetMapping("/{companyId}/{resaleId}/filter/id/{id}")
+    public ResponseEntity<Object> filterId(@PathVariable(name = "companyId") Integer companyId,
+                                                @PathVariable(name = "resaleId") Integer resaleId,
+                                                @PathVariable(name = "id") Integer id) {
+        try {
+            ToolControlRequest result = this.service.filterId(companyId, resaleId, id);
+            return ResponseEntity.status(HttpStatus.OK).body(result);
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
+        }
+    }
 
 }

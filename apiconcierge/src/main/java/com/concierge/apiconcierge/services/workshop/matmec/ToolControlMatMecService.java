@@ -44,8 +44,10 @@ public class ToolControlMatMecService implements IToolControlMatMecService {
                     newMatMec.setDeliveryQuantity(1);
                     newMatMec.setDeliveryInformation(matMec.getDeliveryInformation());
                     newMatMec.setReturnUserId(null);
+                    newMatMec.setReturnUserName("");
                     newMatMec.setReturnDate(null);
                     newMatMec.setReturnQuantity(0);
+                    newMatMec.setReturnInformation("");
                     newMatMec.setMaterialId(matMec.getMaterialId());
                     newMatMec.setMaterialDescription(matMec.getMaterialDescription());
                     newMatMec.setMaterialNumberCA(matMec.getMaterialNumberCA());
@@ -60,18 +62,6 @@ public class ToolControlMatMecService implements IToolControlMatMecService {
         } catch (Exception ex) {
             throw new ToolControlException(ex.getMessage());
         }
-    }
-
-    private String updateQuantityMaterial(ToolControlMatMec matMec, String type) {
-        List<ToolControlMatMec> mats = this.repository.filterMatIdDevPend(matMec.getCompanyId(), matMec.getResaleId(), matMec.getMaterialId());
-        ToolControlMaterial material = this.materialRepository.filterId(matMec.getCompanyId(), matMec.getResaleId(), matMec.getMaterialId());
-        if (type.equals("Loan")) {
-            material.setQuantityAvailableLoan(material.getQuantityAccountingLoan() - mats.size());
-        } else if (type.equals("Return")) {
-           // material.setQuantityAvailableLoan(material.getQuantityAvailableLoan() + matMec.getQuantityRet());
-        }
-        this.materialRepository.save(material);
-        return ConstantsMessage.SUCCESS;
     }
 
     @SneakyThrows
@@ -94,6 +84,18 @@ public class ToolControlMatMecService implements IToolControlMatMecService {
         }
     }
 
+    private String updateQuantityMaterial(ToolControlMatMec matMec, String type) {
+        List<ToolControlMatMec> mats = this.repository.filterMatIdDevPend(matMec.getCompanyId(), matMec.getResaleId(), matMec.getMaterialId());
+        ToolControlMaterial material = this.materialRepository.filterId(matMec.getCompanyId(), matMec.getResaleId(), matMec.getMaterialId());
+        if (type.equals("Loan")) {
+            material.setQuantityAvailableLoan(material.getQuantityAccountingLoan() - mats.size());
+        } else if (type.equals("Return")) {
+            material.setQuantityAvailableLoan(material.getQuantityAvailableLoan() + matMec.getReturnQuantity());
+        }
+        this.materialRepository.save(material);
+        return ConstantsMessage.SUCCESS;
+    }
+
     @SneakyThrows
     @Override
     public Map<String, Object> filterId(Integer companyId, Integer resaleId, UUID id) {
@@ -105,6 +107,26 @@ public class ToolControlMatMecService implements IToolControlMatMecService {
                     throw new ToolControlException("Material not found.");
 
                 return this.loadMatMec(matmec);
+            } else {
+                throw new ToolControlException(message);
+            }
+        } catch (Exception ex) {
+            throw new ToolControlException(ex.getMessage());
+        }
+    }
+
+    @SneakyThrows
+    @Override
+    public List<Map<String, Object>> filterRequestId(Integer companyId, Integer resaleId, Integer requestId) {
+        try {
+            String message = this.validation.filterRequestId(companyId, resaleId, requestId);
+            if (ConstantsMessage.SUCCESS.equals(message)) {
+                List<ToolControlMatMec> resultList = this.repository.filterRequestId(companyId, resaleId, requestId);
+                List<Map<String, Object>> list = new ArrayList<>();
+                for (ToolControlMatMec item : resultList) {
+                    list.add(this.loadMatMec(item));
+                }
+                return list;
             } else {
                 throw new ToolControlException(message);
             }
@@ -144,12 +166,23 @@ public class ToolControlMatMecService implements IToolControlMatMecService {
         map.put("resaleId", matMec.getResaleId());
         map.put("id", matMec.getId());
         map.put("requestId", matMec.getRequestId());
-//        map.put("quantityReq", matMec.getQuantityReq());
-//        map.put("quantityRet", matMec.getQuantityRet());
-//        map.put("userIdRet", matMec.getUserIdRet() != null ? matMec.getUserIdRet() : "");
-//        map.put("dateRet", matMec.getDateRet() != null ? matMec.getDateRet() : "");
-//        map.put("informationRet", matMec.getInformationRet());
+
+        map.put("deliveryUserId", matMec.getDeliveryUserId());
+        map.put("deliveryUserName", matMec.getDeliveryUserName());
+        map.put("deliveryDate", matMec.getDeliveryDate());
+        map.put("deliveryQuantity", matMec.getDeliveryQuantity());
+        map.put("deliveryInformation", matMec.getDeliveryInformation());
+
+        map.put("returnUserId", matMec.getReturnUserId() != null ? matMec.getReturnUserId() : 0);
+        map.put("returnUserName", matMec.getReturnUserName());
+        map.put("returnDate", matMec.getReturnDate() != null ? matMec.getReturnDate() : "");
+        map.put("returnQuantity", matMec.getReturnQuantity());
+        map.put("returnInformation", matMec.getReturnInformation());
+
         map.put("materialId", matMec.getMaterialId());
+        map.put("materialDescription", matMec.getMaterialDescription());
+        map.put("materialNumberCA", matMec.getMaterialNumberCA());
+
         return map;
     }
 }

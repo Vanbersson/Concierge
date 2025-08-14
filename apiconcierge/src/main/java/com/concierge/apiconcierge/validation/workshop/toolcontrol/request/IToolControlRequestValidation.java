@@ -11,6 +11,8 @@ public interface IToolControlRequestValidation {
 
     String loanReturn(ToolControlRequest req);
 
+    String filterId(Integer companyId, Integer resaleId, Integer requestId);
+
     String filterMechanicId(Integer companyId, Integer resaleId, Integer mechanicId);
 
     String listAllStatus(Integer companyId, Integer resaleId, StatusRequest status);

@@ -13,6 +13,8 @@ public interface IToolControlMatMecService {
 
     Map<String, Object>  filterId(Integer companyId, Integer resaleId, UUID id);
 
+    List<Map<String, Object>> filterRequestId(Integer companyId, Integer resaleId, Integer requestId);
+
     List<Map<String, Object>> filterMatIdDevPend(Integer companyId, Integer resaleId, Integer materialId);
 
     List<Map<String, Object>> filterMecIdDevPend(Integer companyId, Integer resaleId, Integer mechanicId);
