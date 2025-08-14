@@ -779,8 +779,8 @@ export default class PegarDevolverComponent implements OnInit {
     if (resultRequest.status == 200) {
       this.formDetailsRequest.patchValue({
         requestId: requesId,
-        requestStatus: resultRequest.body.status,
-        requestType: resultRequest.body.requestType,
+        requestStatus: resultRequest.body.status == StatusRequest.DELIVERY? "Entregue":"Encerrado",
+        requestType: "Empréstimo",
         requestDate: new Date(resultRequest.body.requestDate),
         requestUserId: resultRequest.body.requestUserId,
         requestUserName: resultRequest.body.requestUserName,
@@ -798,5 +798,7 @@ export default class PegarDevolverComponent implements OnInit {
   hideDialogDetails() {
     this.visibleDialogDetailsRequest = false;
   }
+
+  get
 
 }

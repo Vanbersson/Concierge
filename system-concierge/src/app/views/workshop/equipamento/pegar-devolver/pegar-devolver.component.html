@@ -59,15 +59,15 @@
                             styleClass="p-datatable-sm">
                             <ng-template pTemplate="header">
                                 <tr>
-                                    <th pSortableColumn="requestId" class="font-normal" style="width: 10%">Requisição<p-sortIcon field="requestId"></p-sortIcon></th>
+                                    <th pSortableColumn="requestId" class="font-normal" style="width: 8%">Requisição<p-sortIcon field="requestId"></p-sortIcon></th>
                                     <th></th>
                                     <th pSortableColumn="requestDate" class="font-normal" style="width: 10%">Entregue<p-sortIcon field="requestDate"></p-sortIcon></th>
                                     <th pSortableColumn="categoryDesc" class="font-normal" style="width: 10%">Categoria<p-sortIcon field="categoryDesc"></p-sortIcon></th>
                                     <th pSortableColumn="materialPhoto" class="font-normal" style="width: 10%">Foto<p-sortIcon field="materialPhoto"></p-sortIcon></th>
                                     <th pSortableColumn="materialDesc" class="font-normal" style="width: 30%">Descrição<p-sortIcon field="materialDesc"></p-sortIcon></th>
                                     <th pSortableColumn="materialQuantReq" class="font-normal" style="width: 10%">Quant.<p-sortIcon field="materialQuantReq"></p-sortIcon></th>
-                                    <th pSortableColumn="requestInf" class="font-normal" style="width: 10%">Inf.<p-sortIcon field="requestInf"></p-sortIcon></th>
-                                    <th class="font-normal" style="width: 10%">Ver</th>
+                                    <th pSortableColumn="requestInf" class="font-normal" style="width: 14%">Inf.<p-sortIcon field="requestInf"></p-sortIcon></th>
+                                    <th class="font-normal" style="width: 8%">Ver</th>
                                 </tr>
                             </ng-template>
                             <ng-template pTemplate="body" let-mat let-rowgroup="rowgroup" let-rowspan="rowspan">
@@ -91,7 +91,7 @@
                                         {{mat.matMecDelivInfor | uppercase}}
                                     </td>
                                     <td *ngIf="rowgroup" [attr.rowspan]="rowspan">
-                                        <p-button icon="pi pi-eye" label="Visualizar" [rounded]="true" [text]="true" severity="secondary"  size="large" (onClick)="showDialogDetails(mat.requestId)"/>
+                                        <p-button icon="pi pi-eye" label="Visualizar" [rounded]="true" [text]="true" severity="secondary" (onClick)="showDialogDetails(mat.requestId)"/>
                                     </td> 
                                 </tr>
                             </ng-template>
@@ -311,7 +311,7 @@
         </p-table>
     </div>
     <div class="flex justify-content-end mt-1">
-        <button pButton type="button" pRipple label="Fechar" icon="pi pi-times" class="p-button-text" (click)=" hideDialogDev()"></button>
+        <button pButton type="button" pRipple label="Fechar" icon="pi pi-times" class="p-button-text" (click)="hideDialogDev()"></button>
         <button pButton type="button" pRipple label="Devolver Materiais" icon="pi pi-check" class="p-button-text" (click)="confirmReturnMaterial()"></button>
     </div>
 </p-dialog>
@@ -488,34 +488,44 @@
             </div>        
         </div>
     </form>
-    <p-table [value]="listMaterialDetailsRequest" [tableStyle]="{'min-width': '120rem'}" [scrollable]="true" scrollWidht="400px" scrollHeight="300px"  styleClass="p-datatable-sm">
-        <ng-template pTemplate="header">
-            <tr>
-                <th>Código</th>
-                <th>Descrição</th>
-                <th>Entregue Quant.</th>
-                <th>Entregue Usuá.</th>
-                <th>Entregue Data</th>
-                <th>Entregue Inf.</th>
-                <th>Retorno Quant.</th>
-                <th>Retorno Usuá.</th>
-                <th>Retorno Data</th>
-                <th>Retorno Inf.</th>
-            </tr>
-        </ng-template>
-        <ng-template pTemplate="body" let-mat>
-            <tr>
-                <td>{{mat.materialId}}</td>
-                <td>{{mat.materialDescription | uppercase}}</td>
-                <td>{{mat.deliveryQuantity | number: '1.2-2'}}</td>
-                <td>{{mat.deliveryUserName | uppercase}}</td>
-                <td>{{mat.deliveryDate | date:'dd/MM/yyyy hh:mm'}}</td>
-                <td>{{mat.deliveryInformation | uppercase}}</td>
-                <td>{{mat.returnQuantity | number: '1.2-2' }}</td>
-                <td>{{mat.returnUserName | uppercase}}</td>
-                <td>{{mat.returnDate | date:'dd/MM/yyyy hh:mm'}}</td>
-                <td>{{mat.returnInformation | uppercase}}</td>
-            </tr>
-        </ng-template>
-    </p-table>
+    <div style="height: 312px;">   
+        <p-table [value]="listMaterialDetailsRequest" [tableStyle]="{'min-width': '120rem'}" [scrollable]="true" scrollWidht="400px" scrollHeight="310px"  styleClass="p-datatable-sm">
+            <ng-template pTemplate="header">
+                <tr>
+                    <th>Código</th>
+                    <th>Descrição</th>
+                    <th>Entregue Quant.</th>
+                    <th>Entregue Usuá.</th>
+                    <th>Entregue Data</th>
+                    <th>Entregue Inf.</th>
+                    <th>Retorno Quant.</th>
+                    <th>Retorno Usuá.</th>
+                    <th>Retorno Data</th>
+                    <th>Retorno Inf.</th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-mat>
+                <tr>
+                    <td>{{mat.materialId}}</td>
+                    <td>{{mat.materialDescription | uppercase}}</td>
+                    <td>{{mat.deliveryQuantity | number: '1.2-2'}}</td>
+                    <td>{{mat.deliveryUserName | uppercase}}</td>
+                    <td>{{mat.deliveryDate | date:'dd/MM/yyyy hh:mm'}}</td>
+                    <td>{{mat.deliveryInformation | uppercase}}</td>
+                    <td>{{mat.returnQuantity | number: '1.2-2' }}</td>
+                    <td>{{mat.returnUserName | uppercase}}</td>
+                    <td>{{mat.returnDate | date:'dd/MM/yyyy hh:mm'}}</td>
+                    <td>{{mat.returnInformation | uppercase}}</td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+     <div class="flex justify-content-between mt-1">
+        <div class="flex">
+            <button pButton type="button" pRipple label="Ficha EPI" icon="pi pi-print" class="p-button-text"></button>
+            <p-divider layout="vertical" />
+            <button pButton type="button" pRipple label="Imprimir Requisição" icon="pi pi-print" class="p-button-text"></button>
+        </div>
+        <button pButton type="button" pRipple label="Fechar" icon="pi pi-times" class="p-button-text" (click)="hideDialogDetails()"></button>
+    </div>
  </p-dialog>
