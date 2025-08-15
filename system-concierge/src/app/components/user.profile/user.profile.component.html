@@ -14,16 +14,11 @@
             <div class="field col-12 flex align-items-center justify-content-center">
                 <div class="layout-photo-person mb-5 mt-1">
                     @if(userPhoto){
-                    <p-image [imageStyle]="{'border-radius':'100%','object-fit':'cover'}"
-                        src="data:image/png;base64,{{userPhoto}}" alt="imagem motorista" height="80"
-                        width="80" [preview]="true" />
-
-                    <p-button severity="danger" [text]="true" label="Remover" class=""
-                        (click)="deletePhoto()"></p-button>
+                    <p-image [imageStyle]="{'border-radius':'100%','object-fit':'cover'}" src="data:image/png;base64,{{userPhoto}}" alt="imagem motorista" height="80" width="80" [preview]="true" />
+                    <p-button severity="danger" [text]="true" label="Remover" (click)="deletePhoto()"></p-button>
                     }@else{
                     <div class="layout-photo-person-label">
-                        <button pButton type="button" label="Foto" [text]="true"
-                            size="small" (click)="selectPhoto()"></button>
+                        <button pButton type="button" label="Foto" [text]="true" size="small" (click)="selectPhoto()"></button>
                     </div>
                     }
                 </div>
@@ -31,9 +26,7 @@
             <div class="field col-12 md:col-12">
                 <label for="nameid">Nome</label>
                 <input pInputText id="nameid" type="text" formControlName="name" />
-                <small class="p-error block"
-                    *ngIf="userFormView.get('name')?.invalid && userFormView.get('name')?.dirty">
-                    Campo obrigatório</small>
+                <small class="p-error block" *ngIf="userFormView.get('name')?.invalid && userFormView.get('name')?.dirty">Campo obrigatório</small>
             </div>
             <div class="field col-12 md:col-6">
                 <label for="">Email</label>
@@ -75,8 +68,7 @@
             </div>
         </div>
         <div class="flex justify-content-end gap-2 mt-3">
-            <button pButton type="button" pRipple label="Fechar" icon="pi pi-times" class="p-button-text"
-                (click)="hideDialogUser()"></button>
+            <button pButton type="button" pRipple label="Fechar" icon="pi pi-times" class="p-button-text" (click)="hideDialogUser()"></button>
             <button pButton type="submit" pRipple label="Salvar" icon="pi pi-check" class="p-button-text"></button>
         </div>
     </form>

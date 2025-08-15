@@ -60,9 +60,15 @@
 
     }
 
-    ::ng-deep .p-image-preview-container>img {
-        width: 80px;
-        height: 80px;
+    ::ng-deep {
+        .p-button.p-button-icon-only {
+            padding: 0.5rem 0;
+        }
+
+        .p-image-preview-container>img {
+            width: 80px;
+            height: 80px;
+        }
     }
 
     .layout-file {

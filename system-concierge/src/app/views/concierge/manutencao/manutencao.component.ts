@@ -27,6 +27,7 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { SpeedDialModule } from 'primeng/speeddial';
 import { CheckboxModule } from 'primeng/checkbox';
 import { StepsModule } from 'primeng/steps';
+import { DividerModule } from 'primeng/divider';
 
 //Service
 import { VehicleService } from '../../../services/vehicle/vehicle.service';
@@ -43,7 +44,6 @@ import {
   STATUS_VEHICLE_ENTRY_AUTHORIZED, MESSAGE_RESPONSE_NOT_CLIENT,
   MESSAGE_RESPONSE_NOT_ATTENDANT, MESSAGE_RESPONSE_NOT_DRIVEREXIT, MESSAGE_RESPONSE_ERROR_AUTH_EXIT
 } from '../../../util/constants';
-
 //Class
 import { User } from '../../../models/user/user';
 import { ClientCompany } from '../../../models/clientcompany/client-company';
@@ -59,23 +59,17 @@ import { BusyService } from '../../../components/loading/busy.service';
 import { lastValueFrom } from 'rxjs';
 import { HttpResponse } from '@angular/common/http';
 import { IBudget } from '../../../interfaces/budget/ibudget';
-
 //Components
 import { FilterClientComponent } from '../../../components/filter.client/filter.client.component';
 import { StatusBudgetEnum } from '../../../models/budget/status-budget-enum';
 import { StatusVehicle } from '../../../models/enum/status-vehicle';
 import { ClientFisJurEnum } from '../../../models/clientcompany/client-fisjur-enum';
 
-interface IModel {
-  description: string,
-  id: number
-}
-
 @Component({
   selector: 'app-manutencao',
   standalone: true,
   imports: [CommonModule, FilterClientComponent, RouterModule,
-    TabViewModule, FormsModule, IconFieldModule,
+    TabViewModule, FormsModule, IconFieldModule,DividerModule,
     CheckboxModule, StepsModule, SpeedDialModule,
     ConfirmDialogModule, InputIconModule, ImageModule,
     DialogModule, ToastModule, TableModule, ReactiveFormsModule,
@@ -101,7 +95,6 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
   private notAuth = STATUS_VEHICLE_ENTRY_NOTAUTH;
   private firstAuth = STATUS_VEHICLE_ENTRY_FIRSTAUTH;
   private authorized = STATUS_VEHICLE_ENTRY_AUTHORIZED;
-
   formVehicle = new FormGroup({
     id: new FormControl<number>(0, Validators.required),
     placa: new FormControl<string>(''),
@@ -109,7 +102,7 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
     color: new FormControl<IColor[]>([], Validators.required),
     kmEntry: new FormControl<string | null>(''),
     kmExit: new FormControl<string | null>(''),
-    modelVehicle: new FormControl<IModel[] | null>([], Validators.required),
+    modelVehicle: new FormControl<ModelVehicle[] | null>([], Validators.required),
     dateEntry: new FormControl<Date | null>(null, Validators.required),
     datePrevisionExit: new FormControl<Date | null>(null),
 
@@ -141,7 +134,7 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
     information: new FormControl<string>('')
   });
   public cores: IColor[] = []
-  public modelVehicles: IModel[] = [];
+  public modelVehicles: ModelVehicle[] = [];
 
   public attendantsUser: User[] = [];
   private attendantUser: User;
@@ -151,14 +144,11 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
   photoVehicle4!: string;
   public dateExitAuth1 = signal<string>('');
   public dateExitAuth2 = signal<string>('');
-
   vehicleExit = false;
-
   //Porteiro
   proteiroId: number = 0;
   porteiroName: string = '';
   porteiroInfo: String = '';
-
   //ClientCompany
   selectClientCompany = signal<ClientCompany>(new ClientCompany());
   formClientCompany = new FormGroup({
@@ -169,7 +159,6 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
     clientCompanyCpf: new FormControl<string>(''),
     clientCompanyRg: new FormControl<string | null>(null),
   });
-
   //Driver
   formDriver = new FormGroup({
     driverEntryName: new FormControl<string>('', Validators.required),
@@ -193,7 +182,6 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
   driverExitPhoto!: string;
   driverExitPhotoDoc1!: string;
   driverExitPhotoDoc2!: string;
-
   //Budget
   dialogVisibleOrcamento: boolean = false;
   dialogNomeClientCompany!: string;
@@ -327,28 +315,21 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
   private async init() {
     //Show load
     this.busyService.busy();
-
     //Attendant
     this.attendantsUser = await this.getUserRole();
-
     //Model
-    const modelResult = await this.getVehicleModel();
-    for (var item of modelResult) {
-      this.modelVehicles.push({ id: item.id, description: item.description });
-    }
-
+    this.modelVehicles = await this.getVehicleModel();
+    //Vehicle
     const vehicleResult = await this.getVehicleEntry();
     //Close load
     this.busyService.idle();
 
     if (vehicleResult.status == 200) {
       this.vehicleEntry = vehicleResult.body;
-
       //Vehicle has already left
       if (this.vehicleEntry.status == StatusVehicle.exit) {
         this.vehicleExit = true;
       }
-
       this.loadForms();
     } else {
       setTimeout(() => {
@@ -426,7 +407,7 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
       color: [{ color: this.vehicleEntry.color }],
       placa: this.vehicleEntry.placa,
       frota: this.vehicleEntry.frota,
-      modelVehicle: [{ id: this.vehicleEntry.modelId, description: this.vehicleEntry.modelDescription }],
+      modelVehicle: [this.modelVehicles.find(m => m.id == this.vehicleEntry.modelId)],
       kmEntry: this.vehicleEntry.kmEntry == "" ? null : this.vehicleEntry.kmEntry,
       kmExit: this.vehicleEntry.kmExit == "" ? null : this.vehicleEntry.kmExit,
       serviceOrder: this.vehicleEntry.serviceOrder,

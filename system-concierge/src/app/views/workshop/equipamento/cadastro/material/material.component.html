@@ -79,8 +79,7 @@
             </div>
             <div class="field col-12 md:col-4">
                 <label for="categoryId">Categoria</label>
-                <p-multiSelect [options]="listCat" optionLabel="description" placeholder="Categorias" display="chip"
-                    [selectionLimit]="1" formControlName="categories" />
+                <p-multiSelect [options]="listCat" optionLabel="description" placeholder="Categorias" [selectionLimit]="1" formControlName="categories" />
                 <small class="p-error block" *ngIf="formMat.get('categories')?.invalid">Campo obrigatório</small>
             </div>
             <div class="field col-12 md:col-2">
@@ -127,8 +126,7 @@
                             <button type="button" pButton icon="pi pi-lock" class="p-button-secondary"
                                 (click)="confirmEditQuant()"></button>
                         </p-inputGroup>
-                        <small class="p-error block" *ngIf="formMat.get('quantityAccountingLoan')?.invalid">Campo
-                            obrigatório</small>
+                        <small class="p-error block" *ngIf="formMat.get('quantityAccountingLoan')?.invalid">Campo obrigatório</small>
                     </div>
                     <div class="flex flex-column field">
                         <label for="quantityAvailableId">Disponível</label>

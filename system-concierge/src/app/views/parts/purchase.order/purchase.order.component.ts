@@ -22,6 +22,7 @@ import { CalendarModule } from 'primeng/calendar';
 import { TagModule } from 'primeng/tag';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { InputTextareaModule } from 'primeng/inputtextarea';
+import { DividerModule } from 'primeng/divider';
 
 //Class
 import { PurchaseOrder } from '../../../models/purchase.order/puchase.order';
@@ -46,8 +47,10 @@ import { PurchaseOrderItemService } from '../../../services/purchase/purchase-or
   selector: 'app-purchase.order',
   standalone: true,
   imports: [CommonModule, PrintPurchaseComponent, FilterClientComponent, FilterPartsComponent, InputTextareaModule,
-    ToastModule, ButtonModule, TableModule, InputTextModule, IconFieldModule, InputIconModule, DialogModule,
-    ReactiveFormsModule, FormsModule, InputGroupModule, InputNumberModule, MultiSelectModule, InputMaskModule, TagModule, ConfirmDialogModule,
+    ToastModule, ButtonModule, TableModule, InputTextModule, IconFieldModule, 
+    InputIconModule, DialogModule,DividerModule,
+    ReactiveFormsModule, FormsModule, InputGroupModule, InputNumberModule, 
+    MultiSelectModule, InputMaskModule, TagModule, ConfirmDialogModule,
     CalendarModule],
   templateUrl: './purchase.order.component.html',
   styleUrl: './purchase.order.component.scss',

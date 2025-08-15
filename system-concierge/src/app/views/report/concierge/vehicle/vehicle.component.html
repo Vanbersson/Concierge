@@ -14,8 +14,7 @@
                     <p-inputIcon>
                         <i class="pi pi-search"></i>
                     </p-inputIcon>
-                    <input pInputText type="text" (input)="dt1.filterGlobal($event.target.value, 'contains')"
-                        placeholder="Pesquisar" />
+                    <input pInputText type="text" (input)="dt1.filterGlobal($event.target.value, 'contains')" placeholder="Pesquisar" />
                 </p-iconField>
                 <p-button icon="pi pi-filter" severity="warning" [text]="true" (onClick)="showDialog()" label="Filtros" />
             </div>
@@ -98,13 +97,11 @@
             </div>
             <div class="field col-12 md:col-3">
                 <label for="dateIniId">Período inicial</label>
-                <p-calendar dateFormat="dd/mm/yy" [iconDisplay]="'input'" [showIcon]="true" inputId="buttondisplay"
-                    formControlName="dateInit" />
+                <p-calendar dateFormat="dd/mm/yy" [iconDisplay]="'input'" [showIcon]="true" inputId="buttondisplay" formControlName="dateInit" />
             </div>
             <div class="field col-12 md:col-3">
                 <label for="dateIniId">Período final</label>
-                <p-calendar dateFormat="dd/mm/yy" [iconDisplay]="'input'" [showIcon]="true" inputId="buttondisplay"
-                    formControlName="dateFinal" />
+                <p-calendar dateFormat="dd/mm/yy" [iconDisplay]="'input'" [showIcon]="true" inputId="buttondisplay" formControlName="dateFinal" />
             </div>
             <div class="md:col-6"></div>
             <div class="field col-12 md:col-6 ">
@@ -133,8 +130,7 @@
             <div class="md:col-6"></div>
             <div class="field col-12 md:col-2">
                 <label for="clientCompanyCodeId">Código</label>
-                <p-inputNumber inputId="clientCompanyCodeId" mode="decimal" [useGrouping]="false"
-                    formControlName="clientCompanyId" />
+                <p-inputNumber inputId="clientCompanyCodeId" mode="decimal" [useGrouping]="false" formControlName="clientCompanyId" />
             </div>
             <div class="field col-10 md:col-6">
                 <label for="clientCompanyNameId">Empresa</label>
@@ -147,24 +143,17 @@
             <div class="md:col-3"></div>
             <div class="field col-12 md:col-4">
                 <label for="vehiclemodelid">Modelos</label>
-                <p-multiSelect [options]="vehicleModels$ | async" display="chip" [selectionLimit]="1"
-                    placeholder="Selecione" optionLabel="description" formControlName="modelVehicle">
+                <p-multiSelect [options]="vehicleModels$ | async" [selectionLimit]="1" placeholder="Selecione" optionLabel="description" formControlName="modelVehicle">
                     <ng-template let-value pTemplate="selectedItems">
                         <div class="inline-flex align-items-center gap-2" *ngFor="let model of value">
-                            @if(model.photo){
-                            <p-image [src]="'data:image/png;base64,'+model.photo" alt="" height="22" width="22"
-                                [preview]="false" />
-                            }
-                            <div style="margin: 0.42rem;">{{ model.description }}</div>
+                            <img *ngIf="model.photo" src="data:image/png;base64,{{model.photo}}" alt="photo vehicle" height="15" width="15"/>
+                            <div >{{ model.description }}</div>
                         </div>
                         <div *ngIf="!value || value.length === 0">Selecione</div>
                     </ng-template>
                     <ng-template let-model pTemplate="item">
                         <div class="flex align-items-center gap-2">
-                            @if(model.photo){
-                            <p-image [src]="'data:image/png;base64,'+model.photo" alt="" height="18" width="18"
-                                [preview]="false" />
-                            }
+                            <img *ngIf="model.photo" src="data:image/png;base64,{{model.photo}}" alt="photo vehicle" height="22" width="22"/>
                             <div>{{ model.description }}</div>
                         </div>
                     </ng-template>
@@ -184,8 +173,7 @@
             </div>
             <div class=" field col-12 md:col-4">
                 <label for="placaId">Placa</label>
-                <p-inputMask id="placaId" mask="***-****" [unmask]="true" [style]="{'text-transform':'uppercase'}"
-                    formControlName="placa" />
+                <p-inputMask id="placaId" mask="***-****" [unmask]="true" [style]="{'text-transform':'uppercase'}" formControlName="placa" />
             </div>
             <div class=" field col-12 md:col-2">
                 <label for="frotaId">Frota</label>
@@ -207,10 +195,8 @@
         </div>
 
         <div class="flex justify-content-end gap-2 mt-5">
-            <button pButton type="button" pRipple label="Fechar" icon="pi pi-times" class="p-button-text"
-                (click)="hideDialog()"></button>
-            <button pButton type="button" pRipple label="Pesquisar" icon="pi pi-search" class="p-button-text"
-                (click)="searchFilter()"></button>
+            <button pButton type="button" pRipple label="Fechar" icon="pi pi-times" class="p-button-text" (click)="hideDialog()"></button>
+            <button pButton type="button" pRipple label="Pesquisar" icon="pi pi-search" class="p-button-text" (click)="searchFilter()"></button>
         </div>
     </form>
 </p-dialog>

@@ -62,9 +62,9 @@
   }
 
   ::ng-deep{
-     .p-button-label {
-            font-weight: 400;
-        }
+     .p-inputtext {
+    padding: 0.75rem 0.75rem;
+}
   }
 
   @media only screen and (min-width: 375px) and (max-width: 667px) {

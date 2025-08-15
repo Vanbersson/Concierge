@@ -28,7 +28,7 @@
             <td><span>E-mail: {{printPurchaseOrder().attendantEmail}}</span></td>
         </tr>
         <tr>
-            <td><span>Fornecedor: {{abreviaDesc(printPurchaseOrder().clientCompanyName) }}</span></td>
+            <td><span>Fornecedor: {{printPurchaseOrder().clientCompanyName }}</span></td>
             <td><span>Data Entrega: {{printPurchaseOrder().dateDelivery | date: 'dd/MM/yyyy'}}</span></td>
         </tr>
         <tr>
@@ -50,7 +50,7 @@
         </tr>
         <tr *ngFor="let item of printPurchaseOrderItems">
             <td>{{item?.partCode }}</td>
-            <td>{{ abreviaDesc(item?.partDescription || '') | uppercase }}</td>
+            <td>{{item?.partDescription | uppercase }}</td>
             <td>{{item?.quantity || ''}}</td>
             <td>{{item?.price || 0 | currency }}</td>
             <td>{{item?.discount || 0 | currency}}</td>

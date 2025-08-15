@@ -15,11 +15,9 @@
                     <p-inputIcon>
                         <i class="pi pi-search"></i>
                     </p-inputIcon>
-                    <input pInputText type="text" (input)="dt1.filterGlobal($event.target.value, 'contains')"
-                        placeholder="Pesquisar" />
+                    <input pInputText type="text" (input)="dt1.filterGlobal($event.target.value, 'contains')" placeholder="Pesquisar" />
                 </p-iconField>
-                <p-button icon="pi pi-filter" severity="warning" [text]="true" label="Filtros"
-                    (onClick)="showDialogFilter()" />
+                <p-button icon="pi pi-filter" severity="warning" [text]="true" label="Filtros" (onClick)="showDialogFilter()" />
             </div>
         </ng-template>
         <ng-template pTemplate="header">
@@ -77,17 +75,16 @@
                         </div>
                         <div class="field col-12 md:col-3">
                             <label for="ClientFantasiaId">Fantasia</label>
-                            <input id="ClientFantasiaId" type="text" [style]="{'text-transform':'uppercase'}" pInputText
-                                formControlName="fantasia" />
+                            <input id="ClientFantasiaId" type="text" [style]="{'text-transform':'uppercase'}" pInputText formControlName="fantasia" />
                         </div>
                         <div class="field col-12 md:col-3">
                             <label for="CliForId">Cliente/Fornecedor</label>
-                            <p-multiSelect [options]="clifor" optionLabel="type" display="chip" [selectionLimit]="1" placeholder="Selecione" formControlName="clifor" />
+                            <p-multiSelect [options]="clifor" optionLabel="type" [selectionLimit]="1" placeholder="Selecione" formControlName="clifor" />
                             <small class="p-error block" *ngIf="formClient.get('clifor')?.invalid">Campo obrigatório</small>
                         </div>
                         <div class="field col-12 md:col-2">
                             <label for="FisJurId">Jurídica/Física</label>
-                            <p-multiSelect [options]="fisjur" optionLabel="type" display="chip" [selectionLimit]="1" placeholder="Selecione" formControlName="fisjur" />
+                            <p-multiSelect [options]="fisjur" optionLabel="type" [selectionLimit]="1" placeholder="Selecione" formControlName="fisjur" />
                             <small class="p-error block" *ngIf="formClient.get('fisjur')?.invalid">Campo obrigatório</small>
                         </div>
                         <div class="md:col-4">
@@ -171,36 +168,30 @@
                     <div class="p-fluid p-formgrid grid">
                         <div class="field col-12 md:col-6">
                             <label for="contactNameId">Nome</label>
-                            <input id="contactNameId" type="text" [style]="{'text-transform':'uppercase'}" pInputText
-                                formControlName="contactName" />
+                            <input id="contactNameId" type="text" [style]="{'text-transform':'uppercase'}" pInputText formControlName="contactName" />
                         </div>
                         <div class="md:col-6"></div>
                         <div class="field col-12 md:col-6">
                             <label for="contactEmailId">E-Mail</label>
-                            <input id="contactEmailId" type="email" [style]="{'text-transform':'lowercase'}" pInputText
-                                formControlName="contactEmail" />
+                            <input id="contactEmailId" type="email" [style]="{'text-transform':'lowercase'}" pInputText formControlName="contactEmail" />
                         </div>
                         <div class="md:col-6"></div>
                         <div class="field col-12 md:col-1">
                             <label for="contactDDDPhoneId">DDD</label>
-                            <p-inputMask id="contactDDDPhoneId" mask="99" [unmask]="true"
-                                formControlName="contactDDDPhone" />
+                            <p-inputMask id="contactDDDPhoneId" mask="99" [unmask]="true" formControlName="contactDDDPhone" />
                         </div>
                         <div class="field col-12 md:col-3">
                             <label for="contactPhoneId">Telefone</label>
-                            <p-inputMask id="contactPhoneId" mask="9999-9999" [unmask]="true"
-                                formControlName="contactPhone" />
+                            <p-inputMask id="contactPhoneId" mask="9999-9999" [unmask]="true" formControlName="contactPhone" />
                         </div>
 
                         <div class="field col-12 md:col-1">
                             <label for="contactDDDCellphoneId">DDD</label>
-                            <p-inputMask id="contactDDDCellphoneId" mask="99" [unmask]="true"
-                                formControlName="contactDDDCellphone" />
+                            <p-inputMask id="contactDDDCellphoneId" mask="99" [unmask]="true" formControlName="contactDDDCellphone" />
                         </div>
                         <div class="field col-12 md:col-3">
                             <label for="contactCellphoneId">Celular</label>
-                            <p-inputMask id="contactCellphoneId" mask="9999-9999" [unmask]="true"
-                                formControlName="contactCellphone" />
+                            <p-inputMask id="contactCellphoneId" mask="9999-9999" [unmask]="true" formControlName="contactCellphone" />
                         </div>
                     </div>
                 </form>
@@ -215,8 +206,7 @@
                             <p-inputMask *ngIf="editCNPJCPF" mask="99.999.999/9999-99" [unmask]="true" formControlName="cnpj" />
                             <p-inputGroup *ngIf="!editCNPJCPF">
                                 <p-inputMask mask="99.999.999/9999-99" [unmask]="true" formControlName="cnpj" />
-                                <button type="button" pButton icon="pi pi-lock" class="p-button-secondary"
-                                    (click)="confirm('CNPJ')"></button>
+                                <button type="button" pButton icon="pi pi-lock" class="p-button-secondary" (click)="confirm('CNPJ')"></button>
                             </p-inputGroup>
                             <small class="p-error block" *ngIf="formClient.get('cnpj')?.invalid">Campo obrigatório</small>
                         </div>

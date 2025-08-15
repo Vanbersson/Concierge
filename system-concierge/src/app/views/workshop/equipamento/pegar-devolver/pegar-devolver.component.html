@@ -402,7 +402,7 @@
         </div>
     </form>
     <div class="flex justify-content-end">
-        <button pButton type="button" pRipple label="Solicitar materiais" class="p-button" (click)="newRequest()"></button>
+         <p-button type="button" icon="pi pi-plus"  [raised]="true" label="Salvar Solicitação" severity="success-custom" size="small" (onClick)="newRequest()" />
     </div>
     <div class="pt-2 w-full">
         <p-table [value]="listRequestPendent"  styleClass="p-datatable-sm" [scrollable]="true" scrollHeight="280px">

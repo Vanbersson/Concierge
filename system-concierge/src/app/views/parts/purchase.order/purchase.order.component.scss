@@ -15,18 +15,15 @@
     }
 
     ::ng-deep {
-        .p-button-label {
-            font-weight: 400;
+        .p-button.p-button-icon-only {
+            padding: 0.5rem 0;
         }
 
         .p-tag {
             font-weight: 400;
         }
 
-        .p-tag.p-tag-secondary {
-            background-color: var(--color-grey-300);
-            color: var(--color-text-primary);
-        }
+       
     }
 
 

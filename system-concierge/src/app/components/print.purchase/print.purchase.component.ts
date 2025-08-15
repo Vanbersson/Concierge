@@ -69,11 +69,6 @@ export class PrintPurchaseComponent {
     }
 
   }
-  abreviaDesc(desc: string) {
-    if (desc == '') return desc;
-    if (desc.length <= 20) return desc;
-    return desc.substring(0, 20);
-  }
   private async PurchaseOrderFilterId(id: number): Promise<HttpResponse<PurchaseOrder>> {
     try {
       return await lastValueFrom(this.purchaseOrderService.filterId(this.storageService.companyId, this.storageService.resaleId, id));

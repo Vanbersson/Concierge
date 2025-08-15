@@ -1,21 +1,21 @@
 :host {
-    
+
     .layout-card-title {
         display: flex;
         justify-content: space-between;
         align-items: center;
-      
+
         span {
             display: flex;
             align-items: center;
-            font-size: 1.5rem; 
-            font-weight: 600;           
+            font-size: 1.5rem;
+            font-weight: 600;
             color: var(--color-text-primary);
-        } 
+        }
     }
 
     .mobile-visible-none {
-        display: block;        
+        display: block;
     }
 
     .layout-main-between {
@@ -24,25 +24,6 @@
         display: flex;
         flex-direction: column;
         justify-content: space-between;
-
-    }
-
-    .layout-input-disabled {
-        display: flex;
-        font-size: 1rem;
-        padding: 0.75rem;
-        border-radius: 6px;
-        border: 1px solid var(--color-grey-300);
-    }
-
-    .layout-input-disabled-area-text {
-        display: flex;
-        height: 8rem;
-        width: 100%;
-        font-size: 1rem;
-        padding: 0.75rem;
-        border-radius: 6px;
-        border: 1px solid var(--color-grey-300);
     }
 
     .layourt-button-action-speedDial {
@@ -139,7 +120,6 @@
 
         .layout-card-option-title {
             font-weight: 400px;
-
         }
     }
 
@@ -150,38 +130,18 @@
     }
 
     ::ng-deep {
-        .p-button-label {
-            font-weight: 400;
-        }
-        
-        .p-timeline-horizontal{
+
+        .p-timeline-horizontal {
             width: 70rem;
-        }
-        .p-button.p-button-secondary-custom {
-            color: #475569;
-            background-color: #f1f5f9;
-            border: 1px solid #f1f5f9
-        }
-
-        .p-button.p-button-secondary-custom:hover {
-            background-color: #e9ecee;
-            border: 1px solid #e9ecee
-        }
-
-        .p-button.p-button-success-custom {
-            color: #475569;
-            background-color: #acf3aa;
-            border: 1px solid #acf3aa
-        }
-
-        .p-button.p-button-success-custom:hover {
-            background-color: #a0f19e;
-            border: 1px solid #a0f19e
         }
 
         .p-image-preview-container>img {
             width: 80px;
             height: 80px;
+        }
+
+        .p-button.p-button-icon-only {
+            padding: 0.5rem 0;
         }
     }
 

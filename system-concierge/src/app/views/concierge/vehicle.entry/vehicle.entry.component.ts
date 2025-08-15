@@ -111,7 +111,7 @@ export default class VehicleEntryComponent implements OnInit, OnDestroy, DoCheck
 
   formVehicle = new FormGroup({
     placa: new FormControl<string>(''),
-    frota: new FormControl<string>(''),
+    frota: new FormControl<string | null>(null),
     kmEntry: new FormControl<string | null>(null),
     modelVehicle: new FormControl<IModelVehicle[]>([], Validators.required),
     dateEntry: new FormControl<Date | null>(new Date(), Validators.required),

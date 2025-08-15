@@ -18,10 +18,10 @@
     }
 
     ::ng-deep {
-        .p-button-label {
-            font-weight: 400;
+        .p-button.p-button-icon-only {
+            padding: 0.5rem 0;
         }
-
+        
         .p-inputgroup .p-inputtext,
         .p-fluid .p-inputgroup .p-inputtext,
         .p-inputgroup .p-inputwrapper,
