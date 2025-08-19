@@ -510,11 +510,11 @@
                     <td>{{mat.materialDescription | uppercase}}</td>
                     <td>{{mat.deliveryQuantity | number: '1.2-2'}}</td>
                     <td>{{mat.deliveryUserName | uppercase}}</td>
-                    <td>{{mat.deliveryDate | date:'dd/MM/yyyy hh:mm'}}</td>
+                    <td>{{mat.deliveryDate | date:'dd/MM/yyyy HH:mm'}}</td>
                     <td>{{mat.deliveryInformation | uppercase}}</td>
                     <td>{{mat.returnQuantity | number: '1.2-2' }}</td>
                     <td>{{mat.returnUserName | uppercase}}</td>
-                    <td>{{mat.returnDate | date:'dd/MM/yyyy hh:mm'}}</td>
+                    <td>{{mat.returnDate | date:'dd/MM/yyyy HH:mm'}}</td>
                     <td>{{mat.returnInformation | uppercase}}</td>
                 </tr>
             </ng-template>
@@ -522,10 +522,18 @@
     </div>
      <div class="flex justify-content-between mt-1">
         <div class="flex">
-            <button pButton type="button" pRipple label="Ficha EPI" icon="pi pi-print" class="p-button-text"></button>
+            <div>
+                <p-button type="button" icon="pi pi-print"  [raised]="true" label="Imprimir EPI" severity="secondary-custom" size="small" (onClick)="printEPI()" />
+            </div>
             <p-divider layout="vertical" />
-            <button pButton type="button" pRipple label="Imprimir Requisição" icon="pi pi-print" class="p-button-text"></button>
+            <div>
+                <p-button type="button" icon="pi pi-print"  [raised]="true" label="Imprimir Requisição" severity="secondary-custom" disabled="true" size="small" />
+            </div>  
         </div>
-        <button pButton type="button" pRipple label="Fechar" icon="pi pi-times" class="p-button-text" (click)="hideDialogDetails()"></button>
+        <div>
+            <button pButton type="button" pRipple label="Fechar" icon="pi pi-times" class="p-button-text" (click)="hideDialogDetails()"></button>
+        </div>
     </div>
  </p-dialog>
+
+ <app-printepi #printEPIComponent/>

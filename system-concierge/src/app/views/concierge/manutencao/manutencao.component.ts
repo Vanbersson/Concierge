@@ -69,7 +69,7 @@ import { ClientFisJurEnum } from '../../../models/clientcompany/client-fisjur-en
   selector: 'app-manutencao',
   standalone: true,
   imports: [CommonModule, FilterClientComponent, RouterModule,
-    TabViewModule, FormsModule, IconFieldModule,DividerModule,
+    TabViewModule, FormsModule, IconFieldModule, DividerModule,
     CheckboxModule, StepsModule, SpeedDialModule,
     ConfirmDialogModule, InputIconModule, ImageModule,
     DialogModule, ToastModule, TableModule, ReactiveFormsModule,
@@ -98,7 +98,7 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
   formVehicle = new FormGroup({
     id: new FormControl<number>(0, Validators.required),
     placa: new FormControl<string>(''),
-    frota: new FormControl<string>(''),
+    frota: new FormControl<string | null>(null),
     color: new FormControl<IColor[]>([], Validators.required),
     kmEntry: new FormControl<string | null>(''),
     kmExit: new FormControl<string | null>(''),
@@ -406,7 +406,7 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
       datePrevisionExit: this.vehicleEntry.datePrevisionExit != "" ? new Date(this.vehicleEntry.datePrevisionExit) : null,
       color: [{ color: this.vehicleEntry.color }],
       placa: this.vehicleEntry.placa,
-      frota: this.vehicleEntry.frota,
+      frota: this.vehicleEntry.frota == "" ? null : this.vehicleEntry.frota,
       modelVehicle: [this.modelVehicles.find(m => m.id == this.vehicleEntry.modelId)],
       kmEntry: this.vehicleEntry.kmEntry == "" ? null : this.vehicleEntry.kmEntry,
       kmExit: this.vehicleEntry.kmExit == "" ? null : this.vehicleEntry.kmExit,
@@ -1282,7 +1282,7 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
     this.vehicleEntry.datePrevisionExit = vehicleValue?.datePrevisionExit == null ? "" : this.formatDateTime(vehicleValue.datePrevisionExit);
     this.vehicleEntry.placa = vehicleValue.placa;
     this.vehicleEntry.placasJunto = "";
-    this.vehicleEntry.frota = vehicleValue.frota;
+    this.vehicleEntry.frota = vehicleValue.frota == null ? "" : vehicleValue.frota.toString();
     this.vehicleEntry.modelId = vehicleValue.modelVehicle.at(0).id;
     this.vehicleEntry.modelDescription = vehicleValue.modelVehicle.at(0).description;
     this.vehicleEntry.color = vehicleValue.color.at(0).color;

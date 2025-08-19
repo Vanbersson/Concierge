@@ -12,6 +12,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
+
 @RestController
 @RequestMapping("/auth")
 public class AutheticationController {
@@ -25,14 +26,11 @@ public class AutheticationController {
     @Autowired
     private IUserRepository repository;
 
-     @PostMapping("/login")
+    @PostMapping("/login")
     public ResponseEntity<Object> login(@RequestBody AuthenticationDto data) {
-
         var userNamePassword = new UsernamePasswordAuthenticationToken(data.email(), data.password());
         var auth = this.authenticationManager.authenticate(userNamePassword);
-
         var token = tokenService.generateToken((User) auth.getPrincipal());
-
         User user = this.repository.loginEmail(data.email());
 
         //Last Session
@@ -40,7 +38,6 @@ public class AutheticationController {
 
         this.repository.save(user);
         Map<String, Object> map = new HashMap<>();
-
         map.put("companyId", user.getCompanyId());
         map.put("resaleId", user.getResaleId());
         map.put("id", user.getId());
@@ -54,7 +51,6 @@ public class AutheticationController {
         } else {
             map.put("photo", user.getPhoto());
         }
-
         return ResponseEntity.status(HttpStatus.OK).body(map);
     }
 

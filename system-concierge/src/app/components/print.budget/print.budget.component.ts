@@ -1,7 +1,5 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HttpResponse } from '@angular/common/http';
-
 //Print
 import printJS from 'print-js';
 import { Budget } from '../../models/budget/budget';
@@ -11,9 +9,6 @@ import { BudgetRequisition } from '../../models/budget/budget-requisition';
 import { BudgetServiceItem } from '../../models/budget/budget-item-service';
 import { BudgetItem } from '../../models/budget/budget-item';
 import { ClientFisJurEnum } from '../../models/clientcompany/client-fisjur-enum';
-
-//Service
-
 
 @Component({
   selector: 'app-printbudget',
@@ -53,9 +48,7 @@ export class PrintBudgetComponent {
     return CPF;
   }
    formatNumberBudget(id: number): string {
-
     var code = "";
-
     if (id.toString().length == 1) {
       code = "00000" + id;
     } else if (id.toString().length == 2) {

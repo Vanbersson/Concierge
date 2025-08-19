@@ -47,9 +47,9 @@ import { PurchaseOrderItemService } from '../../../services/purchase/purchase-or
   selector: 'app-purchase.order',
   standalone: true,
   imports: [CommonModule, PrintPurchaseComponent, FilterClientComponent, FilterPartsComponent, InputTextareaModule,
-    ToastModule, ButtonModule, TableModule, InputTextModule, IconFieldModule, 
-    InputIconModule, DialogModule,DividerModule,
-    ReactiveFormsModule, FormsModule, InputGroupModule, InputNumberModule, 
+    ToastModule, ButtonModule, TableModule, InputTextModule, IconFieldModule,
+    InputIconModule, DialogModule, DividerModule,
+    ReactiveFormsModule, FormsModule, InputGroupModule, InputNumberModule,
     MultiSelectModule, InputMaskModule, TagModule, ConfirmDialogModule,
     CalendarModule],
   templateUrl: './purchase.order.component.html',
@@ -86,7 +86,7 @@ export default class PurchaseOrderComponent implements OnInit, DoCheck {
 
   formPurchase = new FormGroup({
     dateDelivery: new FormControl<Date | string>("", Validators.required),
-    responsible: new FormControl<User[]>([], Validators.required),
+    responsibleName: new FormControl<string>(this.storageService.name, Validators.required),
     clientCompanyId: new FormControl<number | null>(null),
     clientCompanyName: new FormControl<string>(""),
     attendantName: new FormControl<string>(''),
@@ -118,7 +118,7 @@ export default class PurchaseOrderComponent implements OnInit, DoCheck {
   @ViewChild('printComponent') printComponent!: PrintPurchaseComponent;
 
   constructor(
-     private primeNGConfig: PrimeNGConfig,
+    private primeNGConfig: PrimeNGConfig,
     private busyService: BusyService,
     private storageService: StorageService,
     private messageService: MessageService,
@@ -130,7 +130,7 @@ export default class PurchaseOrderComponent implements OnInit, DoCheck {
   ) { }
 
   ngOnInit(): void {
-     this.primeNGConfig.setTranslation({
+    this.primeNGConfig.setTranslation({
       accept: 'Accept',
       reject: 'Cancel',
       firstDayOfWeek: 0,
@@ -203,24 +203,20 @@ export default class PurchaseOrderComponent implements OnInit, DoCheck {
   private clientdisable() {
     this.formPurchase.get('clientCompanyId').disable();
     this.formPurchase.get('clientCompanyName').disable();
-
   }
-
   //Save
   async saveNew() {
     const { value, valid } = this.formPurchase;
-
     if (valid) {
       this.busyService.busy();
-
       this.purchaseOrder = new PurchaseOrder();
       this.purchaseOrder.companyId = this.storageService.companyId;
       this.purchaseOrder.resaleId = this.storageService.resaleId;
       this.purchaseOrder.status = "Open_Purchase_Order";
       this.purchaseOrder.dateGeneration = this.formatDateTime(new Date());
       this.purchaseOrder.dateDelivery = this.formatDateTime(new Date(value.dateDelivery));
-      this.purchaseOrder.responsibleId = value.responsible.at(0).id;
-      this.purchaseOrder.responsibleName = value.responsible.at(0).name;
+      this.purchaseOrder.responsibleId = this.storageService.id;
+      this.purchaseOrder.responsibleName = this.storageService.name;
       this.purchaseOrder.paymentType = value.paymentType;
       this.purchaseOrder.clientCompanyId = this.selectClientCompany().id;
       this.purchaseOrder.clientCompanyName = this.selectClientCompany().name;
@@ -251,16 +247,13 @@ export default class PurchaseOrderComponent implements OnInit, DoCheck {
   async saveUpdate() {
     this.clientEnable();
     const { value, valid } = this.formPurchase;
-
     const nf = this.formNF.value;
-
     if (valid) {
       this.busyService.busy();
-
       this.purchaseOrder.dateGeneration = this.formatDateTime(new Date(this.purchaseOrder.dateGeneration))
       this.purchaseOrder.dateDelivery = this.formatDateTime(new Date(value.dateDelivery));
-      this.purchaseOrder.responsibleId = value.responsible.at(0).id;
-      this.purchaseOrder.responsibleName = value.responsible.at(0).name;
+      this.purchaseOrder.responsibleId = this.storageService.id;
+      this.purchaseOrder.responsibleName = this.storageService.name;
       this.purchaseOrder.paymentType = value.paymentType;
       this.purchaseOrder.clientCompanyId = value.clientCompanyId;
       this.purchaseOrder.clientCompanyName = value.clientCompanyName;
@@ -280,7 +273,6 @@ export default class PurchaseOrderComponent implements OnInit, DoCheck {
       if (resultPu.status == 200) {
         this.messageService.add({ severity: 'success', summary: 'Pedido de Compra', detail: 'Salvo com sucesso', icon: 'pi pi-check' });
       }
-
       this.busyService.idle();
     }
     this.clientdisable();
@@ -312,8 +304,8 @@ export default class PurchaseOrderComponent implements OnInit, DoCheck {
           this.purchaseOrder.dateGeneration = this.formatDateTime(new Date(this.purchaseOrder.dateGeneration))
           this.purchaseOrder.dateDelivery = this.formatDateTime(new Date(value.dateDelivery));
           this.purchaseOrder.dateReceived = this.formatDateTime(new Date(dateReceived.dateClose));
-          this.purchaseOrder.responsibleId = value.responsible.at(0).id;
-          this.purchaseOrder.responsibleName = value.responsible.at(0).name;
+          this.purchaseOrder.responsibleId = this.storageService.id;
+          this.purchaseOrder.responsibleName = this.storageService.name;
           this.purchaseOrder.paymentType = value.paymentType;
           this.purchaseOrder.clientCompanyId = value.clientCompanyId;
           this.purchaseOrder.clientCompanyName = value.clientCompanyName;
@@ -426,7 +418,6 @@ export default class PurchaseOrderComponent implements OnInit, DoCheck {
   cleanForm() {
     this.formPurchase.patchValue({
       dateDelivery: null,
-      responsible: [],
       clientCompanyId: null,
       clientCompanyName: "",
       attendantName: "",
@@ -440,7 +431,7 @@ export default class PurchaseOrderComponent implements OnInit, DoCheck {
       nfNumSerie: "",
       nfDate: "",
       nfKey: "",
-      information:""
+      information: ""
     });
     this.numPurchaseOrder.set(null);
     this.selectClientCompany.set(new ClientCompany());
@@ -476,7 +467,7 @@ export default class PurchaseOrderComponent implements OnInit, DoCheck {
       for (var user of this.responsable) {
         if (user.id == this.purchaseOrder.responsibleId) {
           this.formPurchase.patchValue({
-            responsible: [user]
+            // responsible: [user]
           });
         }
       }

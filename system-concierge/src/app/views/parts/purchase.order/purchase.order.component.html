@@ -19,8 +19,7 @@
                         <i class="pi pi-search"></i>
                     </p-inputIcon>
                     <input pInputText type="text"
-                        (input)="tableFilter.filterGlobal($any($event.target).value, 'contains')"
-                        placeholder="Pesquisar" />
+                        (input)="tableFilter.filterGlobal($any($event.target).value, 'contains')" placeholder="Pesquisar" />
                 </p-iconField>
             </div>
         </ng-template>
@@ -53,10 +52,8 @@
                 <td><span class="text-500">{{purchase.responsibleName | uppercase}}</span></td>
                 <td><p-tag [value]="purchase.status" [severity]="getStatusSeverity(purchase.status)" /></td>
                 <td class="flex gap-2">
-                    <p-button icon="pi pi-pencil" [text]="true" size="small" label="Editar"
-                        (onClick)="edit(purchase.id)" />
-                    <p-button icon="pi pi-print" (onClick)="print(purchase.id)" label="Imprimir" severity="secondary"
-                        [text]="true" size="small"></p-button>
+                    <p-button icon="pi pi-pencil" [text]="true" size="small" label="Editar" (onClick)="edit(purchase.id)" />
+                    <p-button icon="pi pi-print" (onClick)="print(purchase.id)" label="Imprimir" severity="secondary" [text]="true" size="small"></p-button>
                 </td>
             </tr>
         </ng-template>
@@ -67,22 +64,21 @@
     [style]="{ width: '80rem', height:'70rem' }" [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }">
     <form [formGroup]="formPurchase">
         <div class="p-fluid p-formgrid grid">
-            <div class="col-12 flex justify-content-between">
+            <div class="col-12 flex gap-2">
                 <div class="field flex align-items-center gap-2 ">
-                    <span>{{"Número do pedido:"}}</span>
+                    <span>{{"Nº Pedido:"}}</span>
                     <span class="text-xl font-bold">{{numPurchaseOrder()}}</span>
                 </div>
-                @if (nfNum()) {
-                <div class="field flex align-items-center gap-2 ">
-                    <span>{{"Nota:"}}</span>
+                <div *ngIf="nfNum()" class="field flex align-items-center gap-2 ">
+                    <span>{{"Nº Nota:"}}</span>
                     <span class="text-xl font-bold">{{nfNum()}}</span>
                 </div>
-                }
             </div>
             <div class="field col-12 md:col-3">
                 <label for="purchaseOrderId">Responsável</label>
-                <p-multiSelect [options]="responsable" optionLabel="name" [selectionLimit]="1" placeholder="Selecione" formControlName="responsible" />
-                <small class="p-error block" *ngIf="formPurchase.get('responsible')?.invalid">Campo obrigatório</small>
+                <div class="layout-input-disabled">
+                    <span class="text-500 font-medium"><strong>{{formPurchase.get('responsibleName').value}}</strong></span>
+                </div>
             </div>
             <div class="field col-12 md:col-3">
                 <label for="paymentId">Forma de pagamento</label>
@@ -141,7 +137,6 @@
                 <label for="attendantPhoneId">Informações</label>
                 <textarea rows="4" cols="30" pInputTextarea formControlName="information"></textarea>
             </div>
-
             <div class="flex w-full justify-content-between mb-2">
                 <div class="flex gap-2">
                     <p-button type="button" icon="pi pi-plus"  [raised]="true" label="Gerar pedido" severity="success-custom" size="small" [disabled]="numPurchaseOrder()" (onClick)="saveNew()" />
@@ -149,16 +144,27 @@
                     <p-button type="button" icon="pi pi-bookmark"  [raised]="true" label="Nota fiscal" severity="secondary-custom" size="small" [disabled]="!numPurchaseOrder()" (onClick)="showDialogNF()" />
                     <p-divider layout="vertical" />
                     <p-button type="button" icon="pi pi-times"  [raised]="true" label="Fechar pedido" severity="secondary-custom" size="small" [disabled]="!nfNum()" (onClick)="showDialogDateclose()" />
+                     <p-divider layout="vertical" />
+                    <p-button type="button" icon="pi pi-print"  [raised]="true" label="Imprimir" severity="secondary-custom" size="small" [disabled]="purchaseOrderItems.length <= 0" (onClick)="print(numPurchaseOrder())" />
                 </div>
-                <app-filterparts *ngIf="numPurchaseOrder()" (outputPart)="selectPart.set($event)" />
             </div>
         </div>
     </form>
     <div style="height: 312px;">
-        <p-table #tableFilter dataKey="id" [value]="purchaseOrderItems"  editMode="row" 
+        <p-table #tableFilter2 dataKey="id" [value]="purchaseOrderItems" editMode="row" 
             [globalFilterFields]="['partCode', 'partDescription']" 
-            [scrollable]="true" scrollHeight="300px" 
-            styleClass="p-datatable-sm">
+            [scrollable]="true" scrollHeight="300px" styleClass="p-datatable-sm">
+             <ng-template pTemplate="caption">
+            <div class="flex justify-content-between  ">
+                <p-iconField iconPosition="left">
+                    <p-inputIcon>
+                        <i class="pi pi-search"></i>
+                    </p-inputIcon>
+                    <input pInputText type="text" (input)="tableFilter2.filterGlobal($any($event.target).value, 'contains')" placeholder="Pesquisar" />
+                </p-iconField>
+                <app-filterparts *ngIf="numPurchaseOrder()" (outputPart)="selectPart.set($event)" />
+            </div>
+        </ng-template>
             <ng-template pTemplate="header">
                 <tr>
                     <th pSortableColumn="partCode" style="width:10%;font-weight: 400;">Código<p-sortIcon field="partCode"/></th>

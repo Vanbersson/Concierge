@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, ViewChild } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormControl, FormsModule, FormGroup, ReactiveFormsModule, Validators, FormBuilder } from '@angular/forms';
 //PrimeNG
@@ -41,6 +41,7 @@ import { ToolControlRequest } from '../../../../models/workshop/toolcontrol/tool
 import { ToolcontrolReportService } from '../../../../services/workshop/tool-control/tool-control-report.service';
 import { ToolControlReport } from '../../../../models/workshop/report/tool-control-report';
 import { BusyService } from '../../../../components/loading/busy.service';
+import { PrintEpiComponent } from '../../../../components/print.epi/print.epi.component';
 
 enum StatusRequest {
   OPEN = "Open", DELIVERY = "Delivered", COMPLETE = "Complete"
@@ -84,7 +85,7 @@ class MatItem {
   standalone: true,
   imports: [CommonModule, ButtonModule, TableModule, InputTextModule, InputNumberModule, MultiSelectModule, DividerModule, CheckboxModule,
     IconFieldModule, InputMaskModule, InputGroupModule, InputIconModule, DialogModule, ReactiveFormsModule, FormsModule, PasswordModule, RadioButtonModule,
-    ConfirmDialogModule, ToastModule, InputTextareaModule, CalendarModule],
+    ConfirmDialogModule, ToastModule, InputTextareaModule, CalendarModule, PrintEpiComponent],
   templateUrl: './pegar-devolver.component.html',
   styleUrl: './pegar-devolver.component.scss',
   providers: [ConfirmationService, MessageService]
@@ -156,6 +157,8 @@ export default class PegarDevolverComponent implements OnInit {
     requestCategoryType: new FormControl<string>(""),
     requestMechanicName: new FormControl<string>(""),
   });
+
+  @ViewChild('printEPIComponent') printEPIComponent!: PrintEpiComponent;
 
   constructor(
     private busyService: BusyService,
@@ -779,7 +782,7 @@ export default class PegarDevolverComponent implements OnInit {
     if (resultRequest.status == 200) {
       this.formDetailsRequest.patchValue({
         requestId: requesId,
-        requestStatus: resultRequest.body.status == StatusRequest.DELIVERY? "Entregue":"Encerrado",
+        requestStatus: resultRequest.body.status == StatusRequest.DELIVERY ? "Entregue" : "Encerrado",
         requestType: "Empréstimo",
         requestDate: new Date(resultRequest.body.requestDate),
         requestUserId: resultRequest.body.requestUserId,
@@ -799,6 +802,26 @@ export default class PegarDevolverComponent implements OnInit {
     this.visibleDialogDetailsRequest = false;
   }
 
-  get
+  //print EPI
+
+  printEPI() {
+
+
+    var listPrint: ToolControlMatMec[] = [];
+    const req: ToolControlRequest = new ToolControlRequest();
+
+    for (var item of this.listMaterialDetailsRequest) {
+      const catId = this.listMat.find(mat => mat.id == item.materialId).categoryId;
+      const catType = this.listCat.find(cat => cat.id == catId).type;
+
+      if (catType == TypeCategory.EPI) {
+        listPrint.push(item);
+      }
+    }
+
+
+
+    this.printEPIComponent.print(req, listPrint);
+  }
 
 }

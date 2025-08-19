@@ -1,4 +1,4 @@
-<p-button label="Peças" (onClick)="showDialogParts()" severity="warning" icon="pi pi-filter"/>
+<p-button label="Peças" text="true" (onClick)="showDialogParts()" severity="warning" icon="pi pi-filter"/>
 
 <p-dialog [(visible)]="visibleParts" header="Peças" [modal]="true" [draggable]="false" [resizable]="false"
     [style]="{ width: '70rem',height:'70rem'}" [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }">

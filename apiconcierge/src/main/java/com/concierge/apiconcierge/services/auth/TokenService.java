@@ -37,7 +37,6 @@ public class TokenService {
         }
     }
 
-
     public String validToken(String token) {
         try {
             Algorithm algorithm = Algorithm.HMAC256(secretKey);
