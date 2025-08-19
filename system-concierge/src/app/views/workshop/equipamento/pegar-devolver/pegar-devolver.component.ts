@@ -795,7 +795,6 @@ export default class PegarDevolverComponent implements OnInit {
 
       this.visibleDialogDetailsRequest = true;
     }
-
     this.busyService.idle();
   }
   hideDialogDetails() {
@@ -803,13 +802,9 @@ export default class PegarDevolverComponent implements OnInit {
   }
 
   //print EPI
-
   printEPI() {
-
-
     var listPrint: ToolControlMatMec[] = [];
     const req: ToolControlRequest = new ToolControlRequest();
-
     for (var item of this.listMaterialDetailsRequest) {
       const catId = this.listMat.find(mat => mat.id == item.materialId).categoryId;
       const catType = this.listCat.find(cat => cat.id == catId).type;
@@ -818,9 +813,6 @@ export default class PegarDevolverComponent implements OnInit {
         listPrint.push(item);
       }
     }
-
-
-
     this.printEPIComponent.print(req, listPrint);
   }
 

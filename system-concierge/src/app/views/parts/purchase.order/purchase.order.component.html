@@ -5,6 +5,7 @@
         <span>Pedidos de compras</span>
         <div class="flex gap-2">
             <p-button icon="pi pi-plus" [text]="true" label="Novo pedido" (onClick)="newPurchaseOrder()" />
+            <p-divider layout="vertical" />
             <p-button icon="pi pi-refresh" [text]="true" label="Recarregar" (onClick)="listPurchaseOrders()" />
         </div>
     </div>
@@ -44,7 +45,6 @@
                 }@else {
                 <td></td>
                 }
-
                 <td><span class="text-500">{{ abreviaNome(purchase.clientCompanyName) | uppercase}}</span></td>
                 <td><span class="text-500">{{purchase.attendantName | uppercase}}</span></td>
                 <td><span class="text-500">{{purchase.dateGeneration | date: 'dd/MM/yyyy'}}</span></td>
@@ -75,7 +75,7 @@
                 </div>
             </div>
             <div class="field col-12 md:col-3">
-                <label for="purchaseOrderId">Responsável</label>
+                <label for="purchaseOrderId">Comprador</label>
                 <div class="layout-input-disabled">
                     <span class="text-500 font-medium"><strong>{{formPurchase.get('responsibleName').value}}</strong></span>
                 </div>
@@ -144,7 +144,7 @@
                     <p-button type="button" icon="pi pi-bookmark"  [raised]="true" label="Nota fiscal" severity="secondary-custom" size="small" [disabled]="!numPurchaseOrder()" (onClick)="showDialogNF()" />
                     <p-divider layout="vertical" />
                     <p-button type="button" icon="pi pi-times"  [raised]="true" label="Fechar pedido" severity="secondary-custom" size="small" [disabled]="!nfNum()" (onClick)="showDialogDateclose()" />
-                     <p-divider layout="vertical" />
+                    <p-divider layout="vertical" />
                     <p-button type="button" icon="pi pi-print"  [raised]="true" label="Imprimir" severity="secondary-custom" size="small" [disabled]="purchaseOrderItems.length <= 0" (onClick)="print(numPurchaseOrder())" />
                 </div>
             </div>
