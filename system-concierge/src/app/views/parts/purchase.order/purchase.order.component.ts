@@ -27,7 +27,6 @@ import { DividerModule } from 'primeng/divider';
 //Class
 import { PurchaseOrder } from '../../../models/purchase.order/puchase.order';
 import { ClientCompany } from '../../../models/clientcompany/client-company';
-import { User } from '../../../models/user/user';
 import { PurchaseOrderItem } from '../../../models/purchase.order/purchase.order.item';
 import { Part } from '../../../models/parts/Part';
 

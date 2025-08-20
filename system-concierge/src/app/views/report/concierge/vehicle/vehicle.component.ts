@@ -1,5 +1,5 @@
 import { CommonModule, DatePipe } from '@angular/common';
-import { Component, DoCheck, OnInit, signal } from '@angular/core';
+import { Component, DoCheck, OnInit, signal, ViewChild } from '@angular/core';
 import { FormGroup, FormControl, ReactiveFormsModule, FormsModule, Validators } from '@angular/forms'
 import { HttpResponse } from '@angular/common/http';
 import { lastValueFrom } from 'rxjs';
@@ -37,6 +37,7 @@ import { FilterClientComponent } from '../../../../components/filter.client/filt
 import { BusyService } from '../../../../components/loading/busy.service';
 import { StorageService } from '../../../../services/storage/storage.service';
 import { Router } from '@angular/router';
+import ManutencaoComponent from '../../../concierge/manutencao/manutencao.component';
 
 export interface IFilterVehicles {
   type: string;
@@ -59,7 +60,7 @@ export interface IFilterVehicles {
     InputTextModule, IconFieldModule, InputIconModule, TagModule,
     DialogModule, ReactiveFormsModule, FormsModule, InputNumberModule,
     CalendarModule, InputGroupModule, MultiSelectModule, ImageModule,
-    InputMaskModule, RadioButtonModule, CheckboxModule],
+    InputMaskModule, RadioButtonModule, CheckboxModule,ManutencaoComponent],
   templateUrl: './vehicle.component.html',
   styleUrl: './vehicle.component.scss',
   providers: [MessageService]
@@ -86,13 +87,17 @@ export default class VehicleComponent implements OnInit, DoCheck {
     frota: new FormControl<string>('')
   });
 
+  //Dialog details vehicles
+  dialogVisibleVehicleDetails: boolean = false;
+
+  @ViewChild('detailsVehicle') detailsVehicle!:ManutencaoComponent;
+
   constructor(
     private primeNGConfig: PrimeNGConfig,
     private reportService: VehicleReportService,
     private vehicleModelService: VehicleModelService,
     private busyService: BusyService,
-    private storageService: StorageService,
-    private router: Router) {
+    private storageService: StorageService) {
   }
   ngOnInit(): void {
     this.clientdisable();
@@ -144,7 +149,6 @@ export default class VehicleComponent implements OnInit, DoCheck {
     return datePipe.transform(date, "yyyy-MM-dd'T'HH:mm:ss.SSS") + timezone;
   }
   private preList(vehicle: VehicleEntry): VehicleEntry {
-
     //Format Date
     const datePipe = new DatePipe('pt-BR');
     vehicle.dateEntry = datePipe.transform(this.formatDateTime(new Date(vehicle.dateEntry)), 'dd/MM/yyyy HH:mm');
@@ -188,7 +192,6 @@ export default class VehicleComponent implements OnInit, DoCheck {
     return vehicle;
   }
   getSeverity(value: string): any {
-
     switch (value) {
       case 'Pendente Aprovação':
         return 'warning';
@@ -272,7 +275,11 @@ export default class VehicleComponent implements OnInit, DoCheck {
     }
   }
   showVeiculo(id: number) {
-    this.router.navigateByUrl('portaria/mannutencao-entrada-veiculo/' + id);
+    //Show dialog
+    this.dialogVisibleVehicleDetails = true;
+    //Details vehicle
+    this.detailsVehicle.showDetailsVehicle(id);
   }
+
 
 }

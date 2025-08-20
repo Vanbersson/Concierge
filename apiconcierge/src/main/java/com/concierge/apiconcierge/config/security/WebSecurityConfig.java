@@ -3,6 +3,7 @@ package com.concierge.apiconcierge.config.security;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -17,6 +18,8 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.List;
 
@@ -27,39 +30,22 @@ public class WebSecurityConfig {
     @Autowired
     SecurityFilter securityFilter;
 
-    /**
-     * CorsConfigurationSource - usado pelo .cors() do Spring Security
-     */
     @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration config = new CorsConfiguration();
+    public WebMvcConfigurer corsConfig() {
 
-        // Em dev: defina explicitamente sua origem do frontend.
-        // NÃO use "*" se setAllowCredentials(true).
-        config.setAllowedOrigins(List.of("http://localhost:4200"));
-        //config.setAllowedOrigins(List.of("https://www.atenatruck.com.br"));
-
-        // Métodos permitidos, incluir OPTIONS
-        config.setAllowedMethods(List.of("GET", "POST"));
-
-        // Headers permitidos (pode limitar se desejar)
-        config.setAllowedHeaders(List.of("*"));
-
-        // Se você precisa enviar credenciais (cookies/authorization via credentials)
-        config.setAllowCredentials(true);
-
-        config.setMaxAge(3600L);
-
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", config);
-        return source;
+        return new WebMvcConfigurer() {
+            public void addCorsMappings(CorsRegistry registry) {
+                registry.addMapping("/**")
+                        .allowedOrigins("*")
+                        .allowedMethods(HttpMethod.POST.name(), HttpMethod.GET.name())
+                        .allowedHeaders(HttpHeaders.CONTENT_TYPE, HttpHeaders.AUTHORIZATION);
+            }
+        };
     }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity
-                .cors() // <- importante: habilita CORS para Spring Security (usa o CorsConfigurationSource acima)
-                .and()
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize

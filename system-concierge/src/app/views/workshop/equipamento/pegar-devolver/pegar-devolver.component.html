@@ -91,7 +91,7 @@
                                         {{mat.matMecDelivInfor | uppercase}}
                                     </td>
                                     <td *ngIf="rowgroup" [attr.rowspan]="rowspan">
-                                        <p-button icon="pi pi-eye" label="Visualizar" [rounded]="true" [text]="true" severity="secondary" (onClick)="showDialogDetails(mat.requestId)"/>
+                                        <p-button icon="pi pi-eye" label="Visualizar" [text]="true" severity="secondary" (onClick)="showDialogDetails(mat.requestId)"/>
                                     </td> 
                                 </tr>
                             </ng-template>

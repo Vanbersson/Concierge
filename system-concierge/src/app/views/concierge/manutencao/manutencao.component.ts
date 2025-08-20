@@ -190,6 +190,9 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
 
   itemsButtonMenu: MenuItem[] = [];
 
+  //Details Vehicle
+  detailsVehicle: boolean = false;
+
   constructor(
     private primeNGConfig: PrimeNGConfig,
     private vehicleService: VehicleService,
@@ -207,6 +210,8 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
   ) {
   }
   ngOnInit(): void {
+     //Id vehicle entry
+    this.id = this.activatedRoute.snapshot.params['id'];
 
     this.primeNGConfig.setTranslation({
       accept: 'Accept',
@@ -240,9 +245,6 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
         label: 'Saída concluída'
       }
     ];
-
-    //Id vehicle entry
-    this.id = this.activatedRoute.snapshot.params['id'];
 
     this.init();
 
@@ -282,7 +284,96 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
         }
       }
     ];
+    console.log("teste")
 
+    this.disableInput();
+
+    //Prorietário
+    this.disableClientId();
+    this.disableClientName();
+    this.disableClientCnpj();
+    this.disableClientCpf();
+    this.disableClientRg();
+  }
+  //Details Vehicle
+  //mostra os detalhes da entrada do veículos chamar dentro de um dialog 
+  showDetailsVehicle(id: number) {
+    this.id = id;
+
+    this.detailsVehicle = true;
+
+    this.primeNGConfig.setTranslation({
+      accept: 'Accept',
+      reject: 'Cancel',
+      firstDayOfWeek: 0,
+      dayNames: ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"],
+      dayNamesShort: ["dom", "seg", "ter", "qua", "qui", "sex", "sáb"],
+      dayNamesMin: ["D", "S", "T", "Q", "Q", "S", "S"],
+      monthNames: ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"],
+      monthNamesShort: ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"],
+      today: 'Hoje',
+      clear: 'Limpar',
+      dateFormat: 'dd/mm/yy',
+      weekHeader: 'Sm'
+    });
+
+    this.itemsStatus = [
+      {
+        label: 'Atendimento',
+      },
+      {
+        label: 'Orçamento',
+      },
+      {
+        label: 'Serviço em execução',
+      },
+      {
+        label: 'Serviço concluído',
+      },
+      {
+        label: 'Saída concluída'
+      }
+    ];
+
+    this.init();
+
+    this.cores = [
+      { color: 'Branco' },
+      { color: 'Preto' },
+      { color: 'Azul' },
+      { color: 'Verde' },
+      { color: 'Cinza' },
+      { color: 'Vermelho' },
+      { color: 'Amarelo' },
+      { color: 'Rosa' },
+      { color: 'Roxo' },
+      { color: 'Outro' }
+    ];
+
+    this.itemsButtonMenu = [
+      {
+        icon: 'pi pi-thumbs-up',
+        tooltipOptions: { tooltipLabel: 'Autorizar Saída' },
+        command: () => {
+          this.authExit();
+        }
+      },
+      {
+        icon: 'pi pi-file',
+        tooltipOptions: { tooltipLabel: 'Orçamento' },
+        command: () => {
+          this.confirmGerarOrcamento();
+        }
+      },
+      {
+        icon: 'pi pi-upload',
+        tooltipOptions: { tooltipLabel: 'Salvar' },
+        command: () => {
+          this.save();
+        }
+      }
+    ];
+   
     this.disableInput();
 
     //Prorietário
@@ -333,7 +424,7 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
       this.loadForms();
     } else {
       setTimeout(() => {
-        this.router.navigateByUrl("/portaria/lista-entrada-veiculo");
+        // this.router.navigateByUrl("/portaria/lista-entrada-veiculo");
       }, 2000)
     }
 

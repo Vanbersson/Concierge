@@ -21,6 +21,16 @@
     border-radius: $borderRadius;
 }
 
+.layout-card-dialog {
+    min-height: calc(100vh - 15rem);
+    width: 100%;
+    background: var(--surface-card);
+    border: 1px solid var(--surface-border);
+    padding: 1rem;
+    box-shadow: var(--card-shadow);
+    border-radius: $borderRadius;
+}
+
 .p-toast {
 
     &.p-toast-top-right,

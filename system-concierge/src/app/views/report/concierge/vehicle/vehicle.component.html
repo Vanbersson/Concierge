@@ -80,14 +80,14 @@
                 </td>
                 <td><p-tag [value]="vehicle.budgetStatus" [severity]="getSeverity(vehicle.budgetStatus)"></p-tag></td>
                 <td>
-                    <p-button icon="pi pi-eye" severity="success" [text]="true" size="small"  (onClick)="showVeiculo(vehicle.id)"/>
+                    <p-button icon="pi pi-eye" label="Visualizar" [text]="true" severity="secondary" (onClick)="showVeiculo(vehicle.id)"/>
                 </td>
             </tr>
         </ng-template>
     </p-table>
 </div>
 
-<p-dialog [(visible)]="dialogVisible" header="Filtro" [modal]="true" [style]="{ width: '70rem',height:'60rem' }"
+<p-dialog [(visible)]="dialogVisible" header="Filtro" [modal]="true" [style]="{ width: '70rem',height:'55rem' }"
     [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }" [maximizable]="true">
     <form [formGroup]="formFilter">
         <div class="p-fluid p-formgrid grid">
@@ -199,4 +199,8 @@
             <button pButton type="button" pRipple label="Pesquisar" icon="pi pi-search" class="p-button-text" (click)="searchFilter()"></button>
         </div>
     </form>
+</p-dialog>
+
+<p-dialog [(visible)]="dialogVisibleVehicleDetails" [modal]="true" [style]="{ width: '110rem',height:'60rem' }">
+    <app-manutencao #detailsVehicle/>
 </p-dialog>
