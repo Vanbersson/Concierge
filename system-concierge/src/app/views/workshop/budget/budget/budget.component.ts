@@ -303,12 +303,12 @@ export default class BudgetComponent implements OnInit, OnDestroy, DoCheck {
       this.listPayment = data;
     });
   }
-  private getPayment(desc: string): TypePayment{
+  private getPayment(desc: string): TypePayment {
 
-    for(var pay of this.listPayment ){
-        if(desc == pay.description){
-          return pay;
-        }
+    for (var pay of this.listPayment) {
+      if (desc == pay.description) {
+        return pay;
+      }
     }
     return null;
   }
@@ -890,20 +890,13 @@ export default class BudgetComponent implements OnInit, OnDestroy, DoCheck {
       description: ''
     });
   }
-
   //Service
   private async getListBudgetSetvice(): Promise<BudgetServiceItem[]> {
-
     try {
       return await lastValueFrom(this.budgetService.getBudgetService(this.budget.id));
     } catch (error) {
       return [];
     }
-
-    /* this.budgetService.getBudgetService(this.budget.id).subscribe(data => {
-      this.listBudgetService = data;
-      this.somaService();
-    }); */
   }
   async saveBudgetService() {
     if (this.verifyStatusBudget() == StatusBudget.close) {
@@ -925,7 +918,10 @@ export default class BudgetComponent implements OnInit, OnDestroy, DoCheck {
     this.budgetServiceItem.discount = value.discount;
 
     const resultValid = this.validInputService();
-    if (resultValid == false) return;
+    if (resultValid == false) {
+      this.budgetServiceItem = null;
+      return;
+    }
 
     //Verifica se o desconto é permitido
     if (this.budgetServiceItem.discount > 0) {
@@ -1030,7 +1026,6 @@ export default class BudgetComponent implements OnInit, OnDestroy, DoCheck {
     return true;
   }
   calcDiscountUpdateService(service: BudgetServiceItem): boolean {
-
     var tempTotal = service.price * service.hourService;
     var tempTotalDiscount = service.discount;
     for (var item of this.listBudgetService) {
@@ -1039,11 +1034,9 @@ export default class BudgetComponent implements OnInit, OnDestroy, DoCheck {
         tempTotalDiscount += item.discount;
       }
     }
-
     if (tempTotalDiscount == 0) return true;
 
     const totalLimit = (tempTotal * this.storageService.limitDiscount) / 100;
-
     if (tempTotalDiscount > totalLimit) {
       this.messageService.add({ severity: 'error', summary: 'Desconto', detail: 'Maior que o permitido', icon: 'pi pi-times' });
       return false;

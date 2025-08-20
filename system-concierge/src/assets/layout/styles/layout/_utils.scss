@@ -61,9 +61,13 @@
 }
 
 /* PrimeNG */
- .p-button-label {
+.p-button-label {
     font-weight: 400;
-} 
+}
+
+.p-button.p-button-icon-only {
+    padding: 0.5rem 0;
+}
 
 .p-inputtext {
     padding: 0.5rem 0.75rem;

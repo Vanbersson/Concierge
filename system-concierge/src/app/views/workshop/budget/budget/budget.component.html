@@ -15,7 +15,7 @@
         <div class="card">
             <div class="grid p-fluid p-formgrid">
                 <div class="col-12 md:col-2">
-                    <span class="text-500">Nrº Orçamento</span>
+                    <span class="text-500">Nº Orçamento</span>
                     <div class="layout-input-disabled">
                         <span class="text-500 font-medium "><strong>{{budget.id}}</strong></span>
                     </div>
@@ -47,7 +47,7 @@
                     <span class="text-500">Consultor</span>
                     <div class="layout-input-disabled">
                         <span class="text-500 font-medium ">
-                            <strong>{{this.vehicleEntry.nameUserAttendant}}</strong>
+                            <strong>{{this.vehicleEntry.nameUserAttendant | uppercase}}</strong>
                         </span>
                     </div>
                 </div>
@@ -88,7 +88,7 @@
                 <div class="col-12 md:col-4">
                     <span class="text-500">Contato/Nome</span>
                     <div class="layout-input-disabled">
-                        <span class="text-500 font-medium"><strong>{{clientCompany.contactName}}</strong></span>
+                        <span class="text-500 font-medium"><strong>{{clientCompany.contactName | uppercase}}</strong></span>
                     </div>
                 </div>
                 <div class="col-12 md:col-4">
@@ -154,7 +154,7 @@
                         </div>
                     </div>
                     <div class="col-12 md:col-1">
-                        <span class="text-500">Nrº</span>
+                        <span class="text-500">Nº</span>
                         <div class="layout-input-disabled">
                             <span class="text-500 font-medium">
                                 <strong>{{clientCompany.addressNumber| uppercase}}</strong>
@@ -224,34 +224,27 @@
 
                         <div class="col-12 md:col-6 lg:col-6 xl:col-6">
                             <span>Forma de pagamento</span>
-                            <p-multiSelect [options]="listPayment" optionLabel="description" display="chip" [showClear]="true"
-                                [selectionLimit]="1" placeholder="Selecione" formControlName="typePayment" />
+                            <p-multiSelect [options]="listPayment" optionLabel="description" [showClear]="true" [selectionLimit]="1" placeholder="Selecione" formControlName="typePayment" />
                         </div>
                         <!-- show in mobile -->
                         <div class="mobile-anabled col-12">
-                            <button pButton type="button" label="Fazer Orçamento" size="large" [raised]="true"
-                                severity="warning" (click)="showDialogBudget()"></button>
+                            <button pButton type="button" label="Fazer Orçamento" size="large" [raised]="true"  severity="warning" (click)="showDialogBudget()"></button>
                         </div>
                         <div class="col-12 md:col-6 lg:col-6 xl:col-6 flex flex-column">
                             <span class="text-500">Total Orçamento</span>
                             <span class="text-900 font-medium text-4xl">
-                                <strong>{{
-                                    (totalBudgetService() + totalBudgetParts()) - (totalBudgetDiscountService() +
-                                    totalBudgetDiscountParts()) | currency
-                                    }} </strong>
+                                <strong>{{ (totalBudgetService() + totalBudgetParts()) - (totalBudgetDiscountService() + totalBudgetDiscountParts()) | currency }} </strong>
                             </span>
                         </div>
 
                         <div class="mobile-disabled col-12 md:col-6 lg:col-6 xl:col-6 flex ">
-                            <button pButton type="button" label="Fazer Orçamento" size="large" [raised]="true"
-                                severity="warning" (click)="showDialogBudget()"></button>
+                            <button pButton type="button" label="Fazer Orçamento" size="large" [raised]="true" severity="warning" (click)="showDialogBudget()"></button>
                         </div>
 
                         <div class="col-12 md:col-6 lg:col-6 xl:col-6 flex flex-column">
                             <span class="text-500">Total Desconto</span>
                             <span class="text-900 font-medium text-4xl">
-                                <strong>{{(totalBudgetDiscountService() + totalBudgetDiscountParts()) |
-                                    currency}}</strong>
+                                <strong>{{(totalBudgetDiscountService() + totalBudgetDiscountParts()) | currency}}</strong>
                             </span>
                         </div>
 
@@ -401,7 +394,7 @@
                     <ng-template pTemplate="body" let-requi>
                         <tr>
                             <td>{{requi.ordem}}</td>
-                            <td>{{requi.description}}</td>
+                            <td>{{requi.description | uppercase}}</td>
                             <td>
                                 <p-button icon="pi pi-pencil" [text]="true" size="small" severity="primary"
                                     (onClick)="editarBudgetRequisition(requi)"></p-button>
@@ -422,8 +415,7 @@
                         <div class="field col-12 md:col-6">
                             <label for="idbudgetDescService">Descrição do serviço</label>
                             <input pInputText id="idbudgetDescService" type="text" formControlName="description" />
-                            <small class="p-error block" *ngIf="formBudgetService.get('description')?.invalid">
-                                Campo obrigatório</small>
+                            <small class="p-error block" *ngIf="formBudgetService.get('description')?.invalid">Campo obrigatório</small>
                         </div>
                         <div class="field col-12 md:col-2">
                             <label for="Quantidade">Tempo serviço</label>
@@ -433,37 +425,29 @@
                                 incrementButtonClass="p-button-outlined p-button-success"
                                 incrementButtonIcon="pi pi-plus" decrementButtonIcon="pi pi-minus"
                                 formControlName="hourService" />
-                            <small class="p-error block" *ngIf="formBudgetService.get('hourService')?.invalid">
-                                Campo obrigatório</small>
+                            <small class="p-error block" *ngIf="formBudgetService.get('hourService')?.invalid">Campo obrigatório</small>
                         </div>
                         <div class="field col-12 md:col-2">
                             <label for="valor">Valor hora</label>
-                            <p-inputNumber mode="decimal" inputId="currency-br" locale="pt-BR" [minFractionDigits]="2"
-                                formControlName="price" />
-                            <small class="p-error block" *ngIf="formBudgetService.get('price')?.invalid">
-                                Campo obrigatório</small>
+                            <p-inputNumber mode="decimal" inputId="currency-br" locale="pt-BR" [minFractionDigits]="2" formControlName="price" />
+                            <small class="p-error block" *ngIf="formBudgetService.get('price')?.invalid">Campo obrigatório</small>
                         </div>
                         <div class="field col-12 md:col-2">
                             <label for="Quantidade">Desconto</label>
                             <p-inputGroup>
-                                <p-inputNumber mode="decimal" inputId="currency-br" locale="pt-BR"
-                                    [minFractionDigits]="2" formControlName="discount" />
+                                <p-inputNumber mode="decimal" inputId="currency-br" locale="pt-BR" [minFractionDigits]="2" formControlName="discount" />
                                 @if(!budgetServiceItem){
-                                <button *ngIf="!budgetServiceItem" pButton type="button" icon="pi pi-plus"
-                                    class="p-button-primary" (click)="saveBudgetService()"></button>
+                                    <button *ngIf="!budgetServiceItem" pButton type="button" icon="pi pi-plus" class="p-button-primary" (click)="saveBudgetService()"></button>
                                 }@else {
-                                <button pButton type="button" icon="pi pi-check" class="p-button-primary"
-                                    (click)="updateBudgetService()"></button>
-                                <button pButton type="button" icon="pi pi-times" class="p-button-danger"
-                                    (click)="cleanBudgetService()"></button>
+                                    <button pButton type="button" icon="pi pi-check" class="p-button-primary" (click)="updateBudgetService()"></button>
+                                    <button pButton type="button" icon="pi pi-times" class="p-button-danger" (click)="cleanBudgetService()"></button>
                                 }
                             </p-inputGroup>
                         </div>
 
                     </div>
                 </form>
-                <p-table [value]="listBudgetService" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 25, 50]"
-                    styleClass="p-datatable-sm" [scrollable]="true" scrollHeight="30rem">
+                <p-table [value]="listBudgetService" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 25, 50]" styleClass="p-datatable-sm" [scrollable]="true" scrollHeight="30rem">
                     <ng-template pTemplate="header">
                         <tr>
                             <th class="font-normal" style="width: 5rem;">Ordem</th>
@@ -486,12 +470,10 @@
                             <td>
                                 {{ (service.price * service.hourService )-service.discount | currency }}</td>
                             <td>
-                                <p-button icon="pi pi-pencil" [text]="true" size="small" severity="primary"
-                                    (onClick)="editarBudgetService(service)"></p-button>
+                                <p-button icon="pi pi-pencil" [text]="true" size="small" severity="primary" (onClick)="editarBudgetService(service)"></p-button>
                             </td>
                             <td>
-                                <p-button icon="pi pi-trash" [text]="true" size="small" severity="danger"
-                                    (onClick)="removerBudgetService(service)"></p-button>
+                                <p-button icon="pi pi-trash" [text]="true" size="small" severity="danger" (onClick)="removerBudgetService(service)"></p-button>
                             </td>
                         </tr>
                     </ng-template>
