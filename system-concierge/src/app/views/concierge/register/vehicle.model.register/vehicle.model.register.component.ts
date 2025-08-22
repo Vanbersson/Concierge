@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, Validators, FormGroup, FormControl } from '@angular/forms';
 import { HttpResponse } from '@angular/common/http';
 import { lastValueFrom } from 'rxjs';
-
 //primeNG
 import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
@@ -15,11 +14,11 @@ import { IconFieldModule } from 'primeng/iconfield';
 import { InputTextModule } from 'primeng/inputtext';
 import { InputIconModule } from 'primeng/inputicon';
 import { RadioButtonModule } from 'primeng/radiobutton';
-
 //Service
 import { StorageService } from '../../../../services/storage/storage.service';
 import { VehicleModelService } from '../../../../services/vehicle-model/vehicle-model.service';
 import { NgxImageCompressService } from 'ngx-image-compress';
+import { BusyService } from '../../../../components/loading/busy.service';
 //Class
 import { ModelVehicle } from '../../../../models/vehicle-model/model-vehicle';
 //Enum
@@ -42,10 +41,8 @@ export default class VehicleModelRegisterComponent implements OnInit {
 
   enabled = StatusEnabledDisabled.enabled;
   disabled = StatusEnabledDisabled.disabled;
-
   modelVehicles: ModelVehicle[] = [];
   modelVehicle: ModelVehicle;
-
   dialogVisible: boolean = false;
   photoModel: string = "";
 
@@ -59,14 +56,22 @@ export default class VehicleModelRegisterComponent implements OnInit {
     private vehicleModelService: VehicleModelService,
     private storageService: StorageService,
     private messageService: MessageService,
-    private ngxImageCompressService: NgxImageCompressService) { }
+    private ngxImageCompressService: NgxImageCompressService,
+    private busyService: BusyService) { }
 
   ngOnInit(): void {
     this.listaModel();
   }
   private listaModel() {
+    //Inicia load
+    this.busyService.busy();
     this.vehicleModelService.listAll().subscribe((data) => {
       this.modelVehicles = data;
+      //Fecha load
+      this.busyService.idle();
+    }, error => {
+      //Fecha load
+      this.busyService.idle();
     });
   }
   hideDialog() {
@@ -117,11 +122,11 @@ export default class VehicleModelRegisterComponent implements OnInit {
   }
   async saveMod() {
     const { valid, value } = this.formModel;
-
     if (!valid) {
       return;
     }
-
+    //Fecha load
+    this.busyService.busy();
     if (this.modelVehicle == null) {
       //Save
       this.modelVehicle = new ModelVehicle();
@@ -149,6 +154,8 @@ export default class VehicleModelRegisterComponent implements OnInit {
         this.listaModel();
       }
     }
+    //Fecha load
+    this.busyService.idle();
   }
   private async saveModel(mod: ModelVehicle): Promise<HttpResponse<ModelVehicle>> {
     try {
