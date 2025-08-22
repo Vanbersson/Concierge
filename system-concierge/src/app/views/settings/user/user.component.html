@@ -3,121 +3,110 @@
     <p-toast />
     <div class="layout-card-title">
         <span>Usuários</span>
-
-        <div class="flex gap-2">
-            <p-button icon="pi pi-plus" label="Usuário" [outlined]="true" (onClick)="showDialogSave()"></p-button>
+        <div class="flex">
+            <p-button icon="pi pi-plus" label="Usuário" [text]="true" (onClick)="showDialogSave()"/>
+            <p-divider layout="vertical" />
+            <p-button icon="pi pi-refresh" label="Recarregar" [text]="true" (onClick)="getUsers()" />
         </div>
     </div>
-    <p-table [value]="users">
+    <p-table #tableFilter dataKey="id" [value]="users" [globalFilterFields]="['id','name','email','roleDesc']" styleClass="p-datatable-sm">
+        <ng-template pTemplate="caption">
+            <div class="flex">
+                 <p-iconField iconPosition="left">
+                    <p-inputIcon>
+                        <i class="pi pi-search"></i>
+                    </p-inputIcon>
+                    <input pInputText type="text" (input)="tableFilter.filterGlobal($any($event.target).value, 'contains')" placeholder="Pesquisar" />
+                </p-iconField>
+            </div>
+        </ng-template>
         <ng-template pTemplate="header">
             <tr>
-                <th>Nome</th>
-                <th>Email</th>
-                <th>Cargo</th>
-                <th>Ativo</th>
+                <th pSortableColumn="name">Nome<p-sortIcon field="name"></p-sortIcon></th>
+                <th pSortableColumn="email">E-mail<p-sortIcon field="email"></p-sortIcon></th>
+                <th pSortableColumn="roleDesc">Cargo<p-sortIcon field="roleDesc"></p-sortIcon></th>
+                <th pSortableColumn="status">Ativo<p-sortIcon field="status"></p-sortIcon></th>
                 <th>Editar</th>
                 <th>Senha</th>
             </tr>
         </ng-template>
         <ng-template pTemplate="body" let-user>
             <tr>
-                <td>
-                    @if(user.photo){
-                    <img class="layout-tab-img" [alt]="user.name" src="data:image/png;base64,{{user.photo}}"
-                        style="vertical-align: middle" width="56" height="56" />
-                    }@else {
-                    <p-avatar [label]="firstLetter(user)" size="xlarge" shape="circle"></p-avatar>
-                    }
-                    {{user.name}}
+                <td class="flex gap-2 align-items-center">
+                    <img *ngIf="user.photo" class="layout-tab-img" [alt]="user.name" src="data:image/png;base64,{{user.photo}}" style="vertical-align: middle" width="50" height="50" />
+                    <p-avatar *ngIf="!user.photo" [label]="firstLetter(user)" size="xlarge" shape="circle"></p-avatar>
+                  <span>{{user.name | uppercase}}</span>
                 </td>
                 <td>{{user.email}}</td>
-                <td>{{user.roleDesc}}</td>
+                <td>{{user.roleDesc | uppercase}}</td>
                 <td>
-                    @if(user.status== enabled){
-                    <i class="pi text-green-500 pi-check-circle"></i>
-                    }@else {
-                    <i class="pi text-red-500 pi-times-circle"></i>
-                    }
+                    <i class="pi" [ngClass]="{
+                        'text-green-500 pi-check-circle':user.status== enabled,
+                        'text-red-500 pi-times-circle':user.status != enabled
+                    }"></i>
                 </td>
                 <td>
-                    <button pButton type="button" icon="pi pi-pencil" [text]="true" (click)="showDialogEdit(user)"></button>
+                    <button pButton type="button" icon="pi pi-pencil" [text]="true" label="Editar" (click)="showDialogEdit(user)"></button>
                 </td>
                 <td>
-                    <button pButton type="button" icon="pi pi-shield" severity="danger" [text]="true"></button>
+                    <button pButton type="button" icon="pi pi-shield"[text]="true"  label="Alterar" severity="danger" ></button>
                 </td>
-
             </tr>
         </ng-template>
     </p-table>
-
 </div>
 
-<p-dialog [(visible)]="visibleDialogUser" [modal]="true" [style]="{ width: '50rem' }"
-    [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }">
+<p-dialog header="Cadastro usuário" [(visible)]="visibleDialogUser" [modal]="true" [style]="{ width: '50rem', height:'46rem' }" [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }">
     <form [formGroup]="formUser" (ngSubmit)="save()">
         <div class="p-fluid p-formgrid grid">
-
             <div class="field col-12 flex align-items-center justify-content-center ">
                 <div class="layout-photo-person">
                     @if(userPhoto){
-                    <p-image [imageStyle]="{'border-radius':'100%','object-fit':'cover'}"
-                        src="data:image/png;base64,{{userPhoto}}" alt="imagem motorista" height="80"
-                        width="80" [preview]="true" />
-
-                    <button pButton severity="danger" [text]="true" label="Remover"
-                        (click)="deletePhoto()"></button>
+                    <p-image [imageStyle]="{'border-radius':'100%','object-fit':'cover'}" src="data:image/png;base64,{{userPhoto}}" alt="imagem motorista" height="80" width="80" [preview]="true" />
+                    <button pButton severity="danger" [text]="true" label="Remover" (click)="deletePhoto()"></button>
                     }@else{
                     <div class="layout-photo-person-label">
-                        <button pButton type="button" label="Foto" [rounded]="true" [text]="true"
-                            size="small" (click)="selectPhoto()"></button>
+                        <button pButton type="button" label="Foto" [rounded]="true" [text]="true" size="small" (click)="selectPhoto()"></button>
                     </div>
                     }
                 </div>
             </div>
-
-            <div class="field col-12 md:col-2">
+            <div class="col-12 md:col-2">
                 <label for="nameid">Código</label>
                 <p-inputNumber formControlName="id"></p-inputNumber>
             </div>
-            <div class="field col-12 md:col-10">
+            <div class="col-12 md:col-10">
                 <label for="nameid">Nome</label>
                 <input pInputText id="nameid" type="text" formControlName="name" />
-                <small class="p-error block" *ngIf="formUser.get('name')?.invalid && formUser.get('name')?.dirty">
-                    Campo obrigatório</small>
+                <small class="p-error block" *ngIf="formUser.get('name')?.invalid && formUser.get('name')?.dirty">Campo obrigatório</small>
             </div>
-            <div class="field col-12 md:col-6">
+            <div class="col-12 md:col-6">
                 <label for="emailid">Email</label>
                 <input pInputText id="emailid" type="email" formControlName="email" />
             </div>
-            <div class="field col-12 md:col-4">
+            <div class="col-12 md:col-4">
                 <label for="cellphoneid">Celular</label>
                 <p-inputMask id="cellphoneid" mask="(99) 9 9999-9999" formControlName="cellphone" unmask="true" />
             </div>
-            <div class="field col-12 md:col-2">
+            <div class="col-12 md:col-2">
                 <label for="discountid">Desconto</label>
                 <p-inputNumber suffix="%" formControlName="limitDiscount" />
             </div>
-            <div class="field col-12 md:col-4">
+            <div class="col-12 md:col-4">
                 <label for="passwordid">Senha</label>
                 <p-password id="passwordid" formControlName="password" [feedback]="false" [toggleMask]="true" />
-                <small class="p-error block"
-                    *ngIf="formUser.get('password')?.invalid && formUser.get('password')?.dirty">
-                    Campo obrigatório</small>
+                <small class="p-error block" *ngIf="formUser.get('password')?.invalid && formUser.get('password')?.dirty">Campo obrigatório</small>
             </div>
-            <div class="field col-12 md:col-4">
+            <div class="col-12 md:col-4">
                 <label for="passwordvalidid">Repetir senha</label>
-                <p-password id="passwordvalidid" formControlName="passwordValid" [feedback]="false"
-                    [toggleMask]="true" />
-                <small class="p-error block"
-                    *ngIf="formUser.get('passwordValid')?.invalid && formUser.get('passwordValid')?.dirty">
-                    Campo Obrigatório</small>
+                <p-password id="passwordvalidid" formControlName="passwordValid" [feedback]="false" [toggleMask]="true" />
+                <small class="p-error block" *ngIf="formUser.get('passwordValid')?.invalid && formUser.get('passwordValid')?.dirty">Campo Obrigatório</small>
             </div>
-            <div class="field col-12 md:col-4">
+            <div class="col-12 md:col-4">
                 <label for="userrole">Cargo</label>
-                <p-multiSelect id="userrole" [options]="roles" optionLabel="description" display="chip"
-                    [selectionLimit]="1" placeholder="Selecione" formControlName="roleDesc" />
+                <p-multiSelect id="userrole" [options]="roles" optionLabel="description" [selectionLimit]="1" placeholder="Selecione" formControlName="roleDesc" />
             </div>
-            <div class="field col-12 md:col-5 ">
+            <div class="col-12 md:col-5 ">
                 <div class="layout-card-status">
                     <span>Perfil</span>
                     <div class="flex align-items-center">
@@ -130,52 +119,42 @@
                     </div>
                 </div>
             </div>
-
-            <div class="field col-12 md:col-5">
+            <div class="col-12 md:col-5">
                 <div class="layout-card-status">
                     <span>Situação</span>
                     <div class="flex align-items-center">
                         <p-radioButton inputId="ativo" [value]="enabled" formControlName="status"></p-radioButton>
                         <label for="ativo" class="ml-2">Ativado</label>
                     </div>
-
                     <div class="flex align-items-center">
                         <p-radioButton inputId="inativo" [value]="disabled" formControlName="status"></p-radioButton>
                         <label for="inativo" class="ml-2">Desativado</label>
                     </div>
                 </div>
             </div>
-            <div class="field col-12 md:col-4">
+            <div class="col-12 md:col-4">
                 <button pButton type="button" label="Menus" (click)="showDialogMenu()"></button>
-
             </div>
-            <div class="field col-12 md:col-4">
+            <div class="col-12 md:col-4">
                 <button pButton type="button" label="Funções" (click)="showDialogFunc()"></button>
-
             </div>
-
-
         </div>
         <div class="flex justify-content-end gap-2 mt-3">
-            <button pButton type="button" pRipple label="Fechar" icon="pi pi-times" class="p-button-text"
-                (click)="hideDialogUser()"></button>
+            <button pButton type="button" pRipple label="Fechar" icon="pi pi-times" class="p-button-text" (click)="hideDialogUser()"></button>
             <button pButton type="submit" pRipple label="Salvar" icon="pi pi-check" class="p-button-text"></button>
         </div>
-
     </form>
 </p-dialog>
 
 <!-- Funções -->
-<p-dialog [(visible)]="visibleDialogFunc" [modal]="true" [style]="{ width: '40rem' }"
-    [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }">
+<p-dialog [(visible)]="visibleDialogFunc" [modal]="true" [style]="{ width: '40rem' }" [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }">
     <p-table [value]="permissions" [(selection)]="permissionsSelect" dataKey="id" styleClass="p-datatable-sm">
         <ng-template pTemplate="header">
             <tr>
-                <th style="width: 4rem"><p-tableHeaderCheckbox /></th>
-                <th>Código</th>
-                <th>Descrição</th>
+                <th>Sel.</th>
+                <th pSortableColumn="id" style="width: 20%;">Código<p-sortIcon field="id"></p-sortIcon></th>
+                <th pSortableColumn="description">Descrição<p-sortIcon field="description"></p-sortIcon></th>
             </tr>
-
         </ng-template>
         <ng-template pTemplate="body" let-permission>
             <tr [pSelectableRow]="permission">
@@ -189,27 +168,19 @@
 
     </p-table>
     <div class="flex justify-content-end gap-2 mt-3">
-        <button pButton type="button" pRipple label="Fechar" icon="pi pi-times" class="p-button-text"
-            (click)="hideDialogFunc()"></button>
-        <button pButton type="button" pRipple label="Salvar" icon="pi pi-check" class="p-button-text"
-            (click)="savePermissions()"></button>
+        <button pButton type="button" pRipple label="Fechar" icon="pi pi-times" class="p-button-text" (click)="hideDialogFunc()"></button>
+        <button pButton type="button" pRipple label="Salvar" icon="pi pi-check" class="p-button-text" (click)="savePermissions()"></button>
     </div>
 </p-dialog>
-
 <!-- Menu -->
-<p-dialog [(visible)]="visibleDialogMenu" [modal]="true" [style]="{ width: '40rem'}"
-    [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }">
-
+<p-dialog [(visible)]="visibleDialogMenu" [modal]="true" [style]="{ width: '40rem'}" [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }">
     <p-tree [value]="menus" 
      selectionMode="checkbox" 
      [(selection)]="menuSelect"
      [propagateSelectionDown]="false"
      [propagateSelectionUp]="false"/>
-
     <div class="flex justify-content-end gap-2 mt-3">
-        <button pButton type="button" pRipple label="Fechar" icon="pi pi-times" class="p-button-text"
-            (click)="hideDialogMenu()"></button>
-        <button pButton type="button" pRipple label="Salvar" icon="pi pi-check" class="p-button-text"
-            (click)="saveMenus()"></button>
+        <button pButton type="button" pRipple label="Fechar" icon="pi pi-times" class="p-button-text" (click)="hideDialogMenu()"></button>
+        <button pButton type="button" pRipple label="Salvar" icon="pi pi-check" class="p-button-text" (click)="saveMenus()"></button>
     </div>
 </p-dialog>

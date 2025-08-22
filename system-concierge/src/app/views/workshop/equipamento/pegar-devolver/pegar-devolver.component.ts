@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, signal, ViewChild } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormControl, FormsModule, FormGroup, ReactiveFormsModule, Validators, FormBuilder } from '@angular/forms';
 //PrimeNG
@@ -42,6 +42,7 @@ import { ToolcontrolReportService } from '../../../../services/workshop/tool-con
 import { ToolControlReport } from '../../../../models/workshop/report/tool-control-report';
 import { BusyService } from '../../../../components/loading/busy.service';
 import { PrintEpiComponent } from '../../../../components/print.epi/print.epi.component';
+import { LayoutService } from '../../../../layouts/layout/service/layout.service';
 
 enum StatusRequest {
   OPEN = "Open", DELIVERY = "Delivered", COMPLETE = "Complete"
@@ -160,7 +161,10 @@ export default class PegarDevolverComponent implements OnInit {
 
   @ViewChild('printEPIComponent') printEPIComponent!: PrintEpiComponent;
 
+  @ViewChild('topbarmenu') menu!: ElementRef;
+
   constructor(
+    public layoutService: LayoutService,
     private busyService: BusyService,
     private storageService: StorageService,
     private mechanicService: MechanicService,

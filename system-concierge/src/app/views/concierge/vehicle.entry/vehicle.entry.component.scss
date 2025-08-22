@@ -2,14 +2,14 @@
     .layout-card-title {
         display: flex;
         justify-content: space-between;
-        padding-right: 1.2rem;
+        margin-bottom: 1rem;
 
         span {
             display: flex;
             align-items: center;
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: var(--color-text-primary);
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--color-grey-800);
         }
     }
 
@@ -18,7 +18,7 @@
 
         >p-badge {
             position: absolute;
-            right: 54px;
+            right: 52px;
         }
     }
 

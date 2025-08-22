@@ -254,9 +254,9 @@
         </div>
     </form>
     <div class="btn-action">
-        <button pButton type="button" label="Salvar" size="small" [raised]="true" severity="secondary-custom" icon="pi pi-check" (click)="saveBudget()"></button>
+        <button pButton type="button" label="Salvar" size="small" [raised]="true" severity="success-custom" icon="pi pi-check" (click)="saveBudget()"></button>
         <button pButton type="button" label="Imprimir" size="small" [raised]="true" severity="secondary-custom" icon="pi pi-print" (click)="print()"></button>
-        <button pButton type="button" label="Enviar Cliente" size="small" [raised]="true" severity="success-custom" icon="pi pi-send" [disabled]="!enabledSendMailButton" (click)="confirmSendEmail()"></button>
+        <button pButton type="button" label="Enviar Cliente" size="small" [raised]="true" severity="secondary-custom" icon="pi pi-send" [disabled]="!enabledSendMailButton" (click)="confirmSendEmail()"></button>
     </div>
 
     <!-- Budget -->
@@ -606,15 +606,10 @@
             </p-tabPanel>
         </p-tabView>
         <div class="flex justify-content-between">
-            <button *ngIf="!enabledOpenBudget" pButton type="button" label="Orçamento Concluído" size="small"
-                [raised]="true" severity="secondary-custom" icon="pi pi-book" (click)="closeBudget()"></button>
-            <button *ngIf="enabledOpenBudget" pButton type="button" label="Abrir Orçamento" size="small"
-                [raised]="true" severity="secondary-custom" icon="pi pi-lock-open"
-                (click)="confirmOpenBudget()"></button>
-
+            <button *ngIf="!enabledOpenBudget" pButton type="button" label="Orçamento Concluído" size="small" [raised]="true" severity="secondary-custom" icon="pi pi-book" (click)="closeBudget()"></button>
+            <button *ngIf="enabledOpenBudget" pButton type="button" label="Abrir Orçamento" size="small" [raised]="true" severity="secondary-custom" icon="pi pi-lock-open" (click)="confirmOpenBudget()"></button>
             <div class="flex justify-content-end">
-                <button pButton type="button" label="Fechar" size="small" icon="pi pi-times" class="p-button-text"
-                    (click)="closeDialogBudget()"></button>
+                <button pButton type="button" label="Fechar" size="small" icon="pi pi-times" class="p-button-text" (click)="closeDialogBudget()"></button>
             </div>
         </div>
     </p-dialog>

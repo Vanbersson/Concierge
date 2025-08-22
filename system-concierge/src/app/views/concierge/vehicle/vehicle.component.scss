@@ -7,9 +7,9 @@
         span {
             display: flex;
             align-items: center;
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: var(--color-text-primary);
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--color-grey-800);
         }
     }
 
@@ -18,17 +18,9 @@
     }
 
     ::ng-deep {
-        .p-button-label {
-            font-weight: 400;
-        }
 
         .p-tag {
             font-weight: 400;
-        }
-
-        .p-tag.p-tag-secondary {
-            background-color: var(--color-grey-300);
-            color: var(--color-text-primary);
         }
 
     }
@@ -40,8 +32,6 @@
 
         .mobile-visible {
             display: flex;
-            justify-content: center;
-
         }
 
     }

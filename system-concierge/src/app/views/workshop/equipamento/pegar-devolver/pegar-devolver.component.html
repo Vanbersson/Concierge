@@ -2,14 +2,14 @@
     <p-toast />
     <div class="layout-card-title">
         <span>Requisições</span>
-        <div class="flex gap-2">
+       <div class="flex gap-2">
             <p-button icon="pi pi-plus" [text]="true" label="Solicitação" (onClick)=" showDialogReq()" />
             <p-divider layout="vertical" />
             <p-button icon="pi pi-plus" [text]="true" label="Entrega de Materiais" (onClick)="showDialogDeliveryMat()" />
             <p-divider layout="vertical" />
             <p-button icon="pi pi-reply" [text]="true" label="Devolver" severity="danger" [disabled]="selectedMaterials.length == 0"
                 (onClick)=" returnMaterial()" />
-        </div>
+        </div> 
     </div>
     <p-table #dt dataKey="mecId" [value]="listfilterMec" [expandedRowKeys]="expandedRows"
         (onRowExpand)="onRowExpand($event)" (onRowCollapse)="onRowCollapse($event)" [paginator]="true" [rows]="10"

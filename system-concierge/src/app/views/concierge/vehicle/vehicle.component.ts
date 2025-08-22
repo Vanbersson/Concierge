@@ -12,7 +12,7 @@ import { TagModule } from 'primeng/tag';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { ButtonModule } from 'primeng/button';
 import { DropdownModule } from 'primeng/dropdown';
-import { MessageService } from 'primeng/api';
+import { MessageService, PrimeNGConfig } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 
 //Service
@@ -49,7 +49,7 @@ export default class VeiculosComponent implements OnInit, OnDestroy {
   listVehicleEntry: VehicleEntry[] = [];
   selectedItems: VehicleEntry[] = [];
 
-  constructor(
+  constructor(private primeNGConfig: PrimeNGConfig,
     private vehicleService: VehicleService,
     public layoutService: LayoutService,
     private storageService: StorageService,
@@ -59,6 +59,16 @@ export default class VeiculosComponent implements OnInit, OnDestroy {
     private taskService: TaskService) { }
 
   ngOnInit(): void {
+
+    this.primeNGConfig.setTranslation({
+      startsWith: 'Inicia',
+      contains: 'Contém ',
+      notContains: 'Não Contém',
+      endsWith: 'Termina',
+      equals: 'É igual a',
+      notEquals: 'Não igual a',
+      noFilter: 'Sem filtro'
+    });
 
     this.statusOrcamento = [
       { label: 'Sem Orçamento', value: 'Sem Orçamento' },

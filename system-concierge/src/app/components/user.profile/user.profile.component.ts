@@ -37,17 +37,14 @@ import { StatusEnabledDisabled } from '../../models/enum/status-enabled-disabled
 export class UserProfileComponent {
   private user: User;
   @Output() public outputUser = new EventEmitter<User>();
-
   enabled = StatusEnabledDisabled.enabled;
   disabled = StatusEnabledDisabled.disabled;
-
   visibleDialogUser: boolean = false;
 
   userPhoto!: string;
   userEmail!: string;
   userRoleDescription!: string;
   limitDiscount = signal<number>(0);
-
   userFormView = new FormGroup({
     status: new FormControl<string>({ value: '', disabled: true }),
     name: new FormControl<string>('', Validators.required),
@@ -133,22 +130,18 @@ export class UserProfileComponent {
     this.user.photo = this.userPhoto != "" ? this.userPhoto : "";
     this.user.password = value.password;
   }
-
   private validUser(): boolean {
     const { value } = this.userFormView;
     if (value.name == "") {
       this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Nome não informado', icon: 'pi pi-times' });
       return false;
     }
-
     return true;
   }
   async updateUser() {
     this.dataUpdateUser();
-
     if (this.validUser()) {
       const resultUser = await this.saveUser(this.user);
-
       if (resultUser.status == 200) {
         this.messageService.add({ severity: 'success', summary: 'Usuário', detail: 'Atualizado com sucesso', icon: 'pi pi-check' });
         this.outputUser.emit(this.user);
@@ -156,10 +149,7 @@ export class UserProfileComponent {
       }
     }
 
-
-
   }
-
   private async saveUser(user: User): Promise<HttpResponse<User>> {
     try {
       return await lastValueFrom(this.userService.updateUser(user));
@@ -168,9 +158,7 @@ export class UserProfileComponent {
       return error;
     }
   }
-
   alertErroPassword() {
     this.messageService.add({ severity: 'error', summary: 'Senha', detail: 'Senha não conferir', icon: 'pi pi-times' });
   }
-
 }

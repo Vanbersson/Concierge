@@ -1,5 +1,5 @@
 import { Component, signal, ViewChild, ElementRef, OnInit, OnDestroy, DoCheck } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, UpperCasePipe } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 
 //PrimeNg
@@ -106,7 +106,17 @@ export class TopbarComponent implements OnInit, OnDestroy, DoCheck {
   }
 
   get firstLetter(): string {
-    return this.showUserName.substring(0, 1);
+    let pipe = new UpperCasePipe();
+    var iniciais = "";
+    var names = this.storageService.name.split(' ');
+    try {
+      iniciais = names.at(0).substring(0, 1);
+      iniciais = iniciais + "" + names.at(1).substring(0, 1);
+      return pipe.transform(iniciais);
+    } catch {
+      iniciais = names.at(0).substring(0, 1);
+      return pipe.transform(iniciais);;
+    }
   }
 
 

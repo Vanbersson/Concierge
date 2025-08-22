@@ -1,10 +1,12 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, UpperCasePipe } from '@angular/common';
 import { FormControl, FormsModule, ReactiveFormsModule, FormGroup, Validators } from '@angular/forms';
 
 //PrimeNG
 import { TableModule } from 'primeng/table'
 import { InputTextModule } from 'primeng/inputtext';
+import { IconFieldModule } from 'primeng/iconfield';
+import { InputIconModule } from 'primeng/inputicon';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { PasswordModule } from 'primeng/password';
 import { ButtonModule } from 'primeng/button';
@@ -17,6 +19,7 @@ import { AvatarModule } from 'primeng/avatar';
 import { ImageModule } from 'primeng/image';
 import { DialogModule } from 'primeng/dialog';
 import { TreeModule } from 'primeng/tree';
+import { DividerModule } from 'primeng/divider';
 
 //Service
 import { UserService } from '../../../services/user/user.service';
@@ -41,8 +44,8 @@ import { StatusEnabledDisabled } from '../../../models/enum/status-enabled-disab
 @Component({
   selector: 'app-user',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule, TableModule, InputTextModule, TreeModule, 
-    InputNumberModule, InputMaskModule, MultiSelectModule, ToastModule, DialogModule, PasswordModule, 
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, TableModule, InputTextModule, TreeModule, IconFieldModule, InputIconModule,
+    InputNumberModule, InputMaskModule, MultiSelectModule, ToastModule, DialogModule, PasswordModule,DividerModule,
     ImageModule, ButtonModule, AvatarModule, RadioButtonModule],
   templateUrl: './user.component.html',
   styleUrl: './user.component.scss',
@@ -122,23 +125,27 @@ export default class UserComponent implements OnInit {
             ]
           },
           {
-            key:'2_99',label:'Cadastro',children:[]
+            key: '2_99', label: 'Cadastro', children: []
           }
         ]
       },
       {
-        key:'3_0', label:'Oficina', children:[
-          {key:'3_1',label:'Orçamentos'},
-          {key:'3_2',label:'Controle de equipamentos',children:[
-            {key:'3_2_0',label:'Requisições'},
-            {key:'3_2_1',label:'Cadastro',children:[
-              {key:'3_2_1_0',label:'Categoria'},
-              {key:'3_2_1_1',label:'Material'},
-            ]}
-          ]},
+        key: '3_0', label: 'Oficina', children: [
+          { key: '3_1', label: 'Orçamentos' },
           {
-            key:'3_99',label:'Cadastro',children:[
-               {key:'3_99_0',label:'Mecânico'},
+            key: '3_2', label: 'Controle de equipamentos', children: [
+              { key: '3_2_0', label: 'Requisições' },
+              {
+                key: '3_2_1', label: 'Cadastro', children: [
+                  { key: '3_2_1_0', label: 'Categoria' },
+                  { key: '3_2_1_1', label: 'Material' },
+                ]
+              }
+            ]
+          },
+          {
+            key: '3_99', label: 'Cadastro', children: [
+              { key: '3_99_0', label: 'Mecânico' },
             ]
           }
         ]
@@ -193,7 +200,7 @@ export default class UserComponent implements OnInit {
     this.formUser.controls['passwordValid'].removeValidators([Validators.minLength(8), Validators.required]);
     this.formUser.controls['passwordValid'].updateValueAndValidity();
   }
-  private getUsers() {
+  getUsers() {
     this.userService.getAll$().subscribe(data => {
       this.users = data;
     });
@@ -204,7 +211,17 @@ export default class UserComponent implements OnInit {
     })
   }
   public firstLetter(user: User): string {
-    return user.name.substring(0, 1);
+    let pipe = new UpperCasePipe();
+    var iniciais = "";
+    var names = user.name.split(' ');
+    try {
+      iniciais = names.at(0).substring(0, 1);
+      iniciais = iniciais + "" + names.at(1).substring(0, 1);
+      return pipe.transform(iniciais);
+    } catch {
+      iniciais = names.at(0).substring(0, 1);
+      return pipe.transform(iniciais);;
+    }
   }
   public showDialogSave() {
     this.formUser.controls.id.disable();
@@ -458,7 +475,6 @@ export default class UserComponent implements OnInit {
       return error;
     }
   }
-
   //Dialog Menu
   public showDialogMenu() {
     if (this.userSelect) {

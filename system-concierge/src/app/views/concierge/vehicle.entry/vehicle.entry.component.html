@@ -5,9 +5,8 @@
         <span>Atendimento de veículos</span>
         <div class="layout-button-alert">
             @if (listVehicleEntry.length > 0) {
-            <p-badge [value]="listVehicleEntry.length" severity="warning"></p-badge>
-            <p-button icon="pi pi-car" [rounded]="true" severity="warning" [outlined]="true" [text]="true" size="large"
-                (onClick)="showDialogVehicle()" />
+                <p-badge [value]="listVehicleEntry.length" severity="warning"></p-badge>
+                <p-button icon="pi pi-car" [rounded]="true" severity="warning" [outlined]="true" [text]="true" size="large" (onClick)="showDialogVehicle()" />
             }
         </div>
     </div>
@@ -37,33 +36,33 @@
                                 <div class="checkboxDisable"> </div>
                                 <label for="ClientCompanyNotId" style="color: #3B82F6;">Empresa sem cadastro!</label>
                             </div>
-                            <div class="field col-12 md:col-1">
+                            <div class="col-12 md:col-1">
                                 <label for="clientCompanyId">Código</label>
                                 <p-inputNumber inputId="clientCompanyId" [useGrouping]="false" formControlName="clientCompanyId" />
                                 <small class="p-error block" *ngIf="formClientCompany.get('clientCompanyId')?.invalid">Campo obrigatório</small>
                             </div>
                             <div class="md:col-11"></div>
-                            <div class="field col-10 md:col-6">
+                            <div class="col-10 md:col-6">
                                 <label for="clientCompanyName">Empresa</label>
                                 <input pInputText id="clientCompanyName" type="text" formControlName="clientCompanyName" [style]="{'text-transform':'uppercase'}" />
                                 <small class="p-error block" *ngIf="formClientCompany.get('clientCompanyName')?.invalid">Campo obrigatório</small>
                             </div>
-                            <div class="field col-2 md:col-1 flex flex-column">
+                            <div class="col-2 md:col-1 flex flex-column">
                                 <label for="">Filtro</label>
                                 <app-filterclient (outputClient)="selectClientCompany.set($event)" />
                             </div>
                             <div class="md:col-5"></div>
-                            <div class="field col-12 md:col-2">
+                            <div class="col-12 md:col-2">
                                 <label for="clientCompanyCnpj">CNPJ</label>
                                 <p-inputMask id="clientCompanyCnpj" mask="99.999.999/9999-99" formControlName="clientCompanyCnpj" />
                                 <small class="p-error block" *ngIf="formClientCompany.get('clientCompanyCnpj')?.invalid">Campo obrigatório</small>
                             </div>
-                            <div class="field col-12 md:col-2">
+                            <div class="col-12 md:col-2">
                                 <label for="clientCompanyCpf">CPF</label>
                                 <p-inputMask id="clientCompanyCpf" mask="999.999.999-99" formControlName="clientCompanyCpf" />
                                 <small class="p-error block" *ngIf="formClientCompany.get('clientCompanyCpf')?.invalid">Campo obrigatório</small>
                             </div>
-                            <div class="field col-12 md:col-2">
+                            <div class="col-12 md:col-2">
                                 <label for="clientCompanyRg">RG</label>
                                 <p-inputNumber inputId="clientCompanyRg" [useGrouping]="false" formControlName="clientCompanyRg" />
                             </div>
@@ -97,7 +96,7 @@
                         <span>Vamos informar os dados do motorista</span>
                         <div class="p-fluid p-formgrid grid">
 
-                            <div class="field col-12 flex align-items-center">
+                            <div class="col-12 flex align-items-center">
                                 <div class="layout-photo-person">
                                     @if(driverEntryPhoto){
                                     <p-image [imageStyle]="{'border-radius':'100%','object-fit':'cover'}" src="data:image/png;base64,{{driverEntryPhoto}}" alt="imagem motorista" height="80" width="80" [preview]="true" />
@@ -109,26 +108,26 @@
                                     }
                                 </div>
                             </div>
-                            <div class="field col-12 md:col-6">
+                            <div class="col-12 md:col-6">
                                 <label for="driverEntryName">Nome</label>
                                 <input pInputText id="driverEntryName" type="text" formControlName="driverEntryName" [style]="{'text-transform':'capitalize'}">
                                 <small class="p-error block" *ngIf="formDriver.get('driverEntryName')?.invalid">Campo obrigatório</small>
                             </div>
                             <div class="md:col-6"></div>
-                            <div class="field col-12 md:col-2">
+                            <div class="col-12 md:col-2">
                                 <label for="driverEntryCpf">CPF</label>
                                 <p-inputMask id="driverEntryCpf" mask="999.999.999-99" unmask="true" formControlName="driverEntryCpf" />
                                 <small class="p-error block" *ngIf="formDriver.get('driverEntryCpf')?.invalid">Campo obrigatório CPF ou RG</small>
                             </div>
 
-                            <div class="field col-12 md:col-2">
+                            <div class="col-12 md:col-2">
                                 <label for="driverEntryRg">RG</label>
                                 <p-inputNumber id="clientCompanyRg" mode="decimal" [useGrouping]="false" formControlName="driverEntryRg" />
                                 <small class="p-error block" *ngIf="formDriver.get('driverEntryRg')?.invalid">Campo obrigatório CPF ou RG</small>
                             </div>
                             <div class="md:col-8"></div>
 
-                            <div class="field col-12 md:col-6 flex align-items-center gap-2">
+                            <div class="col-12 md:col-6 flex align-items-center gap-2">
                                 <div class="layout-file">
                                     <div class="layout-file-img">
                                         @if(driverEntryPhotoDoc1){
@@ -164,12 +163,9 @@
 
                     </div>
                 </form>
-
                 <div class="flex pt-4 justify-content-between">
-                    <p-button (onClick)="prevCallback.emit()" label="Voltar" severity="secondary"
-                        icon="pi pi-arrow-left" />
-                    <p-button (onClick)="nextSterpperDriver()" label="Avançar" icon="pi pi-arrow-right"
-                        iconPos="right" />
+                    <p-button (onClick)="prevCallback.emit()" label="Voltar" severity="secondary" icon="pi pi-arrow-left" />
+                    <p-button (onClick)="nextSterpperDriver()" label="Avançar" icon="pi pi-arrow-right"  iconPos="right" />
                 </div>
             </ng-template>
         </p-stepperPanel>
@@ -194,16 +190,16 @@
                         <span>Vamos informar agora os dados do veículo</span>
                         <div class="p-fluid p-formgrid grid">
 
-                            <div class="field col-12 md:col-1">
+                            <div class="col-12 md:col-1">
                                 <label for="placa">Placa</label>
                                 <p-inputMask id="placa" mask="***-****" [unmask]="true" [style]="{'text-transform':'uppercase'}" formControlName="placa" />
                                 <small class="p-error block" *ngIf="formVehicle.get('placa')?.invalid">Campo obrigatório</small>
                             </div>
-                            <div class="field col-12 md:col-1">
+                            <div class="col-12 md:col-1">
                                 <label for="frotaId">Frota</label>
                                 <p-inputNumber inputId="frotaId" [useGrouping]="false"  formControlName="frota" />
                             </div>
-                            <div class="field col-12 md:col-2">
+                            <div class="col-12 md:col-2">
                                 <label for="vehiclemodelid">Modelos</label>
                                 <p-multiSelect [options]="vehicleModels$ | async" [selectionLimit]="1" placeholder="Selecione" optionLabel="description" formControlName="modelVehicle">
                                     <ng-template let-value pTemplate="selectedItems">
@@ -222,7 +218,7 @@
                                 </p-multiSelect>
                                 <small class="p-error block" *ngIf="formVehicle.get('modelVehicle')?.invalid">Campo obrigatório</small>
                             </div>
-                            <div class="field col-12 md:col-2 ">
+                            <div class="col-12 md:col-2 ">
                                 <label for="dateEntry">Data Entrada</label>
                                 <p-calendar [iconDisplay]="'input'" 
                                 [showIcon]="true" 
@@ -233,46 +229,46 @@
                                 <small class="p-error block" *ngIf="formVehicle.get('dateEntry')?.invalid">Campo obrigatório</small>
                             </div>
 
-                            <div class="field col-12 md:col-2 ">
+                            <div class="col-12 md:col-2 ">
                                 <label for="datePrevisionExit">Previsão saída</label>
                                 <p-calendar [iconDisplay]="'input'" [showIcon]="true" [showTime]="true"  dateFormat="dd/mm/yy" inputId="datePrevisionExit" formControlName="datePrevisionExit" />
                             </div>
-                            <div class="field col-12 md:col-2">
+                            <div class="col-12 md:col-2">
                                 <label for="vehiclecolorid">Cor</label>
                                 <p-multiSelect id="vehiclecolorid" [options]="cores" optionLabel="color"  [selectionLimit]="1" placeholder="Selecione" [style]="{'text-transform':'capitalize'}" formControlName="color" />
                                 <small class="p-error block" *ngIf="formVehicle.get('color')?.invalid">Campo obrigatório</small>
                             </div>
 
-                            <div class="field col-12 md:col-2">
+                            <div class="col-12 md:col-2">
                                 <label for="kmatual">KM Atual</label>
                                 <p-inputNumber inputId="kmatual" [useGrouping]="false" formControlName="kmEntry" />
                             </div>
 
-                            <div class="field col-12 md:col-2">
+                            <div class="col-12 md:col-2">
                                 <label for="coneid">Cone</label>
                                 <p-inputNumber inputId="coneid" [useGrouping]="false" formControlName="quantityTrafficCone" />
                             </div>
-                            <div class="field col-12 md:col-2">
+                            <div class="col-12 md:col-2">
                                 <label for="extintorid">Extintor</label>
                                 <p-inputNumber inputId="extintorid" [useGrouping]="false" formControlName="quantityExtinguisher" />
                             </div>
-                            <div class="field col-12 md:col-2">
+                            <div class="col-12 md:col-2">
                                 <label for="pneuid">Pneu</label>
                                 <p-inputNumber inputId="pneuid" [useGrouping]="false" formControlName="quantityTire" />
                             </div>
-                            <div class="field col-12 md:col-2">
+                            <div class="col-12 md:col-2">
                                 <label for="pneurodaid">Pneu c/roda</label>
                                 <p-inputNumber inputId="pneurodaid" [useGrouping]="false"  formControlName="quantityTireComplete" />
                             </div>
-                            <div class="field col-12 md:col-2">
+                            <div class="col-12 md:col-2">
                                 <label for="cxferramentaid">Cx ferramenta</label>
                                 <p-inputNumber inputId="cxferramentaid" [useGrouping]="false" formControlName="quantityToolBox" />
                             </div>
-                            <div class="field col-12 md:col-2">
+                            <div class="col-12 md:col-2">
                                 <label for="consultorid">Consultor</label>
                                 <p-multiSelect id="consultorid" [options]="consultores$ | async" [selectionLimit]="1"  optionLabel="name" placeholder="Selecione" [style]="{'text-transform':'capitalize'}" formControlName="UserAttendant" />
                             </div>
-                            <div class="field col-12 lg:col-6 md:col-12 flex align-items-center gap-2">
+                            <div class="col-12 lg:col-6 md:col-12 flex align-items-center gap-2">
                                 <div class="layout-file">
                                     <div class="layout-file-img">
                                         @if(photoVehicle1){
@@ -322,7 +318,7 @@
                                     }
                                 </div>
                             </div>
-                            <div class="field col-12 lg:col-3 md:col-12">
+                            <div class="col-12 lg:col-3 md:col-12">
                                 <div class="layout-card-option">
                                     <div class="layout-card-option-title">Veículo novo</div>
                                     <div class="flex align-items-center">
@@ -337,7 +333,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="field col-12 lg:col-3 md:col-12">
+                            <div class="col-12 lg:col-3 md:col-12">
                                 <div class="layout-card-option">
                                     <div class="layout-card-option-title">Ordem serviço</div>
                                     <div class="flex align-items-center">
@@ -352,7 +348,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="field col-12">
+                            <div class="col-12">
                                 <label for="informacao" class="ml-2">Informações</label>
                                 <textarea pInputTextarea id="informacao" rows="5" cols="30" formControlName="informationConcierge"></textarea>
                             </div>

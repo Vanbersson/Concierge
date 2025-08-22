@@ -8,13 +8,11 @@
         <i class="pi pi-bars"></i>
     </button>
 
-    <button #topbarmenubutton class="p-link layout-topbar-menu-button layout-topbar-button"
-        (click)="layoutService.showProfileSidebar()">
+    <button #topbarmenubutton class="p-link layout-topbar-menu-button layout-topbar-button" (click)="layoutService.showProfileSidebar()">
         <i class="pi pi-ellipsis-v"></i>
     </button>
 
-    <div #topbarmenu class="layout-topbar-menu"
-        [ngClass]="{'layout-topbar-menu-mobile-active':layoutService.state.profileSidebarVisible}">
+    <div #topbarmenu class="layout-topbar-menu" [ngClass]="{'layout-topbar-menu-mobile-active':layoutService.state.profileSidebarVisible}">
 
         <app-vehicleexit></app-vehicleexit>
         <button class="p-link layout-topbar-button">
@@ -34,14 +32,12 @@
     <ng-template pTemplate="headless">
         <div class="layout-sidebar-header">
             <div class="layout-sidebar-header-close">
-                <p-button type="button" (click)="closeSideBarCallback($event)" icon="pi pi-times" [rounded]="true"
-                    [text]="true" size="large" severity="secondary"></p-button>
+                <p-button type="button" (click)="closeSideBarCallback($event)" icon="pi pi-times" [rounded]="true" [text]="true" size="large" severity="secondary"></p-button>
             </div>
             <div class="flex flex-row gap-2 mt-5">
                 <div class="layout-side-header-photo">
                     @if(showUserPhoto){
-                    <p-image [imageStyle]="{'border-radius':'100%','object-fit':'cover'}"
-                        src="data:image/png;base64,{{showUserPhoto}}" alt="imagem usuário" height="56" width="56" />
+                    <p-image [imageStyle]="{'border-radius':'100%','object-fit':'cover'}" src="data:image/png;base64,{{showUserPhoto}}" alt="imagem usuário" height="56" width="56" />
                     }@else {
                     <p-avatar [label]="firstLetter" size="xlarge" shape="circle" [style]="{ 'background-color': '#dee9fc' }"></p-avatar>
                     }
