@@ -6,7 +6,7 @@
         <div class="layout-button-alert">
             @if (listVehicleEntry.length > 0) {
                 <p-badge [value]="listVehicleEntry.length" severity="warning"></p-badge>
-                <p-button icon="pi pi-car" [rounded]="true" severity="warning" [outlined]="true" [text]="true" size="large" (onClick)="showDialogVehicle()" />
+                <p-button type="button" icon="pi pi-car" [rounded]="true" severity="warning" [outlined]="true" [text]="true" size="large" (onClick)="showDialogVehicle()" />
             }
         </div>
     </div>
@@ -131,31 +131,25 @@
                                 <div class="layout-file">
                                     <div class="layout-file-img">
                                         @if(driverEntryPhotoDoc1){
-                                        <p-image src="data:image/png;base64,{{driverEntryPhotoDoc1}}" alt="" height="80"
-                                            width="80" [preview]="true" />
+                                        <p-image src="data:image/png;base64,{{driverEntryPhotoDoc1}}" alt="" height="80" width="80" [preview]="true" />
                                         }
                                     </div>
                                     @if(driverEntryPhotoDoc1){
-                                    <button pButton icon="pi pi-trash" severity="danger"
-                                        (click)="deleteEntryFileDriver1()"></button>
+                                    <button pButton icon="pi pi-trash" severity="danger" (click)="deleteEntryFileDriver1()"></button>
                                     }@else {
-                                    <button pButton type="button" label="Foto Arquivo" severity="secondary"
-                                        (click)="photoFile1Driver()"></button>
+                                    <button pButton type="button" label="Foto Arquivo" severity="secondary" (click)="photoFile1Driver()"></button>
                                     }
                                 </div>
                                 <div class="layout-file">
                                     <div class="layout-file-img">
                                         @if(driverEntryPhotoDoc2){
-                                        <p-image src="data:image/png;base64,{{driverEntryPhotoDoc2}}" alt="" height="80"
-                                            width="80" [preview]="true" />
+                                        <p-image src="data:image/png;base64,{{driverEntryPhotoDoc2}}" alt="" height="80" width="80" [preview]="true" />
                                         }
                                     </div>
                                     @if(driverEntryPhotoDoc2){
-                                    <button pButton icon="pi pi-trash" severity="danger"
-                                        (click)="deleteEntryFileDriver2()"></button>
+                                    <button pButton icon="pi pi-trash" severity="danger" (click)="deleteEntryFileDriver2()"></button>
                                     }@else {
-                                    <button pButton type="button" label="Foto Arquivo" severity="secondary"
-                                        (click)="photoFile2Driver()"></button>
+                                    <button pButton type="button" label="Foto Arquivo" severity="secondary" (click)="photoFile2Driver()"></button>
                                     }
                                 </div>
                             </div>

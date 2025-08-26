@@ -11,6 +11,7 @@
             font-weight: 700;
             color: var(--color-grey-800);
         }
+
     }
 
     .layout-dialog-img {
@@ -39,6 +40,22 @@
         object-fit: cover;
     }
 
-    
+    .mobile-enabled {
+        display: none !important;
+    }
+
+    @media (max-width: 991px) {
+
+        .mobile-disabled {
+            display: none !important;
+        }
+
+        .mobile-enabled {
+            display: flex !important;
+        }
+
+    }
+
+
 
 }

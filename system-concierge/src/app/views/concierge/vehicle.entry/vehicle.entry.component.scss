@@ -13,14 +13,14 @@
         }
     }
 
-    .layout-button-alert {
+     .layout-button-alert {
         height: 42px;
 
         >p-badge {
             position: absolute;
-            right: 52px;
+            right: 50px;
         }
-    }
+    } 
 
     .checkboxDisable {
         position: absolute;
@@ -63,6 +63,7 @@
     ::ng-deep {
         .p-button.p-button-icon-only {
             padding: 0.5rem 0;
+            margin-right: 15px;
         }
 
         .p-image-preview-container>img {

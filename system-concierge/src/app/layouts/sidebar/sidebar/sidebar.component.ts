@@ -59,9 +59,9 @@ export class SidebarComponent implements OnInit {
           },
           {
             key: '1_3',
-            label: 'Manutenção',
+            label: 'Motorista',
             visible: false,
-            routerLink: 'portaria/mannutencao-entrada-veiculo',
+            routerLink: 'portaria/manutencao-motorista',
           },
           {
             key: '1_4',

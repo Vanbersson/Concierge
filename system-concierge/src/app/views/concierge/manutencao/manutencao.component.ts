@@ -24,7 +24,6 @@ import { ToastModule } from 'primeng/toast';
 import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { SpeedDialModule } from 'primeng/speeddial';
 import { CheckboxModule } from 'primeng/checkbox';
 import { StepsModule } from 'primeng/steps';
 import { DividerModule } from 'primeng/divider';
@@ -70,8 +69,7 @@ import { ClientFisJurEnum } from '../../../models/clientcompany/client-fisjur-en
   standalone: true,
   imports: [CommonModule, FilterClientComponent, RouterModule,
     TabViewModule, FormsModule, IconFieldModule, DividerModule,
-    CheckboxModule, StepsModule, SpeedDialModule,
-    ConfirmDialogModule, InputIconModule, ImageModule,
+    CheckboxModule, StepsModule, ConfirmDialogModule, InputIconModule, ImageModule,
     DialogModule, ToastModule, TableModule, ReactiveFormsModule,
     InputTextareaModule, InputNumberModule, InputTextModule,
     ButtonModule, InputMaskModule, MultiSelectModule,
@@ -188,8 +186,6 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
   dialogIdClientCompany!: number;
   private budget: IBudgetNew;
 
-  itemsButtonMenu: MenuItem[] = [];
-
   //Details Vehicle
   detailsVehicle: boolean = false;
 
@@ -261,31 +257,6 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
       { color: 'Outro' }
     ];
 
-    this.itemsButtonMenu = [
-      {
-        icon: 'pi pi-thumbs-up',
-        tooltipOptions: { tooltipLabel: 'Autorizar Saída' },
-        command: () => {
-          this.authExit();
-        }
-      },
-      {
-        icon: 'pi pi-file',
-        tooltipOptions: { tooltipLabel: 'Orçamento' },
-        command: () => {
-          this.confirmGerarOrcamento();
-        }
-      },
-      {
-        icon: 'pi pi-upload',
-        tooltipOptions: { tooltipLabel: 'Salvar' },
-        command: () => {
-          this.save();
-        }
-      }
-    ];
-    console.log("teste")
-
     this.disableInput();
 
     //Prorietário
@@ -348,30 +319,6 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
       { color: 'Rosa' },
       { color: 'Roxo' },
       { color: 'Outro' }
-    ];
-
-    this.itemsButtonMenu = [
-      {
-        icon: 'pi pi-thumbs-up',
-        tooltipOptions: { tooltipLabel: 'Autorizar Saída' },
-        command: () => {
-          this.authExit();
-        }
-      },
-      {
-        icon: 'pi pi-file',
-        tooltipOptions: { tooltipLabel: 'Orçamento' },
-        command: () => {
-          this.confirmGerarOrcamento();
-        }
-      },
-      {
-        icon: 'pi pi-upload',
-        tooltipOptions: { tooltipLabel: 'Salvar' },
-        command: () => {
-          this.save();
-        }
-      }
     ];
    
     this.disableInput();

@@ -107,7 +107,7 @@ export default class UserComponent implements OnInit {
         key: '1_0', label: 'Portaria', children: [
           { key: '1_1', label: 'Atendimento', },
           { key: '1_2', label: 'Veículos' },
-          { key: '1_3', label: 'Manutenção' },
+          { key: '1_3', label: 'Motorista' },
           {
             key: '1_4', label: 'Cadastros', children: [
               { key: '1_4_0', label: 'Modelo' },

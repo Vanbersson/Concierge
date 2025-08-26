@@ -44,6 +44,11 @@ export const routes: Routes = [
                         loadComponent: () => import('./views/concierge/vehicle/vehicle.component')
                     },
                     {
+                        path: 'manutencao-motorista',
+                        title: 'Motorista',
+                        loadComponent: () => import('./views/concierge/driver/driver.component')
+                    },
+                    {
                         path: 'mannutencao-entrada-veiculo/:id',
                         title: 'Manutenção Entrada',
                         loadComponent: () => import('./views/concierge/manutencao/manutencao.component')

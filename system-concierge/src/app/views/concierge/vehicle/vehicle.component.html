@@ -1,7 +1,7 @@
 <div class="layout-card">
     <p-toast />
     <div class="layout-card-title">
-        <span>Lista de veículos</span>
+        <span>Entrada de veículos</span>
         <p-button icon="pi pi-refresh" [text]="true" label="Recarregar" (onClick)="listVehicles()" />
     </div>
 
@@ -96,9 +96,7 @@
                 <th></th>
                 <th></th>
                 <th>
-                    @if (selectedItems.length > 0) {
-                    <p-button label="Liberar" severity="success" size="small"(onClick)="addAuthorizationAll()"></p-button>
-                    }
+                    <p-button *ngIf="selectedItems.length > 0" type="button" label="Liberar" icon="pi pi-car" text="true" size="small" severity="success-custom" (onClick)="addAuthorizationAll()"></p-button>
                 </th>
             </tr>
         </ng-template>
@@ -149,10 +147,10 @@
                     </div>
                 </td>
                 <td>
-                    <p-button type="button" label="Editar" icon="pi pi-pencil" text="true" size="small" (onClick)="editVeiculo(vehicle.id)"></p-button>
+                    <p-button type="button" label="Editar" icon="pi pi-pencil" text="true" size="small" severity="secondary-custom" (onClick)="editVeiculo(vehicle.id)"></p-button>
                 </td>
                 <td>
-                    <p-button label="Liberar" [outlined]="true" size="small" severity="success" (onClick)="authExit(vehicle)"></p-button>
+                    <p-button type="button" label="Liberar" icon="pi pi-car" text="true" size="small" severity="success-custom" (onClick)="authExit(vehicle)"></p-button>
                 </td>
             </tr>
             <tr class="mobile-visible">
@@ -182,7 +180,7 @@
                     <p-button type="button" icon="pi pi-pencil" text="true" size="small" (onClick)="editVeiculo(vehicle.id)"></p-button>
                 </td>
                 <td style="width: 10%">
-                    <p-button type="button" label="Liberar" [outlined]="true" size="small" severity="success" (onClick)="authExit(vehicle)"></p-button>
+                    <p-button type="button" label="Liberar" text="true" size="small" severity="success" (onClick)="authExit(vehicle)"></p-button>
                 </td>
             </tr>
         </ng-template>

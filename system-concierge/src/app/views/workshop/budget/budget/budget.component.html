@@ -1,620 +1,619 @@
 <div class="layout-card">
     <!-- Toast -->
     <p-toast />
-
     <div class="layout-card-title">
         <span>Orçamento</span>
         <div class="w-6">
             <p-steps [model]="itemsStatus" [readonly]="true" [activeIndex]="activeIndexStatus" />
         </div>
-        <p-button icon="pi pi-arrow-right" [text]="true" label="Voltar"
-            [routerLink]="'/portaria/mannutencao-entrada-veiculo/'+vehicleId()" />
+        <p-button icon="pi pi-arrow-right" [text]="true" label="Voltar" [routerLink]="'/portaria/mannutencao-entrada-veiculo/'+vehicleId()" />
     </div>
-
-    <form [formGroup]="formBudget">
-        <div class="card">
-            <div class="grid p-fluid p-formgrid">
-                <div class="col-12 md:col-2">
-                    <span class="text-500">Nº Orçamento</span>
-                    <div class="layout-input-disabled">
-                        <span class="text-500 font-medium "><strong>{{budget.id}}</strong></span>
-                    </div>
-                </div>
-                <div class=" col-12 md:col-3">
-                    <span class="text-500">Data Geração</span>
-                    <div class="layout-input-disabled">
-                        <span class="text-500 font-medium ">
-                            <strong> {{budget.dateGeneration | date: 'dd/MM/yyyy HH:mm'}}</strong>
-                        </span>
-                    </div>
-                </div>
-                <div class="col-12 md:col-2">
-                    <span class="text-500">Validade</span>
-                    <p-calendar [iconDisplay]="'input'" [showIcon]="true" dateFormat="dd/mm/yy"
-                        (onSelect)="onChangeDateValidation($event)" formControlName="dateValidation">
-                        <ng-template pTemplate="date" let-date>
-                            <span [ngStyle]="{color: isPastDate(date) ? 'red' : '' }">
-                                {{date.day}}
-                            </span>
-                        </ng-template>
-                    </p-calendar>
-                </div>
-                <div class="col-12 md:col-3">
-                    <span class="text-500">Responsavel</span>
-                    <input pInputText formControlName="nameResponsible" />
-                </div>
-                <div class="col-12 md:col-2">
-                    <span class="text-500">Consultor</span>
-                    <div class="layout-input-disabled">
-                        <span class="text-500 font-medium ">
-                            <strong>{{this.vehicleEntry.nameUserAttendant | uppercase}}</strong>
-                        </span>
-                    </div>
-                </div>
-                <div class="col-12 md:col-6">
-                    <span class="text-500">Cliente</span>
-                    <div class="layout-input-disabled">
-                        <span class="text-500 font-medium">
-                            <strong>{{clientCompany.name | uppercase}}</strong>
-                        </span>
-                    </div>
-                </div>
-                @if(clientCompany.fisjur == juridica){
-                <div class="col-12 md:col-4">
-                    <span class="text-500">CNPJ</span>
-                    <div class="layout-input-disabled">
-                        <span class="text-500 font-medium"><strong>{{ maskCNPJ(clientCompany.cnpj) }}</strong></span>
-                    </div>
-                </div>
-                }@else {
-                <div class="col-12 md:col-4">
-                    <span class="text-500">CPF</span>
-                    <div class="layout-input-disabled">
-                        <span class="text-500 font-medium"><strong>{{maskCPF(clientCompany.cpf)}}</strong></span>
-                    </div>
-                </div>
-                }
-
-                <div class="col-12 md:col-2">
-                    <span class="text-500">Telefone Cliente</span>
-                    <div class="layout-input-disabled">
-                        <span *ngIf="clientCompany.phone" class="text-500 font-medium">
-                            <strong>
-                                {{maskPhone(clientCompany.dddPhone,clientCompany.phone)}}
-                            </strong>
-                        </span>
-                    </div>
-                </div>
-                <div class="col-12 md:col-4">
-                    <span class="text-500">Contato/Nome</span>
-                    <div class="layout-input-disabled">
-                        <span class="text-500 font-medium"><strong>{{clientCompany.contactName | uppercase}}</strong></span>
-                    </div>
-                </div>
-                <div class="col-12 md:col-4">
-                    <span class="text-500">Contato/E-Mail</span>
-                    <div class="layout-input-disabled">
-                        <span class="text-500 font-medium"><strong>{{clientCompany.contactEmail}}</strong></span>
-                    </div>
-                </div>
-                <div class="col-12 md:col-2">
-                    <span class="text-500">Contato/Celular</span>
-                    <div class="layout-input-disabled">
-                        <span class="text-500 font-medium">
-                            <strong>{{maskCellphone(clientCompany.contactDDDCellphone,clientCompany.contactCellphone)}}</strong>
-                        </span>
-                    </div>
-                </div>
-                <div class="col-12 md:col-2">
-                    <span class="text-500">Contato/Telefone</span>
-                    <div class="layout-input-disabled">
-                        <span class="text-500 font-medium">
-                            <strong>{{maskPhone(clientCompany.contactDDDPhone,clientCompany.contactPhone)}}</strong>
-                        </span>
-                    </div>
-                </div>
-            </div>
+    <div style="min-height: 46rem;">
+        <form [formGroup]="formBudget">
             <div class="card">
-                <div class="grid">
-                    <div class="col-8 md:col-2">
-                        <span class="text-500">CEP</span>
+                <div class="grid p-fluid p-formgrid">
+                    <div class="col-12 md:col-2">
+                        <span class="text-500">Nº Orçamento</span>
                         <div class="layout-input-disabled">
-                            <span class="text-500 font-medium"> <strong>{{
-                                    maskZipCode(clientCompany.zipCode)}}</strong></span>
+                            <span class="text-500 font-medium "><strong>{{budget.id}}</strong></span>
                         </div>
                     </div>
-                    <div class="col-4 md:col-2">
-                        <span class="text-500">UF</span>
+                    <div class=" col-12 md:col-3">
+                        <span class="text-500">Data Geração</span>
                         <div class="layout-input-disabled">
-                            <span class="text-500 font-medium"><strong>{{clientCompany.state |
-                                    uppercase}}</strong></span>
+                            <span class="text-500 font-medium ">
+                                <strong> {{budget.dateGeneration | date: 'dd/MM/yyyy HH:mm'}}</strong>
+                            </span>
                         </div>
                     </div>
-                    <div class="col-12 md:col-4">
-                        <span class="text-500">Município</span>
-                        <div class="layout-input-disabled">
-                            <span class="text-500 font-medium"><strong>{{clientCompany.city |
-                                    uppercase}}</strong></span>
-                        </div>
+                    <div class="col-12 md:col-2">
+                        <span class="text-500">Validade</span>
+                        <p-calendar [iconDisplay]="'input'" [showIcon]="true" dateFormat="dd/mm/yy"
+                            (onSelect)="onChangeDateValidation($event)" formControlName="dateValidation">
+                            <ng-template pTemplate="date" let-date>
+                                <span [ngStyle]="{color: isPastDate(date) ? 'red' : '' }">
+                                    {{date.day}}
+                                </span>
+                            </ng-template>
+                        </p-calendar>
                     </div>
-                    <div class="col-12 md:col-4">
-                        <span class="text-500">Bairro</span>
+                    <div class="col-12 md:col-3">
+                        <span class="text-500">Responsavel</span>
+                        <input pInputText formControlName="nameResponsible" />
+                    </div>
+                    <div class="col-12 md:col-2">
+                        <span class="text-500">Consultor</span>
                         <div class="layout-input-disabled">
-                            <span class="text-500 font-medium">
-                                <strong>{{clientCompany.neighborhood| uppercase}}</strong>
+                            <span class="text-500 font-medium ">
+                                <strong>{{this.vehicleEntry.nameUserAttendant | uppercase}}</strong>
                             </span>
                         </div>
                     </div>
                     <div class="col-12 md:col-6">
-                        <span class="text-500">Logradouro</span>
+                        <span class="text-500">Cliente</span>
                         <div class="layout-input-disabled">
                             <span class="text-500 font-medium">
-                                <strong>{{clientCompany.address | uppercase}}</strong>
+                                <strong>{{clientCompany.name | uppercase}}</strong>
                             </span>
                         </div>
                     </div>
-                    <div class="col-12 md:col-1">
-                        <span class="text-500">Nº</span>
+                    @if(clientCompany.fisjur == juridica){
+                    <div class="col-12 md:col-4">
+                        <span class="text-500">CNPJ</span>
                         <div class="layout-input-disabled">
-                            <span class="text-500 font-medium">
-                                <strong>{{clientCompany.addressNumber| uppercase}}</strong>
+                            <span class="text-500 font-medium"><strong>{{ maskCNPJ(clientCompany.cnpj) }}</strong></span>
+                        </div>
+                    </div>
+                    }@else {
+                    <div class="col-12 md:col-4">
+                        <span class="text-500">CPF</span>
+                        <div class="layout-input-disabled">
+                            <span class="text-500 font-medium"><strong>{{maskCPF(clientCompany.cpf)}}</strong></span>
+                        </div>
+                    </div>
+                    }
+
+                    <div class="col-12 md:col-2">
+                        <span class="text-500">Telefone Cliente</span>
+                        <div class="layout-input-disabled">
+                            <span *ngIf="clientCompany.phone" class="text-500 font-medium">
+                                <strong>
+                                    {{maskPhone(clientCompany.dddPhone,clientCompany.phone)}}
+                                </strong>
                             </span>
                         </div>
                     </div>
-                    <div class="col-12 md:col-5">
-                        <span class="text-500">Complemento</span>
+                    <div class="col-12 md:col-4">
+                        <span class="text-500">Contato/Nome</span>
+                        <div class="layout-input-disabled">
+                            <span class="text-500 font-medium"><strong>{{clientCompany.contactName | uppercase}}</strong></span>
+                        </div>
+                    </div>
+                    <div class="col-12 md:col-4">
+                        <span class="text-500">Contato/E-Mail</span>
+                        <div class="layout-input-disabled">
+                            <span class="text-500 font-medium"><strong>{{clientCompany.contactEmail}}</strong></span>
+                        </div>
+                    </div>
+                    <div class="col-12 md:col-2">
+                        <span class="text-500">Contato/Celular</span>
                         <div class="layout-input-disabled">
                             <span class="text-500 font-medium">
-                                <strong>{{clientCompany.addressComplement| uppercase}}</strong>
+                                <strong>{{maskCellphone(clientCompany.contactDDDCellphone,clientCompany.contactCellphone)}}</strong>
                             </span>
                         </div>
+                    </div>
+                    <div class="col-12 md:col-2">
+                        <span class="text-500">Contato/Telefone</span>
+                        <div class="layout-input-disabled">
+                            <span class="text-500 font-medium">
+                                <strong>{{maskPhone(clientCompany.contactDDDPhone,clientCompany.contactPhone)}}</strong>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="grid">
+                        <div class="col-8 md:col-2">
+                            <span class="text-500">CEP</span>
+                            <div class="layout-input-disabled">
+                                <span class="text-500 font-medium"> <strong>{{
+                                        maskZipCode(clientCompany.zipCode)}}</strong></span>
+                            </div>
+                        </div>
+                        <div class="col-4 md:col-2">
+                            <span class="text-500">UF</span>
+                            <div class="layout-input-disabled">
+                                <span class="text-500 font-medium"><strong>{{clientCompany.state |
+                                        uppercase}}</strong></span>
+                            </div>
+                        </div>
+                        <div class="col-12 md:col-4">
+                            <span class="text-500">Município</span>
+                            <div class="layout-input-disabled">
+                                <span class="text-500 font-medium"><strong>{{clientCompany.city |
+                                        uppercase}}</strong></span>
+                            </div>
+                        </div>
+                        <div class="col-12 md:col-4">
+                            <span class="text-500">Bairro</span>
+                            <div class="layout-input-disabled">
+                                <span class="text-500 font-medium">
+                                    <strong>{{clientCompany.neighborhood| uppercase}}</strong>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-12 md:col-6">
+                            <span class="text-500">Logradouro</span>
+                            <div class="layout-input-disabled">
+                                <span class="text-500 font-medium">
+                                    <strong>{{clientCompany.address | uppercase}}</strong>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-12 md:col-1">
+                            <span class="text-500">Nº</span>
+                            <div class="layout-input-disabled">
+                                <span class="text-500 font-medium">
+                                    <strong>{{clientCompany.addressNumber| uppercase}}</strong>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-12 md:col-5">
+                            <span class="text-500">Complemento</span>
+                            <div class="layout-input-disabled">
+                                <span class="text-500 font-medium">
+                                    <strong>{{clientCompany.addressComplement| uppercase}}</strong>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-2"></div>
+                <div class="card">
+                    <div class="grid">
+                        <div class="col-6 md:col-2">
+                            <span class="text-500">Placa</span>
+                            <div class="layout-input-disabled">
+                                <span class="text-500 font-medium"><strong>{{maskPlaca(vehicleEntry.placa) |
+                                        uppercase}}</strong></span>
+                            </div>
+                        </div>
+                        <div class="col-6 md:col-2">
+                            <span class="text-500">Frota</span>
+                            <div class="layout-input-disabled">
+                                <span class="text-500 font-medium"><strong>{{vehicleEntry.frota| uppercase}}</strong></span>
+                            </div>
+                        </div>
+                        <div class="col-12 md:col-2">
+                            <span class="text-500">Modelo</span>
+                            <div class="layout-input-disabled">
+                                <span class="text-500 font-medium">
+                                    <strong>{{vehicleEntry.modelDescription| uppercase}}</strong>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-6 md:col-2">
+                            <span class="text-500">Cor</span>
+                            <div class="layout-input-disabled">
+                                <span class="text-500 font-medium"><strong>{{vehicleEntry.color| uppercase}}</strong></span>
+                            </div>
+                        </div>
+                        <div class="col-6 md:col-2">
+                            <span class="text-500">KM</span>
+                            <div class="layout-input-disabled">
+                                <span class="text-500 font-medium"><strong>{{vehicleEntry.kmEntry}}</strong></span>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
             </div>
             <div class="mb-2"></div>
             <div class="card">
-                <div class="grid">
-                    <div class="col-6 md:col-2">
-                        <span class="text-500">Placa</span>
-                        <div class="layout-input-disabled">
-                            <span class="text-500 font-medium"><strong>{{maskPlaca(vehicleEntry.placa) |
-                                    uppercase}}</strong></span>
+                <div class="grid p-fluid p-formgrid">
+                    <div class="col-12 md:col-12 lg:col-6 xl:col-6">
+                        <span class="text-500">Informações complementares</span>
+                        <textarea pInputTextarea id="informacao" rows="5" cols="30"
+                            formControlName="information"></textarea>
+                    </div>
+                    <div class="col-12 md:col-12 lg:col-6 xl:col-6">
+                        <div class="grid p-fluid p-formgrid">
+
+                            <div class="col-12 md:col-6 lg:col-6 xl:col-6">
+                                <span>Forma de pagamento</span>
+                                <p-multiSelect [options]="listPayment" optionLabel="description" [showClear]="true" [selectionLimit]="1" placeholder="Selecione" formControlName="typePayment" />
+                            </div>
+                            <!-- show in mobile -->
+                            <div class="mobile-anabled col-12">
+                                <button pButton type="button" label="Fazer Orçamento" size="large" [raised]="true"  severity="warning" (click)="showDialogBudget()"></button>
+                            </div>
+                            <div class="col-12 md:col-6 lg:col-6 xl:col-6 flex flex-column">
+                                <span class="text-500">Total Orçamento</span>
+                                <span class="text-900 font-medium text-4xl">
+                                    <strong>{{ (totalBudgetService() + totalBudgetParts()) - (totalBudgetDiscountService() + totalBudgetDiscountParts()) | currency }} </strong>
+                                </span>
+                            </div>
+
+                            <div class="mobile-disabled col-12 md:col-6 lg:col-6 xl:col-6 flex ">
+                                <button pButton type="button" label="Fazer Orçamento" size="large" [raised]="true" severity="warning" (click)="showDialogBudget()"></button>
+                            </div>
+
+                            <div class="col-12 md:col-6 lg:col-6 xl:col-6 flex flex-column">
+                                <span class="text-500">Total Desconto</span>
+                                <span class="text-900 font-medium text-4xl">
+                                    <strong>{{(totalBudgetDiscountService() + totalBudgetDiscountParts()) | currency}}</strong>
+                                </span>
+                            </div>
+
                         </div>
                     </div>
-                    <div class="col-6 md:col-2">
-                        <span class="text-500">Frota</span>
-                        <div class="layout-input-disabled">
-                            <span class="text-500 font-medium"><strong>{{vehicleEntry.frota| uppercase}}</strong></span>
+                </div>
+            </div>
+        </form>
+    </div>
+    <!-- class="btn-action" -->
+    <div class="flex justify-content-between mt-2">
+        <div class="flex gap-2">
+            <button pButton type="button" label="Salvar" size="small" [raised]="true" severity="success-custom" icon="pi pi-check" (click)="saveBudget()"></button>
+            <button pButton type="button" label="Imprimir" size="small" [raised]="true" severity="secondary-custom" icon="pi pi-print" (click)="print()"></button>
+            <button pButton type="button" label="Enviar Cliente" size="small" [raised]="true" severity="secondary-custom" icon="pi pi-send" [disabled]="!enabledSendMailButton" (click)="confirmSendEmail()"></button>
+        </div>
+    </div>
+</div>
+<!-- Budget -->
+<p-dialog [(visible)]="visibleBudget" header="Fazer Orçamento" [modal]="true" [maximizable]="true"
+    [style]="{ width: '80rem',height:'80rem' }" [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }">
+    <p-tabView [style]="{'min-height': '49rem'}">
+        <p-tabPanel header="Solicitação">
+
+            <div class="grid p-fluid p-formgrid">
+                <div class="col-12 md:col-5">
+
+                    <form [formGroup]="formDiscount">
+                        <div class="grid p-fluid p-formgrid">
+                            <div class="col-12">
+                                <span>Desconto em serviços</span>
+                            </div>
+                            <div class="col-12 md:col-4">
+                                <p-inputNumber suffix="%" formControlName="discountServPer" />
+                                <small>Em Percentual</small>
+                            </div>
+
+                            <div class="col-12 md:col-4">
+                                <p-inputNumber prefix="R$ " mode="decimal" [minFractionDigits]="2"
+                                    [maxFractionDigits]="2" formControlName="discountServVal" />
+                                <small>Em Valor</small>
+                            </div>
+                            <div class="col-12 md:col-4 flex gap-2">
+                                <p-button icon="pi pi-calculator" size="small" [raised]="true"
+                                    severity="secondary-custom" (click)="addDiscountAllService()" />
+                                <p-button icon="pi pi-times" size="small" [raised]="true" severity="danger"
+                                    (click)="confirmDeleteDiscountService()" />
+                            </div>
+                            <div class="col-12">
+                                <span>Desconto em Peças</span>
+                            </div>
+                            <div class="col-12 md:col-4">
+                                <p-inputNumber suffix="%" formControlName="discountPartPer" />
+                                <small>Em Percentual</small>
+                            </div>
+
+                            <div class="col-12 md:col-4">
+                                <p-inputNumber prefix="R$ " mode="decimal" [minFractionDigits]="2"
+                                    [maxFractionDigits]="2" formControlName="discountPartVal" />
+                                <small>Em Valor</small>
+                            </div>
+                            <div class="col-12 md:col-4 flex gap-2">
+                                <p-button icon="pi pi-calculator" size="small" [raised]="true"
+                                    severity="secondary-custom" (click)="addDiscountAllPart()" />
+                                <p-button icon="pi pi-times" size="small" [raised]="true" severity="danger"
+                                    (click)="confirmDeleteDiscountPart()" />
+                            </div>
+
                         </div>
+                    </form>
+
+                </div>
+                <div class="md:col-2 mobile-disabled">
+                    <p-divider layout="vertical" />
+                </div>
+                <div class="col-12 md:col-5">
+                    <div class="card">
+                        <div class="grid p-fluid p-formgrid">
+                            <div class="col-12 flex justify-content-between align-items-center">
+                                <span class="text-500">Serviço/Peças</span>
+
+                                <div class="flex align-items-center justify-content-center bg-gray-100 border-round"
+                                    [ngStyle]="{width: '2.5rem', height: '2.5rem'}">
+                                    <i class="pi pi-book text-gray-500 text-xl"></i>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <span class="text-500 mr-1">Serviço:</span>
+                                <span class="text-green-700  font-medium text-xl">+</span>
+                                <span class="text-500">{{totalBudgetService() | currency }}</span>
+                            </div>
+                            <div class="col-12">
+                                <span class="text-500 mr-1">Peças:</span>
+                                <span class="text-green-700 font-medium text-xl">+</span>
+                                <span class="text-500">{{totalBudgetParts() | currency}}</span>
+                            </div>
+                            <div class="col-12">
+                                <span class="text-500 mr-1">Desconto:</span>
+                                <span class="text-red-700 font-medium text-xl">-</span>
+                                <span class="text-500">{{(totalBudgetDiscountService() + totalBudgetDiscountParts())
+                                    |
+                                    currency}}</span>
+                            </div>
+                            <div class="col-12 flex">
+                                <span class="text-700 text-lg mr-1 ">Total:</span>
+                                <div class="text-700 font-medium text-lg">
+                                    {{
+                                    (totalBudgetService() + totalBudgetParts()) - (totalBudgetDiscountService() +
+                                    totalBudgetDiscountParts()) | currency
+                                    }} </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="mobile-disabled">
+                <p-divider />
+            </div>
+
+            <form [formGroup]="formBudgetRequisition">
+                <div class="p-fluid p-formgrid grid">
+
+                    <div class="col-12">
+                        <label for="idbudgetrequisition">Descrição da solicitação</label>
+                        <p-inputGroup>
+                            <input pInputText id="idbudgetrequisition" type="text" formControlName="description" />
+                            @if(requisition != null){
+                            <button pButton type="button" icon="pi pi-check" class="p-button-primary"
+                                (click)="updateBudgetRequisition()"></button>
+                            <button pButton type="button" icon="pi pi-times" class="p-button-danger"
+                                (click)="cleanBudgetRequisition()"></button>
+                            }@else {
+                            <button pButton type="button" icon="pi pi-plus" class="p-button-primary"
+                                (click)="saveBudgetRequisition()"></button>
+                            }
+                        </p-inputGroup>
+                    </div>
+                </div>
+            </form>
+            <p-table [value]="listBudgetRequisition" [paginator]="true" [rows]="10"
+                [rowsPerPageOptions]="[10, 25, 50]" styleClass="p-datatable-sm" [scrollable]="true"
+                scrollHeight="12rem">
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th class="font-normal" style="width: 10%;">Ordem</th>
+                        <th class="font-normal" style="width: 70%;">Descrição</th>
+                        <th class="font-normal" style="width: 10%;">Editar</th>
+                        <th class="font-normal" style="width: 10%;">Remover</th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-requi>
+                    <tr>
+                        <td>{{requi.ordem}}</td>
+                        <td>{{requi.description | uppercase}}</td>
+                        <td>
+                            <p-button icon="pi pi-pencil" [text]="true" size="small" severity="primary"
+                                (onClick)="editarBudgetRequisition(requi)"></p-button>
+                        </td>
+                        <td class="p-0">
+                            <p-button icon="pi pi-trash" [text]="true" size="small" severity="danger"
+                                (onClick)="removerBudgetRequisition(requi)"></p-button>
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </p-tabPanel>
+
+        <p-tabPanel header="Serviços">
+            <form [formGroup]="formBudgetService">
+                <div class="p-fluid p-formgrid grid">
+
+                    <div class="col-12 md:col-6">
+                        <label for="idbudgetDescService">Descrição do serviço</label>
+                        <input pInputText id="idbudgetDescService" type="text" formControlName="description" />
+                        <small class="p-error block" *ngIf="formBudgetService.get('description')?.invalid">Campo obrigatório</small>
                     </div>
                     <div class="col-12 md:col-2">
-                        <span class="text-500">Modelo</span>
-                        <div class="layout-input-disabled">
-                            <span class="text-500 font-medium">
-                                <strong>{{vehicleEntry.modelDescription| uppercase}}</strong>
-                            </span>
-                        </div>
+                        <label for="Quantidade">Tempo serviço</label>
+                        <p-inputNumber [showButtons]="true" buttonLayout="horizontal" inputId="horizontal"
+                            spinnerMode="horizontal" [step]="0.50"
+                            decrementButtonClass="p-button-outlined p-button-danger"
+                            incrementButtonClass="p-button-outlined p-button-success"
+                            incrementButtonIcon="pi pi-plus" decrementButtonIcon="pi pi-minus"
+                            formControlName="hourService" />
+                        <small class="p-error block" *ngIf="formBudgetService.get('hourService')?.invalid">Campo obrigatório</small>
                     </div>
-                    <div class="col-6 md:col-2">
-                        <span class="text-500">Cor</span>
-                        <div class="layout-input-disabled">
-                            <span class="text-500 font-medium"><strong>{{vehicleEntry.color| uppercase}}</strong></span>
-                        </div>
+                    <div class="col-12 md:col-2">
+                        <label for="valor">Valor hora</label>
+                        <p-inputNumber mode="decimal" inputId="currency-br" locale="pt-BR" [minFractionDigits]="2" formControlName="price" />
+                        <small class="p-error block" *ngIf="formBudgetService.get('price')?.invalid">Campo obrigatório</small>
                     </div>
-                    <div class="col-6 md:col-2">
-                        <span class="text-500">KM</span>
-                        <div class="layout-input-disabled">
-                            <span class="text-500 font-medium"><strong>{{vehicleEntry.kmEntry}}</strong></span>
-                        </div>
+                    <div class="col-12 md:col-2">
+                        <label for="Quantidade">Desconto</label>
+                        <p-inputGroup>
+                            <p-inputNumber mode="decimal" inputId="currency-br" locale="pt-BR" [minFractionDigits]="2" formControlName="discount" />
+                            @if(!budgetServiceItem){
+                                <button *ngIf="!budgetServiceItem" pButton type="button" icon="pi pi-plus" class="p-button-primary" (click)="saveBudgetService()"></button>
+                            }@else {
+                                <button pButton type="button" icon="pi pi-check" class="p-button-primary" (click)="updateBudgetService()"></button>
+                                <button pButton type="button" icon="pi pi-times" class="p-button-danger" (click)="cleanBudgetService()"></button>
+                            }
+                        </p-inputGroup>
                     </div>
 
                 </div>
-            </div>
+            </form>
+            <p-table [value]="listBudgetService" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 25, 50]" styleClass="p-datatable-sm" [scrollable]="true" scrollHeight="30rem">
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th class="font-normal" style="width: 5rem;">Ordem</th>
+                        <th class="font-normal" style="width: 45rem;">Descrição</th>
+                        <th class="font-normal" style="width: 10rem;">Tempo</th>
+                        <th class="font-normal" style="width: 10rem;">Valor</th>
+                        <th class="font-normal" style="width: 10rem;">Desconto</th>
+                        <th class="font-normal" style="width: 10rem;">Total</th>
+                        <th class="font-normal" style="width: 5rem;">Editar</th>
+                        <th class="font-normal" style="width: 5rem;">Remover</th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-service>
+                    <tr style="height: 10px;">
+                        <td>{{ service.ordem }}</td>
+                        <td>{{ service.description | uppercase }}</td>
+                        <td>{{ service.hourService }}</td>
+                        <td>{{ service.price | currency }}</td>
+                        <td>{{ service.discount | currency }}</td>
+                        <td>
+                            {{ (service.price * service.hourService )-service.discount | currency }}</td>
+                        <td>
+                            <p-button icon="pi pi-pencil" [text]="true" size="small" severity="primary" (onClick)="editarBudgetService(service)"></p-button>
+                        </td>
+                        <td>
+                            <p-button icon="pi pi-trash" [text]="true" size="small" severity="danger" (onClick)="removerBudgetService(service)"></p-button>
+                        </td>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="footer">
+                    <tr>
+                        <td colspan="3" class="text-right">Totais</td>
+                        <td>{{totalBudgetService() | currency}}</td>
+                        <td>{{totalBudgetDiscountService() | currency}}</td>
+                        <td>{{(totalBudgetService() - totalBudgetDiscountService()) | currency}}</td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </p-tabPanel>
+
+        <p-tabPanel header="Peças">
+            <p-table #dtPecas dataKey="id" [value]="listBudgetItem" editMode="row"
+                [globalFilterFields]="['code', 'description', 'price', 'discount','Total']" [paginator]="true"
+                [rows]="10" [rowsPerPageOptions]="[10, 25, 50]" styleClass="p-datatable-sm" [scrollable]="true"
+                scrollHeight="33rem">
+                <ng-template pTemplate="caption">
+                    <div class="flex justify-content-between">
+                        <p-iconField iconPosition="left">
+                            <p-inputIcon>
+                                <i class="pi pi-search"></i>
+                            </p-inputIcon>
+                            <input pInputText type="text"
+                                (input)="dtPecas.filterGlobal($event.target.value, 'contains')" placeholder="Pesquisar" />
+                        </p-iconField>
+                        <app-filterparts (outputPart)="selectPart.set($event)" />
+                    </div>
+                </ng-template>
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th class="font-normal" style="width: 5%;">Ordem</th>
+                        <th class="font-normal" style="width: 10%;">Código</th>
+                        <th class="font-normal" style="width: 40%;">Descrição</th>
+                        <th class="font-normal" style="width: 5%;">Quantidade</th>
+                        <th class="font-normal" style="width: 10%;">Valor</th>
+                        <th class="font-normal" style="width: 10%;">Desconto</th>
+                        <th class="font-normal" style="width: 10%;">Total</th>
+                        <th class="font-normal" style="width: 5%;"></th>
+
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-parts let-editing="editing" let-index="rowIndex">
+                    <tr [pEditableRow]="parts">
+                        <td>{{parts.ordem}}</td>
+                        <td>{{parts.code}}</td>
+                        <td>
+                            <p-cellEditor>
+                                <ng-template pTemplate="input">
+                                    <input pInputText type="text" [(ngModel)]="parts.description" />
+                                </ng-template>
+                                <ng-template pTemplate="output">
+                                    {{parts.description}}
+                                </ng-template>
+                            </p-cellEditor>
+                        </td>
+                        <td>
+                            <p-cellEditor>
+                                <ng-template pTemplate="input">
+                                    <p-inputNumber model="decimal" currency="BRL" locale="pt-BR"
+                                        [minFractionDigits]="2" [maxFractionDigits]="2"
+                                        [(ngModel)]="parts.quantity" />
+                                </ng-template>
+                                <ng-template pTemplate="output">
+                                    {{parts.quantity | number:'1.2-2'}}
+                                </ng-template>
+                            </p-cellEditor>
+                        </td>
+                        <td>
+                            <p-cellEditor>
+                                <ng-template pTemplate="input">
+                                    <p-inputNumber model="decimal" currency="BRL" locale="pt-BR"
+                                        [minFractionDigits]="2" [maxFractionDigits]="2" [(ngModel)]="parts.price" />
+                                </ng-template>
+                                <ng-template pTemplate="output">
+                                    {{parts.price | currency }}
+                                </ng-template>
+                            </p-cellEditor>
+                        </td>
+                        <td>
+                            <p-cellEditor>
+                                <ng-template pTemplate="input">
+                                    <p-inputNumber model="decimal" currency="BRL" locale="pt-BR"
+                                        [minFractionDigits]="2" [maxFractionDigits]="2"
+                                        [(ngModel)]="parts.discount" />
+                                </ng-template>
+                                <ng-template pTemplate="output">
+                                    {{parts.discount | currency }}
+                                </ng-template>
+                            </p-cellEditor>
+                        </td>
+                        <td>{{( ( parts.quantity * parts.price ) - parts.discount) | currency}}</td>
+                        <td>
+                            <div class="flex align-items-center justify-content-center gap-2">
+                                <button *ngIf="!editing" pButton type="button" pInitEditableRow icon="pi pi-pencil"
+                                    (click)="onRowEditInit(parts)" class="p-button-text" size="small">
+                                </button>
+                                <button *ngIf="!editing" pButton type="button" icon="pi pi-trash"
+                                    (click)="deleteBudgetItem(parts)" class=" p-button-text" size="small"
+                                    severity="danger">
+                                </button>
+                                <button *ngIf="editing" pButton pRipple type="button" pSaveEditableRow
+                                    icon="pi pi-check" (click)="onRowEditSave(parts,index)"
+                                    class="p-button-text p-button-success mr-2">
+                                </button>
+                                <button *ngIf="editing" pButton pRipple type="button" pCancelEditableRow
+                                    icon="pi pi-times" (click)="onRowEditCancel(parts, index)"
+                                    class="p-button-text p-button-danger">
+                                </button>
+                            </div>
+                        </td>
+
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="footer">
+                    <tr>
+                        <td colspan="4" class="text-right">Totais</td>
+                        <td>{{totalBudgetParts() | currency}}</td>
+                        <td>{{totalBudgetDiscountParts() | currency}}</td>
+                        <td>{{(totalBudgetParts() - totalBudgetDiscountParts()) | currency}}</td>
+                        <td></td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </p-tabPanel>
+    </p-tabView>
+    <div class="flex justify-content-between">
+        <button *ngIf="!enabledOpenBudget" pButton type="button" label="Orçamento Concluído" size="small" [raised]="true" severity="secondary-custom" icon="pi pi-book" (click)="closeBudget()"></button>
+        <button *ngIf="enabledOpenBudget" pButton type="button" label="Abrir Orçamento" size="small" [raised]="true" severity="secondary-custom" icon="pi pi-lock-open" (click)="confirmOpenBudget()"></button>
+        <div class="flex justify-content-end">
+            <button pButton type="button" label="Fechar" size="small" icon="pi pi-times" class="p-button-text" (click)="closeDialogBudget()"></button>
         </div>
-        <div class="mb-2"></div>
-        <div class="card">
-            <div class="grid p-fluid p-formgrid">
-                <div class="col-12 md:col-12 lg:col-6 xl:col-6">
-                    <span class="text-500">Informações complementares</span>
-                    <textarea pInputTextarea id="informacao" rows="5" cols="30"
-                        formControlName="information"></textarea>
-                </div>
-                <div class="col-12 md:col-12 lg:col-6 xl:col-6">
-                    <div class="grid p-fluid p-formgrid">
-
-                        <div class="col-12 md:col-6 lg:col-6 xl:col-6">
-                            <span>Forma de pagamento</span>
-                            <p-multiSelect [options]="listPayment" optionLabel="description" [showClear]="true" [selectionLimit]="1" placeholder="Selecione" formControlName="typePayment" />
-                        </div>
-                        <!-- show in mobile -->
-                        <div class="mobile-anabled col-12">
-                            <button pButton type="button" label="Fazer Orçamento" size="large" [raised]="true"  severity="warning" (click)="showDialogBudget()"></button>
-                        </div>
-                        <div class="col-12 md:col-6 lg:col-6 xl:col-6 flex flex-column">
-                            <span class="text-500">Total Orçamento</span>
-                            <span class="text-900 font-medium text-4xl">
-                                <strong>{{ (totalBudgetService() + totalBudgetParts()) - (totalBudgetDiscountService() + totalBudgetDiscountParts()) | currency }} </strong>
-                            </span>
-                        </div>
-
-                        <div class="mobile-disabled col-12 md:col-6 lg:col-6 xl:col-6 flex ">
-                            <button pButton type="button" label="Fazer Orçamento" size="large" [raised]="true" severity="warning" (click)="showDialogBudget()"></button>
-                        </div>
-
-                        <div class="col-12 md:col-6 lg:col-6 xl:col-6 flex flex-column">
-                            <span class="text-500">Total Desconto</span>
-                            <span class="text-900 font-medium text-4xl">
-                                <strong>{{(totalBudgetDiscountService() + totalBudgetDiscountParts()) | currency}}</strong>
-                            </span>
-                        </div>
-
-                    </div>
-                </div>
-            </div>
-        </div>
-    </form>
-    <div class="btn-action">
-        <button pButton type="button" label="Salvar" size="small" [raised]="true" severity="success-custom" icon="pi pi-check" (click)="saveBudget()"></button>
-        <button pButton type="button" label="Imprimir" size="small" [raised]="true" severity="secondary-custom" icon="pi pi-print" (click)="print()"></button>
-        <button pButton type="button" label="Enviar Cliente" size="small" [raised]="true" severity="secondary-custom" icon="pi pi-send" [disabled]="!enabledSendMailButton" (click)="confirmSendEmail()"></button>
     </div>
-
-    <!-- Budget -->
-    <p-dialog [(visible)]="visibleBudget" header="Fazer Orçamento" [modal]="true" [maximizable]="true"
-        [style]="{ width: '80rem',height:'80rem' }" [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }">
-        <p-tabView [style]="{'min-height': '49rem'}">
-            <p-tabPanel header="Solicitação">
-
-                <div class="grid p-fluid p-formgrid">
-                    <div class="col-12 md:col-5">
-
-                        <form [formGroup]="formDiscount">
-                            <div class="grid p-fluid p-formgrid">
-                                <div class="col-12">
-                                    <span>Desconto em serviços</span>
-                                </div>
-                                <div class="field col-12 md:col-4">
-                                    <p-inputNumber suffix="%" formControlName="discountServPer" />
-                                    <small>Em Percentual</small>
-                                </div>
-
-                                <div class="field col-12 md:col-4">
-                                    <p-inputNumber prefix="R$ " mode="decimal" [minFractionDigits]="2"
-                                        [maxFractionDigits]="2" formControlName="discountServVal" />
-                                    <small>Em Valor</small>
-                                </div>
-                                <div class="field col-12 md:col-4 flex gap-2">
-                                    <p-button icon="pi pi-calculator" size="small" [raised]="true"
-                                        severity="secondary-custom" (click)="addDiscountAllService()" />
-                                    <p-button icon="pi pi-times" size="small" [raised]="true" severity="danger"
-                                        (click)="confirmDeleteDiscountService()" />
-                                </div>
-                                <div class="col-12">
-                                    <span>Desconto em Peças</span>
-                                </div>
-                                <div class="field col-12 md:col-4">
-                                    <p-inputNumber suffix="%" formControlName="discountPartPer" />
-                                    <small>Em Percentual</small>
-                                </div>
-
-                                <div class="field col-12 md:col-4">
-                                    <p-inputNumber prefix="R$ " mode="decimal" [minFractionDigits]="2"
-                                        [maxFractionDigits]="2" formControlName="discountPartVal" />
-                                    <small>Em Valor</small>
-                                </div>
-                                <div class="field col-12 md:col-4 flex gap-2">
-                                    <p-button icon="pi pi-calculator" size="small" [raised]="true"
-                                        severity="secondary-custom" (click)="addDiscountAllPart()" />
-                                    <p-button icon="pi pi-times" size="small" [raised]="true" severity="danger"
-                                        (click)="confirmDeleteDiscountPart()" />
-                                </div>
-
-                            </div>
-                        </form>
-
-                    </div>
-                    <div class="md:col-2 mobile-disabled">
-                        <p-divider layout="vertical" />
-                    </div>
-                    <div class="col-12 md:col-5">
-                        <div class="card">
-                            <div class="grid p-fluid p-formgrid">
-                                <div class="col-12 flex justify-content-between align-items-center">
-                                    <span class="text-500">Serviço/Peças</span>
-
-                                    <div class="flex align-items-center justify-content-center bg-gray-100 border-round"
-                                        [ngStyle]="{width: '2.5rem', height: '2.5rem'}">
-                                        <i class="pi pi-book text-gray-500 text-xl"></i>
-                                    </div>
-                                </div>
-                                <div class="col-12">
-                                    <span class="text-500 mr-1">Serviço:</span>
-                                    <span class="text-green-700  font-medium text-xl">+</span>
-                                    <span class="text-500">{{totalBudgetService() | currency }}</span>
-                                </div>
-                                <div class="col-12">
-                                    <span class="text-500 mr-1">Peças:</span>
-                                    <span class="text-green-700 font-medium text-xl">+</span>
-                                    <span class="text-500">{{totalBudgetParts() | currency}}</span>
-                                </div>
-                                <div class="col-12">
-                                    <span class="text-500 mr-1">Desconto:</span>
-                                    <span class="text-red-700 font-medium text-xl">-</span>
-                                    <span class="text-500">{{(totalBudgetDiscountService() + totalBudgetDiscountParts())
-                                        |
-                                        currency}}</span>
-                                </div>
-                                <div class="col-12 flex">
-                                    <span class="text-700 text-lg mr-1 ">Total:</span>
-                                    <div class="text-700 font-medium text-lg">
-                                        {{
-                                        (totalBudgetService() + totalBudgetParts()) - (totalBudgetDiscountService() +
-                                        totalBudgetDiscountParts()) | currency
-                                        }} </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="mobile-disabled">
-                    <p-divider />
-                </div>
-
-                <form [formGroup]="formBudgetRequisition">
-                    <div class="p-fluid p-formgrid grid">
-
-                        <div class="field col-12">
-                            <label for="idbudgetrequisition">Descrição da solicitação</label>
-                            <p-inputGroup>
-                                <input pInputText id="idbudgetrequisition" type="text" formControlName="description" />
-                                @if(requisition != null){
-                                <button pButton type="button" icon="pi pi-check" class="p-button-primary"
-                                    (click)="updateBudgetRequisition()"></button>
-                                <button pButton type="button" icon="pi pi-times" class="p-button-danger"
-                                    (click)="cleanBudgetRequisition()"></button>
-                                }@else {
-                                <button pButton type="button" icon="pi pi-plus" class="p-button-primary"
-                                    (click)="saveBudgetRequisition()"></button>
-                                }
-                            </p-inputGroup>
-                        </div>
-                    </div>
-                </form>
-                <p-table [value]="listBudgetRequisition" [paginator]="true" [rows]="10"
-                    [rowsPerPageOptions]="[10, 25, 50]" styleClass="p-datatable-sm" [scrollable]="true"
-                    scrollHeight="12rem">
-                    <ng-template pTemplate="header">
-                        <tr>
-                            <th class="font-normal" style="width: 10%;">Ordem</th>
-                            <th class="font-normal" style="width: 70%;">Descrição</th>
-                            <th class="font-normal" style="width: 10%;">Editar</th>
-                            <th class="font-normal" style="width: 10%;">Remover</th>
-                        </tr>
-                    </ng-template>
-                    <ng-template pTemplate="body" let-requi>
-                        <tr>
-                            <td>{{requi.ordem}}</td>
-                            <td>{{requi.description | uppercase}}</td>
-                            <td>
-                                <p-button icon="pi pi-pencil" [text]="true" size="small" severity="primary"
-                                    (onClick)="editarBudgetRequisition(requi)"></p-button>
-                            </td>
-                            <td class="p-0">
-                                <p-button icon="pi pi-trash" [text]="true" size="small" severity="danger"
-                                    (onClick)="removerBudgetRequisition(requi)"></p-button>
-                            </td>
-                        </tr>
-                    </ng-template>
-                </p-table>
-            </p-tabPanel>
-
-            <p-tabPanel header="Serviços">
-                <form [formGroup]="formBudgetService">
-                    <div class="p-fluid p-formgrid grid">
-
-                        <div class="field col-12 md:col-6">
-                            <label for="idbudgetDescService">Descrição do serviço</label>
-                            <input pInputText id="idbudgetDescService" type="text" formControlName="description" />
-                            <small class="p-error block" *ngIf="formBudgetService.get('description')?.invalid">Campo obrigatório</small>
-                        </div>
-                        <div class="field col-12 md:col-2">
-                            <label for="Quantidade">Tempo serviço</label>
-                            <p-inputNumber [showButtons]="true" buttonLayout="horizontal" inputId="horizontal"
-                                spinnerMode="horizontal" [step]="0.50"
-                                decrementButtonClass="p-button-outlined p-button-danger"
-                                incrementButtonClass="p-button-outlined p-button-success"
-                                incrementButtonIcon="pi pi-plus" decrementButtonIcon="pi pi-minus"
-                                formControlName="hourService" />
-                            <small class="p-error block" *ngIf="formBudgetService.get('hourService')?.invalid">Campo obrigatório</small>
-                        </div>
-                        <div class="field col-12 md:col-2">
-                            <label for="valor">Valor hora</label>
-                            <p-inputNumber mode="decimal" inputId="currency-br" locale="pt-BR" [minFractionDigits]="2" formControlName="price" />
-                            <small class="p-error block" *ngIf="formBudgetService.get('price')?.invalid">Campo obrigatório</small>
-                        </div>
-                        <div class="field col-12 md:col-2">
-                            <label for="Quantidade">Desconto</label>
-                            <p-inputGroup>
-                                <p-inputNumber mode="decimal" inputId="currency-br" locale="pt-BR" [minFractionDigits]="2" formControlName="discount" />
-                                @if(!budgetServiceItem){
-                                    <button *ngIf="!budgetServiceItem" pButton type="button" icon="pi pi-plus" class="p-button-primary" (click)="saveBudgetService()"></button>
-                                }@else {
-                                    <button pButton type="button" icon="pi pi-check" class="p-button-primary" (click)="updateBudgetService()"></button>
-                                    <button pButton type="button" icon="pi pi-times" class="p-button-danger" (click)="cleanBudgetService()"></button>
-                                }
-                            </p-inputGroup>
-                        </div>
-
-                    </div>
-                </form>
-                <p-table [value]="listBudgetService" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 25, 50]" styleClass="p-datatable-sm" [scrollable]="true" scrollHeight="30rem">
-                    <ng-template pTemplate="header">
-                        <tr>
-                            <th class="font-normal" style="width: 5rem;">Ordem</th>
-                            <th class="font-normal" style="width: 45rem;">Descrição</th>
-                            <th class="font-normal" style="width: 10rem;">Tempo</th>
-                            <th class="font-normal" style="width: 10rem;">Valor</th>
-                            <th class="font-normal" style="width: 10rem;">Desconto</th>
-                            <th class="font-normal" style="width: 10rem;">Total</th>
-                            <th class="font-normal" style="width: 5rem;">Editar</th>
-                            <th class="font-normal" style="width: 5rem;">Remover</th>
-                        </tr>
-                    </ng-template>
-                    <ng-template pTemplate="body" let-service>
-                        <tr style="height: 10px;">
-                            <td>{{ service.ordem }}</td>
-                            <td>{{ service.description | uppercase }}</td>
-                            <td>{{ service.hourService }}</td>
-                            <td>{{ service.price | currency }}</td>
-                            <td>{{ service.discount | currency }}</td>
-                            <td>
-                                {{ (service.price * service.hourService )-service.discount | currency }}</td>
-                            <td>
-                                <p-button icon="pi pi-pencil" [text]="true" size="small" severity="primary" (onClick)="editarBudgetService(service)"></p-button>
-                            </td>
-                            <td>
-                                <p-button icon="pi pi-trash" [text]="true" size="small" severity="danger" (onClick)="removerBudgetService(service)"></p-button>
-                            </td>
-                        </tr>
-                    </ng-template>
-                    <ng-template pTemplate="footer">
-                        <tr>
-                            <td colspan="3" class="text-right">Totais</td>
-                            <td>{{totalBudgetService() | currency}}</td>
-                            <td>{{totalBudgetDiscountService() | currency}}</td>
-                            <td>{{(totalBudgetService() - totalBudgetDiscountService()) | currency}}</td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                    </ng-template>
-                </p-table>
-            </p-tabPanel>
-
-            <p-tabPanel header="Peças">
-                <p-table #dtPecas dataKey="id" [value]="listBudgetItem" editMode="row"
-                    [globalFilterFields]="['code', 'description', 'price', 'discount','Total']" [paginator]="true"
-                    [rows]="10" [rowsPerPageOptions]="[10, 25, 50]" styleClass="p-datatable-sm" [scrollable]="true"
-                    scrollHeight="33rem">
-                    <ng-template pTemplate="caption">
-                        <div class="flex justify-content-between">
-                            <p-iconField iconPosition="left">
-                                <p-inputIcon>
-                                    <i class="pi pi-search"></i>
-                                </p-inputIcon>
-                                <input pInputText type="text"
-                                    (input)="dtPecas.filterGlobal($event.target.value, 'contains')"
-                                    placeholder="Pesquisar" />
-                            </p-iconField>
-                            <app-filterparts (outputPart)="selectPart.set($event)" />
-                        </div>
-                    </ng-template>
-                    <ng-template pTemplate="header">
-                        <tr>
-                            <th class="font-normal" style="width: 5%;">Ordem</th>
-                            <th class="font-normal" style="width: 10%;">Código</th>
-                            <th class="font-normal" style="width: 40%;">Descrição</th>
-                            <th class="font-normal" style="width: 5%;">Quantidade</th>
-                            <th class="font-normal" style="width: 10%;">Valor</th>
-                            <th class="font-normal" style="width: 10%;">Desconto</th>
-                            <th class="font-normal" style="width: 10%;">Total</th>
-                            <th class="font-normal" style="width: 5%;"></th>
-
-                        </tr>
-                    </ng-template>
-                    <ng-template pTemplate="body" let-parts let-editing="editing" let-index="rowIndex">
-                        <tr [pEditableRow]="parts">
-                            <td>{{parts.ordem}}</td>
-                            <td>{{parts.code}}</td>
-                            <td>
-                                <p-cellEditor>
-                                    <ng-template pTemplate="input">
-                                        <input pInputText type="text" [(ngModel)]="parts.description" />
-                                    </ng-template>
-                                    <ng-template pTemplate="output">
-                                        {{parts.description}}
-                                    </ng-template>
-                                </p-cellEditor>
-                            </td>
-                            <td>
-                                <p-cellEditor>
-                                    <ng-template pTemplate="input">
-                                        <p-inputNumber model="decimal" currency="BRL" locale="pt-BR"
-                                            [minFractionDigits]="2" [maxFractionDigits]="2"
-                                            [(ngModel)]="parts.quantity" />
-                                    </ng-template>
-                                    <ng-template pTemplate="output">
-                                        {{parts.quantity | number:'1.2-2'}}
-                                    </ng-template>
-                                </p-cellEditor>
-                            </td>
-                            <td>
-                                <p-cellEditor>
-                                    <ng-template pTemplate="input">
-                                        <p-inputNumber model="decimal" currency="BRL" locale="pt-BR"
-                                            [minFractionDigits]="2" [maxFractionDigits]="2" [(ngModel)]="parts.price" />
-                                    </ng-template>
-                                    <ng-template pTemplate="output">
-                                        {{parts.price | currency }}
-                                    </ng-template>
-                                </p-cellEditor>
-                            </td>
-                            <td>
-                                <p-cellEditor>
-                                    <ng-template pTemplate="input">
-                                        <p-inputNumber model="decimal" currency="BRL" locale="pt-BR"
-                                            [minFractionDigits]="2" [maxFractionDigits]="2"
-                                            [(ngModel)]="parts.discount" />
-                                    </ng-template>
-                                    <ng-template pTemplate="output">
-                                        {{parts.discount | currency }}
-                                    </ng-template>
-                                </p-cellEditor>
-                            </td>
-                            <td>{{( ( parts.quantity * parts.price ) - parts.discount) | currency}}</td>
-                            <td>
-                                <div class="flex align-items-center justify-content-center gap-2">
-                                    <button *ngIf="!editing" pButton type="button" pInitEditableRow icon="pi pi-pencil"
-                                        (click)="onRowEditInit(parts)" class="p-button-text" size="small">
-                                    </button>
-                                    <button *ngIf="!editing" pButton type="button" icon="pi pi-trash"
-                                        (click)="deleteBudgetItem(parts)" class=" p-button-text" size="small"
-                                        severity="danger">
-                                    </button>
-                                    <button *ngIf="editing" pButton pRipple type="button" pSaveEditableRow
-                                        icon="pi pi-check" (click)="onRowEditSave(parts,index)"
-                                        class="p-button-text p-button-success mr-2">
-                                    </button>
-                                    <button *ngIf="editing" pButton pRipple type="button" pCancelEditableRow
-                                        icon="pi pi-times" (click)="onRowEditCancel(parts, index)"
-                                        class="p-button-text p-button-danger">
-                                    </button>
-                                </div>
-                            </td>
-
-                        </tr>
-                    </ng-template>
-                    <ng-template pTemplate="footer">
-                        <tr>
-                            <td colspan="4" class="text-right">Totais</td>
-                            <td>{{totalBudgetParts() | currency}}</td>
-                            <td>{{totalBudgetDiscountParts() | currency}}</td>
-                            <td>{{(totalBudgetParts() - totalBudgetDiscountParts()) | currency}}</td>
-                            <td></td>
-                        </tr>
-                    </ng-template>
-                </p-table>
-            </p-tabPanel>
-        </p-tabView>
-        <div class="flex justify-content-between">
-            <button *ngIf="!enabledOpenBudget" pButton type="button" label="Orçamento Concluído" size="small" [raised]="true" severity="secondary-custom" icon="pi pi-book" (click)="closeBudget()"></button>
-            <button *ngIf="enabledOpenBudget" pButton type="button" label="Abrir Orçamento" size="small" [raised]="true" severity="secondary-custom" icon="pi pi-lock-open" (click)="confirmOpenBudget()"></button>
-            <div class="flex justify-content-end">
-                <button pButton type="button" label="Fechar" size="small" icon="pi pi-times" class="p-button-text" (click)="closeDialogBudget()"></button>
-            </div>
-        </div>
-    </p-dialog>
-</div>
-
+</p-dialog>
 <!-- Toast discount  -->
 <p-toast position="top-center" key="toastInfoDiscount" (onClose)="onCloseAlertDiscount()" [baseZIndex]="5000">
     <ng-template let-message pTemplate="headless" let-closeFn="closeFn">
@@ -641,7 +640,6 @@
         </section>
     </ng-template>
 </p-toast>
-
 <!-- Confirm delete discount -->
 <p-confirmDialog #cd>
     <ng-template pTemplate="headless" let-message>
@@ -662,10 +660,8 @@
         </div>
     </ng-template>
 </p-confirmDialog>
-
 <!-- Print -->
 <app-printbudget #printComponent />
-
 <!-- Comfirm send email -->
 <p-confirmDialog #cdd key="confirmEmailId">
     <ng-template pTemplate="headless" let-message>
@@ -687,7 +683,6 @@
         </div>
     </ng-template>
 </p-confirmDialog>
-
 <!-- Comfirm open Budget -->
 <p-confirmDialog #cob key="confirmOpenBudgetId">
     <ng-template pTemplate="headless" let-message>

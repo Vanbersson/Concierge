@@ -22,6 +22,7 @@ import { DividerModule } from 'primeng/divider';
 import { RadioButtonModule } from 'primeng/radiobutton';
 import { CheckboxModule } from 'primeng/checkbox';
 import { CalendarModule } from 'primeng/calendar';
+import { OverlayPanelModule } from 'primeng/overlaypanel';
 
 //Service
 import { MechanicService } from '../../../../services/workshop/mechanic/mechanic.service';
@@ -86,7 +87,7 @@ class MatItem {
   standalone: true,
   imports: [CommonModule, ButtonModule, TableModule, InputTextModule, InputNumberModule, MultiSelectModule, DividerModule, CheckboxModule,
     IconFieldModule, InputMaskModule, InputGroupModule, InputIconModule, DialogModule, ReactiveFormsModule, FormsModule, PasswordModule, RadioButtonModule,
-    ConfirmDialogModule, ToastModule, InputTextareaModule, CalendarModule, PrintEpiComponent],
+    ConfirmDialogModule, ToastModule, InputTextareaModule, CalendarModule, PrintEpiComponent,OverlayPanelModule],
   templateUrl: './pegar-devolver.component.html',
   styleUrl: './pegar-devolver.component.scss',
   providers: [ConfirmationService, MessageService]
@@ -160,8 +161,6 @@ export default class PegarDevolverComponent implements OnInit {
   });
 
   @ViewChild('printEPIComponent') printEPIComponent!: PrintEpiComponent;
-
-  @ViewChild('topbarmenu') menu!: ElementRef;
 
   constructor(
     public layoutService: LayoutService,

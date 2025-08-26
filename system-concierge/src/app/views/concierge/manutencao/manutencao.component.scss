@@ -27,10 +27,6 @@
         justify-content: space-between;
     }
 
-    .layourt-button-action-speedDial {
-        display: none;
-    }
-
     .layourt-button-action {
         display: flex;
         width: 100%;
@@ -154,13 +150,6 @@
 
         .layourt-button-action {
             display: none;
-        }
-
-        .layourt-button-action-speedDial {
-            display: flex;
-            position: fixed !important;
-            bottom: 30vh;
-            right: 18vw;
         }
 
         ::ng-deep {

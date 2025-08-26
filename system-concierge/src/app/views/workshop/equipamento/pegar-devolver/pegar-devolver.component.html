@@ -2,14 +2,23 @@
     <p-toast />
     <div class="layout-card-title">
         <span>Requisições</span>
-       <div class="flex gap-2">
+       <div class="mobile-disabled flex gap-2 ">
             <p-button icon="pi pi-plus" [text]="true" label="Solicitação" (onClick)=" showDialogReq()" />
             <p-divider layout="vertical" />
             <p-button icon="pi pi-plus" [text]="true" label="Entrega de Materiais" (onClick)="showDialogDeliveryMat()" />
             <p-divider layout="vertical" />
-            <p-button icon="pi pi-reply" [text]="true" label="Devolver" severity="danger" [disabled]="selectedMaterials.length == 0"
-                (onClick)=" returnMaterial()" />
+            <p-button icon="pi pi-reply" [text]="true" label="Devolver" severity="danger" [disabled]="selectedMaterials.length == 0" (onClick)=" returnMaterial()" />            
         </div> 
+        <div class="mobile-enabled">
+            <p-button (onClick)="op.toggle($event)" icon="pi pi-ellipsis-v"  text="true" severity="secondary" [rounded]="true"/>
+            <p-overlayPanel #op>
+                <div class="flex flex-column ">
+                    <p-button icon="pi pi-plus" [text]="true" label="Solicitação" (onClick)=" showDialogReq()" />
+                    <p-button icon="pi pi-plus" [text]="true" label="Entrega de Materiais" (onClick)="showDialogDeliveryMat()" />
+                    <p-button icon="pi pi-reply" [text]="true" label="Devolver" severity="danger" [disabled]="selectedMaterials.length == 0" (onClick)=" returnMaterial()" /> 
+                </div>
+            </p-overlayPanel>
+        </div>
     </div>
     <p-table #dt dataKey="mecId" [value]="listfilterMec" [expandedRowKeys]="expandedRows"
         (onRowExpand)="onRowExpand($event)" (onRowCollapse)="onRowCollapse($event)" [paginator]="true" [rows]="10"
@@ -104,7 +113,7 @@
 </div>
 
 <!-- Requisição de materiais -->
-<p-dialog header="Entrega de Materiais" [(visible)]="visibleDialogPegar" modal="true"
+<p-dialog header="Entrega de Materiais" [(visible)]="visibleDialogPegar" modal="true" [maximizable]="true"
     [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }" [style]="{width: '60rem', height:'60rem'}">
     <form [formGroup]="formPegar">
         <div class="mt-2 layout-dialog-img">
@@ -278,7 +287,7 @@
 </p-dialog>
 
 <!-- Retorno de material -->
-<p-dialog header="Devoluções de Materiais" [(visible)]="visibleDialogDev" modal="true" closable="false"
+<p-dialog header="Devoluções de Materiais" [(visible)]="visibleDialogDev" modal="true" [maximizable]="true" closable="false"
     [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }" [style]="{width: '80rem', height:'40rem'}">
     <div style="min-height: 30rem;">
         <p-table [value]="listReturnMaterial" [tableStyle]="{ 'min-width': '40rem'}" [tableStyle]="{ 'min-width': '50rem' }">
@@ -347,7 +356,7 @@
 </p-confirmDialog>
 
 <!-- Solicitação -->
-<p-dialog header="Solicitação de Materiais" [(visible)]="visibleDialogRequest" modal="true" 
+<p-dialog header="Solicitação de Materiais" [(visible)]="visibleDialogRequest" modal="true" [maximizable]="true"
     [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }" [style]="{width: '60rem', height:'54rem'}">
     <form [formGroup]="formRequest">
          <div class="p-fluid p-formgrid grid">

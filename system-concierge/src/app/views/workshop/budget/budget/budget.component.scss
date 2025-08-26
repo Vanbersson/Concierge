@@ -3,15 +3,14 @@
     .layout-card-title {
         display: flex;
         justify-content: space-between;
-        align-items: center;
-        margin-bottom: 8px;
+        margin-bottom: 1rem;
 
         span {
             display: flex;
             align-items: center;
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: var(--color-text-primary);
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--color-grey-800);
         }
     }
 

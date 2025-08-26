@@ -553,7 +553,7 @@ export default class VehicleEntryComponent implements OnInit, OnDestroy, DoCheck
 
     this.formVehicle.patchValue({
       placa: '',
-      frota: '',
+      frota: null,
       modelVehicle: [],
       dateEntry: new Date(),
       datePrevisionExit: null,
