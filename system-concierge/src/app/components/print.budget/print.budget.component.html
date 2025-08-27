@@ -104,9 +104,7 @@
             <span class="text-normal">{{clientCompany.address}} {{clientCompany.addressNumber}}</span>
         </div>
     </div>
-
     <div class="border-bottom-1 w-screen"></div>
-
     <div class="w-screen mt-1">
         <span>SOLICITAÇÕES</span>
     </div>
@@ -172,10 +170,7 @@
             </tr>
         </tfoot>
     </table>
-
-    <div class="border-bottom-1 w-screen"></div>
-
-    <div class="w-screen mt-1">
+    <div class="w-screen mt-2">
         <span>PEÇAS</span>
     </div>
     <br>
@@ -222,30 +217,33 @@
             </tr>
         </tfoot>
     </table>
-    <div class="flex justify-content-end flex-wrap w-screen">
+    <!-- Evita que o conteúdo seja dividido 'break-inside: avoid;' -->
+    <div class="flex justify-content-end" style="break-inside: avoid;">
         <table class="mt-5" style="width: 300px;">
-            <tr>
-                <td class="text-normal p-1">TOTAL DE SERVIÇOS</td>
-                <td class="text-normal" style="text-align: right;">
-                    <strong>{{totalService - totalServiceDiscount | currency }}</strong>
-                </td>
-            </tr>
-            <tr>
-                <td class="text-normal p-1">TOTAL DE PEÇAS</td>
-                <td class="text-normal" style="text-align: right;">
-                    <strong>{{totalPart - totalPartDiscount |currency }}</strong>
-                </td>
-            </tr>
-            <tr>
-                <td class="text-normal p-1">TOTAL GERAL</td>
-                <td class="text-normal" style="text-align: right;">
-                    <strong>{{totalGeral |currency }}</strong>
-                </td>
-            </tr>
+            <tbody>
+                <tr>
+                    <td class="text-normal p-1">TOTAL DE SERVIÇOS</td>
+                    <td class="text-normal" style="text-align: right;">
+                        <strong>{{totalService - totalServiceDiscount | currency }}</strong>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="text-normal p-1">TOTAL DE PEÇAS</td>
+                    <td class="text-normal" style="text-align: right;">
+                        <strong>{{totalPart - totalPartDiscount |currency }}</strong>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="text-normal p-1">TOTAL GERAL</td>
+                    <td class="text-normal" style="text-align: right;">
+                        <strong>{{totalGeral |currency }}</strong>
+                    </td>
+                </tr>
+            </tbody>
         </table>
     </div>
     <br>
-    <table>
+    <table style="break-inside: avoid;">
         <tr>
             <td>
                 <span class="text-small">Informações</span>
@@ -270,7 +268,4 @@
             </td>
         </tr>
     </table>
-   
-    
-   
 </div>

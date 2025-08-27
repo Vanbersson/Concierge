@@ -106,7 +106,7 @@ export class PrintBudgetComponent {
         targetStyles: ['*'], // Inclui todos os estilos aplicáveis
         scanStyles: true,
         documentTitle: 'Orçamento',
-        font_size:'10pt'
+        font_size:'8pt'
       });
       print.style.display = 'none';
     }, 200);

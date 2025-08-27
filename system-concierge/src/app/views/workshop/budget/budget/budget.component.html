@@ -263,10 +263,9 @@
 </div>
 <!-- Budget -->
 <p-dialog [(visible)]="visibleBudget" header="Fazer Orçamento" [modal]="true" [maximizable]="true"
-    [style]="{ width: '80rem',height:'80rem' }" [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }">
-    <p-tabView [style]="{'min-height': '49rem'}">
+    [style]="{ width: '80rem',height:'60rem' }" [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }">
+    <p-tabView [style]="{'min-height': '46rem'}">
         <p-tabPanel header="Solicitação">
-
             <div class="grid p-fluid p-formgrid">
                 <div class="col-12 md:col-5">
 
@@ -358,10 +357,6 @@
                     </div>
                 </div>
             </div>
-            <div class="mobile-disabled">
-                <p-divider />
-            </div>
-
             <form [formGroup]="formBudgetRequisition">
                 <div class="p-fluid p-formgrid grid">
 
@@ -382,15 +377,13 @@
                     </div>
                 </div>
             </form>
-            <p-table [value]="listBudgetRequisition" [paginator]="true" [rows]="10"
-                [rowsPerPageOptions]="[10, 25, 50]" styleClass="p-datatable-sm" [scrollable]="true"
-                scrollHeight="12rem">
+            <p-table [value]="listBudgetRequisition" [scrollable]="true" scrollHeight="19rem" styleClass="p-datatable-sm">
                 <ng-template pTemplate="header">
                     <tr>
-                        <th class="font-normal" style="width: 10%;">Ordem</th>
-                        <th class="font-normal" style="width: 70%;">Descrição</th>
-                        <th class="font-normal" style="width: 10%;">Editar</th>
-                        <th class="font-normal" style="width: 10%;">Remover</th>
+                        <th style="width: 10%;">Ordem</th>
+                        <th style="width: 70%;">Descrição</th>
+                        <th style="width: 10%;">Editar</th>
+                        <th style="width: 10%;">Remover</th>
                     </tr>
                 </ng-template>
                 <ng-template pTemplate="body" let-requi>
@@ -398,12 +391,10 @@
                         <td>{{requi.ordem}}</td>
                         <td>{{requi.description | uppercase}}</td>
                         <td>
-                            <p-button icon="pi pi-pencil" [text]="true" size="small" severity="primary"
-                                (onClick)="editarBudgetRequisition(requi)"></p-button>
+                            <p-button icon="pi pi-pencil" [text]="true" size="small" severity="primary" (onClick)="editarBudgetRequisition(requi)"></p-button>
                         </td>
-                        <td class="p-0">
-                            <p-button icon="pi pi-trash" [text]="true" size="small" severity="danger"
-                                (onClick)="removerBudgetRequisition(requi)"></p-button>
+                        <td>
+                            <p-button icon="pi pi-trash" [text]="true" size="small" severity="danger" (onClick)="removerBudgetRequisition(requi)"></p-button>
                         </td>
                     </tr>
                 </ng-template>
@@ -413,7 +404,6 @@
         <p-tabPanel header="Serviços">
             <form [formGroup]="formBudgetService">
                 <div class="p-fluid p-formgrid grid">
-
                     <div class="col-12 md:col-6">
                         <label for="idbudgetDescService">Descrição do serviço</label>
                         <input pInputText id="idbudgetDescService" type="text" formControlName="description" />
@@ -449,17 +439,17 @@
 
                 </div>
             </form>
-            <p-table [value]="listBudgetService" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 25, 50]" styleClass="p-datatable-sm" [scrollable]="true" scrollHeight="30rem">
+            <p-table [value]="listBudgetService" [scrollable]="true" scrollHeight="34rem" styleClass="p-datatable-sm">
                 <ng-template pTemplate="header">
                     <tr>
-                        <th class="font-normal" style="width: 5rem;">Ordem</th>
-                        <th class="font-normal" style="width: 45rem;">Descrição</th>
-                        <th class="font-normal" style="width: 10rem;">Tempo</th>
-                        <th class="font-normal" style="width: 10rem;">Valor</th>
-                        <th class="font-normal" style="width: 10rem;">Desconto</th>
-                        <th class="font-normal" style="width: 10rem;">Total</th>
-                        <th class="font-normal" style="width: 5rem;">Editar</th>
-                        <th class="font-normal" style="width: 5rem;">Remover</th>
+                        <th style="width: 5rem;">Ordem</th>
+                        <th style="width: 45rem;">Descrição</th>
+                        <th style="width: 10rem;">Tempo</th>
+                        <th style="width: 10rem;">Valor</th>
+                        <th style="width: 10rem;">Desconto</th>
+                        <th style="width: 10rem;">Total</th>
+                        <th style="width: 5rem;">Editar</th>
+                        <th style="width: 5rem;">Remover</th>
                     </tr>
                 </ng-template>
                 <ng-template pTemplate="body" let-service>
@@ -494,9 +484,8 @@
 
         <p-tabPanel header="Peças">
             <p-table #dtPecas dataKey="id" [value]="listBudgetItem" editMode="row"
-                [globalFilterFields]="['code', 'description', 'price', 'discount','Total']" [paginator]="true"
-                [rows]="10" [rowsPerPageOptions]="[10, 25, 50]" styleClass="p-datatable-sm" [scrollable]="true"
-                scrollHeight="33rem">
+                [globalFilterFields]="['code', 'description', 'price', 'discount','Total']"
+                [scrollable]="true" scrollHeight="36rem" styleClass="p-datatable-sm">
                 <ng-template pTemplate="caption">
                     <div class="flex justify-content-between">
                         <p-iconField iconPosition="left">
@@ -606,11 +595,12 @@
             </p-table>
         </p-tabPanel>
     </p-tabView>
+    <p-divider />
     <div class="flex justify-content-between">
-        <button *ngIf="!enabledOpenBudget" pButton type="button" label="Orçamento Concluído" size="small" [raised]="true" severity="secondary-custom" icon="pi pi-book" (click)="closeBudget()"></button>
+        <button *ngIf="!enabledOpenBudget" pButton type="button" label="Orçamento Concluído" size="small" [raised]="true" severity="secondary-custom" icon="pi pi-lock" (click)="closeBudget()"></button>
         <button *ngIf="enabledOpenBudget" pButton type="button" label="Abrir Orçamento" size="small" [raised]="true" severity="secondary-custom" icon="pi pi-lock-open" (click)="confirmOpenBudget()"></button>
         <div class="flex justify-content-end">
-            <button pButton type="button" label="Fechar" size="small" icon="pi pi-times" class="p-button-text" (click)="closeDialogBudget()"></button>
+            <button pButton type="button" label="Fechar" icon="pi pi-times" class="p-button-text" (click)="closeDialogBudget()"></button>
         </div>
     </div>
 </p-dialog>
