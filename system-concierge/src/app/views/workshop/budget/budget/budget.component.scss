@@ -30,6 +30,19 @@
         display: none;
     }
 
+    ::ng-deep {
+
+        .p-inputgroup .p-inputtext,
+        .p-fluid .p-inputgroup .p-inputtext,
+        .p-inputgroup .p-inputwrapper,
+        .p-inputgroup .p-inputwrapper>.p-component {
+            flex: 1 1 auto;
+            width: 100%;
+            border-bottom-right-radius: 0;
+            border-top-right-radius: 0;
+        }
+    }
+
     /* Small devices (portrait tablets and large phones, 600px and up) */
     @media only screen and (min-width: 375px) and (max-width: 667px) {
         .mobile-disabled {
