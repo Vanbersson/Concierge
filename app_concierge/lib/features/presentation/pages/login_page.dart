@@ -1,7 +1,6 @@
 import 'package:app_concierge/features/data/domain/user_login_sqlite_service.dart';
 import 'package:app_concierge/features/domain/user/user_login.dart';
 import 'package:app_concierge/features/presentation/pages/main_page.dart';
-import 'package:app_concierge/features/presentation/widgets/myTextField.dart';
 import 'package:app_concierge/services/login/login_service.dart';
 import 'package:flutter/material.dart';
 
@@ -40,7 +39,7 @@ class _LoginPageState extends State<LoginPage> {
         height: myHeight,
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            colors: [Colors.blue, Colors.grey, Colors.black],
+            colors: [Colors.blue, Colors.grey, Colors.blue],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -50,14 +49,20 @@ class _LoginPageState extends State<LoginPage> {
             Positioned(
               top: myWidth / 6,
               left: myWidth / 14,
-              child: Image.asset("assets/icons/icon-1.png",
-                  width: 60, fit: BoxFit.cover),
+              child: Image.asset(
+                "assets/icons/icon-1.png",
+                width: 60,
+                fit: BoxFit.cover,
+              ),
             ),
             Positioned(
               top: myWidth / 3,
               right: myWidth / 12,
-              child: Image.asset("assets/icons/icon-2.png",
-                  width: 60, fit: BoxFit.cover),
+              child: Image.asset(
+                "assets/icons/icon-2.png",
+                width: 60,
+                fit: BoxFit.cover,
+              ),
             ),
             Positioned(
               bottom: myWidth / 4,
@@ -68,23 +73,19 @@ class _LoginPageState extends State<LoginPage> {
                 fit: BoxFit.cover,
               ),
             ),
-            
+
             Column(
               children: [
-                const Expanded(
-                  flex: 1,
-                  child: SizedBox(),
-                ),
+                const Expanded(flex: 1, child: SizedBox()),
                 Text(
-                  "ATENATRUCK",
+                  "Portaria",
                   style: TextStyle(
-                      color: Colors.white,
-                      fontSize: sizeScreen * 0.07,
-                      fontWeight: FontWeight.w900),
+                    color: Colors.white,
+                    fontSize: sizeScreen * 0.07,
+                    fontWeight: FontWeight.w900,
+                  ),
                 ),
-                const SizedBox(
-                  height: 50,
-                ),
+                const SizedBox(height: 50),
                 //Welcome text
                 Text(
                   "Bem-vindo",
@@ -92,7 +93,7 @@ class _LoginPageState extends State<LoginPage> {
                   style: TextStyle(
                     color: Colors.black87,
                     fontSize: sizeScreen * 0.045,
-                    fontWeight: FontWeight.bold
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
                 Text(
@@ -103,31 +104,72 @@ class _LoginPageState extends State<LoginPage> {
                     fontSize: sizeScreen * 0.035,
                   ),
                 ),
-                const SizedBox(
-                  height: 15,
-                ),
+                const SizedBox(height: 15),
 
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24.0),
                   child: Align(
                     alignment: Alignment.topLeft,
-                    child: Text("E-mail",
-                        style: TextStyle(
-                            color: Colors.black87,
-                            fontSize: sizeScreen * 0.045,
-                            fontWeight: FontWeight.bold)),
+                    child: Text(
+                      "E-mail",
+                      style: TextStyle(
+                        color: Colors.black87,
+                        fontSize: sizeScreen * 0.045,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
                 ),
-
                 //Usúario
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                  child: Mytextfield(
-                    myKey: userKey,
-                    myController: userController,
-                    myLabelText: "",
-                    myKeyboardType: TextInputType.emailAddress,
-                    myTextInputAction: TextInputAction.next,
+                  child: TextFormField(
+                    key: userKey,
+                    validator: (text) {
+                      if (text == null || text.trim().isEmpty) {
+                        return "E-mail inválido!";
+                      }
+                      return null;
+                    },
+                    onTapOutside: (event) => FocusScope.of(context).unfocus(),
+                    controller: userController,
+                    keyboardType: TextInputType.emailAddress,
+                    textInputAction: TextInputAction.next,
+                    maxLength: 100,
+                    maxLines: 1,
+                    enabled: true,
+                    style: TextStyle(
+                      color: Colors.black54,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                    decoration: InputDecoration(
+                      counterText: "",
+                      fillColor: Colors.grey.shade200,
+                      filled: true,
+                      labelText: "",
+                      labelStyle: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        color: Colors.grey.shade700,
+                      ),
+                      enabledBorder: const OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.transparent),
+                        borderRadius: BorderRadius.all(Radius.circular(10)),
+                      ),
+                      focusedBorder: const OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.transparent),
+                        borderRadius: BorderRadius.all(Radius.circular(10)),
+                      ),
+                      errorBorder: const OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.transparent),
+                        borderRadius: BorderRadius.all(Radius.circular(10)),
+                      ),
+                      focusedErrorBorder: const OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.transparent),
+                        borderRadius: BorderRadius.all(Radius.circular(10)),
+                      ),
+                    ),
                   ),
                 ),
 
@@ -135,11 +177,14 @@ class _LoginPageState extends State<LoginPage> {
                   padding: const EdgeInsets.symmetric(horizontal: 24.0),
                   child: Align(
                     alignment: Alignment.topLeft,
-                    child: Text("Senha",
-                        style: TextStyle(
-                            color: Colors.black87,
-                            fontSize: sizeScreen * 0.045,
-                            fontWeight: FontWeight.bold)),
+                    child: Text(
+                      "Senha",
+                      style: TextStyle(
+                        color: Colors.black87,
+                        fontSize: sizeScreen * 0.045,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
                 ),
                 //Senha
@@ -157,9 +202,10 @@ class _LoginPageState extends State<LoginPage> {
                     controller: passwordController,
                     obscureText: myObscureText,
                     style: const TextStyle(
-                        color: Colors.black54,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16),
+                      color: Colors.black54,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
                     decoration: InputDecoration(
                       fillColor: Colors.grey.shade200,
                       filled: true,
@@ -170,9 +216,11 @@ class _LoginPageState extends State<LoginPage> {
                             myObscureText = !myObscureText;
                           });
                         },
-                        icon: Icon(myObscureText
-                            ? Icons.visibility_off
-                            : Icons.visibility),
+                        icon: Icon(
+                          myObscureText
+                              ? Icons.visibility_off
+                              : Icons.visibility,
+                        ),
                       ),
                       labelStyle: TextStyle(
                         fontWeight: FontWeight.bold,
@@ -180,23 +228,25 @@ class _LoginPageState extends State<LoginPage> {
                         color: Colors.grey.shade700,
                       ),
                       enabledBorder: const OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.white),
-                        borderRadius: BorderRadius.all(
-                          Radius.circular(10.0),
-                        ),
+                        borderSide: BorderSide(color: Colors.transparent),
+                        borderRadius: BorderRadius.all(Radius.circular(10)),
                       ),
                       focusedBorder: const OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.white),
-                        borderRadius: BorderRadius.all(
-                          Radius.circular(10.0),
-                        ),
+                        borderSide: BorderSide(color: Colors.transparent),
+                        borderRadius: BorderRadius.all(Radius.circular(10)),
+                      ),
+                      errorBorder: const OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.transparent),
+                        borderRadius: BorderRadius.all(Radius.circular(10)),
+                      ),
+                      focusedErrorBorder: const OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.transparent),
+                        borderRadius: BorderRadius.all(Radius.circular(10)),
                       ),
                     ),
                   ),
                 ),
-                const SizedBox(
-                  height: 25,
-                ),
+                const SizedBox(height: 25),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24.0),
                   child: Row(
@@ -212,9 +262,7 @@ class _LoginPageState extends State<LoginPage> {
                     ],
                   ),
                 ),
-                const SizedBox(
-                  height: 25,
-                ),
+                const SizedBox(height: 25),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24.0),
                   child: ElevatedButton(
@@ -232,7 +280,9 @@ class _LoginPageState extends State<LoginPage> {
                       clickLogin.value = true;
 
                       userLogin = await loginservice.login(
-                          userController.text, passwordController.text);
+                        userController.text,
+                        passwordController.text,
+                      );
 
                       clickLogin.value = false;
 
@@ -243,9 +293,8 @@ class _LoginPageState extends State<LoginPage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => MainPage(
-                              userLogin: userLogin,
-                            ),
+                            builder: (context) =>
+                                MainPage(userLogin: userLogin),
                           ),
                         );
                       } else {
@@ -259,11 +308,15 @@ class _LoginPageState extends State<LoginPage> {
                     },
                     style: ButtonStyle(
                       elevation: const WidgetStatePropertyAll<double>(8.0),
-                      backgroundColor:
-                          const WidgetStatePropertyAll<Color>(Colors.blue),
+                      backgroundColor: const WidgetStatePropertyAll<Color>(
+                        Colors.blue,
+                      ),
                       padding: WidgetStatePropertyAll<EdgeInsetsGeometry>(
-                          EdgeInsets.symmetric(
-                              horizontal: sizeScreen * 0.36, vertical: 16.0)),
+                        EdgeInsets.symmetric(
+                          horizontal: sizeScreen * 0.36,
+                          vertical: 16.0,
+                        ),
+                      ),
                       shape: WidgetStatePropertyAll<RoundedRectangleBorder>(
                         RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8.0),
@@ -273,33 +326,29 @@ class _LoginPageState extends State<LoginPage> {
                     child: const Text(
                       "Acessar",
                       style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16),
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
                     ),
                   ),
                 ),
 
-                const Expanded(
-                  flex: 1,
-                  child: SizedBox(
-                    height: 25,
-                  ),
-                ),
+                const Expanded(flex: 1, child: SizedBox(height: 25)),
                 Text(
-                  "NATIVA MAQUINAS E IMPLEMENTOS LTDA",
+                  "Aplicativo para controle de entrada de veículos.",
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    color: Colors.white30,
-                    fontWeight: FontWeight.w300,
+                    color: Colors.white,
+                    fontWeight: FontWeight.w400,
                     fontSize: sizeScreen * 0.03,
                   ),
                 ),
-                const SizedBox(
-                  height: 10,
-                ),
+                const SizedBox(height: 10),
               ],
             ),
+
+            //Load
             ValueListenableBuilder(
               valueListenable: clickLogin,
               builder: (context, value, child) {
@@ -308,13 +357,15 @@ class _LoginPageState extends State<LoginPage> {
                         width: myWidth,
                         height: myHeight,
                         decoration: const BoxDecoration(
-                            color: Color.fromARGB(103, 190, 190, 190)),
+                          color: Color.fromARGB(103, 190, 190, 190),
+                        ),
                         child: const Center(
                           child: CircularProgressIndicator(
                             color: Colors.blue,
                             strokeWidth: 2,
                           ),
-                        ))
+                        ),
+                      )
                     : const SizedBox();
               },
             ),

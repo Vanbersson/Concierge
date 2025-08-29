@@ -15,10 +15,7 @@ import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
 class DriverPage extends StatefulWidget {
   UserLogin userLogin;
-  DriverPage({
-    super.key,
-    required this.userLogin
-  });
+  DriverPage({super.key, required this.userLogin});
 
   @override
   State<DriverPage> createState() => _DriverPageState();
@@ -33,9 +30,10 @@ class _DriverPageState extends State<DriverPage> {
   final cpfKey = GlobalKey<FormFieldState>();
   final cpfControler = TextEditingController();
   var maskFormatterCpf = MaskTextInputFormatter(
-      mask: '###.###.###-##',
-      filter: {"#": RegExp(r'[0-9]')},
-      type: MaskAutoCompletionType.lazy);
+    mask: '###.###.###-##',
+    filter: {"#": RegExp(r'[0-9]')},
+    type: MaskAutoCompletionType.lazy,
+  );
   final rgKey = GlobalKey<FormFieldState>();
   final rgControler = TextEditingController();
 
@@ -46,11 +44,9 @@ class _DriverPageState extends State<DriverPage> {
   @override
   void initState() {
     _userDriver = UserDriver();
-
     photoDriver = ValueNotifier<Uint8List>(Uint8List(0));
     doc1Driver = ValueNotifier<Uint8List>(Uint8List(0));
     doc2Driver = ValueNotifier<Uint8List>(Uint8List(0));
-
     super.initState();
   }
 
@@ -58,7 +54,7 @@ class _DriverPageState extends State<DriverPage> {
   Widget build(BuildContext context) {
     final widght = MediaQuery.of(context).size.width;
     final height = MediaQuery.of(context).size.height;
-     sizeScreen = MediaQuery.of(context).size.shortestSide;
+    sizeScreen = MediaQuery.of(context).size.shortestSide;
 
     return Scaffold(
       backgroundColor: Colors.grey.shade100,
@@ -76,18 +72,20 @@ class _DriverPageState extends State<DriverPage> {
                     const Text(
                       "Vamos informar os dados do motorista",
                       style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 24,
-                          color: Colors.black87),
+                        fontWeight: FontWeight.bold,
+                        fontSize: 24,
+                        color: Colors.black87,
+                      ),
                     ),
                     const Row(
                       children: [
                         Text(
                           "Por favor informe os dados corretamente.",
                           style: TextStyle(
-                              fontWeight: FontWeight.w300,
-                              fontSize: 16,
-                              color: Colors.black87),
+                            fontWeight: FontWeight.w300,
+                            fontSize: 16,
+                            color: Colors.black87,
+                          ),
                         ),
                       ],
                     ),
@@ -121,9 +119,10 @@ class _DriverPageState extends State<DriverPage> {
                           child: const Text(
                             "Foto motorista",
                             style: TextStyle(
-                                fontWeight: FontWeight.w300,
-                                fontSize: 16,
-                                color: Colors.blue),
+                              fontWeight: FontWeight.w300,
+                              fontSize: 16,
+                              color: Colors.blue,
+                            ),
                           ),
                         ),
                         ValueListenableBuilder(
@@ -139,7 +138,8 @@ class _DriverPageState extends State<DriverPage> {
                                     icon: const Icon(
                                       Icons.clear,
                                       color: Colors.red,
-                                    ))
+                                    ),
+                                  )
                                 : const SizedBox();
                           },
                         ),
@@ -205,9 +205,10 @@ class _DriverPageState extends State<DriverPage> {
                                   child: Text(
                                     "Documento1",
                                     style: TextStyle(
-                                        fontWeight: FontWeight.w300,
-                                        fontSize: 16,
-                                        color: Colors.blue.shade300),
+                                      fontWeight: FontWeight.w300,
+                                      fontSize: 16,
+                                      color: Colors.blue.shade300,
+                                    ),
                                   ),
                                 ),
                                 ValueListenableBuilder(
@@ -223,7 +224,8 @@ class _DriverPageState extends State<DriverPage> {
                                             icon: const Icon(
                                               Icons.clear,
                                               color: Colors.red,
-                                            ))
+                                            ),
+                                          )
                                         : const SizedBox();
                                   },
                                 ),
@@ -258,9 +260,10 @@ class _DriverPageState extends State<DriverPage> {
                                   child: Text(
                                     "Documento2",
                                     style: TextStyle(
-                                        fontWeight: FontWeight.w300,
-                                        fontSize: 16,
-                                        color: Colors.blue.shade300),
+                                      fontWeight: FontWeight.w300,
+                                      fontSize: 16,
+                                      color: Colors.blue.shade300,
+                                    ),
                                   ),
                                 ),
                                 ValueListenableBuilder(
@@ -276,7 +279,8 @@ class _DriverPageState extends State<DriverPage> {
                                             icon: const Icon(
                                               Icons.clear,
                                               color: Colors.red,
-                                            ))
+                                            ),
+                                          )
                                         : const SizedBox();
                                   },
                                 ),
@@ -296,10 +300,16 @@ class _DriverPageState extends State<DriverPage> {
                                   cpfControler.text.isNotEmpty ||
                               rgControler.text.isNotEmpty) {
                             _userDriver.name = nameControler.text;
-                            _userDriver.cpf = _removerMaskCpf(cpfControler.text);
+                            _userDriver.cpf = _removerMaskCpf(
+                              cpfControler.text,
+                            );
                             _userDriver.rg = rgControler.text;
-                      
-                            Navigator.of(context).push(_createRouteDriver());
+
+                            bool result = validDriver(_userDriver);
+
+                            if (result) {
+                              Navigator.of(context).push(_createRouteDriver());
+                            }
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
@@ -311,9 +321,10 @@ class _DriverPageState extends State<DriverPage> {
                         },
                         style: ButtonStyle(
                           elevation: const WidgetStatePropertyAll<double>(8.0),
-                          backgroundColor:
-                              WidgetStatePropertyAll<Color>(Colors.blue.shade300),
-                         
+                          backgroundColor: WidgetStatePropertyAll<Color>(
+                            Colors.blue.shade300,
+                          ),
+
                           shape: WidgetStatePropertyAll<RoundedRectangleBorder>(
                             RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8.0),
@@ -331,10 +342,26 @@ class _DriverPageState extends State<DriverPage> {
                 ),
               ),
             ),
-          )
+          ),
         ],
       ),
     );
+  }
+
+  bool validDriver(UserDriver driver) {
+    if (driver.cpf!.isNotEmpty) {
+      if (driver.cpf!.length != 11) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('CPF invalido.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return false;
+      }
+    }
+
+    return true;
   }
 
   Future<Uint8List?> compressFile(File file) async {
@@ -347,16 +374,18 @@ class _DriverPageState extends State<DriverPage> {
 
   void openCamera1(BuildContext context) async {
     Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (_) => CameraCamera(
-                  onFile: (file) {
-                    if (file != null) {
-                      fileToBase64Photo(file.path);
-                      Navigator.pop(context);
-                    }
-                  },
-                )));
+      context,
+      MaterialPageRoute(
+        builder: (_) => CameraCamera(
+          onFile: (file) {
+            if (file != null) {
+              fileToBase64Photo(file.path);
+              Navigator.pop(context);
+            }
+          },
+        ),
+      ),
+    );
   }
 
   void fileToBase64Photo(String filePath) async {
@@ -367,16 +396,18 @@ class _DriverPageState extends State<DriverPage> {
 
   void openCamera2(BuildContext context) async {
     Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (_) => CameraCamera(
-                  onFile: (file) {
-                    if (file != null) {
-                      fileToBase64PDoc1(file.path);
-                      Navigator.pop(context);
-                    }
-                  },
-                )));
+      context,
+      MaterialPageRoute(
+        builder: (_) => CameraCamera(
+          onFile: (file) {
+            if (file != null) {
+              fileToBase64PDoc1(file.path);
+              Navigator.pop(context);
+            }
+          },
+        ),
+      ),
+    );
   }
 
   void fileToBase64PDoc1(String filePath) async {
@@ -387,16 +418,18 @@ class _DriverPageState extends State<DriverPage> {
 
   void openCamera3(BuildContext context) async {
     Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (_) => CameraCamera(
-                  onFile: (file) {
-                    if (file != null) {
-                      fileToBase64PDoc2(file.path);
-                      Navigator.pop(context);
-                    }
-                  },
-                )));
+      context,
+      MaterialPageRoute(
+        builder: (_) => CameraCamera(
+          onFile: (file) {
+            if (file != null) {
+              fileToBase64PDoc2(file.path);
+              Navigator.pop(context);
+            }
+          },
+        ),
+      ),
+    );
   }
 
   void fileToBase64PDoc2(String filePath) async {
@@ -407,33 +440,36 @@ class _DriverPageState extends State<DriverPage> {
 
   Route _createRouteDriver() {
     return PageRouteBuilder(
-        pageBuilder: (context, animation, secondaryAnimation) => VehicleAddPage(
-              userLogin: widget.userLogin,
-              userDriver: _userDriver,
-            ),
-        transitionDuration: const Duration(milliseconds: 600),
-        transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          const begin = Offset(1.0, 0.0);
-          const end = Offset.zero;
-          const curve = Curves.ease;
+      pageBuilder: (context, animation, secondaryAnimation) =>
+          VehicleAddPage(userLogin: widget.userLogin, userDriver: _userDriver),
+      transitionDuration: const Duration(milliseconds: 600),
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        const begin = Offset(1.0, 0.0);
+        const end = Offset.zero;
+        const curve = Curves.ease;
 
-          final tween = Tween(begin: begin, end: end);
+        final tween = Tween(begin: begin, end: end);
 
-          final curvedAnimation =
-              CurvedAnimation(parent: animation, curve: curve);
+        final curvedAnimation = CurvedAnimation(
+          parent: animation,
+          curve: curve,
+        );
 
-          return SlideTransition(
-            position: tween.animate(curvedAnimation),
-            child: child,
-          );
-        });
+        return SlideTransition(
+          position: tween.animate(curvedAnimation),
+          child: child,
+        );
+      },
+    );
   }
 
   String _removerMaskCpf(String cpf) {
     var mask;
     try {
       var mask = MaskTextInputFormatter(
-          mask: "###########", filter: {"#": RegExp(r'[0-9]')});
+        mask: "###########",
+        filter: {"#": RegExp(r'[0-9]')},
+      );
       return mask.maskText(cpf);
     } catch (e) {
       return "";

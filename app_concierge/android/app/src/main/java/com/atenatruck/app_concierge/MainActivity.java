@@ -1,4 +1,4 @@
-package com.autopoint.app_concierge;
+package com.atenatruck.app_concierge;
 
 import io.flutter.embedding.android.FlutterActivity;
 

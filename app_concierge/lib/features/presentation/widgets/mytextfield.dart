@@ -48,7 +48,6 @@ class Mytextfield extends StatelessWidget {
       maxLength: myMaxLength ?? 255,
       maxLines: myMaxLines ?? 1,
       enabled: myEnabled ?? true,
-      
       textCapitalization: myTextCapitalization ?? TextCapitalization.words,
       style: TextStyle(
         color: myTextColor ?? Colors.black54,
@@ -63,19 +62,15 @@ class Mytextfield extends StatelessWidget {
         labelStyle: TextStyle(
           fontWeight: FontWeight.bold,
           fontSize: 16,
-          color: Colors.grey.shade700,
+          color: Colors.black54,
         ),
-        enabledBorder:const OutlineInputBorder(
-          borderSide: BorderSide(color: Colors.white),
-          borderRadius:  BorderRadius.all(
-            Radius.circular(10),
-          ),
+        enabledBorder: const OutlineInputBorder(
+          borderSide: BorderSide(color: Colors.grey),
+          borderRadius: BorderRadius.all(Radius.circular(10)),
         ),
-        focusedBorder:const OutlineInputBorder(
-          borderSide: BorderSide(color: Colors.white),
-          borderRadius:  BorderRadius.all(
-            Radius.circular(10),
-          ),
+        focusedBorder: const OutlineInputBorder(
+          borderSide: BorderSide(color: Colors.grey),
+          borderRadius: BorderRadius.all(Radius.circular(10)),
         ),
       ),
     );

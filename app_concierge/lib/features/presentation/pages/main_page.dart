@@ -18,10 +18,7 @@ import 'package:app_concierge/features/domain/user/user_login.dart';
 
 class MainPage extends StatefulWidget {
   UserLogin userLogin;
-  MainPage({
-    super.key,
-    required this.userLogin,
-  });
+  MainPage({super.key, required this.userLogin});
 
   @override
   State<MainPage> createState() => _MainPageState();
@@ -69,10 +66,14 @@ class _MainPageState extends State<MainPage> {
   void initSearch() async {
     clickViewVehicle.value = true;
     // Obter as listas de veículos autorizados
-    List<VehicleEntry> vehiclesAuth =
-        await _vehicleService.allAuthorized(companyId, resaleId);
-    listVehicles.value =
-        await _vehicleService.allPendingAuthorization(companyId, resaleId);
+    List<VehicleEntry> vehiclesAuth = await _vehicleService.allAuthorized(
+      companyId,
+      resaleId,
+    );
+    listVehicles.value = await _vehicleService.allPendingAuthorization(
+      companyId,
+      resaleId,
+    );
 
     //Total de veículos autorizados
     _allAuthorizedTotal.value = vehiclesAuth.length;
@@ -83,15 +84,19 @@ class _MainPageState extends State<MainPage> {
     timer = Timer.periodic(const Duration(seconds: 30), (timer) async {
       try {
         // Obter a lista de veículos autorizados
-        List<VehicleEntry> vehicleAuth1 =
-            await _vehicleService.allAuthorized(companyId, resaleId);
+        List<VehicleEntry> vehicleAuth1 = await _vehicleService.allAuthorized(
+          companyId,
+          resaleId,
+        );
 
         //Total de veículos autorizados
         _allAuthorizedTotal.value = vehicleAuth1.length;
 
         // Obter a lista de veículos
-        listVehicles.value =
-            await _vehicleService.allPendingAuthorization(companyId, resaleId);
+        listVehicles.value = await _vehicleService.allPendingAuthorization(
+          companyId,
+          resaleId,
+        );
       } catch (e) {
         // print("Erro ao consultar e atualizar a lista: $e");
       }
@@ -108,29 +113,33 @@ class _MainPageState extends State<MainPage> {
       _currIndexIconSearch.value = 1;
 
       temp1 = listVehicleEntryFilter
-          .where((vehicle) => vehicle.placa.toString()
-          .contains(searchString))
+          .where((vehicle) => vehicle.placa.toString().contains(searchString))
           .toList();
       if (searchString == "novo") {
         temp1 += listVehicleEntryFilter
-            .where((vehicle) => vehicle.vehicleNew.toString()
-            .contains("yes"))
+            .where((vehicle) => vehicle.vehicleNew.toString().contains("yes"))
             .toList();
       }
       temp1 += listVehicleEntryFilter
-          .where((vehicle) => vehicle.clientCompanyName
-              .toString()
-              .contains(searchString.toUpperCase()))
+          .where(
+            (vehicle) => vehicle.clientCompanyName.toString().contains(
+              searchString.toUpperCase(),
+            ),
+          )
           .toList();
 
       temp1 += listVehicleEntryFilter
-          .where((vehicle) => vehicle.modelDescription.toString()
-          .contains(searchString))
+          .where(
+            (vehicle) =>
+                vehicle.modelDescription.toString().contains(searchString),
+          )
           .toList();
 
       temp1 += listVehicleEntryFilter
-          .where((vehicle) => formatDate(vehicle.dateEntry.toString())
-          .contains(searchString))
+          .where(
+            (vehicle) =>
+                formatDate(vehicle.dateEntry.toString()).contains(searchString),
+          )
           .toList();
 
       listVehicles.value = temp1;
@@ -170,9 +179,10 @@ class _MainPageState extends State<MainPage> {
                   child: Text(
                     widget.userLogin.name.toString().substring(0, 1),
                     style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18.0,
-                        color: Colors.black54),
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18.0,
+                      color: Colors.black54,
+                    ),
                   ),
                 ),
               ),
@@ -190,7 +200,7 @@ class _MainPageState extends State<MainPage> {
                         IconButton(
                           onPressed: () {},
                           color: Colors.black45,
-                          icon: const Icon(
+                          icon: Icon(
                             Icons.notifications_active_outlined,
                             color: Colors.black54,
                           ),
@@ -203,21 +213,21 @@ class _MainPageState extends State<MainPage> {
                             width: 16,
                             alignment: Alignment.center,
                             decoration: BoxDecoration(
-                                color: Colors.green.shade300,
-                                borderRadius: BorderRadius.circular(20)),
+                              color: Colors.green,
+                              borderRadius: BorderRadius.circular(20),
+                            ),
                             child: Text(
                               "$value",
                               style: const TextStyle(
-                                  color: Colors.white, fontSize: 10.0),
+                                color: Colors.white,
+                                fontSize: 10.0,
+                              ),
                             ),
                           ),
                         ),
                       ],
                     )
-                  : const Icon(
-                      Icons.notifications_none,
-                      color: Colors.black54,
-                    );
+                  : const Icon(Icons.notifications_none, color: Colors.black54);
             },
           ),
           //Exit
@@ -237,9 +247,7 @@ class _MainPageState extends State<MainPage> {
                           style: TextStyle(fontSize: 16, color: Colors.black87),
                         ),
                       ),
-                      const SizedBox(
-                        height: 10,
-                      ),
+                      const SizedBox(height: 10),
                       SizedBox(
                         width: myWidth - sizeScreen * 0.04,
                         height: 50,
@@ -249,45 +257,46 @@ class _MainPageState extends State<MainPage> {
                             deletestorage();
                             Navigator.pop(context, false);
                             Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const SplashPage(),
-                                ));
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const SplashPage(),
+                              ),
+                            );
                           },
                           style: ButtonStyle(
                             backgroundColor:
                                 const WidgetStatePropertyAll<Color>(
-                                    Colors.blue),
+                                  Colors.blue,
+                                ),
                             shape:
                                 WidgetStatePropertyAll<RoundedRectangleBorder>(
-                              RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8.0),
-                              ),
-                            ),
+                                  RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8.0),
+                                  ),
+                                ),
                           ),
                           child: const Text("Sim"),
                         ),
                       ),
-                      const SizedBox(
-                        height: 8,
-                      ),
+                      const SizedBox(height: 8),
                       SizedBox(
                         width: myWidth - sizeScreen * 0.04,
                         height: 50,
                         child: OutlinedButton(
-                            onPressed: () {
-                              ScaffoldMessenger.of(context).clearSnackBars();
-                            },
-                            style: ButtonStyle(
-                              shape: WidgetStatePropertyAll<
-                                  RoundedRectangleBorder>(
-                                RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8.0),
+                          onPressed: () {
+                            ScaffoldMessenger.of(context).clearSnackBars();
+                          },
+                          style: ButtonStyle(
+                            shape:
+                                WidgetStatePropertyAll<RoundedRectangleBorder>(
+                                  RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8.0),
+                                  ),
                                 ),
-                              ),
-                            ),
-                            child: Text("Não")),
-                      )
+                          ),
+                          child: Text("Não"),
+                        ),
+                      ),
                     ],
                   ),
                 );
@@ -305,9 +314,7 @@ class _MainPageState extends State<MainPage> {
         children: [
           Column(
             children: [
-              const SizedBox(
-                height: 25,
-              ),
+              const SizedBox(height: 25),
               //Search
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 24.0),
@@ -324,11 +331,12 @@ class _MainPageState extends State<MainPage> {
                       width: 60,
                       height: 55,
                       decoration: BoxDecoration(
-                          color: Colors.deepOrange.shade300,
-                          borderRadius: const BorderRadius.only(
-                            topRight: Radius.circular(8),
-                            bottomRight: Radius.circular(8),
-                          )),
+                        color: Colors.deepOrange.shade300,
+                        borderRadius: const BorderRadius.only(
+                          topRight: Radius.circular(8),
+                          bottomRight: Radius.circular(8),
+                        ),
+                      ),
                       child: IconButton(
                         icon: ValueListenableBuilder(
                           valueListenable: _currIndexIconSearch,
@@ -337,20 +345,31 @@ class _MainPageState extends State<MainPage> {
                               duration: const Duration(milliseconds: 450),
                               transitionBuilder: (child, anim) =>
                                   RotationTransition(
-                                turns:
-                                    child.key == const ValueKey('iconSearch1')
-                                        ? Tween<double>(begin: 1, end: 0.75)
-                                            .animate(anim)
-                                        : Tween<double>(begin: 0.75, end: 1)
-                                            .animate(anim),
-                                child:
-                                    ScaleTransition(scale: anim, child: child),
-                              ),
+                                    turns:
+                                        child.key ==
+                                            const ValueKey('iconSearch1')
+                                        ? Tween<double>(
+                                            begin: 1,
+                                            end: 0.75,
+                                          ).animate(anim)
+                                        : Tween<double>(
+                                            begin: 0.75,
+                                            end: 1,
+                                          ).animate(anim),
+                                    child: ScaleTransition(
+                                      scale: anim,
+                                      child: child,
+                                    ),
+                                  ),
                               child: _currIndexIconSearch.value != 0
-                                  ? const Icon(Icons.close,
-                                      key: ValueKey('iconSearch1'))
-                                  : const Icon(Icons.search,
-                                      key: ValueKey('iconSearch2')),
+                                  ? const Icon(
+                                      Icons.close,
+                                      key: ValueKey('iconSearch1'),
+                                    )
+                                  : const Icon(
+                                      Icons.search,
+                                      key: ValueKey('iconSearch2'),
+                                    ),
                             );
                           },
                         ),
@@ -372,22 +391,16 @@ class _MainPageState extends State<MainPage> {
                     ),
                     enabledBorder: const OutlineInputBorder(
                       borderSide: BorderSide(color: Colors.grey),
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(10.0),
-                      ),
+                      borderRadius: BorderRadius.all(Radius.circular(10.0)),
                     ),
                     focusedBorder: const OutlineInputBorder(
                       borderSide: BorderSide(color: Colors.grey),
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(10.0),
-                      ),
+                      borderRadius: BorderRadius.all(Radius.circular(10.0)),
                     ),
                   ),
                 ),
               ),
-              const SizedBox(
-                height: 20,
-              ),
+              const SizedBox(height: 20),
               //List vehicles
               Expanded(
                 child: Container(
@@ -397,15 +410,14 @@ class _MainPageState extends State<MainPage> {
                     borderRadius: const BorderRadius.all(Radius.circular(20.0)),
                   ),
                   child: ValueListenableBuilder(
-                      valueListenable: listVehicles,
-                      builder: (context, value, child) {
-                        return vehicles(value);
-                      }),
+                    valueListenable: listVehicles,
+                    builder: (context, value, child) {
+                      return vehicles(value);
+                    },
+                  ),
                 ),
               ),
-              const SizedBox(
-                height: 20,
-              ),
+              const SizedBox(height: 20),
               //Entry
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -413,10 +425,12 @@ class _MainPageState extends State<MainPage> {
                   FloatingActionButton.extended(
                     onPressed: () {
                       Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => ClienteCompanyPage(
-                                  userLogin: widget.userLogin)));
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              ClienteCompanyPage(userLogin: widget.userLogin),
+                        ),
+                      );
                     },
                     label: const Text('Entrada'),
                     icon: const Icon(Icons.add),
@@ -424,9 +438,7 @@ class _MainPageState extends State<MainPage> {
                   ),
                 ],
               ),
-              const SizedBox(
-                height: 20,
-              ),
+              const SizedBox(height: 20),
             ],
           ),
           ValueListenableBuilder(
@@ -437,7 +449,8 @@ class _MainPageState extends State<MainPage> {
                       width: myWidth,
                       height: myHeight,
                       decoration: const BoxDecoration(
-                          color: Color.fromARGB(103, 190, 190, 190)),
+                        color: Color.fromARGB(103, 190, 190, 190),
+                      ),
                       child: const Center(
                         child: CircularProgressIndicator(
                           color: Colors.blue,
@@ -462,63 +475,65 @@ class _MainPageState extends State<MainPage> {
 
   Widget vehicles(List<VehicleEntry> vehicles) {
     return ListView.builder(
-        itemCount: vehicles.length,
-        scrollDirection: Axis.vertical,
-        itemBuilder: (_, index) {
-          VehicleEntry vei = vehicles[index];
+      itemCount: vehicles.length,
+      scrollDirection: Axis.vertical,
+      itemBuilder: (_, index) {
+        VehicleEntry vei = vehicles[index];
 
-          return Padding(
-            padding: const EdgeInsets.all(6.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                VehicleItemList(
-                  myWidth: sizeScreen,
-                  myPlaca: vei.placa.toString(),
-                  myDodelDesc: vei.modelDescription.toString(),
-                  myClientName: vei.clientCompanyName.toString(),
-                  myStatusAuth: vei.statusAuthExit.toString(),
-                  myVehicleNew: vei.vehicleNew.toString(),
-                  myDateEntry: vei.dateEntry.toString(),
-                ),
-                Ink(
-                  width: sizeScreen * 0.12,
-                  height: 60,
-                  child: InkWell(
-                    onTap: () {
-                      clickViewVehicle.value = true;
+        return Padding(
+          padding: const EdgeInsets.all(6.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              VehicleItemList(
+                myWidth: sizeScreen,
+                myPlaca: vei.placa.toString(),
+                myDodelDesc: vei.modelDescription.toString(),
+                myClientName: vei.clientCompanyName.toString(),
+                myStatusAuth: vei.statusAuthExit.toString(),
+                myVehicleNew: vei.vehicleNew.toString(),
+                myDateEntry: vei.dateEntry.toString(),
+              ),
+              Ink(
+                width: sizeScreen * 0.12,
+                height: 60,
+                child: InkWell(
+                  onTap: () {
+                    clickViewVehicle.value = true;
 
-                      _vehicleService
-                          .vehicleId(widget.userLogin.companyId!,
-                              widget.userLogin.resaleId!, vei.id!)
-                          .then((onValue) {
-                        clickViewVehicle.value = false;
-                        // Chama a tela de detalhes
-                        Navigator.of(context)
-                            .push(_createRouteDetails(onValue));
-                      });
-                    },
-                    child: Container(
-                      width: 50,
-                      height: 60,
-                      decoration: const BoxDecoration(
-                        color: Colors.blue,
-                        borderRadius: BorderRadius.only(
-                          topRight: Radius.circular(10.0),
-                          bottomRight: Radius.circular(10.0),
-                        ),
-                      ),
-                      child: const Icon(
-                        Icons.more_horiz,
-                        color: Colors.black38,
+                    _vehicleService
+                        .vehicleId(
+                          widget.userLogin.companyId!,
+                          widget.userLogin.resaleId!,
+                          vei.id!,
+                        )
+                        .then((onValue) {
+                          clickViewVehicle.value = false;
+                          // Chama a tela de detalhes
+                          Navigator.of(
+                            context,
+                          ).push(_createRouteDetails(onValue));
+                        });
+                  },
+                  child: Container(
+                    width: 50,
+                    height: 60,
+                    decoration: const BoxDecoration(
+                      color: Colors.blue,
+                      borderRadius: BorderRadius.only(
+                        topRight: Radius.circular(10.0),
+                        bottomRight: Radius.circular(10.0),
                       ),
                     ),
+                    child: const Icon(Icons.more_horiz, color: Colors.black38),
                   ),
-                )
-              ],
-            ),
-          );
-        });
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   deletestorage() async {
@@ -528,25 +543,26 @@ class _MainPageState extends State<MainPage> {
 
   Route _createRouteDetails(Vehicle vehicle) {
     return PageRouteBuilder(
-        pageBuilder: (context, animation, secondaryAnimation) => VehicleDetails(
-              vehicleEntry: vehicle,
-              userLogin: widget.userLogin,
-            ),
-        transitionDuration: const Duration(milliseconds: 600),
-        transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          const begin = Offset(1.0, 0.0);
-          const end = Offset.zero;
-          const curve = Curves.ease;
+      pageBuilder: (context, animation, secondaryAnimation) =>
+          VehicleDetails(vehicleEntry: vehicle, userLogin: widget.userLogin),
+      transitionDuration: const Duration(milliseconds: 600),
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        const begin = Offset(1.0, 0.0);
+        const end = Offset.zero;
+        const curve = Curves.ease;
 
-          final tween = Tween(begin: begin, end: end);
+        final tween = Tween(begin: begin, end: end);
 
-          final curvedAnimation =
-              CurvedAnimation(parent: animation, curve: curve);
+        final curvedAnimation = CurvedAnimation(
+          parent: animation,
+          curve: curve,
+        );
 
-          return SlideTransition(
-            position: tween.animate(curvedAnimation),
-            child: child,
-          );
-        });
+        return SlideTransition(
+          position: tween.animate(curvedAnimation),
+          child: child,
+        );
+      },
+    );
   }
 }

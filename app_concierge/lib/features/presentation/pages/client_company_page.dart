@@ -15,7 +15,6 @@ import 'package:provider/provider.dart';
 
 class ClienteCompanyPage extends StatefulWidget {
   UserLogin userLogin;
-
   ClienteCompanyPage({super.key, required this.userLogin});
 
   @override
@@ -26,7 +25,13 @@ class _ClienteCompanyPageState extends State<ClienteCompanyPage> {
   double sizeScreen = 0;
   ValueNotifier<Future<List<ClientCompany>>> clients =
       ValueNotifier<Future<List<ClientCompany>>>(Future.value([]));
-  ValueNotifier<ClientCompany> selectClient = ValueNotifier<ClientCompany>(ClientCompany());
+  ValueNotifier<ClientCompany> selectClient = ValueNotifier<ClientCompany>(
+    ClientCompany(),
+  );
+
+  ValueNotifier<ClientCompany> checkedClient = ValueNotifier<ClientCompany>(
+    ClientCompany(),
+  );
 
   final TextEditingController clientCodeFilter = TextEditingController();
   final TextEditingController clientFantasiaFilter = TextEditingController();
@@ -45,13 +50,14 @@ class _ClienteCompanyPageState extends State<ClienteCompanyPage> {
   @override
   void initState() {
     init();
-
     super.initState();
   }
 
   init() async {
     _attendants = await _attendantService.attendants(
-        widget.userLogin.companyId!, widget.userLogin.resaleId!);
+      widget.userLogin.companyId!,
+      widget.userLogin.resaleId!,
+    );
     _models = await _vehicleService.vehicleModels();
     if (_attendants.isEmpty || _models.isEmpty) {
       Navigator.pop(context);
@@ -104,54 +110,52 @@ class _ClienteCompanyPageState extends State<ClienteCompanyPage> {
                 height: height,
                 child: Column(
                   children: [
-                    const Expanded(
-                      flex: 1,
-                      child: SizedBox(),
-                    ),
+                    const Expanded(flex: 1, child: SizedBox()),
                     const Text(
                       "Vamos fazer a entrada de um novo veículo",
                       style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 24,
-                          color: Colors.black87),
+                        fontWeight: FontWeight.bold,
+                        fontSize: 24,
+                        color: Colors.black87,
+                      ),
                     ),
                     const Text(
                       "Por favor selecione a empresa em que esse veículo pertence.",
                       style: TextStyle(
-                          fontWeight: FontWeight.w300,
-                          fontSize: 16,
-                          color: Colors.black87),
+                        fontWeight: FontWeight.w300,
+                        fontSize: 16,
+                        color: Colors.black87,
+                      ),
                     ),
                     const SizedBox(height: 20.0),
                     //Check
                     ValueListenableBuilder(
-                        valueListenable: isChecked,
-                        builder:
-                            (BuildContext context, bool value, Widget? child) {
-                          return Row(
-                            children: [
-                              Checkbox(
-                                value: value,
-                                checkColor: Colors.black54,
-                                activeColor: Colors.green.shade300,
-                                onChanged: (bool? sele) {
-                                  isChecked.value = sele!;
-                                  selectClient.value = ClientCompany();
-                                },
-                              ),
-                              GestureDetector(
+                      valueListenable: isChecked,
+                      builder:
+                          (BuildContext context, bool value, Widget? child) {
+                            return Row(
+                              children: [
+                                Checkbox(
+                                  value: value,
+                                  checkColor: Colors.black54,
+                                  activeColor: Colors.green.shade300,
+                                  onChanged: (bool? sele) {
+                                    isChecked.value = sele!;
+                                    selectClient.value = ClientCompany();
+                                  },
+                                ),
+                                GestureDetector(
                                   onTap: () {
                                     isChecked.value = !isChecked.value;
                                     selectClient.value = ClientCompany();
                                   },
-                                  child: const Text("Empresa sem cadastro!")),
-                            ],
-                          );
-                        }),
-
-                    const SizedBox(
-                      height: 20,
+                                  child: const Text("Empresa sem cadastro!"),
+                                ),
+                              ],
+                            );
+                          },
                     ),
+                    const SizedBox(height: 20),
                     SizedBox(
                       width: widght - sizeScreen * 0.04,
                       height: 50,
@@ -162,7 +166,8 @@ class _ClienteCompanyPageState extends State<ClienteCompanyPage> {
                         style: ButtonStyle(
                           elevation: const WidgetStatePropertyAll<double>(8.0),
                           backgroundColor: WidgetStatePropertyAll<Color>(
-                              Colors.deepOrange.shade300),
+                            Colors.deepOrange.shade300,
+                          ),
                           shape: WidgetStatePropertyAll<RoundedRectangleBorder>(
                             RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8.0),
@@ -175,9 +180,7 @@ class _ClienteCompanyPageState extends State<ClienteCompanyPage> {
                         ),
                       ),
                     ),
-                    const SizedBox(
-                      height: 25.0,
-                    ),
+                    const SizedBox(height: 25.0),
                     //Código / Fansasia
                     Row(
                       children: [
@@ -220,7 +223,6 @@ class _ClienteCompanyPageState extends State<ClienteCompanyPage> {
                         );
                       },
                     ),
-
                     const SizedBox(height: 8),
                     //CNPF/CPF
                     ValueListenableBuilder(
@@ -235,40 +237,47 @@ class _ClienteCompanyPageState extends State<ClienteCompanyPage> {
                         );
                       },
                     ),
-
                     const Expanded(flex: 1, child: SizedBox()),
                     SizedBox(
                       width: widght - sizeScreen * 0.04,
                       height: 50,
                       child: ElevatedButton(
                         onPressed: () {
-
-                          if (selectClient.value.id != null && isChecked.value == false ) {
+                          if (selectClient.value.id != null &&
+                              isChecked.value == false) {
                             //Objeto completo
-                            selectClient.value.companyId = widget.userLogin.companyId;
-                            selectClient.value.resaleId = widget.userLogin.resaleId;
+                            selectClient.value.companyId =
+                                widget.userLogin.companyId;
+                            selectClient.value.resaleId =
+                                widget.userLogin.resaleId;
                             selectClient.value.status = "Habilitado";
 
-                            selectClient.value.contactName ="";
-                            selectClient.value.contactEmail="";
-                            selectClient.value.contactDDDPhone="";
-                            selectClient.value.contactPhone="";
-                            selectClient.value.contactDDDCellphone="";
-                            selectClient.value.contactCellphone="";
-                                                       
-                            context.read<ClientCompanyProvider>().add(selectClient.value);
-                            //chama á próxima tela
-                            Navigator.of(context).push(_createRouteDriver());
-                          } 
+                            selectClient.value.contactName = "";
+                            selectClient.value.contactEmail = "";
+                            selectClient.value.contactDDDPhone = "";
+                            selectClient.value.contactPhone = "";
+                            selectClient.value.contactDDDCellphone = "";
+                            selectClient.value.contactCellphone = "";
 
-                          if(selectClient.value.id == null && isChecked.value == true){
-                            //Objeto vazio
-                            context.read<ClientCompanyProvider>().add(ClientCompany());
+                            context.read<ClientCompanyProvider>().add(
+                              selectClient.value,
+                            );
                             //chama á próxima tela
                             Navigator.of(context).push(_createRouteDriver());
                           }
 
-                          if(selectClient.value.id == null && isChecked.value == false) {
+                          if (selectClient.value.id == null &&
+                              isChecked.value == true) {
+                            //Objeto vazio
+                            context.read<ClientCompanyProvider>().add(
+                              ClientCompany(),
+                            );
+                            //chama á próxima tela
+                            Navigator.of(context).push(_createRouteDriver());
+                          }
+
+                          if (selectClient.value.id == null &&
+                              isChecked.value == false) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
                                 content: Text('Empresa não selecionada.'),
@@ -276,12 +285,12 @@ class _ClienteCompanyPageState extends State<ClienteCompanyPage> {
                               ),
                             );
                           }
-
                         },
                         style: ButtonStyle(
                           elevation: const WidgetStatePropertyAll<double>(8.0),
                           backgroundColor: WidgetStatePropertyAll<Color>(
-                              Colors.blue.shade300),
+                            Colors.blue.shade300,
+                          ),
                           shape: WidgetStatePropertyAll<RoundedRectangleBorder>(
                             RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8.0),
@@ -300,6 +309,7 @@ class _ClienteCompanyPageState extends State<ClienteCompanyPage> {
               ),
             ),
           ),
+          //Load
           ValueListenableBuilder(
             valueListenable: loadModels,
             builder: (context, value, child) {
@@ -308,7 +318,8 @@ class _ClienteCompanyPageState extends State<ClienteCompanyPage> {
                       width: widght,
                       height: height,
                       decoration: const BoxDecoration(
-                          color: Color.fromARGB(103, 190, 190, 190)),
+                        color: Color.fromARGB(103, 190, 190, 190),
+                      ),
                       child: const Center(
                         child: CircularProgressIndicator(
                           color: Colors.blue,
@@ -326,23 +337,27 @@ class _ClienteCompanyPageState extends State<ClienteCompanyPage> {
 
   Route _createRouteDriver() {
     return PageRouteBuilder(
-        pageBuilder: (context, animation, secondaryAnimation) => DriverPage(userLogin: widget.userLogin),
-        transitionDuration: const Duration(milliseconds: 600),
-        transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          const begin = Offset(1.0, 0.0);
-          const end = Offset.zero;
-          const curve = Curves.ease;
+      pageBuilder: (context, animation, secondaryAnimation) =>
+          DriverPage(userLogin: widget.userLogin),
+      transitionDuration: const Duration(milliseconds: 600),
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        const begin = Offset(1.0, 0.0);
+        const end = Offset.zero;
+        const curve = Curves.ease;
 
-          final tween = Tween(begin: begin, end: end);
+        final tween = Tween(begin: begin, end: end);
 
-          final curvedAnimation =
-              CurvedAnimation(parent: animation, curve: curve);
+        final curvedAnimation = CurvedAnimation(
+          parent: animation,
+          curve: curve,
+        );
 
-          return SlideTransition(
-            position: tween.animate(curvedAnimation),
-            child: child,
-          );
-        });
+        return SlideTransition(
+          position: tween.animate(curvedAnimation),
+          child: child,
+        );
+      },
+    );
   }
 
   void _showDialog(BuildContext context) {
@@ -362,17 +377,10 @@ class _ClienteCompanyPageState extends State<ClienteCompanyPage> {
                   children: [
                     const Text(
                       'Pesquisa de empresas',
-                      style: TextStyle(
-                        color: Colors.black87,
-                        fontSize: 16,
-                      ),
+                      style: TextStyle(color: Colors.black87, fontSize: 16),
                     ),
-                    const Divider(
-                      color: Colors.grey,
-                    ),
-                    const SizedBox(
-                      height: 10,
-                    ),
+                    const Divider(color: Colors.grey),
+                    const SizedBox(height: 10),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -417,9 +425,7 @@ class _ClienteCompanyPageState extends State<ClienteCompanyPage> {
                             ),
                           ),
                         ),
-                        SizedBox(
-                          width: sizeScreen * 0.02,
-                        ),
+                        SizedBox(width: sizeScreen * 0.02),
                         SizedBox(
                           width: sizeScreen * 0.5,
                           child: TextFormField(
@@ -463,9 +469,7 @@ class _ClienteCompanyPageState extends State<ClienteCompanyPage> {
                         ),
                       ],
                     ),
-                    SizedBox(
-                      height: sizeScreen * 0.02,
-                    ),
+                    SizedBox(height: sizeScreen * 0.02),
                     //Textfield search
                     SizedBox(
                       width: sizeScreen * 0.72,
@@ -507,63 +511,71 @@ class _ClienteCompanyPageState extends State<ClienteCompanyPage> {
                         ),
                       ),
                     ),
-                    const SizedBox(
-                      height: 10,
-                    ),
+                    const SizedBox(height: 10),
                     //Check
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         ValueListenableBuilder(
                           valueListenable: isCheckedJ,
-                          builder: (BuildContext context, bool value,
-                              Widget? child) {
-                            return Row(
-                              children: [
-                                Checkbox(
-                                  value: value,
-                                  checkColor: Colors.black54,
-                                  activeColor: Colors.green.shade300,
-                                  onChanged: (bool? sele) {
-                                    isCheckedJ.value = true;
-                                    isCheckedF.value = false;
-                                  },
-                                ),
-                                GestureDetector(
-                                    onTap: () {
-                                      isCheckedJ.value = true;
-                                      isCheckedF.value = false;
-                                    },
-                                    child: const Text("Jurídica")),
-                              ],
-                            );
-                          },
+                          builder:
+                              (
+                                BuildContext context,
+                                bool value,
+                                Widget? child,
+                              ) {
+                                return Row(
+                                  children: [
+                                    Checkbox(
+                                      value: value,
+                                      checkColor: Colors.black54,
+                                      activeColor: Colors.green.shade300,
+                                      onChanged: (bool? sele) {
+                                        isCheckedJ.value = true;
+                                        isCheckedF.value = false;
+                                      },
+                                    ),
+                                    GestureDetector(
+                                      onTap: () {
+                                        isCheckedJ.value = true;
+                                        isCheckedF.value = false;
+                                      },
+                                      child: const Text("Jurídica"),
+                                    ),
+                                  ],
+                                );
+                              },
                         ),
                         SizedBox(width: sizeScreen * 0.02),
                         ValueListenableBuilder(
                           valueListenable: isCheckedF,
-                          builder: (BuildContext context, bool value,
-                              Widget? child) {
-                            return Row(
-                              children: [
-                                Checkbox(
-                                  value: value,
-                                  checkColor: Colors.black54,
-                                  activeColor: Colors.green.shade300,
-                                  onChanged: (bool? sele) {
-                                    isCheckedJ.value = false;
-                                    isCheckedF.value = true;
-                                  },
-                                ),
-                                GestureDetector(
-                                    onTap: () {
-                                      isCheckedJ.value = false;
-                                      isCheckedF.value = true;
-                                    },
-                                    child: const Text("Física")),
-                              ],
-                            );
-                          },
+                          builder:
+                              (
+                                BuildContext context,
+                                bool value,
+                                Widget? child,
+                              ) {
+                                return Row(
+                                  children: [
+                                    Checkbox(
+                                      value: value,
+                                      checkColor: Colors.black54,
+                                      activeColor: Colors.green.shade300,
+                                      onChanged: (bool? sele) {
+                                        isCheckedJ.value = false;
+                                        isCheckedF.value = true;
+                                      },
+                                    ),
+                                    GestureDetector(
+                                      onTap: () {
+                                        isCheckedJ.value = false;
+                                        isCheckedF.value = true;
+                                      },
+                                      child: const Text("Física"),
+                                    ),
+                                  ],
+                                );
+                              },
                         ),
                         SizedBox(width: sizeScreen * 0.02),
                         ElevatedButton(
@@ -574,53 +586,55 @@ class _ClienteCompanyPageState extends State<ClienteCompanyPage> {
                             filterClean();
                           },
                           style: ButtonStyle(
-                            elevation:
-                                const WidgetStatePropertyAll<double>(8.0),
+                            elevation: const WidgetStatePropertyAll<double>(
+                              8.0,
+                            ),
                             backgroundColor: WidgetStatePropertyAll<Color>(
-                                Colors.blue.shade300),
+                              Colors.blue.shade300,
+                            ),
                             shape:
                                 WidgetStatePropertyAll<RoundedRectangleBorder>(
-                                    RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(8.0))),
+                                  RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8.0),
+                                  ),
+                                ),
                           ),
                           child: const Text(
                             "Limpar",
                             style: TextStyle(color: Colors.black),
                           ),
-                        )
+                        ),
                       ],
                     ),
-                    const SizedBox(
-                      height: 10,
-                    ),
+                    const SizedBox(height: 10),
                     //Filter
                     SizedBox(
                       width: sizeScreen * 2,
                       height: 50,
                       child: ElevatedButton(
-                          onPressed: () {
-                            if (isCheckedJ.value == true) {
-                              filterJClient();
-                            } else {
-                              filterFClient();
-                            }
-                          },
-                          style: ButtonStyle(
-                            elevation:
-                                const WidgetStatePropertyAll<double>(8.0),
-                            backgroundColor: WidgetStatePropertyAll<Color>(
-                                Colors.deepOrange.shade300),
-                            shape:
-                                WidgetStatePropertyAll<RoundedRectangleBorder>(
-                                    RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(8.0))),
+                        onPressed: () {
+                          if (isCheckedJ.value == true) {
+                            filterJClient();
+                          } else {
+                            filterFClient();
+                          }
+                        },
+                        style: ButtonStyle(
+                          elevation: const WidgetStatePropertyAll<double>(8.0),
+                          backgroundColor: WidgetStatePropertyAll<Color>(
+                            Colors.deepOrange.shade300,
                           ),
-                          child: const Text(
-                            "Pesquisar",
-                            style: TextStyle(color: Colors.black),
-                          )),
+                          shape: WidgetStatePropertyAll<RoundedRectangleBorder>(
+                            RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8.0),
+                            ),
+                          ),
+                        ),
+                        child: const Text(
+                          "Pesquisar",
+                          style: TextStyle(color: Colors.black),
+                        ),
+                      ),
                     ),
                     ValueListenableBuilder(
                       valueListenable: clients,
@@ -637,8 +651,9 @@ class _ClienteCompanyPageState extends State<ClienteCompanyPage> {
                                   child: Text(
                                     'Erro ao listar empresas!',
                                     style: TextStyle(
-                                        color: Colors.deepOrange,
-                                        fontWeight: FontWeight.w300),
+                                      color: Colors.deepOrange,
+                                      fontWeight: FontWeight.w300,
+                                    ),
                                   ),
                                 );
                               }
@@ -663,27 +678,28 @@ class _ClienteCompanyPageState extends State<ClienteCompanyPage> {
                                     scrollDirection: Axis.vertical,
                                     itemBuilder: (_, index) {
                                       ClientCompany cli = snapshot.data![index];
-
                                       return ListTile(
                                         leading: CircleAvatar(
-                                            child: Text(
-                                          cli.name!.substring(0, 1),
-                                        )),
+                                          child: Text(
+                                            cli.name!.substring(0, 1),
+                                          ),
+                                        ),
                                         title: Text(
                                           abreviaNameSearch(
-                                              cli.name.toString()),
+                                            cli.name.toString(),
+                                          ),
                                         ),
-                                        subtitle: cli.fisjur == "Juridica"
+                                        subtitle: cli.fisjur == juridica
                                             ? Text(cli.cnpj!)
                                             : Text(cli.cpf!),
                                         trailing: ValueListenableBuilder(
-                                          valueListenable: selectClient,
+                                          valueListenable: checkedClient,
                                           builder: (context, value, child) {
                                             return Radio<ClientCompany>(
                                               value: cli,
                                               groupValue: value,
                                               onChanged: (data) {
-                                                selectClient.value = data!;
+                                                checkedClient.value = data!;
                                               },
                                             );
                                           },
@@ -698,9 +714,10 @@ class _ClienteCompanyPageState extends State<ClienteCompanyPage> {
                                 child: Text(
                                   'Empresa não encontrada',
                                   style: TextStyle(
-                                      color: Colors.black54,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 16.0),
+                                    color: Colors.black54,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16.0,
+                                  ),
                                 ),
                               );
                             },
@@ -709,48 +726,54 @@ class _ClienteCompanyPageState extends State<ClienteCompanyPage> {
                       },
                     ),
 
-                    //Button
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
+                        //Button Fechar
                         TextButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                            child: const Text(
-                              "Fechar",
-                              style: TextStyle(color: Colors.black87),
-                            )),
-                        const SizedBox(
-                          width: 10,
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          child: const Text(
+                            "Fechar",
+                            style: TextStyle(color: Colors.black87),
+                          ),
                         ),
+                        const SizedBox(width: 10),
+                        //Button Confirmar
                         FilledButton(
-                            onPressed: () {
-                              if (selectClient.value.id != null) {
-                                Navigator.pop(context);
+                          onPressed: () {
+                            if (checkedClient.value.id != null) {
+                              //desmarcar empresa sem cadastro
+                              isChecked.value = false;
 
-                                //desmarcar empresa sem cadastro
-                                isChecked.value = false;
-                              }
-                            },
-                            style: ButtonStyle(
-                              elevation:
-                                  const WidgetStatePropertyAll<double>(8.0),
-                              backgroundColor: WidgetStatePropertyAll<Color>(
-                                  Colors.blue.shade300),
-                              shape: WidgetStatePropertyAll<
-                                      RoundedRectangleBorder>(
-                                  RoundedRectangleBorder(
-                                      borderRadius:
-                                          BorderRadius.circular(8.0))),
+                              selectClient.value = checkedClient.value;
+                              //Fechar dialog
+                              Navigator.pop(context);
+                            }
+                          },
+                          style: ButtonStyle(
+                            elevation: const WidgetStatePropertyAll<double>(
+                              8.0,
                             ),
-                            child: const Text(
-                              "Confirmar",
-                              style: TextStyle(color: Colors.black87),
-                            )),
+                            backgroundColor: WidgetStatePropertyAll<Color>(
+                              Colors.blue.shade300,
+                            ),
+                            shape:
+                                WidgetStatePropertyAll<RoundedRectangleBorder>(
+                                  RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8.0),
+                                  ),
+                                ),
+                          ),
+                          child: const Text(
+                            "Confirmar",
+                            style: TextStyle(color: Colors.black87),
+                          ),
+                        ),
                       ],
-                    )
+                    ),
                   ],
                 ),
               ),

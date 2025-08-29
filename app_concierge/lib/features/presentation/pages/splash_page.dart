@@ -42,11 +42,12 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
       backgroundColor: Colors.grey.shade200,
       body: Container(
         decoration: const BoxDecoration(
-            gradient: LinearGradient(
-          colors: [Colors.blue, Colors.grey, Colors.black],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        )),
+          gradient: LinearGradient(
+            colors: [Colors.blue, Colors.grey, Colors.blue],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
         child: Center(
           child: Lottie.asset(
             "assets/lotties/animation-loading.json",
@@ -77,18 +78,16 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
   openLogin() {
     Navigator.pop(context);
     Navigator.push(
-        context, MaterialPageRoute(builder: (myContext) => const LoginPage()));
+      context,
+      MaterialPageRoute(builder: (myContext) => const LoginPage()),
+    );
   }
 
   openMain() {
     Navigator.pop(context);
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (myContext) => MainPage(
-          userLogin: userLogin,
-        ),
-      ),
+      MaterialPageRoute(builder: (myContext) => MainPage(userLogin: userLogin)),
     );
   }
 }
