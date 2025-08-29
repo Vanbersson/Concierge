@@ -65,21 +65,20 @@
             <td><strong>{{totalItemsDiscount() | currency}}</strong></td>
             <td><strong>{{totalItemsPrice() - totalItemsDiscount() | currency}}</strong></td>
         </tr>
-
     </table>
     <br>
     <div style="height: 60px; width: 100%; border: 1px solid #ddd;text-align: left;
-    padding: 4px; font-family: Arial, Helvetica, sans-serif; border-collapse: collapse;">
+    padding: 4px; font-family: Arial, Helvetica, sans-serif; border-collapse: collapse;break-inside: avoid;">
         <label for="">Inf.: </label>{{printPurchaseOrder().information | uppercase}}
     </div>
-    <table style="width: 100%; text-align: center;">
+    <table style="width: 100%; text-align: center;break-inside: avoid;">
         <tr>
             <td>AUTORIZADO POR</td>
             <td>AUTORIZADO POR</td>
             <td>AUTORIZADO POR</td>
         </tr>
         <tr>
-            <td class="text-xs"><strong>{{printPurchaseOrder().responsibleName}}</strong></td>
+            <td class="text-xs"><strong>Alexsandro Paulino</strong></td>
             <td class="text-xs"><strong>Luise Rossi</strong></td>
             <td class="text-xs"><strong>Bruna Dones Gayer</strong></td>
         </tr>

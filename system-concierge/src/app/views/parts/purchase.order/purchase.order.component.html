@@ -59,86 +59,87 @@
     </p-table>
 </div>
 <!-- Add pedido -->
-<p-dialog header="Pedido de compra" [modal]="true" [(visible)]="purcharOrderVisible" [maximizable]="true"
-    [style]="{ width: '80rem', height:'70rem' }" [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }">
+<p-dialog header="Pedido de compra" [(visible)]="purcharOrderVisible" [modal]="true" [maximizable]="true"
+    [style]="{ width: '80rem' }" [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }">
     <form [formGroup]="formPurchase">
         <div class="p-fluid p-formgrid grid">
             <div class="col-12 flex gap-2">
-                <div class="field flex align-items-center gap-2 ">
+                <div class="flex align-items-center gap-2 ">
                     <span>{{"Nº Pedido:"}}</span>
                     <span class="text-xl font-bold">{{numPurchaseOrder()}}</span>
                 </div>
-                <div *ngIf="nfNum()" class="field flex align-items-center gap-2 ">
+                <div *ngIf="nfNum()" class="flex align-items-center gap-2 ">
                     <span>{{"Nº Nota:"}}</span>
                     <span class="text-xl font-bold">{{nfNum()}}</span>
                 </div>
             </div>
-            <div class="field col-12 md:col-3">
+            <div class="col-12 md:col-3">
                 <label for="purchaseOrderId">Comprador</label>
                 <div class="layout-input-disabled">
                     <span class="text-500 font-medium"><strong>{{formPurchase.get('responsibleName').value}}</strong></span>
                 </div>
             </div>
-            <div class="field col-12 md:col-3">
+            <div class="col-12 md:col-3">
                 <label for="paymentId">Forma de pagamento</label>
                 <input pInputText id="paymentId" type="text" formControlName="paymentType">
                 <small class="p-error block" *ngIf="formPurchase.get('paymentType')?.invalid">Campo obrigatório</small>
             </div>
-            <div class="field col-12 md:col-3">
+            <div class="col-12 md:col-3">
                 <label for="dateDeliveryId">Previsão entrega</label>
                 <p-calendar [iconDisplay]="'input'" dateFormat="dd/mm/yy" [showIcon]="true" inputId="icondisplay" formControlName="dateDelivery" />
                 <small class="p-error block" *ngIf="formPurchase.get('dateDelivery')?.invalid">Campo obrigatório</small>
             </div>
             <div class="md:col-3">
             </div>
-            <div class="field col-12 md:col-2">
+            <div class="col-12 md:col-2">
                 <label for="clientCompanyCodeId">Código</label>
                 <p-inputNumber inputId="clientCompanyCodeId" mode="decimal" [useGrouping]="false" formControlName="clientCompanyId" />
                 <small class="p-error block" *ngIf="formPurchase.get('clientCompanyId')?.invalid">Campo obrigatório</small>
             </div>
-            <div class="field col-10 md:col-6">
+            <div class="col-10 md:col-6">
                 <label for="clientCompanyNameId">Empresa</label>
                 <input pInputText id="clientCompanyNameId" type="text" formControlName="clientCompanyName" />
                 <small class="p-error block" *ngIf="formPurchase.get('clientCompanyName')?.invalid">Campo obrigatório</small>
             </div>
-            <div class="field col-2 md:col-1 flex flex-column">
+            <div class="col-2 md:col-1 flex flex-column">
                 <label for="">Filtro</label>
                 <app-filterclient (outputClient)="selectClientCompany.set($event)" />
             </div>
             <div class="md:col-2"></div>
-            <div class="field col-12 md:col-4">
+            <div class="col-12 md:col-4">
                 <label for="attendantNameId">Vendedor nome</label>
                 <input pInputText id="attendantNameId" type="text" formControlName="attendantName" />
             </div>
-            <div class="field col-12 md:col-4">
+            <div class="col-12 md:col-4">
                 <label for="attendantEmailId">Vendedor E-Mail</label>
                 <input pInputText id="attendantEmailId" type="text" formControlName="attendantEmail" />
             </div>
             <div class="md:col-4"> </div>
 
-            <div class="field col-12 md:col-1">
+            <div class="col-12 md:col-1">
                 <label for="attendantDddCellphoneId">DDD</label>
                 <p-inputMask mask="(99)" [unmask]="true" formControlName="attendantDddCellphone" />
             </div>
-            <div class="field col-12 md:col-3">
+            <div class="col-12 md:col-3">
                 <label for="attendantCellphoneId">Celular</label>
                 <p-inputMask mask="9 9999-9999" [unmask]="true" formControlName="attendantCellphone" />
             </div>
-            <div class="field col-12 md:col-1">
+            <div class="col-12 md:col-1">
                 <label for="attendantDddPhoneId">DDD</label>
                 <p-inputMask mask="(99)" [unmask]="true" formControlName="attendantDddPhone" />
             </div>
-            <div class="field col-12 md:col-3">
+            <div class="col-12 md:col-3">
                 <label for="attendantPhoneId">Telefone</label>
                 <p-inputMask mask="9999-9999" [unmask]="true" formControlName="attendantPhone" />
             </div>
-            <div class="field col-12">
+            <div class="col-12">
                 <label for="attendantPhoneId">Informações</label>
                 <textarea rows="4" cols="30" pInputTextarea formControlName="information"></textarea>
             </div>
             <div class="flex w-full justify-content-between mb-2">
                 <div class="flex gap-2">
-                    <p-button type="button" icon="pi pi-plus"  [raised]="true" label="Gerar pedido" severity="success-custom" size="small" [disabled]="numPurchaseOrder()" (onClick)="saveNew()" />
+                    <p-button *ngIf="!numPurchaseOrder()" type="button" icon="pi pi-plus"  [raised]="true" label="Gerar pedido" severity="success-custom" size="small" (onClick)="saveNew()" />
+                    <p-button *ngIf="numPurchaseOrder()" type="button" icon="pi pi-check"  [raised]="true" label="Salvar" severity="success-custom" size="small" (onClick)="saveUpdate()" />
                     <p-divider layout="vertical" />
                     <p-button type="button" icon="pi pi-bookmark"  [raised]="true" label="Nota fiscal" severity="secondary-custom" size="small" [disabled]="!numPurchaseOrder()" (onClick)="showDialogNF()" />
                     <p-divider layout="vertical" />
@@ -149,30 +150,30 @@
             </div>
         </div>
     </form>
-    <div style="height: 312px;">
+    <div style="height: 27rem;">
         <p-table #tableFilter2 dataKey="id" [value]="purchaseOrderItems" editMode="row" 
             [globalFilterFields]="['partCode', 'partDescription']" 
-            [scrollable]="true" scrollHeight="300px" styleClass="p-datatable-sm">
+            [scrollable]="true" scrollHeight="320px" styleClass="p-datatable-sm">
              <ng-template pTemplate="caption">
-            <div class="flex justify-content-between  ">
-                <p-iconField iconPosition="left">
-                    <p-inputIcon>
-                        <i class="pi pi-search"></i>
-                    </p-inputIcon>
-                    <input pInputText type="text" (input)="tableFilter2.filterGlobal($any($event.target).value, 'contains')" placeholder="Pesquisar" />
-                </p-iconField>
-                <app-filterparts *ngIf="numPurchaseOrder()" (outputPart)="selectPart.set($event)" />
-            </div>
-        </ng-template>
+                <div class="flex justify-content-between  ">
+                    <p-iconField iconPosition="left">
+                        <p-inputIcon>
+                            <i class="pi pi-search"></i>
+                        </p-inputIcon>
+                        <input pInputText type="text" (input)="tableFilter2.filterGlobal($any($event.target).value, 'contains')" placeholder="Pesquisar" />
+                    </p-iconField>
+                    <app-filterparts *ngIf="numPurchaseOrder()" (outputPart)="selectPart.set($event)" />
+                </div>
+            </ng-template>
             <ng-template pTemplate="header">
                 <tr>
-                    <th pSortableColumn="partCode" style="width:10%;font-weight: 400;">Código<p-sortIcon field="partCode"/></th>
-                    <th pSortableColumn="partDescription" style="width:40%;font-weight: 400;">Descrição<p-sortIcon field="partDescription"/></th>
-                    <th pSortableColumn="quantity" style="width:10%;font-weight: 400;">Quant.<p-sortIcon field="quantity"/></th>
-                    <th pSortableColumn="price" style="width:10%;font-weight: 400;">Preço<p-sortIcon field="price"/></th>
-                    <th pSortableColumn="discount" style="width:10%;font-weight: 400;">Desconto<p-sortIcon field="discount"/></th>
-                    <th style="width:10%;font-weight: 400;">Total</th>
-                    <th style="width:10%;font-weight: 400;"></th>
+                    <th pSortableColumn="partCode" style="width:10%;">Código<p-sortIcon field="partCode"/></th>
+                    <th pSortableColumn="partDescription" style="width:40%;">Descrição<p-sortIcon field="partDescription"/></th>
+                    <th pSortableColumn="quantity" style="width:10%;">Quant.<p-sortIcon field="quantity"/></th>
+                    <th pSortableColumn="price" style="width:10%;">Preço<p-sortIcon field="price"/></th>
+                    <th pSortableColumn="discount" style="width:10%;">Desconto<p-sortIcon field="discount"/></th>
+                    <th style="width:10%;">Total</th>
+                    <th style="width:10%;"></th>
                 </tr>
             </ng-template>
             <ng-template pTemplate="body" let-part let-editing="editing" let-index="rowIndex">
@@ -257,33 +258,32 @@
             </ng-template>
         </p-table>
     </div>
-    <div class="col-12 flex justify-content-end gap-2">
+    <div class="flex justify-content-end mt-2">
         <button pButton type="button" pRipple label="Fechar" icon="pi pi-times" class="p-button-text" (click)="hideDialogPurchase()"></button>
-        <button pButton type="button" pRipple label="Salvar" icon="pi pi-check" class="p-button-text" (click)="saveUpdate()" [disabled]="!numPurchaseOrder()"></button>
     </div>
 </p-dialog>
 <!-- Nota Fiscal -->
 <p-dialog header="Nota Fiscal" [(visible)]="nfVisible" modal="true" [maximizable]="true" [style]="{ width: '50rem',height:'44rem' }">
     <form [formGroup]="formNF">
         <div class=" p-fluid p-formgrid grid">
-            <div class="field col-12 md:col-4">
+            <div class="col-12 md:col-4">
                 <label>Número</label>
                 <p-inputNumber mode="decimal" [useGrouping]="false" formControlName="nfNum" />
                 <small class="p-error block" *ngIf="formNF.get('nfNum')?.invalid">Campo obrigatório</small>
             </div>
-            <div class="field col-12 md:col-4">
+            <div class="col-12 md:col-4">
                 <label>Série</label>
                 <input pInputText type="text" formControlName="nfNumSerie" />
                 <small class="p-error block" *ngIf="formNF.get('nfNumSerie')?.invalid">Campo obrigatório</small>
             </div>
             <div class="md:col-4"></div>
-            <div class="field col-12 md:col-4">
+            <div class="col-12 md:col-4">
                 <label>Data Emissão</label>
                 <p-calendar dateFormat="dd/mm/yy" [iconDisplay]="'input'" [showIcon]="true" inputId="icondisplay" formControlName="nfDate" />
                 <small class="p-error block" *ngIf="formNF.get('nfDate')?.invalid">Campo obrigatório</small>
             </div>
             <div class="md:col-8"></div>
-            <div class="field col-12">
+            <div class="col-12">
                 <label>Chave de Acesso</label>
                 <p-inputMask mask="99999999999999999999999999999999999999999999" [unmask]="true" formControlName="nfKey" />
             </div>
@@ -320,7 +320,7 @@
 <p-dialog header="Data Entrega" [(visible)]="dateCloseVisible" modal="true" [style]="{ width: '30rem',height:'37rem' }">
     <form [formGroup]="formDateClose">
         <div class="p-fluid p-formgrid grid">
-            <div class="field col-12">
+            <div class="col-12">
                 <label for="datecloseId">Data de entrega do material</label>
                 <p-calendar dateFormat="dd/mm/yy" [showIcon]="true" [showOnFocus]="false" inputId="datecloseId"
                     formControlName="dateClose" />
