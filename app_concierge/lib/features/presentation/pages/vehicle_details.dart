@@ -14,8 +14,11 @@ import 'package:share_plus/share_plus.dart';
 class VehicleDetails extends StatefulWidget {
   Vehicle vehicleEntry;
   UserLogin userLogin;
-  VehicleDetails(
-      {super.key, required this.vehicleEntry, required this.userLogin});
+  VehicleDetails({
+    super.key,
+    required this.vehicleEntry,
+    required this.userLogin,
+  });
 
   @override
   State<VehicleDetails> createState() => _VehicleDetailsState();
@@ -75,7 +78,6 @@ class _VehicleDetailsState extends State<VehicleDetails> {
 
   String formatDate(String date) {
     if (date == "") return "";
-
     DateTime dateTime = DateTime.parse(date).toLocal();
     return DateFormat("dd/MM/yyyy HH:mm").format(dateTime);
   }
@@ -93,52 +95,43 @@ class _VehicleDetailsState extends State<VehicleDetails> {
     sizeScreen = MediaQuery.of(context).size.shortestSide;
 
     return DefaultTabController(
-        length: 4,
-        child: Scaffold(
-          backgroundColor: Colors.grey.shade100,
-          appBar: AppBar(
-            title: const Text('Inf. veículo'),
-            actions: [
-              IconButton(
-                  onPressed: () {
-                    print(widget.vehicleEntry.dateEntry);
-                    shareVehicle(widget.vehicleEntry);
-                  },
-                  icon: const Icon(Icons.share))
-            ],
-            bottom: const TabBar(
-              tabs: <Widget>[
-                Tab(
-                  text: "Veículo",
-                  icon: Icon(Icons.drive_eta),
-                ),
-                Tab(
-                  text: "Porteiro",
-                  icon: Icon(Icons.person_4),
-                ),
-                Tab(
-                  text: "Empresa",
-                  icon: Icon(Icons.business),
-                ),
-                Tab(
-                  text: "Motorista",
-                  icon: Icon(Icons.person),
-                ),
-              ],
+      length: 4,
+      child: Scaffold(
+        backgroundColor: Colors.grey.shade100,
+        appBar: AppBar(
+          title: const Text('Inf. veículo'),
+          actions: [
+            IconButton(
+              onPressed: () {
+                print(widget.vehicleEntry.dateEntry);
+                shareVehicle(widget.vehicleEntry);
+              },
+              icon: const Icon(Icons.share),
             ),
+          ],
+          bottom: const TabBar(
+            tabs: <Widget>[
+              Tab(text: "Veículo", icon: Icon(Icons.drive_eta)),
+              Tab(text: "Porteiro", icon: Icon(Icons.person_4)),
+              Tab(text: "Empresa", icon: Icon(Icons.business)),
+              Tab(text: "Motorista", icon: Icon(Icons.person)),
+            ],
           ),
-          body: Stack(
-            children: [
-              TabBarView(children: [
+        ),
+        body: Stack(
+          children: [
+            TabBarView(
+              children: [
+                //Veículo
                 Padding(
                   padding: EdgeInsets.only(
-                      right: sizeScreen * 0.02, left: sizeScreen * 0.02),
+                    right: sizeScreen * 0.02,
+                    left: sizeScreen * 0.02,
+                  ),
                   child: SingleChildScrollView(
                     child: Column(
                       children: [
-                        SizedBox(
-                          height: sizeScreen * 0.02,
-                        ),
+                        SizedBox(height: sizeScreen * 0.02),
                         ValueListenableBuilder(
                           valueListenable: statusAuthExit,
                           builder: (context, value, child) {
@@ -148,17 +141,19 @@ class _VehicleDetailsState extends State<VehicleDetails> {
                                       Text(
                                         "Veículo autorizado",
                                         style: TextStyle(
-                                            color: Colors.green.shade300,
-                                            fontSize: 24.0,
-                                            fontWeight: FontWeight.bold),
+                                          color: Colors.green.shade300,
+                                          fontSize: 24.0,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                       ),
                                       const Text(
                                         "Veículo está autorizado a sair da empresa.",
                                         style: TextStyle(
-                                            fontWeight: FontWeight.w300,
-                                            fontSize: 16,
-                                            color: Colors.black87),
-                                      )
+                                          fontWeight: FontWeight.w300,
+                                          fontSize: 16,
+                                          color: Colors.black87,
+                                        ),
+                                      ),
                                     ],
                                   )
                                 : Column(
@@ -166,24 +161,24 @@ class _VehicleDetailsState extends State<VehicleDetails> {
                                       Text(
                                         "Veículo não autorizado",
                                         style: TextStyle(
-                                            color: Colors.red.shade300,
-                                            fontSize: 24.0,
-                                            fontWeight: FontWeight.bold),
+                                          color: Colors.red.shade300,
+                                          fontSize: 24.0,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                       ),
                                       const Text(
                                         "Veículo não autorizado a sair da empresa.",
                                         style: TextStyle(
-                                            fontWeight: FontWeight.w300,
-                                            fontSize: 16,
-                                            color: Colors.black87),
-                                      )
+                                          fontWeight: FontWeight.w300,
+                                          fontSize: 16,
+                                          color: Colors.black87,
+                                        ),
+                                      ),
                                     ],
                                   );
                           },
                         ),
-                        const SizedBox(
-                          height: 10,
-                        ),
+                        const SizedBox(height: 10),
                         Row(
                           children: [
                             Mytext(
@@ -191,20 +186,17 @@ class _VehicleDetailsState extends State<VehicleDetails> {
                               showText: widget.vehicleEntry.id.toString(),
                               myWidth: sizeScreen * 0.3,
                             ),
-                            const SizedBox(
-                              width: 10,
-                            ),
+                            const SizedBox(width: 10),
                             Mytext(
                               showLabel: "Data Entrada",
-                              showText:
-                                  formatDate(widget.vehicleEntry.dateEntry!),
+                              showText: formatDate(
+                                widget.vehicleEntry.dateEntry!,
+                              ),
                               myWidth: sizeScreen * 0.63,
                             ),
                           ],
                         ),
-                        const SizedBox(
-                          height: 8,
-                        ),
+                        const SizedBox(height: 8),
                         Row(
                           children: [
                             Mytext(
@@ -212,9 +204,7 @@ class _VehicleDetailsState extends State<VehicleDetails> {
                               showText: widget.vehicleEntry.placa!,
                               myWidth: sizeScreen * 0.3,
                             ),
-                            const SizedBox(
-                              width: 10,
-                            ),
+                            const SizedBox(width: 10),
                             Mytext(
                               showLabel: "Frota",
                               showText: widget.vehicleEntry.frota!,
@@ -222,29 +212,23 @@ class _VehicleDetailsState extends State<VehicleDetails> {
                             ),
                           ],
                         ),
-                        const SizedBox(
-                          height: 8,
-                        ),
+                        const SizedBox(height: 8),
                         Mytext(
                           showLabel: "Modelo",
                           showText: widget.vehicleEntry.modelDescription!,
                           myWidth: sizeScreen * 0.96,
                         ),
-                        const SizedBox(
-                          height: 8,
-                        ),
+                        const SizedBox(height: 8),
                         Mytext(
                           showLabel: "Consultor",
                           showText: widget.vehicleEntry.nameUserAttendant!,
                           myWidth: sizeScreen * 0.96,
                         ),
-                        const SizedBox(
-                          height: 8,
-                        ),
+                        const SizedBox(height: 8),
                         Row(
                           children: [
                             Mytext(
-                              showLabel: "N. O.S.",
+                              showLabel: "Nº O.S.",
                               showText: widget.vehicleEntry.numServiceOrder!,
                               myWidth: 120.0,
                             ),
@@ -262,18 +246,14 @@ class _VehicleDetailsState extends State<VehicleDetails> {
                             ),
                           ],
                         ),
-                        const SizedBox(
-                          height: 8,
-                        ),
+                        const SizedBox(height: 8),
                         Mytext(
                           showLabel: "Informações",
                           showText: widget.vehicleEntry.information!,
                           myWidth: sizeScreen * 0.96,
                           myHight: 70,
                         ),
-                        const SizedBox(
-                          height: 10,
-                        ),
+                        const SizedBox(height: 10),
                         Row(
                           children: [
                             vehiclePhoto(vehicle.photo1!),
@@ -285,9 +265,7 @@ class _VehicleDetailsState extends State<VehicleDetails> {
                             vehiclePhoto(vehicle.photo4!),
                           ],
                         ),
-                        const SizedBox(
-                          height: 20,
-                        ),
+                        const SizedBox(height: 20),
                         // Button
                         ValueListenableBuilder(
                           valueListenable: statusAuthExit,
@@ -301,18 +279,23 @@ class _VehicleDetailsState extends State<VehicleDetails> {
                                         saveExit(context);
                                       },
                                       style: ButtonStyle(
-                                        elevation: const WidgetStatePropertyAll<
-                                            double>(8.0),
+                                        elevation:
+                                            const WidgetStatePropertyAll<
+                                              double
+                                            >(8.0),
                                         backgroundColor:
                                             WidgetStatePropertyAll<Color>(
-                                                Colors.green.shade300),
-                                        shape: WidgetStatePropertyAll<
-                                            RoundedRectangleBorder>(
-                                          RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(8.0),
-                                          ),
-                                        ),
+                                              Colors.green.shade300,
+                                            ),
+                                        shape:
+                                            WidgetStatePropertyAll<
+                                              RoundedRectangleBorder
+                                            >(
+                                              RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(8.0),
+                                              ),
+                                            ),
                                       ),
                                       child: const Text(
                                         "Saída",
@@ -326,18 +309,23 @@ class _VehicleDetailsState extends State<VehicleDetails> {
                                     child: ElevatedButton(
                                       onPressed: () {},
                                       style: ButtonStyle(
-                                        elevation: const WidgetStatePropertyAll<
-                                            double>(8.0),
+                                        elevation:
+                                            const WidgetStatePropertyAll<
+                                              double
+                                            >(8.0),
                                         backgroundColor:
                                             WidgetStatePropertyAll<Color>(
-                                                Colors.red.shade300),
-                                        shape: WidgetStatePropertyAll<
-                                            RoundedRectangleBorder>(
-                                          RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(8.0),
-                                          ),
-                                        ),
+                                              Colors.red.shade300,
+                                            ),
+                                        shape:
+                                            WidgetStatePropertyAll<
+                                              RoundedRectangleBorder
+                                            >(
+                                              RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(8.0),
+                                              ),
+                                            ),
                                       ),
                                       child: const Text(
                                         "Saída",
@@ -347,45 +335,93 @@ class _VehicleDetailsState extends State<VehicleDetails> {
                                   );
                           },
                         ),
-                        const SizedBox(
-                          height: 20,
+                        const SizedBox(height: 20),
+                      ],
+                    ),
+                  ),
+                ),
+
+                //Porteiros
+                Padding(
+                  padding: EdgeInsets.only(
+                    right: sizeScreen * 0.02,
+                    left: sizeScreen * 0.02,
+                  ),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        SizedBox(height: sizeScreen * 0.02),
+                        Row(
+                          children: [
+                            Mytext(
+                              showLabel: "Código",
+                              showText: widget.vehicleEntry.idUserEntry
+                                  .toString(),
+                              myWidth: sizeScreen * 0.3,
+                            ),
+                            const SizedBox(width: 10),
+                            Mytext(
+                              showLabel: "Porteiro Entrada",
+                              showText: widget.vehicleEntry.nameUserEntry
+                                  .toString(),
+                              myWidth: sizeScreen * 0.63,
+                            ),
+                          ],
                         ),
                       ],
                     ),
                   ),
                 ),
-                const Center(
-                  child: Text("It's rainy here"),
+                //Proprietario
+                Padding(
+                  padding: EdgeInsets.only(
+                    right: sizeScreen * 0.02,
+                    left: sizeScreen * 0.02,
+                  ),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [const Center(child: Text("Proprietario"))],
+                    ),
+                  ),
                 ),
-                const Center(
-                  child: Text("It's sunny here"),
+                //Motorista
+                Padding(
+                  padding: EdgeInsets.only(
+                    right: sizeScreen * 0.02,
+                    left: sizeScreen * 0.02,
+                  ),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [const Center(child: Text("Motorista"))],
+                    ),
+                  ),
                 ),
-                const Center(
-                  child: Text("It's sunny here2"),
-                ),
-              ]),
-              ValueListenableBuilder(
-                valueListenable: loadSave,
-                builder: (context, value, child) {
-                  return value
-                      ? Container(
-                          width: myWidght,
-                          height: myHeight,
-                          decoration: const BoxDecoration(
-                              color: Color.fromARGB(103, 190, 190, 190)),
-                          child: const Center(
-                            child: CircularProgressIndicator(
-                              color: Colors.blue,
-                              strokeWidth: 2,
-                            ),
+              ],
+            ),
+            ValueListenableBuilder(
+              valueListenable: loadSave,
+              builder: (context, value, child) {
+                return value
+                    ? Container(
+                        width: myWidght,
+                        height: myHeight,
+                        decoration: const BoxDecoration(
+                          color: Color.fromARGB(103, 190, 190, 190),
+                        ),
+                        child: const Center(
+                          child: CircularProgressIndicator(
+                            color: Colors.blue,
+                            strokeWidth: 2,
                           ),
-                        )
-                      : const SizedBox();
-                },
-              ),
-            ],
-          ),
-        ));
+                        ),
+                      )
+                    : const SizedBox();
+              },
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   Future<String> exit(VehicleExit vehicle) async {
@@ -398,8 +434,9 @@ class _VehicleDetailsState extends State<VehicleDetails> {
     return photo != ""
         ? Container(
             decoration: BoxDecoration(
-                color: Colors.grey.shade300,
-                borderRadius: BorderRadius.circular(10.0)),
+              color: Colors.grey.shade300,
+              borderRadius: BorderRadius.circular(10.0),
+            ),
             child: Image.memory(
               base64Decode(photo),
               width: 80,
@@ -411,13 +448,10 @@ class _VehicleDetailsState extends State<VehicleDetails> {
             width: 80,
             height: 80,
             decoration: BoxDecoration(
-                color: Colors.grey.shade300,
-                borderRadius: BorderRadius.circular(10.0)),
-            child: Icon(
-              Icons.photo,
-              color: Colors.grey.shade500,
-              size: 50.0,
+              color: Colors.grey.shade300,
+              borderRadius: BorderRadius.circular(10.0),
             ),
+            child: Icon(Icons.photo, color: Colors.grey.shade500, size: 50.0),
           );
   }
 
@@ -434,9 +468,7 @@ class _VehicleDetailsState extends State<VehicleDetails> {
               style: TextStyle(fontSize: 16, color: Colors.black87),
             ),
           ),
-          const SizedBox(
-            height: 10,
-          ),
+          const SizedBox(height: 10),
           SizedBox(
             width: sizeScreen - sizeScreen * 0.04,
             height: 50,
@@ -466,8 +498,9 @@ class _VehicleDetailsState extends State<VehicleDetails> {
                 loadSave.value = false;
               },
               style: ButtonStyle(
-                backgroundColor:
-                    const WidgetStatePropertyAll<Color>(Colors.blue),
+                backgroundColor: const WidgetStatePropertyAll<Color>(
+                  Colors.blue,
+                ),
                 shape: WidgetStatePropertyAll<RoundedRectangleBorder>(
                   RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8.0),
@@ -477,9 +510,7 @@ class _VehicleDetailsState extends State<VehicleDetails> {
               child: const Text("Sim"),
             ),
           ),
-          const SizedBox(
-            height: 8,
-          ),
+          const SizedBox(height: 8),
           SizedBox(
             width: sizeScreen - sizeScreen * 0.04,
             height: 50,
@@ -494,10 +525,7 @@ class _VehicleDetailsState extends State<VehicleDetails> {
                   ),
                 ),
               ),
-              child: const Text(
-                "Não",
-                style: TextStyle(color: Colors.black87),
-              ),
+              child: const Text("Não", style: TextStyle(color: Colors.black87)),
             ),
           ),
         ],
@@ -520,19 +548,21 @@ class _VehicleDetailsState extends State<VehicleDetails> {
   }
 
   shareVehicle(Vehicle vehicle) async {
-    final result = await Share.share("Código: ${vehicle.id}\n"
-        "Empresa código: ${vehicle.clientCompanyId}\n"
-        "Empresa nome: ${vehicle.clientCompanyName}\n"
-        "Modelo: ${vehicle.modelDescription}\nCor: ${vehicle.color} \n"
-        "Placa: ${maskPlaca(vehicle.placa!)}\nFrota: ${vehicle.frota}\nKM: ${vehicle.kmEntry}\n"
-        "Data entrada: ${formatDate(vehicle.dateEntry!)}\nPorteiro entrada: ${vehicle.nameUserEntry}\n"
-        "Data saída: ${vehicle.dateExit == null ? '' : formatDate(vehicle.dateExit!)}\nPorteiro saída: ${vehicle.userNameExit ?? ''}\n"
-        "Consultor: ${vehicle.nameUserAttendant ?? ''}\n"
-        "O.S.: ${vehicle.numServiceOrder != 0 ? vehicle.numServiceOrder : ''}\n"
-        "NFe: ${vehicle.numNfe != 0 ? vehicle.numNfe : ''}\n"
-        "NFS-e: ${vehicle.numNfse != 0 ? vehicle.numNfse : ''}\n"
-        "Obs Porteiro: ${vehicle.informationConcierge}\n"
-        "Obs Consultor: ${vehicle.information}\n");
+    final result = await Share.share(
+      "Código: ${vehicle.id}\n"
+      "Empresa código: ${vehicle.clientCompanyId}\n"
+      "Empresa nome: ${vehicle.clientCompanyName}\n"
+      "Modelo: ${vehicle.modelDescription}\nCor: ${vehicle.color} \n"
+      "Placa: ${maskPlaca(vehicle.placa!)}\nFrota: ${vehicle.frota}\nKM: ${vehicle.kmEntry}\n"
+      "Data entrada: ${formatDate(vehicle.dateEntry!)}\nPorteiro entrada: ${vehicle.nameUserEntry}\n"
+      "Data saída: ${vehicle.dateExit == null ? '' : formatDate(vehicle.dateExit!)}\nPorteiro saída: ${vehicle.userNameExit ?? ''}\n"
+      "Consultor: ${vehicle.nameUserAttendant ?? ''}\n"
+      "O.S.: ${vehicle.numServiceOrder != 0 ? vehicle.numServiceOrder : ''}\n"
+      "NFe: ${vehicle.numNfe != 0 ? vehicle.numNfe : ''}\n"
+      "NFS-e: ${vehicle.numNfse != 0 ? vehicle.numNfse : ''}\n"
+      "Obs Porteiro: ${vehicle.informationConcierge}\n"
+      "Obs Consultor: ${vehicle.information}\n",
+    );
 
     return result;
   }

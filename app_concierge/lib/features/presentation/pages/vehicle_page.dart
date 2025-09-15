@@ -28,11 +28,12 @@ class VehiclePage extends StatefulWidget {
   // ClientCompany clientCompany;
   UserDriver userDriver;
 
-  VehiclePage(
-      {super.key,
-      required this.userLogin,
-      // required this.clientCompany,
-      required this.userDriver});
+  VehiclePage({
+    super.key,
+    required this.userLogin,
+    // required this.clientCompany,
+    required this.userDriver,
+  });
 
   @override
   State<VehiclePage> createState() => _VehiclePageState();
@@ -57,15 +58,16 @@ class _VehiclePageState extends State<VehiclePage> {
     'Amarelo',
     'Rosa',
     'Roxo',
-    'Outro'
+    'Outro',
   ];
 
   final placaKey = GlobalKey<FormFieldState>();
   final placaControler = TextEditingController();
   var maskFormatterPlaca = MaskTextInputFormatter(
-      mask: '###-####',
-      filter: {"#": RegExp(r'[0-9 A-Z]')},
-      type: MaskAutoCompletionType.lazy);
+    mask: '###-####',
+    filter: {"#": RegExp(r'[0-9 A-Z]')},
+    type: MaskAutoCompletionType.lazy,
+  );
 
   final frotaKey = GlobalKey<FormFieldState>();
   final frotaControler = TextEditingController();
@@ -139,9 +141,10 @@ class _VehiclePageState extends State<VehiclePage> {
       backgroundColor: Colors.grey.shade100,
       body: Padding(
         padding: EdgeInsets.only(
-            top: sizeScreen * 0.06,
-            right: sizeScreen * 0.02,
-            left: sizeScreen * 0.02),
+          top: sizeScreen * 0.06,
+          right: sizeScreen * 0.02,
+          left: sizeScreen * 0.02,
+        ),
         child: SingleChildScrollView(
           child: SizedBox(
             width: myWidght - sizeScreen * 0.02,
@@ -160,58 +163,58 @@ class _VehiclePageState extends State<VehiclePage> {
                 Row(
                   children: [
                     ValueListenableBuilder(
-                        valueListenable: isvehicleNew,
-                        builder:
-                            (BuildContext context, bool value, Widget? child) {
-                          return Row(
-                            children: [
-                              Checkbox(
-                                value: value,
-                                checkColor: Colors.black54,
-                                activeColor: Colors.green.shade300,
-                                onChanged: (bool? sele) {
-                                  isvehicleNew.value = sele!;
-                                  placaControler.text = "";
-                                },
-                              ),
-                              GestureDetector(
+                      valueListenable: isvehicleNew,
+                      builder:
+                          (BuildContext context, bool value, Widget? child) {
+                            return Row(
+                              children: [
+                                Checkbox(
+                                  value: value,
+                                  checkColor: Colors.black54,
+                                  activeColor: Colors.green.shade300,
+                                  onChanged: (bool? sele) {
+                                    isvehicleNew.value = sele!;
+                                    placaControler.text = "";
+                                  },
+                                ),
+                                GestureDetector(
                                   onTap: () {
                                     isvehicleNew.value = !isvehicleNew.value;
                                     placaControler.text = "";
                                   },
-                                  child: const Text("Veículo é novo!")),
-                            ],
-                          );
-                        }),
-                    const SizedBox(
-                      width: 20,
+                                  child: const Text("Veículo é novo!"),
+                                ),
+                              ],
+                            );
+                          },
                     ),
+                    const SizedBox(width: 20),
                     ValueListenableBuilder(
-                        valueListenable: isvehicleService,
-                        builder:
-                            (BuildContext context, bool value, Widget? child) {
-                          return Row(
-                            children: [
-                              Checkbox(
-                                value: value,
-                                checkColor: Colors.black54,
-                                activeColor: Colors.green.shade300,
-                                onChanged: (bool? sele) {
-                                  isvehicleService.value = sele!;
-                                },
-                              ),
-                              GestureDetector(
+                      valueListenable: isvehicleService,
+                      builder:
+                          (BuildContext context, bool value, Widget? child) {
+                            return Row(
+                              children: [
+                                Checkbox(
+                                  value: value,
+                                  checkColor: Colors.black54,
+                                  activeColor: Colors.green.shade300,
+                                  onChanged: (bool? sele) {
+                                    isvehicleService.value = sele!;
+                                  },
+                                ),
+                                GestureDetector(
                                   onTap: () => isvehicleService.value =
                                       !isvehicleService.value,
-                                  child: const Text("Ordem serviço!")),
-                            ],
-                          );
-                        }),
+                                  child: const Text("Ordem serviço!"),
+                                ),
+                              ],
+                            );
+                          },
+                    ),
                   ],
                 ),
-                const SizedBox(
-                  height: 10,
-                ),
+                const SizedBox(height: 10),
                 //Model Color
                 Row(
                   children: [
@@ -221,9 +224,10 @@ class _VehiclePageState extends State<VehiclePage> {
                         const Text(
                           "Modelos",
                           style: TextStyle(
-                              fontWeight: FontWeight.w300,
-                              fontSize: 16.0,
-                              color: Colors.black87),
+                            fontWeight: FontWeight.w300,
+                            fontSize: 16.0,
+                            color: Colors.black87,
+                          ),
                         ),
                         DropdownMenu<String>(
                           width: sizeScreen * 0.6,
@@ -247,17 +251,19 @@ class _VehiclePageState extends State<VehiclePage> {
                             }
                           },
                           dropdownMenuEntries: _models
-                              .map<DropdownMenuEntry<String>>(
-                                  (VehicleModel value) {
-                            return DropdownMenuEntry<String>(
-                              value: value.id!.toString(),
-                              label: value.description!,
-                              labelWidget: Text(
-                                value.description!.toString(),
-                                style: const TextStyle(fontSize: 16),
-                              ),
-                            );
-                          }).toList(),
+                              .map<DropdownMenuEntry<String>>((
+                                VehicleModel value,
+                              ) {
+                                return DropdownMenuEntry<String>(
+                                  value: value.id!.toString(),
+                                  label: value.description!,
+                                  labelWidget: Text(
+                                    value.description!.toString(),
+                                    style: const TextStyle(fontSize: 16),
+                                  ),
+                                );
+                              })
+                              .toList(),
                         ),
                       ],
                     ),
@@ -268,9 +274,10 @@ class _VehiclePageState extends State<VehiclePage> {
                         const Text(
                           "Cor",
                           style: TextStyle(
-                              fontWeight: FontWeight.w300,
-                              fontSize: 16,
-                              color: Colors.black87),
+                            fontWeight: FontWeight.w300,
+                            fontSize: 16,
+                            color: Colors.black87,
+                          ),
                         ),
                         DropdownMenu<String>(
                           width: sizeScreen * 0.34,
@@ -290,45 +297,45 @@ class _VehiclePageState extends State<VehiclePage> {
                           },
                           dropdownMenuEntries: colors
                               .map<DropdownMenuEntry<String>>((String value) {
-                            return DropdownMenuEntry<String>(
-                              value: value,
-                              label: value,
-                              labelWidget: Text(
-                                value,
-                                style: const TextStyle(fontSize: 16.0),
-                              ),
-                            );
-                          }).toList(),
+                                return DropdownMenuEntry<String>(
+                                  value: value,
+                                  label: value,
+                                  labelWidget: Text(
+                                    value,
+                                    style: const TextStyle(fontSize: 16.0),
+                                  ),
+                                );
+                              })
+                              .toList(),
                         ),
                       ],
                     ),
                   ],
                 ),
-                const SizedBox(
-                  height: 10.0,
-                ),
+                const SizedBox(height: 10.0),
                 //Placa Frota
                 Row(
                   children: [
                     SizedBox(
                       width: sizeScreen * 0.4,
                       child: ValueListenableBuilder(
-                          valueListenable: isvehicleNew,
-                          builder: (BuildContext context, bool value,
-                              Widget? child) {
-                            return Mytextfield(
-                              myKey: placaKey,
-                              myController: placaControler,
-                              myLabelText: "Placa",
-                              myKeyboardType: TextInputType.text,
-                              myTextInputAction: TextInputAction.next,
-                              myTextColor: Colors.black87,
-                              myEnabled: !value,
-                              maskText: maskFormatterPlaca,
-                              myTextCapitalization:
-                                  TextCapitalization.characters,
-                            );
-                          }),
+                        valueListenable: isvehicleNew,
+                        builder:
+                            (BuildContext context, bool value, Widget? child) {
+                              return Mytextfield(
+                                myKey: placaKey,
+                                myController: placaControler,
+                                myLabelText: "Placa",
+                                myKeyboardType: TextInputType.text,
+                                myTextInputAction: TextInputAction.next,
+                                myTextColor: Colors.black87,
+                                myEnabled: !value,
+                                maskText: maskFormatterPlaca,
+                                myTextCapitalization:
+                                    TextCapitalization.characters,
+                              );
+                            },
+                      ),
                     ),
                     const Expanded(child: SizedBox()),
                     SizedBox(
@@ -345,9 +352,7 @@ class _VehiclePageState extends State<VehiclePage> {
                     ),
                   ],
                 ),
-                const SizedBox(
-                  height: 10.0,
-                ),
+                const SizedBox(height: 10.0),
                 SizedBox(
                   width: sizeScreen - sizeScreen * 0.02,
                   child: Mytextfield(
@@ -367,9 +372,10 @@ class _VehiclePageState extends State<VehiclePage> {
                     const Text(
                       "Consultor",
                       style: TextStyle(
-                          fontWeight: FontWeight.w300,
-                          fontSize: 16,
-                          color: Colors.black87),
+                        fontWeight: FontWeight.w300,
+                        fontSize: 16,
+                        color: Colors.black87,
+                      ),
                     ),
                     DropdownMenu<String>(
                       width: sizeScreen - sizeScreen * 0.02,
@@ -393,23 +399,23 @@ class _VehiclePageState extends State<VehiclePage> {
                         }
                       },
                       dropdownMenuEntries: _attendants
-                          .map<DropdownMenuEntry<String>>(
-                              (UserAttendant value) {
-                        return DropdownMenuEntry<String>(
-                          value: value.id!.toString(),
-                          label: value.name!,
-                          labelWidget: Text(
-                            value.name!.toString(),
-                            style: const TextStyle(fontSize: 16),
-                          ),
-                        );
-                      }).toList(),
+                          .map<DropdownMenuEntry<String>>((
+                            UserAttendant value,
+                          ) {
+                            return DropdownMenuEntry<String>(
+                              value: value.id!.toString(),
+                              label: value.name!,
+                              labelWidget: Text(
+                                value.name!.toString(),
+                                style: const TextStyle(fontSize: 16),
+                              ),
+                            );
+                          })
+                          .toList(),
                     ),
                   ],
                 ),
-                const SizedBox(
-                  height: 10.0,
-                ),
+                const SizedBox(height: 10.0),
                 Row(
                   children: [
                     SizedBox(
@@ -452,9 +458,7 @@ class _VehiclePageState extends State<VehiclePage> {
                     ),
                   ],
                 ),
-                const SizedBox(
-                  height: 10.0,
-                ),
+                const SizedBox(height: 10.0),
                 Row(
                   children: [
                     SizedBox(
@@ -484,9 +488,7 @@ class _VehiclePageState extends State<VehiclePage> {
                     ),
                   ],
                 ),
-                const SizedBox(
-                  height: 10.0,
-                ),
+                const SizedBox(height: 10.0),
                 //Information
                 SizedBox(
                   width: sizeScreen - sizeScreen * 0.02,
@@ -501,9 +503,7 @@ class _VehiclePageState extends State<VehiclePage> {
                     myMaxLength: 255,
                   ),
                 ),
-                const SizedBox(
-                  height: 10,
-                ),
+                const SizedBox(height: 10),
                 Row(
                   children: [
                     //Photo 1
@@ -513,9 +513,7 @@ class _VehiclePageState extends State<VehiclePage> {
                         return Column(
                           children: [
                             vehiclePhoto(base64Encode(value)),
-                            const SizedBox(
-                              height: 8,
-                            ),
+                            const SizedBox(height: 8),
                             value.isEmpty
                                 ? IconButton(
                                     onPressed: () {
@@ -537,7 +535,7 @@ class _VehiclePageState extends State<VehiclePage> {
                                       color: Colors.red,
                                       size: 30,
                                     ),
-                                  )
+                                  ),
                           ],
                         );
                       },
@@ -550,9 +548,7 @@ class _VehiclePageState extends State<VehiclePage> {
                         return Column(
                           children: [
                             vehiclePhoto(base64Encode(value)),
-                            const SizedBox(
-                              height: 8,
-                            ),
+                            const SizedBox(height: 8),
                             value.isEmpty
                                 ? IconButton(
                                     onPressed: () {
@@ -574,7 +570,7 @@ class _VehiclePageState extends State<VehiclePage> {
                                       color: Colors.red,
                                       size: 30,
                                     ),
-                                  )
+                                  ),
                           ],
                         );
                       },
@@ -587,9 +583,7 @@ class _VehiclePageState extends State<VehiclePage> {
                         return Column(
                           children: [
                             vehiclePhoto(base64Encode(value)),
-                            const SizedBox(
-                              height: 8,
-                            ),
+                            const SizedBox(height: 8),
                             value.isEmpty
                                 ? IconButton(
                                     onPressed: () {
@@ -611,7 +605,7 @@ class _VehiclePageState extends State<VehiclePage> {
                                       color: Colors.red,
                                       size: 30,
                                     ),
-                                  )
+                                  ),
                           ],
                         );
                       },
@@ -624,9 +618,7 @@ class _VehiclePageState extends State<VehiclePage> {
                         return Column(
                           children: [
                             vehiclePhoto(base64Encode(value)),
-                            const SizedBox(
-                              height: 8,
-                            ),
+                            const SizedBox(height: 8),
                             value.isEmpty
                                 ? IconButton(
                                     onPressed: () {
@@ -648,7 +640,7 @@ class _VehiclePageState extends State<VehiclePage> {
                                       color: Colors.red,
                                       size: 30,
                                     ),
-                                  )
+                                  ),
                           ],
                         );
                       },
@@ -667,8 +659,9 @@ class _VehiclePageState extends State<VehiclePage> {
                     },
                     style: ButtonStyle(
                       elevation: const WidgetStatePropertyAll<double>(8.0),
-                      backgroundColor:
-                          WidgetStatePropertyAll<Color>(Colors.blue.shade300),
+                      backgroundColor: WidgetStatePropertyAll<Color>(
+                        Colors.blue.shade300,
+                      ),
                       shape: WidgetStatePropertyAll<RoundedRectangleBorder>(
                         RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8.0),
@@ -700,16 +693,18 @@ class _VehiclePageState extends State<VehiclePage> {
 
   void openCamera1(BuildContext context) async {
     Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (_) => CameraCamera(
-                  onFile: (file) {
-                    if (file != null) {
-                      fileToBase64PPhoto1(file.path);
-                      Navigator.pop(context);
-                    }
-                  },
-                )));
+      context,
+      MaterialPageRoute(
+        builder: (_) => CameraCamera(
+          onFile: (file) {
+            if (file != null) {
+              fileToBase64PPhoto1(file.path);
+              Navigator.pop(context);
+            }
+          },
+        ),
+      ),
+    );
   }
 
   void fileToBase64PPhoto1(String filePath) async {
@@ -720,16 +715,18 @@ class _VehiclePageState extends State<VehiclePage> {
 
   void openCamera2(BuildContext context) async {
     Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (_) => CameraCamera(
-                  onFile: (file) {
-                    if (file != null) {
-                      fileToBase64PPhoto2(file.path);
-                      Navigator.pop(context);
-                    }
-                  },
-                )));
+      context,
+      MaterialPageRoute(
+        builder: (_) => CameraCamera(
+          onFile: (file) {
+            if (file != null) {
+              fileToBase64PPhoto2(file.path);
+              Navigator.pop(context);
+            }
+          },
+        ),
+      ),
+    );
   }
 
   void fileToBase64PPhoto2(String filePath) async {
@@ -740,16 +737,18 @@ class _VehiclePageState extends State<VehiclePage> {
 
   void openCamera3(BuildContext context) async {
     Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (_) => CameraCamera(
-                  onFile: (file) {
-                    if (file != null) {
-                      fileToBase64PPhoto3(file.path);
-                      Navigator.pop(context);
-                    }
-                  },
-                )));
+      context,
+      MaterialPageRoute(
+        builder: (_) => CameraCamera(
+          onFile: (file) {
+            if (file != null) {
+              fileToBase64PPhoto3(file.path);
+              Navigator.pop(context);
+            }
+          },
+        ),
+      ),
+    );
   }
 
   void fileToBase64PPhoto3(String filePath) async {
@@ -760,16 +759,18 @@ class _VehiclePageState extends State<VehiclePage> {
 
   void openCamera4(BuildContext context) async {
     Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (_) => CameraCamera(
-                  onFile: (file) {
-                    if (file != null) {
-                      fileToBase64PPhoto4(file.path);
-                      Navigator.pop(context);
-                    }
-                  },
-                )));
+      context,
+      MaterialPageRoute(
+        builder: (_) => CameraCamera(
+          onFile: (file) {
+            if (file != null) {
+              fileToBase64PPhoto4(file.path);
+              Navigator.pop(context);
+            }
+          },
+        ),
+      ),
+    );
   }
 
   void fileToBase64PPhoto4(String filePath) async {
@@ -793,13 +794,10 @@ class _VehiclePageState extends State<VehiclePage> {
             width: 80,
             height: 80,
             decoration: BoxDecoration(
-                color: Colors.grey.shade300,
-                borderRadius: BorderRadius.circular(10.0)),
-            child: Icon(
-              Icons.photo,
-              color: Colors.grey.shade500,
-              size: 50.0,
+              color: Colors.grey.shade300,
+              borderRadius: BorderRadius.circular(10.0),
             ),
+            child: Icon(Icons.photo, color: Colors.grey.shade500, size: 50.0),
           );
   }
 
@@ -950,10 +948,12 @@ class _VehiclePageState extends State<VehiclePage> {
       _vehicle.quantityExtinguisher = extinguisherControler.text.trim() != ""
           ? int.parse(extinguisherControler.text)
           : 0;
-      _vehicle.quantityTrafficCone =
-          coneControler.text.trim() != "" ? int.parse(coneControler.text) : 0;
-      _vehicle.quantityTire =
-          tireControler.text.trim() != "" ? int.parse(tireControler.text) : 0;
+      _vehicle.quantityTrafficCone = coneControler.text.trim() != ""
+          ? int.parse(coneControler.text)
+          : 0;
+      _vehicle.quantityTire = tireControler.text.trim() != ""
+          ? int.parse(tireControler.text)
+          : 0;
       _vehicle.quantityTireComplete = tirecompleteControler.text.trim() != ""
           ? int.parse(tirecompleteControler.text)
           : 0;

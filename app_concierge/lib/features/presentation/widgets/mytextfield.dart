@@ -56,7 +56,7 @@ class Mytextfield extends StatelessWidget {
       ),
       decoration: InputDecoration(
         counterText: "",
-        fillColor: Colors.grey.shade200,
+        fillColor: Colors.grey.shade100,
         filled: true,
         labelText: myLabelText,
         labelStyle: TextStyle(

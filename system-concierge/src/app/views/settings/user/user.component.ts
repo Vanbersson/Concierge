@@ -45,7 +45,7 @@ import { StatusEnabledDisabled } from '../../../models/enum/status-enabled-disab
   selector: 'app-user',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, FormsModule, TableModule, InputTextModule, TreeModule, IconFieldModule, InputIconModule,
-    InputNumberModule, InputMaskModule, MultiSelectModule, ToastModule, DialogModule, PasswordModule,DividerModule,
+    InputNumberModule, InputMaskModule, MultiSelectModule, ToastModule, DialogModule, PasswordModule, DividerModule,
     ImageModule, ButtonModule, AvatarModule, RadioButtonModule],
   templateUrl: './user.component.html',
   styleUrl: './user.component.scss',
@@ -62,6 +62,7 @@ export default class UserComponent implements OnInit {
   userPhoto!: string;
   userEmail!: string;
   userRoleDescription!: string;
+  isEditUser: boolean = false;
 
   enabled: string = StatusEnabledDisabled.enabled;
   disabled: string = StatusEnabledDisabled.disabled;
@@ -223,8 +224,17 @@ export default class UserComponent implements OnInit {
       return pipe.transform(iniciais);;
     }
   }
+
   public showDialogSave() {
-    this.formUser.controls.id.disable();
+    this.isEditUser = false;
+
+    //disable ID
+    this.formUser.get('id').disable();
+    //enable password
+    this.formUser.get('password').enable();
+    this.formUser.get('passwordValid').enable();
+
+
     this.userSelect = null;
     this.cleanForm();
     this.visibleDialogUser = true;
@@ -232,14 +242,19 @@ export default class UserComponent implements OnInit {
     this.addRequirePass();
     this.addRequirePassValid();
   }
-  public showDialogEdit(user: User) {
-
-    this.deleteRequirePass();
-    this.deleteRequirePassValid();
-
+  editUser(user: User) {
+    this.isEditUser = true;
+    this.showDialogEdit(user);
+  }
+  private showDialogEdit(user: User) {
+    //show dialog
     this.visibleDialogUser = true;
-    this.formUser.controls.id.enable();
-
+    //disable ID
+    this.formUser.get('id').disable();
+    //disable password
+    this.formUser.get('password').disable();
+    this.formUser.get('passwordValid').disable();
+    //Data user
     this.userSelect = user;
 
     var roleSelect: UserRole;
@@ -259,14 +274,14 @@ export default class UserComponent implements OnInit {
       limitDiscount: user.limitDiscount,
       roleDesc: [roleSelect],
       roleFunc: user.roleFunc,
-      status: user.status
+      status: user.status,
+      password: '',
+      passwordValid: ''
     });
-
     //Menus
     this.getMenusUser();
     //Functions
     this.getPermissionUser();
-
   }
 
   private getPermissionUser() {
@@ -328,7 +343,24 @@ export default class UserComponent implements OnInit {
   public deletePhoto() {
     this.userPhoto = "";
   }
-  private validationForm(): boolean {
+  private validationEdit(): boolean {
+    const { value } = this.formUser;
+
+    if (value.name.trim() == '') {
+      this.messageService.add({ severity: 'error', summary: 'Nome', detail: 'Campo inválido', icon: 'pi pi-times' });
+      return false
+    }
+    if (value.email.trim() == '') {
+      this.messageService.add({ severity: 'error', summary: 'Email', detail: 'Campo inválido', icon: 'pi pi-times' });
+      return false
+    }
+    if (value.roleDesc == null) {
+      this.messageService.add({ severity: 'error', summary: 'Cargo', detail: 'Não selecionado', icon: 'pi pi-times' });
+      return false
+    }
+    return true;
+  }
+  private validationSave(): boolean {
     const { value } = this.formUser;
 
     if (value.name.trim() == '') {
@@ -349,12 +381,13 @@ export default class UserComponent implements OnInit {
     }
     return true;
   }
-  public save() {
-
-    if (this.validationForm()) {
-      if (this.formUser.controls.id.disabled) {
+  public saveData() {
+    if (this.isEditUser == false) {
+      if (this.validationSave()) {
         this.saveUser();
-      } else {
+      }
+    } else {
+      if (this.validationEdit()) {
         this.updateUser();
       }
     }
@@ -380,17 +413,18 @@ export default class UserComponent implements OnInit {
     this.userService.saveUser(userNew).subscribe(data => {
 
       if (data.status == 201) {
+        this.formUser.get('id').setValue(data.body.id);
+        this.userSelect = userNew;
+        this.userSelect.id = data.body.id;
+        this.isEditUser = true;
         this.getUsers();
         this.alertUserSave();
-        this.visibleDialogUser = false;
       }
-
     });
-
   }
   private updateUser() {
 
-    if (this.validationForm()) {
+    if (this.isEditUser) {
 
       const { value } = this.formUser;
 

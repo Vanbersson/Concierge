@@ -353,14 +353,13 @@ class _DriverPageState extends State<DriverPage> {
       if (driver.cpf!.length != 11) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('CPF invalido.'),
+            content: Text('CPF inválido.'),
             backgroundColor: Colors.red,
           ),
         );
         return false;
       }
     }
-
     return true;
   }
 
