@@ -25,7 +25,6 @@ public class VehicleReportService implements IVehicleReportService {
     public List<Object> filterVehicles(VehicleReportDto vehicle) {
         try {
             List<VehicleEntry> vehicles =   this.reportRepository.filterVehicles(vehicle);
-
             List<Object> list = new ArrayList();
 
             for (VehicleEntry item : vehicles) {
@@ -54,7 +53,6 @@ public class VehicleReportService implements IVehicleReportService {
         } catch (Exception ex) {
             throw new VehicleEntryException(ex.getMessage());
         }
-
     }
 
 }

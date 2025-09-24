@@ -56,6 +56,7 @@ public class VehicleReportRepository {
             case "E":
                 if (vehicleFilters.dateInit() != null)
                     predicates.add(cb.or(cb.between(vehicle.get("dateEntry"), initStartDate, initEndDate)));
+                    predicates.add(cb.isNull(vehicle.get("dateExit")));
                 break;
             case "S":
                 if (vehicleFilters.dateFinal() != null)
