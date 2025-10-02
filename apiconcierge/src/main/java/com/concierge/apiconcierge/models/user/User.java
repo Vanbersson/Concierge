@@ -51,6 +51,7 @@ public class User implements Serializable, UserDetails {
     @Column(name = "limit_discount")
     private Integer limitDiscount;
 
+    @Lob
     private byte[] photo;
 
     @JoinColumn(table = "tb_user_role", referencedColumnName = "id")

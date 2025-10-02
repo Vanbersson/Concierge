@@ -1,9 +1,241 @@
 <div class="layout-card">
- <p-toast />
+    <!-- Info -->
+    <p-toast />
     <div class="layout-card-title">
         <span>Motorista</span>
-        <p-button icon="pi pi-refresh" [text]="true" label="Recarregar"  />
+        <p-button icon="pi pi-plus" [text]="true" label="Novo" (onClick)="newDriver()" />
     </div>
+    <p-table #dt1 dataKey="id" [value]="listDriver" [rowHover]="true" [showCurrentPageReport]="true"
+        currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} entradas"
+        [globalFilterFields]="['id', 'name', 'cpf', 'rg']" [paginator]="true" [rows]="10"
+        [rowsPerPageOptions]="[10, 25, 50]" styleClass="p-datatable-sm">
+        <ng-template pTemplate="caption">
+            <div class="flex justify-content-between">
+                <p-iconField iconPosition="left">
+                    <p-inputIcon>
+                        <i class="pi pi-search"></i>
+                    </p-inputIcon>
+                    <input pInputText type="text" (input)="dt1.filterGlobal($event.target.value, 'contains')"
+                        placeholder="Pesquisar" />
+                </p-iconField>
+                <p-button icon="pi pi-filter" severity="warning" [text]="true" label="Filtros" (onClick)="showDialogFilter()" />
+            </div>
+        </ng-template>
+        <ng-template pTemplate="header">
+            <tr>
+                <th pSortableColumn="id" style="width:10%">
+                    Código <p-sortIcon field="id" />
+                </th>
+                <th pSortableColumn="Name" style="width:40%">
+                    Nome <p-sortIcon field="Name" />
+                </th>
+                <th pSortableColumn="cpf" style="width:15%">
+                    CPF <p-sortIcon field="cpf" />
+                </th>
+                <th pSortableColumn="rg" style="width:15%">
+                    RG <p-sortIcon field="rg" />
+                </th>
+                <th pSortableColumn="cnhCategory" style="width:10%">
+                    CNH <p-sortIcon field="cnhCategory" />
+                </th>
+                <th pSortableColumn="status" style="width:10%">
+                    Ativo <p-sortIcon field="status" />
+                </th>
+                <th></th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-driver>
+            <tr>
+                <td><span class="text-500">{{ driver.id }}</span></td>
+                <td><span class="text-500">{{ driver.name | uppercase }}</span></td>
+                <td><span class="text-500">{{ maskCPF(driver.cpf)  }}</span></td>
+                <td><span class="text-500">{{ driver.rg }}</span></td>
+                <td><span class="text-500">{{ driver.cnhCategory | uppercase }}</span></td>
+                <td>
+                    <i class="pi " [ngClass]="{
+                        'pi-times-circle text-red-500':driver.status == disabled,
+                        'pi-check-circle text-green-500':driver.status == enabled}">
+                    </i>
+                </td>
+                <td>
+                    <p-button icon="pi pi-pencil" label="Editar" [text]="true" severity="secondary-custom" size="small" (onClick)="edit(driver.id)"/>
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
 </div>
+<!-- Dialog new driver -->
+<p-dialog [(visible)]="visibleDialogNew" header="Cadastro motorista" [modal]="true"
+    [style]="{ width: '70rem',height:'60rem' }" [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }">
+    <form [formGroup]="driverForm">
+        <div class="p-fluid p-formgrid grid">
 
+            <div class="field col-12 flex align-items-center justify-content-center">
+                <div class="layout-photo-person">
+                    @if(driverPhoto){
+                    <p-image [imageStyle]="{'border-radius':'100%','object-fit':'cover'}" src="data:image/png;base64,{{driverPhoto}}" alt="imagem motorista" height="100" width="100" [preview]="true" />
+                    <button pButton severity="danger" [text]="true" label="Remover" (click)="deletePhoto()"></button>
+                    }@else{
+                    <div class="layout-photo-person-label">
+                        <button pButton type="button" label="Foto" [rounded]="true" [text]="true" size="small" (click)="selectPhoto()"></button>
+                    </div>
+                    }
+                </div>
+            </div>
 
+            <div class="col-12 md:col-2">
+                <label for="">Código</label>
+                <p-inputNumber mode="decimal" [useGrouping]="false" formControlName="id"/>
+            </div>
+            <div class="col-12 md:col-10">
+                <label for="">Nome</label>
+                <input pInputText [style]="{'text-transform':'uppercase'}" formControlName="name"/>
+                <small class="p-error block" *ngIf="driverForm.get('name')?.invalid">Campo obrigatório</small>
+            </div>
+            <div class="col-12 md:col-3">
+                <label for="">Data Nascimento</label>
+                <p-calendar dateFormat="dd/mm/yy" [iconDisplay]="'input'" [showIcon]="true" inputId="buttondisplay" formControlName="dateBirth"/>
+                <small class="p-error block" *ngIf="driverForm.get('dateBirth')?.invalid">Campo obrigatório</small>
+            </div>
+            <div class="col-12 md:col-3">
+                <label for="">CPF</label>
+                <p-inputMask mask="999.999.999-99" [unmask]="true" formControlName="cpf"/>
+                <small class="p-error block" *ngIf="driverForm.get('cpf')?.invalid">Campo obrigatório</small>
+            </div>
+            <div class="col-12 md:col-3">
+                <label for="">RG</label>
+                <p-inputNumber mode="decimal" [useGrouping]="false" formControlName="rg"/>
+                <small class="p-error block" *ngIf="driverForm.get('rg')?.invalid">Campo obrigatório</small>
+            </div>
+            <div  class="col-12 md:col-3">
+                <label for="">Sexo</label>
+                <p-dropdown [options]="sexos" optionLabel="type" formControlName="maleFemale"/>
+                <small class="p-error block" *ngIf="driverForm.get('maleFemale')?.invalid">Campo obrigatório</small>
+            </div>
+            <div class="col-12 md:col-6">
+                <label for="">E-mail</label>
+                <input pInputText formControlName="email"/>
+            </div>
+            <div class="col-12 md:col-3">
+                <label for="">Nº Registro CNH</label>
+                <p-inputNumber mode="decimal" [useGrouping]="false" formControlName="cnhRegister"/>
+                <small class="p-error block" *ngIf="driverForm.get('cnhRegister')?.invalid">Campo obrigatório</small>
+            </div>
+            <div class="col-12 md:col-3">
+                <label for="">Categoria CNH</label>
+                <input pInputText [style]="{'text-transform':'uppercase'}" formControlName="cnhCategory"/>
+                <small class="p-error block" *ngIf="driverForm.get('cnhCategory')?.invalid">Campo obrigatório</small>
+            </div>
+            <div class="col-12 md:col-3">
+                <label for="">Validade CNH</label>
+                <p-calendar dateFormat="dd/mm/yy" [iconDisplay]="'input'" [showIcon]="true" inputId="buttondisplay" formControlName="cnhValidation"/>
+                <small class="p-error block" *ngIf="driverForm.get('cnhValidation')?.invalid">Campo obrigatório</small>
+            </div>
+            <div class="col-12 md:col-1">
+                <label for="DDDPhoneId">DDD</label>
+                <p-inputMask id="DDDPhoneId" mask="99" [unmask]="true" formControlName="dddPhone"/>
+            </div>
+            <div class="col-12 md:col-3">
+                <label for="PhoneId">Telefone</label>
+                <p-inputMask id="PhoneId" mask="9999-9999" [unmask]="true" formControlName="phone"/>
+            </div>
+            <div class="col-12 md:col-1">
+                <label for="DDDCellphoneId">DDD</label>
+                <p-inputMask id="DDDCellphoneId" mask="99" [unmask]="true" formControlName="dddCellphone" />
+            </div>
+            <div class="col-12 md:col-3">
+                <label for="cellphoneId">Celular</label>
+                <p-inputMask id="cellphoneId" mask="99999-9999" [unmask]="true" formControlName="cellphone"/>
+            </div>
+
+            <div class="col-12 md:col-2">
+                <label for="ClientzipCode">CEP</label>
+                <p-inputGroup>
+                    <p-inputMask id="ClientzipCode" mask="99999-999" [unmask]="true" formControlName="zipCode" />
+                    <button type="button" pButton icon="pi pi-search" class="p-button-danger" (click)="searchCEP()"></button>
+                </p-inputGroup>
+                <small class="p-error block" *ngIf="driverForm.get('zipCode')?.invalid">Campo obrigatório</small>
+            </div>
+            
+            <div class="col-12 md:col-9">
+                <label for="Clientaddress">Logradouro</label>
+                <input id="Clientaddress" type="text" [style]="{'text-transform':'uppercase'}" pInputText formControlName="address" />
+                <small class="p-error block" *ngIf="driverForm.get('address')?.invalid">Campo obrigatório</small>
+            </div>
+            <div class="col-12 md:col-1">
+                <label for="ClientAddressNumber">Nº</label>
+                <p-inputNumber id="ClientAddressNumber" formControlName="addressNumber" [useGrouping]="false" />
+            </div>
+            
+            <div class="col-12 md:col-1">
+                <label for="ClientState">UF</label>
+                <p-inputMask id="ClientState" [style]="{'text-transform':'uppercase'}" mask="aa" [unmask]="true" formControlName="state" />
+                <small class="p-error block" *ngIf="driverForm.get('state')?.invalid">Campo obrigatório</small>
+            </div>
+            <div class="col-12 md:col-4">
+                <label for="ClientCity">Cidade</label>
+                <input id="ClientCity" type="text" [style]="{'text-transform':'uppercase'}" pInputText formControlName="city" />
+                    <small class="p-error block" *ngIf="driverForm.get('city')?.invalid">Campo obrigatório</small>
+            </div>
+            <div class="col-12 md:col-4">
+                <label for="ClientNeighborhood">Bairro</label>
+                <input id="ClientNeighborhood" type="text" [style]="{'text-transform':'uppercase'}" pInputText formControlName="neighborhood" />
+                <small class="p-error block" *ngIf="driverForm.get('neighborhood')?.invalid">Campo obrigatório</small>
+            </div>
+            <div class="col-12 md:col-3">
+                <label for="ClientAddressComplement">Complemento</label>
+                <input id="ClientAddressComplement" type="text" [style]="{'text-transform':'uppercase'}" pInputText formControlName="addressComplement" />
+            </div>
+            <div class="col-12 md:col-4 layout-card-status">
+                <span>Situação</span>
+                <div class="flex align-items-center">
+                    <p-radioButton inputId="enabledId" [value]="enabled" formControlName="status"></p-radioButton>
+                    <label for="enabledId" class="ml-2">Ativado</label>
+                </div>
+                <div class="flex align-items-center">
+                    <p-radioButton inputId="disabledId" [value]="disabled" formControlName="status"></p-radioButton>
+                    <label for="disabledId" class="ml-2">Desativado</label>
+                </div>
+            </div>
+
+            <div class="col-12 md:col-6 flex align-items-center gap-2">
+                <div class="layout-file">
+                    <div class="layout-file-img">
+                        @if(driverPhotoDoc1){
+                        <p-image [imageStyle]="{'object-fit':'cover'}" src="data:image/png;base64,{{driverPhotoDoc1}}" alt="" height="80" width="80" [preview]="true" />
+                        }
+                    </div>
+                    @if(driverPhotoDoc1){
+                    <button pButton icon="pi pi-trash" severity="danger" (click)="deleteEntryFileDriver1()"></button>
+                    }@else {
+                    <button pButton type="button" label="Foto Arquivo" severity="secondary" (click)="photoFile1Driver()"></button>
+                    }
+                </div>
+                <div class="layout-file">
+                    <div class="layout-file-img">
+                        @if(driverPhotoDoc2){
+                        <p-image [imageStyle]="{'object-fit':'cover'}" src="data:image/png;base64,{{driverPhotoDoc2}}" alt="" height="80" width="80" [preview]="true" />
+                        }
+                    </div>
+                    @if(driverPhotoDoc2){
+                    <button pButton icon="pi pi-trash" severity="danger" (click)="deleteEntryFileDriver2()"></button>
+                    }@else {
+                    <button pButton type="button" label="Foto Arquivo" severity="secondary" (click)="photoFile2Driver()"></button>
+                    }
+                </div>
+            </div>
+
+            
+        </div>
+
+        <div class="flex justify-content-end gap-2 mt-3">
+            <button pButton type="button" pRipple label="Fechar" icon="pi pi-times" class="p-button-text" (click)="hideDialog()"></button>
+            <button pButton type="button" pRipple label="Salvar" icon="pi pi-check" class="p-button-text" (click)=" save()"></button>
+        </div>
+    </form>
+</p-dialog>
+
+<p-dialog [(visible)]="visibleDialogFilter" header="Filtros" [modal]="true"
+    [style]="{ width: '60rem',height:'50rem' }" [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }">
+
+</p-dialog>
