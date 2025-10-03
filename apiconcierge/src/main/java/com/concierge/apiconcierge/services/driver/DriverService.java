@@ -56,11 +56,11 @@ public class DriverService implements IDriverService {
 
     @SneakyThrows
     @Override
-    public List<Map<String, Object>> listLast100(Integer companyId, Integer resaleId) {
+    public List<Map<String, Object>> listAll(Integer companyId, Integer resaleId) {
         try {
-            String message = this.validation.listLast100(companyId, resaleId);
+            String message = this.validation.listAll(companyId, resaleId);
             if (ConstantsMessage.SUCCESS.equals(message)) {
-                List<Driver> result = this.repository.listAll100(companyId, resaleId);
+                List<Driver> result = this.repository.listAll(companyId, resaleId);
 
                 List<Map<String, Object>> list = new ArrayList<>();
                 for (Driver driver : result) {
@@ -121,6 +121,41 @@ public class DriverService implements IDriverService {
             String message = this.validation.filterDriverRG(companyId, resaleId, rg);
             if (ConstantsMessage.SUCCESS.equals(message)) {
                 Driver result = this.repository.filterRG(companyId, resaleId, rg);
+                return this.load(result);
+            } else {
+                throw new DriverException(message);
+            }
+        } catch (Exception e) {
+            throw new DriverException(e.getMessage());
+        }
+    }
+
+    @SneakyThrows
+    @Override
+    public List<Map<String, Object>> filterDriverName(Integer companyId, Integer resaleId, String name){
+        try {
+            String message = this.validation.filterDriverName(companyId, resaleId, name);
+            if (ConstantsMessage.SUCCESS.equals(message)) {
+               List<Driver>  result = this.repository.filterName(companyId, resaleId, name);
+                List<Map<String, Object>> list = new ArrayList<>();
+                for(Driver driver: result){
+                    list.add(this.load(driver));
+                }
+                return list;
+            } else {
+                throw new DriverException(message);
+            }
+        } catch (Exception e) {
+            throw new DriverException(e.getMessage());
+        }
+    }
+    @SneakyThrows
+    @Override
+    public Map<String, Object> filterDriverCNHRegister(Integer companyId, Integer resaleId, String cnhRegister){
+        try {
+            String message = this.validation.filterDriverCNHRegister(companyId, resaleId, cnhRegister);
+            if (ConstantsMessage.SUCCESS.equals(message)) {
+                Driver result = this.repository.filterCNHRegister(companyId, resaleId, cnhRegister);
                 return this.load(result);
             } else {
                 throw new DriverException(message);

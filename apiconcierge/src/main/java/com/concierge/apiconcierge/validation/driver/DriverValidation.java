@@ -44,7 +44,7 @@ public class DriverValidation implements IDriverValidation {
     }
 
     @Override
-    public String listLast100(Integer companyId, Integer resaleId) {
+    public String listAll(Integer companyId, Integer resaleId) {
         if (companyId == null || companyId == 0)
             return ConstantsMessage.ERROR_COMPANY;
         if (resaleId == null || resaleId == 0)
@@ -82,6 +82,28 @@ public class DriverValidation implements IDriverValidation {
             return ConstantsMessage.ERROR_RESALE;
         if (rg.isBlank())
             return "RG not informed.";
+        return ConstantsMessage.SUCCESS;
+    }
+
+    @Override
+    public String filterDriverName(Integer companyId, Integer resaleId, String name) {
+        if (companyId == null || companyId == 0)
+            return ConstantsMessage.ERROR_COMPANY;
+        if (resaleId == null || resaleId == 0)
+            return ConstantsMessage.ERROR_RESALE;
+        if (name.isBlank())
+            return ConstantsMessage.ERROR_NAME;
+        return ConstantsMessage.SUCCESS;
+    }
+
+    @Override
+    public String filterDriverCNHRegister(Integer companyId, Integer resaleId, String cnhRegister) {
+        if (companyId == null || companyId == 0)
+            return ConstantsMessage.ERROR_COMPANY;
+        if (resaleId == null || resaleId == 0)
+            return ConstantsMessage.ERROR_RESALE;
+        if (cnhRegister.isBlank())
+            return "CNH register not informed.";
         return ConstantsMessage.SUCCESS;
     }
 }

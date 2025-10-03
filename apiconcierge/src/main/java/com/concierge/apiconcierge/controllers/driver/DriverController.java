@@ -46,11 +46,11 @@ public class DriverController {
         }
     }
 
-    @GetMapping("/{companyId}/{resaleId}/filter/all/100")
+    @GetMapping("/{companyId}/{resaleId}/filter/all")
     public ResponseEntity<Object> filterId(@PathVariable(name = "companyId") Integer companyId,
                                            @PathVariable(name = "resaleId") Integer resaleId) {
         try {
-            List<Map<String, Object>> result = this.service.listLast100(companyId, resaleId);
+            List<Map<String, Object>> result = this.service.listAll(companyId, resaleId);
             return ResponseEntity.status(HttpStatus.OK).body(result);
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));

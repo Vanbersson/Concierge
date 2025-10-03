@@ -15,10 +15,9 @@
                     <p-inputIcon>
                         <i class="pi pi-search"></i>
                     </p-inputIcon>
-                    <input pInputText type="text" (input)="dt1.filterGlobal($event.target.value, 'contains')"
-                        placeholder="Pesquisar" />
+                    <input pInputText type="text" (input)="dt1.filterGlobal($event.target.value, 'contains')" placeholder="Pesquisar" />
                 </p-iconField>
-                <p-button icon="pi pi-filter" severity="warning" [text]="true" label="Filtros" (onClick)="showDialogFilter()" />
+                <!-- <p-button icon="pi pi-filter" severity="warning" [text]="true" label="Filtros" (onClick)="showDialogFilter()" /> -->
             </div>
         </ng-template>
         <ng-template pTemplate="header">
@@ -67,7 +66,7 @@
 <!-- Dialog new driver -->
 <p-dialog [(visible)]="visibleDialogNew" header="Cadastro motorista" [modal]="true"
     [style]="{ width: '70rem',height:'60rem' }" [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }">
-    <form [formGroup]="driverForm">
+    <form [formGroup]="formDriver">
         <div class="p-fluid p-formgrid grid">
 
             <div class="field col-12 flex align-items-center justify-content-center">
@@ -90,27 +89,27 @@
             <div class="col-12 md:col-10">
                 <label for="">Nome</label>
                 <input pInputText [style]="{'text-transform':'uppercase'}" formControlName="name"/>
-                <small class="p-error block" *ngIf="driverForm.get('name')?.invalid">Campo obrigatório</small>
+                <small class="p-error block" *ngIf="formDriver.get('name')?.invalid">Campo obrigatório</small>
             </div>
             <div class="col-12 md:col-3">
                 <label for="">Data Nascimento</label>
                 <p-calendar dateFormat="dd/mm/yy" [iconDisplay]="'input'" [showIcon]="true" inputId="buttondisplay" formControlName="dateBirth"/>
-                <small class="p-error block" *ngIf="driverForm.get('dateBirth')?.invalid">Campo obrigatório</small>
+                <small class="p-error block" *ngIf="formDriver.get('dateBirth')?.invalid">Campo obrigatório</small>
             </div>
             <div class="col-12 md:col-3">
                 <label for="">CPF</label>
                 <p-inputMask mask="999.999.999-99" [unmask]="true" formControlName="cpf"/>
-                <small class="p-error block" *ngIf="driverForm.get('cpf')?.invalid">Campo obrigatório</small>
+                <small class="p-error block" *ngIf="formDriver.get('cpf')?.invalid">Campo obrigatório</small>
             </div>
             <div class="col-12 md:col-3">
                 <label for="">RG</label>
                 <p-inputNumber mode="decimal" [useGrouping]="false" formControlName="rg"/>
-                <small class="p-error block" *ngIf="driverForm.get('rg')?.invalid">Campo obrigatório</small>
+                <small class="p-error block" *ngIf="formDriver.get('rg')?.invalid">Campo obrigatório</small>
             </div>
             <div  class="col-12 md:col-3">
                 <label for="">Sexo</label>
                 <p-dropdown [options]="sexos" optionLabel="type" formControlName="maleFemale"/>
-                <small class="p-error block" *ngIf="driverForm.get('maleFemale')?.invalid">Campo obrigatório</small>
+                <small class="p-error block" *ngIf="formDriver.get('maleFemale')?.invalid">Campo obrigatório</small>
             </div>
             <div class="col-12 md:col-6">
                 <label for="">E-mail</label>
@@ -119,17 +118,17 @@
             <div class="col-12 md:col-3">
                 <label for="">Nº Registro CNH</label>
                 <p-inputNumber mode="decimal" [useGrouping]="false" formControlName="cnhRegister"/>
-                <small class="p-error block" *ngIf="driverForm.get('cnhRegister')?.invalid">Campo obrigatório</small>
+                <small class="p-error block" *ngIf="formDriver.get('cnhRegister')?.invalid">Campo obrigatório</small>
             </div>
             <div class="col-12 md:col-3">
                 <label for="">Categoria CNH</label>
                 <input pInputText [style]="{'text-transform':'uppercase'}" formControlName="cnhCategory"/>
-                <small class="p-error block" *ngIf="driverForm.get('cnhCategory')?.invalid">Campo obrigatório</small>
+                <small class="p-error block" *ngIf="formDriver.get('cnhCategory')?.invalid">Campo obrigatório</small>
             </div>
             <div class="col-12 md:col-3">
                 <label for="">Validade CNH</label>
                 <p-calendar dateFormat="dd/mm/yy" [iconDisplay]="'input'" [showIcon]="true" inputId="buttondisplay" formControlName="cnhValidation"/>
-                <small class="p-error block" *ngIf="driverForm.get('cnhValidation')?.invalid">Campo obrigatório</small>
+                <small class="p-error block" *ngIf="formDriver.get('cnhValidation')?.invalid">Campo obrigatório</small>
             </div>
             <div class="col-12 md:col-1">
                 <label for="DDDPhoneId">DDD</label>
@@ -152,15 +151,15 @@
                 <label for="ClientzipCode">CEP</label>
                 <p-inputGroup>
                     <p-inputMask id="ClientzipCode" mask="99999-999" [unmask]="true" formControlName="zipCode" />
-                    <button type="button" pButton icon="pi pi-search" class="p-button-danger" (click)="searchCEP()"></button>
+                    <button type="button" pButton icon="pi pi-search" class="p-button-warning" (click)="searchCEP()"></button>
                 </p-inputGroup>
-                <small class="p-error block" *ngIf="driverForm.get('zipCode')?.invalid">Campo obrigatório</small>
+                <small class="p-error block" *ngIf="formDriver.get('zipCode')?.invalid">Campo obrigatório</small>
             </div>
             
             <div class="col-12 md:col-9">
                 <label for="Clientaddress">Logradouro</label>
                 <input id="Clientaddress" type="text" [style]="{'text-transform':'uppercase'}" pInputText formControlName="address" />
-                <small class="p-error block" *ngIf="driverForm.get('address')?.invalid">Campo obrigatório</small>
+                <small class="p-error block" *ngIf="formDriver.get('address')?.invalid">Campo obrigatório</small>
             </div>
             <div class="col-12 md:col-1">
                 <label for="ClientAddressNumber">Nº</label>
@@ -170,17 +169,17 @@
             <div class="col-12 md:col-1">
                 <label for="ClientState">UF</label>
                 <p-inputMask id="ClientState" [style]="{'text-transform':'uppercase'}" mask="aa" [unmask]="true" formControlName="state" />
-                <small class="p-error block" *ngIf="driverForm.get('state')?.invalid">Campo obrigatório</small>
+                <small class="p-error block" *ngIf="formDriver.get('state')?.invalid">Campo obrigatório</small>
             </div>
             <div class="col-12 md:col-4">
                 <label for="ClientCity">Cidade</label>
                 <input id="ClientCity" type="text" [style]="{'text-transform':'uppercase'}" pInputText formControlName="city" />
-                    <small class="p-error block" *ngIf="driverForm.get('city')?.invalid">Campo obrigatório</small>
+                    <small class="p-error block" *ngIf="formDriver.get('city')?.invalid">Campo obrigatório</small>
             </div>
             <div class="col-12 md:col-4">
                 <label for="ClientNeighborhood">Bairro</label>
                 <input id="ClientNeighborhood" type="text" [style]="{'text-transform':'uppercase'}" pInputText formControlName="neighborhood" />
-                <small class="p-error block" *ngIf="driverForm.get('neighborhood')?.invalid">Campo obrigatório</small>
+                <small class="p-error block" *ngIf="formDriver.get('neighborhood')?.invalid">Campo obrigatório</small>
             </div>
             <div class="col-12 md:col-3">
                 <label for="ClientAddressComplement">Complemento</label>
@@ -235,7 +234,41 @@
     </form>
 </p-dialog>
 
-<p-dialog [(visible)]="visibleDialogFilter" header="Filtros" [modal]="true"
-    [style]="{ width: '60rem',height:'50rem' }" [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }">
-
-</p-dialog>
+<!-- <p-dialog [(visible)]="visibleDialogFilter" header="Filtros" [modal]="true"
+    [style]="{ width: '50rem',height:'40rem' }" [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }">
+    <form [formGroup]="formFilter" >
+        <div [style]="{ height:'28rem' }">
+            <div class="p-fluid p-formgrid grid">
+                <div class="col-12 flex justify-content-end mt-2">
+                    <p-button icon="pi pi-refresh" [text]="true" label="Limpar" (onClick)="cleanFormFilter()"/>
+                </div>
+                <div class="col-12 md:col-2">
+                    <label for="">Código</label>
+                    <p-inputNumber mode="decimal" [useGrouping]="false" formControlName="id"/>
+                </div>
+                <div class="md:col-10"></div>
+                <div class="col-12 md:col-9">
+                    <label for="">Nome</label>
+                    <input pInputText [style]="{'text-transform':'uppercase'}" formControlName="name"/>
+                </div>
+                <div class="md:col-3"></div>
+                <div class="col-12 md:col-3">
+                    <label for="">CPF</label>
+                    <p-inputMask mask="999.999.999-99" [unmask]="true" formControlName="cpf"/>
+                </div>
+                <div class="col-12 md:col-3">
+                    <label for="">RG</label>
+                    <p-inputNumber mode="decimal" [useGrouping]="false" formControlName="rg"/>
+                </div>
+                <div class="col-12 md:col-3">
+                    <label for="">Nº Registro CNH</label>
+                    <p-inputNumber mode="decimal" [useGrouping]="false" formControlName="cnhRegister"/>
+                </div>
+            </div>
+        </div>    
+        <div class="flex justify-content-end gap-2 mt-3">
+            <button pButton type="button" pRipple label="Fechar" icon="pi pi-times" class="p-button-text" (click)="hideDialogFilter()"></button>
+            <button pButton type="button" pRipple label="Buscar" icon="pi pi-search" class="p-button-text"(click)="filterSearchDriver()" ></button>
+        </div>
+    </form>
+</p-dialog> -->

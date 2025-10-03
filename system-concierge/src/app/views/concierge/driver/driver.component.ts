@@ -54,16 +54,17 @@ export default class DriverComponent implements OnInit {
   listDriver: Driver[] = [];
   driver!: Driver;
 
+  enabled = StatusEnabledDisabled.enabled;
+  disabled = StatusEnabledDisabled.disabled;
+
   //Dialog novo
   visibleDialogNew: boolean = false;
   driverPhoto!: string;
   driverPhotoDoc1!: string;
   driverPhotoDoc2!: string;
   sexos: sexo[] | undefined;
-  enabled = StatusEnabledDisabled.enabled;
-  disabled = StatusEnabledDisabled.disabled;
 
-  driverForm = new FormGroup({
+  formDriver = new FormGroup({
     status: new FormControl<string>(this.enabled, Validators.required),
     id: new FormControl<number | null>({ value: null, disabled: true }),
     name: new FormControl<string>("", [Validators.required, Validators.maxLength(100)]),
@@ -90,7 +91,13 @@ export default class DriverComponent implements OnInit {
 
   //Dialog filtro
   visibleDialogFilter: boolean = false;
-
+  formFilter = new FormGroup({
+    id: new FormControl<number | null>(null),
+    name: new FormControl<string>(""),
+    cpf: new FormControl<string>(""),
+    rg: new FormControl<string | null>(null),
+    cnhRegister: new FormControl<string | null>(null),
+  });
 
   constructor(private primeNGConfig: PrimeNGConfig,
     private ngxImageCompressService: NgxImageCompressService,
@@ -124,7 +131,7 @@ export default class DriverComponent implements OnInit {
   async listDrivers() {
     //Inicia load
     this.busyService.busy();
-    this.listDriver = await this.listLast100();
+    this.listDriver = await this.listAll();
     //Fecha load
     this.busyService.idle();
   }
@@ -144,16 +151,16 @@ export default class DriverComponent implements OnInit {
   public hideDialog() {
     this.visibleDialogNew = false;
   }
-  
+
   public showDialogFilter() {
     this.visibleDialogFilter = true;
+    this.cleanFormFilter();
   }
   public hideDialogFilter() {
     this.visibleDialogFilter = false;
   }
-
   private cleanForm() {
-    this.driverForm.patchValue({
+    this.formDriver.patchValue({
       id: null,
       name: "",
       dateBirth: null,
@@ -181,6 +188,15 @@ export default class DriverComponent implements OnInit {
     this.driverPhoto = "";
     this.driverPhotoDoc1 = "";
     this.driverPhotoDoc2 = "";
+  }
+  public cleanFormFilter() {
+    this.formFilter.patchValue({
+      id: null,
+      name: "",
+      cpf: "",
+      rg: null,
+      cnhRegister: null,
+    });
   }
   public async selectPhoto() {
     this.ngxImageCompressService.uploadFile().then(({ image, orientation }) => {
@@ -237,8 +253,31 @@ export default class DriverComponent implements OnInit {
   public deleteEntryFileDriver2() {
     this.driverPhotoDoc2 = "";
   }
+  public async filterSearchDriver() {
+    const { value } = this.formFilter;
+    if (value.id != null) {
+      const resultID = await this.filterDriverId(value.id);
+      if (resultID.status == 200) {
+        this.listDriver = [];
+        this.listDriver.push(resultID.body);
+        this.hideDialogFilter();
+      }
+
+    } else if (value.name != "") {
+
+
+
+    } else if (value.cpf != "") {
+
+    } else if (value.rg != "") {
+
+    } else if (value.cnhRegister != "") {
+
+    }
+
+  }
   public async save() {
-    const { value, valid } = this.driverForm;
+    const { value, valid } = this.formDriver;
     if (!valid) {
       return;
     }
@@ -280,7 +319,7 @@ export default class DriverComponent implements OnInit {
       if (resultSave.status == 201) {
         this.driver.id = resultSave.body.id;
         this.driver.dateRegister = resultSave.body.dateRegister;
-        this.driverForm.get('id').setValue(resultSave.body.id);
+        this.formDriver.get('id').setValue(resultSave.body.id);
         this.messageService.add({ severity: 'success', summary: 'Motorista', detail: 'Salvo com sucesso', icon: 'pi pi-check' });
         //Lista motoristas
         this.listDrivers();
@@ -326,7 +365,6 @@ export default class DriverComponent implements OnInit {
       this.busyService.idle();
     }
   }
-
   async edit(id: number) {
     //Inicia load
     this.busyService.busy();
@@ -336,7 +374,7 @@ export default class DriverComponent implements OnInit {
     if (result.status == 200) {
       this.showDialog();
       this.driver = result.body;
-      this.driverForm.patchValue({
+      this.formDriver.patchValue({
         id: this.driver.id,
         name: this.driver.name,
         dateBirth: new Date(this.driver.dateBirth),
@@ -387,11 +425,49 @@ export default class DriverComponent implements OnInit {
       return error;
     }
   }
-  async searchCEP() {
-    const result = await this.cep(this.driverForm.get('zipCode').value);
+  private async filterDriverCPF(cpf: string): Promise<HttpResponse<Driver>> {
+    try {
+      return lastValueFrom(this.driverService.filterCPF(cpf));
+    } catch (error) {
+      return error;
+    }
+  }
+  private async filterDriverRG(rg: string): Promise<HttpResponse<Driver>> {
+    try {
+      return lastValueFrom(this.driverService.filterRG(rg));
+    } catch (error) {
+      return error;
+    }
+  }
+  private async filterDriverCNHRegister(cnh: string): Promise<HttpResponse<Driver>> {
+    try {
+      return lastValueFrom(this.driverService.filterCNHRegister(cnh));
+    } catch (error) {
+      return error;
+    }
+  }
+  private async filterDriverName(name: string): Promise<Driver[]> {
+    try {
+      return lastValueFrom(this.driverService.filterName(name));
+    } catch (error) {
+      return [];
+    }
+  }
+  private async listAll(): Promise<Driver[]> {
+    try {
+      return lastValueFrom(this.driverService.listAll());
+    } catch (error) {
+      return [];
+    }
+  }
+  public async searchCEP() {
+    if (!this.formDriver.get('zipCode').value) {
+      return;
+    }
+    const result = await this.cep(this.formDriver.get('zipCode').value);
 
     if (result.status == 200) {
-      this.driverForm.patchValue({
+      this.formDriver.patchValue({
         address: result.body.logradouro,
         addressComplement: result.body.complemento,
         state: result.body.uf,
@@ -406,13 +482,6 @@ export default class DriverComponent implements OnInit {
       return lastValueFrom(this.cepService.search(cep));
     } catch (error) {
       return error;
-    }
-  }
-  private async listLast100(): Promise<Driver[]> {
-    try {
-      return lastValueFrom(this.driverService.listLast100());
-    } catch (error) {
-      return [];
     }
   }
 }
