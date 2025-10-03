@@ -1,6 +1,8 @@
 import { Routes } from '@angular/router';
 import { authGuardGuard } from './services/login/auth-guard.guard';
-import { vehicleEntryGuard } from './guard/concierge/vehicle.entry.guard';
+import { DriverMenuGuard } from './views/concierge/driver/driver.menu.guard';
+import { VehicleEntryMenuGuard } from './views/concierge/vehicle.entry/vehicle.entry.menu.guard';
+import { VehicleMenuGuard } from './views/concierge/vehicle/vehicle.menu';
 
 export const routes: Routes = [
     {
@@ -36,17 +38,19 @@ export const routes: Routes = [
                         path: 'atendimento-veiculo',
                         title: 'Atendimento',
                         loadComponent: () => import('./views/concierge/vehicle.entry/vehicle.entry.component'),
-                        canActivate: [vehicleEntryGuard]
+                        canActivate: [VehicleEntryMenuGuard]
                     },
                     {
                         path: 'lista-entrada-veiculo',
                         title: 'Lista Veículos',
-                        loadComponent: () => import('./views/concierge/vehicle/vehicle.component')
+                        loadComponent: () => import('./views/concierge/vehicle/vehicle.component'),
+                        canActivate:[VehicleMenuGuard]
                     },
                     {
                         path: 'manutencao-motorista',
                         title: 'Motorista',
-                        loadComponent: () => import('./views/concierge/driver/driver.component')
+                        loadComponent: () => import('./views/concierge/driver/driver.component'),
+                        canActivate:[DriverMenuGuard]
                     },
                     {
                         path: 'mannutencao-entrada-veiculo/:id',

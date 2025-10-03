@@ -1,6 +1,7 @@
 package com.concierge.apiconcierge.services.menu;
 
 import com.concierge.apiconcierge.exceptions.menu.MenuUserException;
+import com.concierge.apiconcierge.models.menu.IMenuUserReport;
 import com.concierge.apiconcierge.models.menu.MenuUser;
 import com.concierge.apiconcierge.repositories.menu.IMenuUserRepository;
 import com.concierge.apiconcierge.util.ConstantsMessage;
@@ -65,17 +66,18 @@ public class MenuUserService implements IMenuUserService {
     public List<Object> filterMenus(MenuUser menu) {
         try {
             String message = this.validation.filterMenus(menu);
-
             if (ConstantsMessage.SUCCESS.equals(message)) {
-                List<MenuUser> list = this.repository.listMenus(menu.getCompanyId(), menu.getResaleId(), menu.getUserId());
-
-                List<Object> keys = new ArrayList<>();
-                for (int a = 0; a < list.size(); a++) {
+                List<IMenuUserReport> list = this.repository.filterUserId(menu.getCompanyId(), menu.getResaleId(), menu.getUserId());
+                List<Object> menus = new ArrayList<>();
+                for(var item : list){
                     Map<String, Object> map = new HashMap<>();
-                    map.put("key", list.get(a).getMenuId());
-                    keys.add(map);
+                    map.put("companyId", item.getCompanyId());
+                    map.put("resaleId", item.getResaleId());
+                    map.put("key", item.getKey());
+                    map.put("menu", item.getMenu());
+                    menus.add(map);
                 }
-                return keys;
+                return menus;
             } else {
                 throw new MenuUserException(message);
             }
