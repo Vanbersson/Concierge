@@ -68,4 +68,49 @@ public class DriverController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
         }
     }
+
+    @GetMapping("/{companyId}/{resaleId}/filter/name/{name}")
+    public ResponseEntity<Object> filterName(@PathVariable(name = "companyId") Integer companyId,
+                                           @PathVariable(name = "resaleId") Integer resaleId,
+                                           @PathVariable(name = "name") String name) {
+        try {
+            List<Map<String, Object>> result = this.service.filterDriverName(companyId, resaleId, name);
+            return ResponseEntity.status(HttpStatus.OK).body(result);
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
+        }
+    }
+    @GetMapping("/{companyId}/{resaleId}/filter/cpf/{cpf}")
+    public ResponseEntity<Object> filterCPF(@PathVariable(name = "companyId") Integer companyId,
+                                             @PathVariable(name = "resaleId") Integer resaleId,
+                                             @PathVariable(name = "cpf") String cpf) {
+        try {
+            Map<String, Object> result = this.service.filterDriverCPF(companyId, resaleId, cpf);
+            return ResponseEntity.status(HttpStatus.OK).body(result);
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
+        }
+    }
+    @GetMapping("/{companyId}/{resaleId}/filter/rg/{rg}")
+    public ResponseEntity<Object> filterRG(@PathVariable(name = "companyId") Integer companyId,
+                                            @PathVariable(name = "resaleId") Integer resaleId,
+                                            @PathVariable(name = "rg") String rg) {
+        try {
+            Map<String, Object> result = this.service.filterDriverRG(companyId, resaleId, rg);
+            return ResponseEntity.status(HttpStatus.OK).body(result);
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
+        }
+    }
+    @GetMapping("/{companyId}/{resaleId}/filter/cnh/register/{cnh}")
+    public ResponseEntity<Object> filterCNHRegister(@PathVariable(name = "companyId") Integer companyId,
+                                           @PathVariable(name = "resaleId") Integer resaleId,
+                                           @PathVariable(name = "cnh") String cnh) {
+        try {
+            Map<String, Object> result = this.service.filterDriverCNHRegister(companyId, resaleId, cnh);
+            return ResponseEntity.status(HttpStatus.OK).body(result);
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
+        }
+    }
 }

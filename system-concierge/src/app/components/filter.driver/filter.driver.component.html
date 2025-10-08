@@ -1,0 +1,79 @@
+<button pButton type="button" icon="pi pi-filter" class="p-button-warning" (click)="showDialog()"></button>
+
+<!-- Filter Driver -->
+<p-dialog [(visible)]="dialogVisibleDriver" header="Empresas" [modal]="true" [style]="{ width: '70rem'}"
+    [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }" [draggable]="false" [resizable]="false">
+    <form [formGroup]="formDriver" (ngSubmit)="filterDriver()">
+        <div class="p-fluid p-formgrid grid">
+            <div class="col-12 md:col-2">
+                <label for="driverId">Código</label>
+                  <p-inputNumber id="driverId" mode="decimal" [useGrouping]="false" formControlName="id" />
+            </div>
+            <div class="col-12 md:col-10">
+                <label for="driverNameId">Nome</label>
+                <input pInputText id="driverNameId" type="text" formControlName="name" />
+            </div>
+            <div class="col-12 md:col-3">
+                <label for="driverCPFId">CPF</label>
+                <p-inputMask id="driverCPFId" mask="999.999.999-99" [unmask]="true" formControlName="cpf" />
+            </div>
+            <div class="col-12 md:col-3">
+                <label for="driverRGId">RG</label>
+                <p-inputNumber id="driverRGId" mode="decimal" [useGrouping]="false" formControlName="rg" />
+            </div>
+            <div class="col-12 md:col-3">
+                <label for="drivercnhRegisterId">Nº Registro CNH</label>
+                <p-inputNumber id="drivercnhRegisterId" mode="decimal" [useGrouping]="false" formControlName="cnhRegister" />
+            </div>
+            <div class="col-12 flex">
+                 <div class="block">
+                    <button pButton type="submit" label="Pesquisar" class="p-button-warning w-full" icon="pi pi-search"></button>
+                 </div>
+            </div>
+        </div>
+    </form>
+
+    <p-table #tableFilter dataKey="id" [value]="listDrivers" selectionMode="single"
+        [(selection)]="dialogSelectDriver" [globalFilterFields]="['id', 'name','cnpj','cpf']" [paginator]="true"
+        [rows]="5" [rowsPerPageOptions]="[5, 10, 20]" [loading]="dialogloadingDriver"
+        [tableStyle]="{ 'min-width': '50rem' }" styleClass="p-datatable-sm">
+        <ng-template pTemplate="caption">
+           <div class="flex">
+                 <p-iconField iconPosition="left">
+                    <p-inputIcon>
+                        <i class="pi pi-search"></i>
+                    </p-inputIcon>
+                    <input pInputText type="text" (input)="tableFilter.filterGlobal($any($event.target).value, 'contains')" placeholder="Pesquisar" />
+                </p-iconField>
+            </div>
+        </ng-template>
+        <ng-template pTemplate="header">
+            <tr>
+                <th pSortableColumn="id" style="width: 10%;">Código<p-sortIcon field="id" /></th>
+                <th pSortableColumn="name" style="width: 40%;">Nome<p-sortIcon field="name" /></th>
+                <th pSortableColumn="cpf" style="width: 20%;">CPF<p-sortIcon field="cpf" /></th>
+                <th pSortableColumn="rg" style="width: 15%;">RG<p-sortIcon field="rg" /></th>
+                 <th pSortableColumn="cnhRegister" style="width: 15%;">CNH<p-sortIcon field="cnhRegister" /></th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-driver>
+            <tr [pSelectableRow]="driver">
+                <td>{{driver.id}}</td>
+                <td>{{driver.name | uppercase}}</td>
+                <td>{{ maskCPF(driver.cpf)}}</td>
+                <td>{{driver.rg}}</td>
+                <td>{{driver.cnhRegister}}</td>
+            </tr>
+        </ng-template>
+    </p-table>
+
+    <div class="flex justify-content-end gap-2 mt-2">
+        <div>
+            <button pButton type="button" pRipple label="Fechar" icon="pi pi-times" class="p-button-text" (click)="hideDialog()"></button>
+        </div>
+
+        <div>
+            <button pButton type="submit" pRipple label="Confirmar" icon="pi pi-check" class="p-button-text" (click)="selectDriver()"></button>
+        </div>
+    </div>
+</p-dialog>

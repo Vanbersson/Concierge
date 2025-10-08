@@ -2,6 +2,7 @@ package com.concierge.apiconcierge.services.driver;
 
 import com.concierge.apiconcierge.exceptions.driver.DriverException;
 import com.concierge.apiconcierge.models.driver.Driver;
+import com.concierge.apiconcierge.models.status.StatusEnableDisable;
 import com.concierge.apiconcierge.repositories.driver.IDriverRepository;
 import com.concierge.apiconcierge.util.ConstantsMessage;
 import com.concierge.apiconcierge.validation.driver.IDriverValidation;
@@ -104,7 +105,7 @@ public class DriverService implements IDriverService {
         try {
             String message = this.validation.filterDriverCPF(companyId, resaleId, cpf);
             if (ConstantsMessage.SUCCESS.equals(message)) {
-                Driver result = this.repository.filterCPF(companyId, resaleId, cpf);
+                Driver result = this.repository.filterCPF(companyId, resaleId, StatusEnableDisable.Habilitado, cpf);
                 return this.load(result);
             } else {
                 throw new DriverException(message);
@@ -120,7 +121,7 @@ public class DriverService implements IDriverService {
         try {
             String message = this.validation.filterDriverRG(companyId, resaleId, rg);
             if (ConstantsMessage.SUCCESS.equals(message)) {
-                Driver result = this.repository.filterRG(companyId, resaleId, rg);
+                Driver result = this.repository.filterRG(companyId, resaleId, StatusEnableDisable.Habilitado, rg);
                 return this.load(result);
             } else {
                 throw new DriverException(message);
@@ -132,13 +133,13 @@ public class DriverService implements IDriverService {
 
     @SneakyThrows
     @Override
-    public List<Map<String, Object>> filterDriverName(Integer companyId, Integer resaleId, String name){
+    public List<Map<String, Object>> filterDriverName(Integer companyId, Integer resaleId, String name) {
         try {
             String message = this.validation.filterDriverName(companyId, resaleId, name);
             if (ConstantsMessage.SUCCESS.equals(message)) {
-               List<Driver>  result = this.repository.filterName(companyId, resaleId, name);
+                List<Driver> result = this.repository.filterName(companyId, resaleId, StatusEnableDisable.Habilitado, name);
                 List<Map<String, Object>> list = new ArrayList<>();
-                for(Driver driver: result){
+                for (Driver driver : result) {
                     list.add(this.load(driver));
                 }
                 return list;
@@ -149,13 +150,14 @@ public class DriverService implements IDriverService {
             throw new DriverException(e.getMessage());
         }
     }
+
     @SneakyThrows
     @Override
-    public Map<String, Object> filterDriverCNHRegister(Integer companyId, Integer resaleId, String cnhRegister){
+    public Map<String, Object> filterDriverCNHRegister(Integer companyId, Integer resaleId, String cnhRegister) {
         try {
             String message = this.validation.filterDriverCNHRegister(companyId, resaleId, cnhRegister);
             if (ConstantsMessage.SUCCESS.equals(message)) {
-                Driver result = this.repository.filterCNHRegister(companyId, resaleId, cnhRegister);
+                Driver result = this.repository.filterCNHRegister(companyId, resaleId, StatusEnableDisable.Habilitado, cnhRegister);
                 return this.load(result);
             } else {
                 throw new DriverException(message);
@@ -199,14 +201,14 @@ public class DriverService implements IDriverService {
         } else {
             map.put("photoDriver", driver.getPhotoDriver());
         }
-        if(driver.getPhotoDoc1() == null){
+        if (driver.getPhotoDoc1() == null) {
             map.put("photoDoc1", "");
-        }else{
+        } else {
             map.put("photoDoc1", driver.getPhotoDoc1());
         }
-        if(driver.getPhotoDoc2() == null){
+        if (driver.getPhotoDoc2() == null) {
             map.put("photoDoc2", "");
-        }else{
+        } else {
             map.put("photoDoc2", driver.getPhotoDoc2());
         }
         return map;
