@@ -18,6 +18,7 @@ import java.util.Date;
 @SecondaryTable(name = "tb_user", pkJoinColumns = @PrimaryKeyJoinColumn(name = "id"))
 @SecondaryTable(name = "tb_client_company", pkJoinColumns = @PrimaryKeyJoinColumn(name = "id"))
 @SecondaryTable(name = "tb_vehicle_model", pkJoinColumns = @PrimaryKeyJoinColumn(name = "id"))
+@SecondaryTable(name = "tb_driver", pkJoinColumns = @PrimaryKeyJoinColumn(name = "id"))
 @Entity
 @Table(name = "tb_vehicle_entry")
 public class VehicleEntry implements Serializable {
@@ -122,6 +123,10 @@ public class VehicleEntry implements Serializable {
     private String clientCompanyRg;
 
     //Motorista entrada
+    @JoinColumn(table = "tb_driver", referencedColumnName = "id")
+    @Column(name = "driver_entry_id")
+    private Integer driverEntryId;
+
     @Column(name = "driver_entry_name")
     private String driverEntryName;
 
@@ -148,6 +153,10 @@ public class VehicleEntry implements Serializable {
     private byte[] driverEntryPhotoDoc2;
 
     //Motorista saída
+    @JoinColumn(table = "tb_driver", referencedColumnName = "id")
+    @Column(name = "driver_exit_id")
+    private Integer driverExitId;
+
     @Column(name = "driver_exit_name")
     private String driverExitName;
 

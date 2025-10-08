@@ -47,6 +47,8 @@ public class VehicleEntryService implements IVehicleEntryService {
             vehicle.setStatusAuthExit(StatusAuthExitEnum.NotAuth);
             vehicle.setUserNameExit("");
 
+            vehicle.setDriverExitId(null);
+
             VehicleEntry vehicleEntry = this.loadVehicle(vehicle);
             String message = this.validation.save(vehicleEntry);
             if (message.equals(ConstantsMessage.SUCCESS)) {

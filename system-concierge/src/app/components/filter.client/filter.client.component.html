@@ -1,5 +1,4 @@
-<button pButton type="button" icon="pi pi-filter" class="p-button-warning"
-    (click)="showDialogFilterClientCompany()"></button>
+<button pButton type="button" icon="pi pi-filter" class="p-button-warning" (click)="showDialogFilterClientCompany()"></button>
 
 <!-- Filter ClientCompany -->
 <p-dialog [(visible)]="dialogVisibleClientCompany" header="Empresas" [modal]="true" [style]="{ width: '70rem'}"
@@ -63,13 +62,14 @@
         [rows]="5" [rowsPerPageOptions]="[5, 10, 20]" [loading]="dialogloadingClientCompany"
         [tableStyle]="{ 'min-width': '50rem','min-height': '20rem' }" styleClass="p-datatable-sm">
         <ng-template pTemplate="caption">
-            <p-iconField iconPosition="left">
-                <p-inputIcon>
-                    <i class="pi pi-search"></i>
-                </p-inputIcon>
-                <input pInputText type="text" (input)="tableFilter.filterGlobal($any($event.target).value, 'contains')"
-                    placeholder="Pesquisar" />
-            </p-iconField>
+            <div class="flex">
+                <p-iconField iconPosition="left">
+                    <p-inputIcon>
+                        <i class="pi pi-search"></i>
+                    </p-inputIcon>
+                    <input pInputText type="text" (input)="tableFilter.filterGlobal($any($event.target).value, 'contains')" placeholder="Pesquisar" />
+                </p-iconField>
+            </div>
         </ng-template>
         <ng-template pTemplate="header">
             <tr>

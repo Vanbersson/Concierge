@@ -38,6 +38,7 @@ export class VehicleEntry {
     clientCompanyCpf: string = '';
     clientCompanyRg: string = '';
 
+    driverEntryId: number = 0;
     driverEntryName: string = '';
     driverEntryCpf: string = '';
     driverEntryRg: string = '';
@@ -46,6 +47,7 @@ export class VehicleEntry {
     driverEntryPhotoDoc1: string = '';
     driverEntryPhotoDoc2: string = '';
 
+    driverExitId: number = 0;
     driverExitName: string = '';
     driverExitCpf: string = '';
     driverExitRg: string = '';
@@ -56,7 +58,7 @@ export class VehicleEntry {
 
     color: string = '';
     placa: string = '';
-    placasJunto: string='';
+    placasJunto: string = '';
     frota: string = '';
     vehicleNew: string = '';
     kmEntry: string = '';

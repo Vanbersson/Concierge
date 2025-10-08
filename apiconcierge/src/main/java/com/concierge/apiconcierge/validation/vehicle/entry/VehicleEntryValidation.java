@@ -43,10 +43,16 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
             return ConstantsMessage.ERROR_VEHICLE_MODEL;
         if (vehicle.getColor() == null)
             return ConstantsMessage.ERROR_COLOR;
-        if (!vehicle.getDriverEntryRg().isBlank()) {
-            if (vehicle.getDriverEntryRg().length() > 11)
-                return ConstantsMessage.ERROR_RG;
-        }
+
+        //Driver
+        if (vehicle.getDriverEntryId() == null || vehicle.getDriverEntryId() == 0)
+            return ConstantsMessage.ERROR_DRIVERENTRY;
+        if (vehicle.getDriverEntryName().isBlank())
+            return ConstantsMessage.ERROR_DRIVERENTRY;
+        if (vehicle.getDriverEntryCpf().isBlank())
+            return ConstantsMessage.ERROR_DRIVERENTRY;
+        if (vehicle.getDriverEntryRg().isBlank())
+            return ConstantsMessage.ERROR_DRIVERENTRY;
 
         if (vehicle.getVehicleNew() == VehicleYesNotEnum.not) {
             if (vehicle.getPlaca().isBlank())
@@ -72,9 +78,9 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
             return ConstantsMessage.ERROR_RESALE;
         if (vehicle.getId() == null || vehicle.getId() == 0)
             return ConstantsMessage.ERROR_ID;
-        if(vehicle.getStatus() == StatusVehicleEnum.saidaAutorizada)
+        if (vehicle.getStatus() == StatusVehicleEnum.saidaAutorizada)
             return ConstantsMessage.ERROR_STATUS;
-        if(vehicle.getStepEntry() == StepVehicleEnum.Exit)
+        if (vehicle.getStepEntry() == StepVehicleEnum.Exit)
             return ConstantsMessage.ERROR_STATUS;
         if (vehicle.getDateEntry() == null)
             return ConstantsMessage.ERROR_DATEENTRY;
@@ -101,9 +107,9 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
             return ConstantsMessage.ERROR_DRIVERENTRY;
         }
 
-        if(vehicle.getBudgetStatus() != StatusBudgetEnum.NotBudget ){
-            if(vehicle.getServiceOrder() == VehicleYesNotEnum.not)
-                return  ConstantsMessage.ERROR_SERVICE_ORDER_NOT;
+        if (vehicle.getBudgetStatus() != StatusBudgetEnum.NotBudget) {
+            if (vehicle.getServiceOrder() == VehicleYesNotEnum.not)
+                return ConstantsMessage.ERROR_SERVICE_ORDER_NOT;
         }
 
         if (vehicle.getServiceOrder() == VehicleYesNotEnum.yes) {
@@ -113,7 +119,7 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
 
                 if (vehicle.getClientCompanyId() == null || vehicle.getClientCompanyId() == 0 || vehicle.getClientCompanyName().isBlank())
                     return ConstantsMessage.ERROR_BUDGET_CLIENT_COMPANY;
-                if(vehicle.getNumServiceOrder().isBlank())
+                if (vehicle.getNumServiceOrder().isBlank())
                     return ConstantsMessage.ERROR_VEHICLE_NUMBER_O_S;
             }
 
@@ -181,17 +187,17 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
 
     public String exit(VehicleExitSaveDto dataExit) {
 
-        if(dataExit.companyId() == null || dataExit.companyId() == 0)
+        if (dataExit.companyId() == null || dataExit.companyId() == 0)
             return ConstantsMessage.ERROR_COMPANY;
-        if(dataExit.resaleId() == null || dataExit.resaleId() == 0)
+        if (dataExit.resaleId() == null || dataExit.resaleId() == 0)
             return ConstantsMessage.ERROR_RESALE;
-        if(dataExit.vehicleId() == null || dataExit.vehicleId() == 0)
+        if (dataExit.vehicleId() == null || dataExit.vehicleId() == 0)
             return ConstantsMessage.ERROR_VEHICLE_ID;
-        if(dataExit.userId() == null || dataExit.userId() == 0)
+        if (dataExit.userId() == null || dataExit.userId() == 0)
             return ConstantsMessage.ERROR_USER_ID;
-        if(dataExit.userName().isBlank())
+        if (dataExit.userName().isBlank())
             return ConstantsMessage.ERROR_NAME;
-        if(dataExit.dateExit() == null)
+        if (dataExit.dateExit() == null)
             return ConstantsMessage.ERROR;
 
         if (dataExit.userId() != 1) {
@@ -210,9 +216,9 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
             return ConstantsMessage.ERROR_COMPANY;
         if (authExitDto.resaleId() == null || authExitDto.resaleId() == 0)
             return ConstantsMessage.ERROR_RESALE;
-        if(vehicle.getStatus() == StatusVehicleEnum.saidaAutorizada)
+        if (vehicle.getStatus() == StatusVehicleEnum.saidaAutorizada)
             return ConstantsMessage.ERROR_STATUS;
-        if(vehicle.getStepEntry() == StepVehicleEnum.Exit)
+        if (vehicle.getStepEntry() == StepVehicleEnum.Exit)
             return ConstantsMessage.ERROR_STATUS;
 
         if (vehicle.getServiceOrder().equals(VehicleYesNotEnum.yes)) {
@@ -291,9 +297,9 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
 
     @Override
     public String deleteAuthExit1(VehicleEntry vehicle, AuthExitDto authExitDto) {
-        if(vehicle.getStatus() == StatusVehicleEnum.saidaAutorizada)
+        if (vehicle.getStatus() == StatusVehicleEnum.saidaAutorizada)
             return ConstantsMessage.ERROR_STATUS;
-        if(vehicle.getStepEntry() == StepVehicleEnum.Exit)
+        if (vehicle.getStepEntry() == StepVehicleEnum.Exit)
             return ConstantsMessage.ERROR_STATUS;
         if (vehicle.getStatusAuthExit() == StatusAuthExitEnum.NotAuth)
             return ConstantsMessage.ERROR_NOTAUTHEXIT;
@@ -333,9 +339,9 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
 
     @Override
     public String deleteAuthExit2(VehicleEntry vehicle, AuthExitDto authExitDto) {
-        if(vehicle.getStatus() == StatusVehicleEnum.saidaAutorizada)
+        if (vehicle.getStatus() == StatusVehicleEnum.saidaAutorizada)
             return ConstantsMessage.ERROR_STATUS;
-        if(vehicle.getStepEntry() == StepVehicleEnum.Exit)
+        if (vehicle.getStepEntry() == StepVehicleEnum.Exit)
             return ConstantsMessage.ERROR_STATUS;
         if (vehicle.getStatusAuthExit() == StatusAuthExitEnum.NotAuth)
             return ConstantsMessage.ERROR_NOTAUTHEXIT;

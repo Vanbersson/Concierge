@@ -28,12 +28,10 @@ public class VehicleEntryController {
         try {
             VehicleEntry vehicleEntry = new VehicleEntry();
             BeanUtils.copyProperties(data, vehicleEntry);
-
             Integer id = this.service.save(vehicleEntry);
             Map<String, Object> map = new HashMap<>();
             map.put("id", id);
             return ResponseEntity.status(HttpStatus.CREATED).body(map);
-
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
         }

@@ -46,17 +46,21 @@ import { VehicleEntry } from '../../../models/vehicle/vehicle-entry';
 import { IColor } from '../../../interfaces/icolor';
 import { MESSAGE_RESPONSE_NOT_COLOR, MESSAGE_RESPONSE_NOT_MODEL, MESSAGE_RESPONSE_NOT_PLACA, MESSAGE_RESPONSE_PLACAEXISTS } from '../../../util/constants';
 //Components
-import { FilterClientComponent } from '../../../components/filter.client/filter.client.component';
+
 import { MessageResponse } from '../../../models/message/message-response';
 import { ExistsPlaca } from '../../../models/vehicle/exists-placa';
 //Enum
 import { ClientFisJurEnum } from '../../../models/clientcompany/client-fisjur-enum';
+import { Driver } from '../../../models/driver/driver';
+//Filters
+import { FilterClientComponent } from '../../../components/filter.client/filter.client.component';
+import { FilterDriverComponent } from '../../../components/filter.driver/filter.driver.component';
 
 @Component({
   selector: 'app-vehicle.entry',
   standalone: true,
   imports: [
-    CommonModule, FilterClientComponent, FormsModule, ReactiveFormsModule,
+    CommonModule, FilterClientComponent, FilterDriverComponent, FormsModule, ReactiveFormsModule,
     StepperModule, ImageModule, ToastModule,
     CheckboxModule, TagModule, DialogModule,
     BadgeModule, TabViewModule, TableModule,
@@ -68,7 +72,7 @@ import { ClientFisJurEnum } from '../../../models/clientcompany/client-fisjur-en
   templateUrl: './vehicle.entry.component.html',
   styleUrl: './vehicle.entry.component.scss'
 })
-export default class VehicleEntryComponent implements OnInit, OnDestroy, DoCheck {
+export default class VehicleEntryComponent implements OnInit, DoCheck {
   IMAGE_MAX_SIZE: number = 4243795;
   private vehicleEntry: VehicleEntry;
 
@@ -77,24 +81,27 @@ export default class VehicleEntryComponent implements OnInit, OnDestroy, DoCheck
 
   //ClientCompany
   selectClientCompany = signal<ClientCompany>(new ClientCompany());
-
+  clientCompany!: ClientCompany;
   formClientCompany = new FormGroup({
     clientCompanyNot: new FormControl<string[]>([]),
-    clientCompanyId: new FormControl<number | null>(null),
-    clientCompanyName: new FormControl<string>(''),
-    clientCompanyCnpj: new FormControl<string>(''),
-    clientCompanyCpf: new FormControl<string>(''),
-    clientCompanyRg: new FormControl<string | null>(null),
+    clientCompanyId: new FormControl<number | null>({ value: null, disabled: true }),
+    clientCompanyName: new FormControl<string>({ value: '', disabled: true }),
+    clientCompanyCnpj: new FormControl<string>({ value: '', disabled: true }),
+    clientCompanyCpf: new FormControl<string>({ value: '', disabled: true }),
+    clientCompanyRg: new FormControl<string | null>({ value: null, disabled: true }),
   });
 
   //Driver
   driverEntryPhoto!: string;
   driverEntryPhotoDoc1!: string;
   driverEntryPhotoDoc2!: string;
+  driver!: Driver;
+  selectDriver = signal<Driver>(new Driver());
   formDriver = new FormGroup({
-    driverEntryName: new FormControl<string>('', Validators.required),
-    driverEntryCpf: new FormControl<string>(''),
-    driverEntryRg: new FormControl<string | null>(null),
+    driverEntryId: new FormControl<number | null>({ value: null, disabled: true }),
+    driverEntryName: new FormControl<string>({ value: '', disabled: true }),
+    driverEntryCpf: new FormControl<string>({ value: '', disabled: true }),
+    driverEntryRg: new FormControl<string | null>({ value: null, disabled: true }),
     driverEntryPhoto: new FormControl(null),
     driverEntrySignature: new FormControl(null),
     driverEntryPhotoDoc1: new FormControl(null),
@@ -161,15 +168,13 @@ export default class VehicleEntryComponent implements OnInit, OnDestroy, DoCheck
       { color: 'Roxo' },
       { color: 'Outro' }
     ];
-
-    this.addRequireInit();
+    this.addRequirePlaca();
   }
-  ngOnDestroy(): void {
 
-  }
   ngDoCheck(): void {
+    //Client
     if (this.selectClientCompany().id != 0) {
-
+      this.clientCompany = this.selectClientCompany();
       this.formClientCompany.patchValue({
         clientCompanyNot: [],
         clientCompanyId: this.selectClientCompany().id,
@@ -178,128 +183,42 @@ export default class VehicleEntryComponent implements OnInit, OnDestroy, DoCheck
         clientCompanyCpf: this.selectClientCompany().cpf,
         clientCompanyRg: this.selectClientCompany().rg
       });
-
-      if (this.selectClientCompany().fisjur == ClientFisJurEnum.juridica) {
-        this.removeValidClientCompanyCpf();
-        this.addValidClientCompanyCnpj();
-      } else {
-        this.removeValidClientCompanyCnpj();
-        this.addValidClientCompanyCpf();
-      }
-
-      //Prorietário
-      this.disableClientId();
-      this.disableClientName();
-      this.disableClientCnpj();
-      this.disableClientCpf();
-      this.disableClientRg();
-      //Limpa
       this.selectClientCompany.set(new ClientCompany());
     }
-  }
-  private addRequireInit() {
-    this.addValidClientCompanyId();
-    this.addValidClientCompanyName();
-    this.addValidClientCompanyCnpj();
-    this.addValidClientCompanyCpf();
-
-    this.addRequireDriverCpf();
-    this.addRequireDriverRg();
-
-    this.addRequirePlaca();
+    //Driver
+    if (this.selectDriver().id != 0) {
+      this.formDriver.patchValue({
+        driverEntryId: this.selectDriver().id,
+        driverEntryName: this.selectDriver().name,
+        driverEntryCpf: this.selectDriver().cpf,
+        driverEntryRg: this.selectDriver().rg
+      });
+      this.driver = this.selectDriver();
+      this.driverEntryPhoto = this.selectDriver().photoDriver;
+      this.driverEntryPhotoDoc1 = this.selectDriver().photoDoc1;
+      this.driverEntryPhotoDoc2 = this.selectDriver().photoDoc2;
+      this.selectDriver.set(new Driver());
+    }
   }
   //ClientCompany
-  disableClientId() {
-    this.formClientCompany.get('clientCompanyId').disable();
-  }
-  enabledClientId() {
-    this.formClientCompany.get('clientCompanyId').enable();
-  }
-  disableClientName() {
-    this.formClientCompany.get('clientCompanyName').disable();
-  }
-  enabledClientName() {
-    this.formClientCompany.get('clientCompanyName').enable();
-  }
-  disableClientCnpj() {
-    this.formClientCompany.get('clientCompanyCnpj').disable();
-  }
-  enabledClientCnpj() {
-    this.formClientCompany.get('clientCompanyCnpj').enable();
-  }
-  disableClientCpf() {
-    this.formClientCompany.get('clientCompanyCpf').disable();
-  }
-  enabledClientCpf() {
-    this.formClientCompany.get('clientCompanyCpf').enable();
-  }
-  disableClientRg() {
-    this.formClientCompany.get('clientCompanyRg').disable();
-  }
-  enabledClientRg() {
-    this.formClientCompany.get('clientCompanyRg').enable();
-  }
-  //Valid Id
-  private addValidClientCompanyId() {
-    this.formClientCompany.controls['clientCompanyId'].addValidators(Validators.required);
-    this.formClientCompany.controls['clientCompanyId'].updateValueAndValidity();
-  }
-  private removeValidClientCompanyId() {
-    this.formClientCompany.controls['clientCompanyId'].removeValidators(Validators.required);
-    this.formClientCompany.controls['clientCompanyId'].updateValueAndValidity();
-  }
-  //Valid Name
-  private addValidClientCompanyName() {
-    this.formClientCompany.controls['clientCompanyName'].addValidators(Validators.required);
-    this.formClientCompany.controls['clientCompanyName'].updateValueAndValidity();
-  }
-  private removeValidClientCompanyName() {
-    this.formClientCompany.controls['clientCompanyName'].removeValidators(Validators.required);
-    this.formClientCompany.controls['clientCompanyName'].updateValueAndValidity();
-  }
-  //Valid CNPJ
-  private addValidClientCompanyCnpj() {
-    this.formClientCompany.controls['clientCompanyCnpj'].addValidators(Validators.required);
-    this.formClientCompany.controls['clientCompanyCnpj'].updateValueAndValidity();
-  }
-  private removeValidClientCompanyCnpj() {
-    this.formClientCompany.controls['clientCompanyCnpj'].removeValidators(Validators.required);
-    this.formClientCompany.controls['clientCompanyCnpj'].updateValueAndValidity();
-  }
-  //Valid CPF
-  private addValidClientCompanyCpf() {
-    this.formClientCompany.controls['clientCompanyCpf'].addValidators(Validators.required);
-    this.formClientCompany.controls['clientCompanyCpf'].updateValueAndValidity();
-  }
-  private removeValidClientCompanyCpf() {
-    this.formClientCompany.controls['clientCompanyCpf'].removeValidators(Validators.required);
-    this.formClientCompany.controls['clientCompanyCpf'].updateValueAndValidity();
-  }
   public validationClientCompany() {
     if (this.formClientCompany.get('clientCompanyNot').value.length == 0) {
-      this.disableClientId();
-      this.disableClientName();
-      this.disableClientCnpj();
-      this.disableClientCpf();
-      this.disableClientRg();
-
       this.cleanFormClientCompany();
+      this.clientCompany = new ClientCompany();
     } else {
-      this.enabledClientId();
-      this.enabledClientName();
-      this.enabledClientCnpj();
-      this.enabledClientCpf();
-      this.enabledClientRg();
+      this.clientCompany = null;
     }
   }
   public async nextStepperClientCompany() {
-    if (this.formClientCompany.valid) {
+    if (this.clientCompany != null) {
+      //Aba motorista
       this.activeStepper = 1;
     } else {
       this.messageService.add({ severity: 'info', summary: 'Atenção', detail: 'Empresa não selecionada', icon: 'pi pi-info-circle' });
     }
   }
   public stepperClientCompany() {
+    //Aba empresa
     this.activeStepper = 0;
   }
   private cleanFormClientCompany() {
@@ -313,125 +232,17 @@ export default class VehicleEntryComponent implements OnInit, OnDestroy, DoCheck
     });
   }
   //Driver
-  public async photoPersonDriver() {
-    this.ngxImageCompressService.uploadFile().then(({ image, orientation }) => {
-      if (this.ngxImageCompressService.byteCount(image) > this.IMAGE_MAX_SIZE) {
-        this.messageService.add({ severity: 'error', summary: 'Imagem', detail: 'Tamanha máximo 3MB', icon: 'pi pi-times', life: 3000 });
-      } else {
-        this.ngxImageCompressService.compressFile(image, orientation, 50, 40).then((compressedImage) => {
-
-          // Remover o prefixo "data:image/jpeg;base64," se existir
-          const base64Data = compressedImage.split(',')[1];
-          this.driverEntryPhoto = base64Data;
-          this.formDriver.patchValue({ driverEntryPhoto: this.driverEntryPhoto });
-        });
-      }
-    });
-  }
-  public async photoFile1Driver() {
-    this.ngxImageCompressService.uploadFile().then(({ image, orientation }) => {
-      if (this.ngxImageCompressService.byteCount(image) > this.IMAGE_MAX_SIZE) {
-        this.messageService.add({ severity: 'error', summary: 'Imagem', detail: 'Tamanha máximo 3MB', icon: 'pi pi-times', life: 3000 });
-      } else {
-        this.ngxImageCompressService.compressFile(image, orientation, 50, 40).then((compressedImage) => {
-
-          // Remover o prefixo "data:image/jpeg;base64," se existir
-          const base64Data = compressedImage.split(',')[1];
-          this.driverEntryPhotoDoc1 = base64Data;
-          this.formDriver.patchValue({ driverEntryPhotoDoc1: this.driverEntryPhotoDoc1 });
-        });
-      }
-    });
-
-  }
-  public async photoFile2Driver() {
-    this.ngxImageCompressService.uploadFile().then(({ image, orientation }) => {
-      if (this.ngxImageCompressService.byteCount(image) > this.IMAGE_MAX_SIZE) {
-        this.messageService.add({ severity: 'error', summary: 'Imagem', detail: 'Tamanha máximo 3MB', icon: 'pi pi-times', life: 3000 });
-      } else {
-        this.ngxImageCompressService.compressFile(image, orientation, 50, 40).then((compressedImage) => {
-
-          // Remover o prefixo "data:image/jpeg;base64," se existir
-          const base64Data = compressedImage.split(',')[1];
-          this.driverEntryPhotoDoc2 = base64Data;
-          this.formDriver.patchValue({ driverEntryPhotoDoc2: this.driverEntryPhotoDoc2 });
-        });
-      }
-    });
-  }
-  public deleteEntryPhotoDriver() {
-    this.driverEntryPhoto = "";
-    this.formDriver.patchValue({ driverEntryPhoto: null });
-  }
-  public deleteEntryFileDriver1() {
-    this.driverEntryPhotoDoc1 = "";
-    this.formDriver.patchValue({ driverEntryPhotoDoc1: null });
-  }
-  public deleteEntryFileDriver2() {
-    this.driverEntryPhotoDoc2 = "";
-    this.formDriver.patchValue({ driverEntryPhotoDoc2: null });
-  }
-  private addRequireDriverCpf() {
-    this.formDriver.controls['driverEntryCpf'].addValidators(Validators.required);
-    this.formDriver.controls['driverEntryCpf'].updateValueAndValidity();
-  }
-  private deleteRequireCpf() {
-    this.formDriver.controls['driverEntryCpf'].removeValidators(Validators.required);
-    this.formDriver.controls['driverEntryCpf'].updateValueAndValidity();
-  }
-  private addRequireDriverRg() {
-    this.formDriver.controls['driverEntryRg'].addValidators([Validators.required, Validators.maxLength(11)]);
-    this.formDriver.controls['driverEntryRg'].updateValueAndValidity();
-  }
-  private deleteRequireRg() {
-    this.formDriver.controls['driverEntryRg'].removeValidators([Validators.required, Validators.maxLength(11)]);
-    this.formDriver.controls['driverEntryRg'].updateValueAndValidity();
-  }
-  private addFormValidatorsDriver(): boolean {
-    this.addRequireDriverCpf();
-    this.addRequireDriverRg();
-
-    const driver = this.formDriver.value;
-
-    if (driver.driverEntryName == "" && driver.driverEntryCpf != "" && driver.driverEntryRg == null) {
-      this.messageService.add({ severity: 'info', summary: 'Atenção', detail: 'Motorista não informado', icon: 'pi pi-info-circle' });
-      return false;
-    }
-    if (driver.driverEntryName == "" && driver.driverEntryCpf == "" && driver.driverEntryRg != null) {
-      this.messageService.add({ severity: 'info', summary: 'Atenção', detail: 'Motorista não informado', icon: 'pi pi-info-circle' });
-      return false;
-    }
-    if (driver.driverEntryName == "" && driver.driverEntryCpf == "" && driver.driverEntryRg == null) {
-      this.messageService.add({ severity: 'info', summary: 'Atenção', detail: 'Motorista não informado', icon: 'pi pi-info-circle' });
-      return false;
-    }
-    if (driver.driverEntryName != "" && driver.driverEntryCpf == "" && driver.driverEntryRg == null) {
-      this.messageService.add({ severity: 'info', summary: 'Atenção', detail: 'Motorista não informado', icon: 'pi pi-info-circle' });
-      return false;
-    }
-
-    if (driver.driverEntryCpf != "" && driver.driverEntryRg == null) {
-      this.deleteRequireRg();
-      return true;
-    }
-    if (driver.driverEntryCpf == "" && driver.driverEntryRg != null && driver.driverEntryRg.toString().length <= 11) {
-      this.deleteRequireCpf();
-      return true;
-    }
-
-    if (driver.driverEntryRg.toString().length > 11) {
-      this.messageService.add({ severity: 'info', summary: 'Atenção', detail: 'RG inválido', icon: 'pi pi-info-circle' });
-      return false;
-    }
-    return true;
-  }
   public nextSterpperDriver() {
-    if (this.addFormValidatorsDriver()) {
+    if (this.driver != null) {
+      //Aba veículo
       this.activeStepper = 2;
+    } else {
+      this.messageService.add({ severity: 'info', summary: 'Atenção', detail: 'Motorista não informado', icon: 'pi pi-info-circle' });
     }
   }
   public stepperDriver() {
-    if (this.formClientCompany.valid) {
+    if (this.clientCompany != null) {
+      //Aba motorista
       this.activeStepper = 1;
     } else {
       this.messageService.add({ severity: 'info', summary: 'Atenção', detail: 'Empresa não selecionada', icon: 'pi pi-info-circle' });
@@ -450,9 +261,12 @@ export default class VehicleEntryComponent implements OnInit, OnDestroy, DoCheck
   }
   //Vehicle
   public stepperVehicle() {
-    if (this.formClientCompany.valid) {
-      if (this.addFormValidatorsDriver()) {
+    if (this.clientCompany != null) {
+      if (this.driver != null) {
+        //Aba veículo
         this.activeStepper = 2;
+      } else {
+        this.messageService.add({ severity: 'info', summary: 'Atenção', detail: 'Motorista não informado', icon: 'pi pi-info-circle' });
       }
     } else {
       this.messageService.add({ severity: 'info', summary: 'Atenção', detail: 'Empresa não selecionada', icon: 'pi pi-info-circle' });
@@ -694,7 +508,6 @@ export default class VehicleEntryComponent implements OnInit, OnDestroy, DoCheck
   }
   //save
   private loadVehicleEntry() {
-    const driverValue = this.formDriver.value;
     const vehicleValue = this.formVehicle.value;
 
     this.vehicleEntry = new VehicleEntry();
@@ -704,21 +517,19 @@ export default class VehicleEntryComponent implements OnInit, OnDestroy, DoCheck
     this.vehicleEntry.nameUserEntry = this.storageService.name;
 
     if (this.formClientCompany.get('clientCompanyNot').value.length == 0) {
-      this.vehicleEntry.clientCompanyId = this.formClientCompany.get('clientCompanyId').value;
-      this.vehicleEntry.clientCompanyName = this.formClientCompany.get('clientCompanyName').value;
-      this.vehicleEntry.clientCompanyCnpj = this.formClientCompany.get('clientCompanyCnpj').value ?? "";
-      this.vehicleEntry.clientCompanyCpf = this.formClientCompany.get('clientCompanyCpf').value ?? "";
-      this.vehicleEntry.clientCompanyRg = this.formClientCompany.get('clientCompanyRg').value ?? "";
+      this.vehicleEntry.clientCompanyId = this.clientCompany.id;
+      this.vehicleEntry.clientCompanyName = this.clientCompany.name;
+      this.vehicleEntry.clientCompanyCnpj = this.clientCompany.cnpj;
+      this.vehicleEntry.clientCompanyCpf = this.clientCompany.cpf;
+      this.vehicleEntry.clientCompanyRg = this.clientCompany.rg;
     } else {
       this.vehicleEntry.clientCompanyId = 0;
     }
 
-    this.vehicleEntry.driverEntryName = driverValue.driverEntryName;
-    this.vehicleEntry.driverEntryCpf = driverValue?.driverEntryCpf ?? "";
-    this.vehicleEntry.driverEntryRg = driverValue?.driverEntryRg ?? "";
-    this.vehicleEntry.driverEntryPhoto = driverValue?.driverEntryPhoto ?? "";
-    this.vehicleEntry.driverEntryPhotoDoc1 = driverValue?.driverEntryPhotoDoc1 ?? "";
-    this.vehicleEntry.driverEntryPhotoDoc2 = driverValue?.driverEntryPhotoDoc2 ?? "";
+    this.vehicleEntry.driverEntryId = this.driver.id;
+    this.vehicleEntry.driverEntryName = this.driver.name;
+    this.vehicleEntry.driverEntryCpf = this.driver.cpf;
+    this.vehicleEntry.driverEntryRg = this.driver.rg;
 
     this.vehicleEntry.placa = vehicleValue?.placa ?? "";
     this.vehicleEntry.placasJunto = "";
@@ -744,7 +555,6 @@ export default class VehicleEntryComponent implements OnInit, OnDestroy, DoCheck
     this.vehicleEntry.vehicleNew = vehicleValue?.vehicleNew ?? "";
     this.vehicleEntry.serviceOrder = vehicleValue?.serviceOrder ?? "";
     this.vehicleEntry.informationConcierge = vehicleValue?.informationConcierge ?? "";
-
     //Add list of vehicle
     this.listVehicleEntry.push(this.vehicleEntry);
     this.messageService.add({ severity: 'success', summary: 'Veículo adicionado', detail: this.vehicleEntry.modelDescription, icon: 'pi pi-car' });
@@ -770,12 +580,11 @@ export default class VehicleEntryComponent implements OnInit, OnDestroy, DoCheck
           this.listVehicleEntry = [];
 
           this.cleanFormDriver();
+          this.driver = null;
           this.cleanFormClientCompany();
-
+          this.clientCompany = null;
           this.stepperClientCompany();
-
-          this.addRequireInit();
-
+          this.addRequirePlaca();
         }
       }
 
@@ -805,13 +614,6 @@ export default class VehicleEntryComponent implements OnInit, OnDestroy, DoCheck
       return error;
     }
 
-  }
-  private async saveClient(client: ClientCompany): Promise<HttpResponse<ClientCompany>> {
-    try {
-      return await lastValueFrom(this.serviceClienteCompany.save(client));
-    } catch (error) {
-      return error;
-    }
   }
 
 }

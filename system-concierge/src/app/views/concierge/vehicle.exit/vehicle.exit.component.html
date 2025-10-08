@@ -6,12 +6,12 @@
     <p-badge [value]="total()" severity="info" />
 </div>
 
-
-<p-overlayPanel #overPanel >
-    <div class="ml-2 mb-2">
-        <span class="text-600" style="font-size: 1.25rem;color: #64748b;">Saída de veículos</span>
+<p-overlayPanel #overPanel>
+    <div class="layout-card-title">
+        <span class="text-700 font-bold" style="font-size: 1.25rem;color: #424242;">Saída de veículos</span>
     </div>
     <p-toast />
+
     <p-confirmDialog #cd>
         <ng-template pTemplate="headless" let-message>
             <div class="flex flex-column align-items-center p-5 surface-overlay border-round">
@@ -42,14 +42,10 @@
                     <p-inputIcon>
                         <i class="pi pi-search"></i>
                     </p-inputIcon>
-                    <input pInputText type="text" (input)="tableFilter.filterGlobal($any($event.target).value, 'contains')"
-                        placeholder="Pesquisar" />
+                    <input pInputText type="text" (input)="tableFilter.filterGlobal($any($event.target).value, 'contains')" placeholder="Pesquisar" />
                 </p-iconField>
                 <p-button type="button" icon="pi pi-refresh" size="small" (onClick)="listVehicles()"></p-button>
-                @if(selectedVehicle.length > 0){
-                <p-button label="Saída" icon="pi pi-sign-out" severity="danger" size="small" class="ml-2"
-                    (click)="confirm()"></p-button>
-                }
+                <p-button *ngIf="selectedVehicle.length > 0" label="Saída" icon="pi pi-sign-out" severity="danger" size="small" class="ml-2" (click)="confirm()"></p-button>
             </div>
         </ng-template>
         <ng-template pTemplate="header">
@@ -57,11 +53,11 @@
                 <th>
                     <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
                 </th>
-                <th class="font-normal">Código</th>
-                <th class="font-normal">Placa</th>
-                <th class="font-normal">Modelo</th>
-                <th class="font-normal">Empresa</th>
-                <th class="font-normal">Consultor</th>
+                <th pSortableColumn="id">Código<p-sortIcon field="id"></p-sortIcon></th>
+                <th pSortableColumn="placa">Placa<p-sortIcon field="placa"></p-sortIcon></th>
+                <th pSortableColumn="modelDescription">Modelo<p-sortIcon field="modelDescription"></p-sortIcon></th>
+                <th pSortableColumn="clientCompanyName">Empresa<p-sortIcon field="clientCompanyName"></p-sortIcon></th>
+                <th pSortableColumn="nameUserAttendant">Consultor<p-sortIcon field="nameUserAttendant"></p-sortIcon></th>
             </tr>
         </ng-template>
         <ng-template pTemplate="body" let-vehicle>
@@ -70,8 +66,7 @@
                 <td><span class="text-500">{{ vehicle.id }}</span></td>
                 <td>
                     @if(vehicle.placa == "NOVO"){
-                    <div class="flex align-items-center justify-content-center bg-blue-100 border-round"
-                        [ngStyle]="{width: '3.5rem', height: '2.5rem'}">
+                    <div class="flex align-items-center justify-content-center bg-blue-100 border-round" [ngStyle]="{width: '3.5rem', height: '2.5rem'}">
                         <span class="text-500">NOVO</span>
                     </div>
                     }@else {

@@ -99,7 +99,7 @@ export default class LoginComponent {
 
         setTimeout(() => {
           this.router.navigateByUrl('/dashboard');
-        }, 2000);
+        }, 1000);
       }
 
       this.busyService.idle();
