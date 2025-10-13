@@ -43,7 +43,8 @@ import {
   STATUS_VEHICLE_ENTRY_NOTAUTH, STATUS_VEHICLE_ENTRY_FIRSTAUTH,
   STATUS_VEHICLE_ENTRY_AUTHORIZED, MESSAGE_RESPONSE_NOT_CLIENT,
   MESSAGE_RESPONSE_NOT_ATTENDANT, MESSAGE_RESPONSE_NOT_DRIVEREXIT, MESSAGE_RESPONSE_ERROR_AUTH_EXIT,
-  IMAGE_MAX_SIZE
+  IMAGE_MAX_SIZE,
+  MESSAGE_RESPONSE_NOT_DRIVERENTRY
 } from '../../../util/constants';
 //Class
 import { User } from '../../../models/user/user';
@@ -257,9 +258,7 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
   //mostra os detalhes da entrada do veículos chamar dentro de um dialog 
   showDetailsVehicle(id: number) {
     this.id = id;
-
     this.detailsVehicle = true;
-
     this.primeNGConfig.setTranslation({
       accept: 'Accept',
       reject: 'Cancel',
@@ -274,7 +273,6 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
       dateFormat: 'dd/mm/yy',
       weekHeader: 'Sm'
     });
-
     this.itemsStatus = [
       {
         label: 'Atendimento',
@@ -292,9 +290,7 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
         label: 'Saída concluída'
       }
     ];
-
     this.init();
-
     this.cores = [
       { color: 'Branco' },
       { color: 'Preto' },
@@ -307,15 +303,7 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
       { color: 'Roxo' },
       { color: 'Outro' }
     ];
-
     this.disableInput();
-
-    //Prorietário
-    /* this.disableClientId();
-    this.disableClientName();
-    this.disableClientCnpj();
-    this.disableClientCpf();
-    this.disableClientRg(); */
   }
   ngDoCheck(): void {
     //proprietário
@@ -712,9 +700,8 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
   public async authExit() {
     const uppercase = new UpperCasePipe();
     if (this.formVehicle.value.statusAuthExit != this.authorized) {
-
+      //Inicia loading
       this.busyService.busy();
-
       var auth = new VehicleEntryAuth();
       auth.companyId = this.storageService.companyId;
       auth.resaleId = this.storageService.resaleId;
@@ -723,6 +710,7 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
       auth.userName = this.storageService.name;
       auth.dateAuth = this.formatDateTime(new Date());
       const permissionResult = await this.addAuthExit(auth);
+
       if (permissionResult.status == 200) {
         if (this.formVehicle.value.statusAuthExit == this.notAuth) {
           this.formVehicle.patchValue({
@@ -773,13 +761,11 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
         }
 
       }
-
+      //Fecha loading
+      this.busyService.idle();
     } else {
       this.messageService.add({ severity: 'info', summary: 'Veículo Liberado', detail: "Placa " + uppercase.transform(this.formVehicle.value.placa), icon: 'pi pi-thumbs-up-fill' });
     }
-
-    this.busyService.idle();
-
   }
   private async addAuthExit(auth: VehicleEntryAuth): Promise<HttpResponse<VehicleEntryAuth>> {
     try {
@@ -789,6 +775,8 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
         this.showClientCompany();
       } else if (error.error.message == MESSAGE_RESPONSE_NOT_ATTENDANT) {
         this.showUserAttendant();
+      } else if (error.error.message == MESSAGE_RESPONSE_NOT_DRIVERENTRY) {
+        this.messageService.add({ severity: 'error', summary: 'Motorista entrada', detail: "Não informado", icon: 'pi pi-times' });
       } else if (error.error.message == MESSAGE_RESPONSE_NOT_DRIVEREXIT) {
         this.messageService.add({ severity: 'error', summary: 'Motorista Saída', detail: "Não informado", icon: 'pi pi-times' });
       } else if (error.error.message == "Permission not informed.") {

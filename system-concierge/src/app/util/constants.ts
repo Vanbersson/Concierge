@@ -10,8 +10,8 @@ export const STATUS_VEHICLE_ENTRY_AUTHORIZED = "Authorized";
 
 export const MESSAGE_RESPONSE_NOT_CLIENT = "ClientCompany not informed.";
 export const MESSAGE_RESPONSE_NOT_ATTENDANT = "Attendant not informed.";
+export const MESSAGE_RESPONSE_NOT_DRIVERENTRY = "DriverEntry not informed.";
 export const MESSAGE_RESPONSE_NOT_DRIVEREXIT = "DriverExit not informed.";
-export const MESSAGE_RESPONSE_NOT_DRIVERENTREY = "DriverEntry not informed.";
 
 //Vehicle
 export const MESSAGE_RESPONSE_NOT_PLACA = "Placa not informed.";

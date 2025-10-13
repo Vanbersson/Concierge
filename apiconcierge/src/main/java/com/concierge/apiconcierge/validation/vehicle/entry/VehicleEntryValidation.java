@@ -211,7 +211,6 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
 
     @Override
     public String addAuthExit(VehicleEntry vehicle, AuthExitDto authExitDto) {
-
         if (authExitDto.companyId() == null || authExitDto.companyId() == 0)
             return ConstantsMessage.ERROR_COMPANY;
         if (authExitDto.resaleId() == null || authExitDto.resaleId() == 0)
@@ -228,42 +227,18 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
             if (vehicle.getIdUserAttendant() == null || vehicle.getIdUserAttendant() == 0 || vehicle.getNameUserAttendant().isBlank()) {
                 return ConstantsMessage.ERROR_ATTENDANT;
             }
-            int countDriver = 0;
-            if (!vehicle.getDriverExitName().isBlank()) {
-                countDriver++;
-            }
-            if (!vehicle.getDriverExitCpf().isBlank()) {
-                countDriver++;
-            }
-            if (!vehicle.getDriverExitRg().isBlank()) {
-                countDriver++;
-            }
-            if (countDriver < 2) {
-                return ConstantsMessage.ERROR_DRIVEREXIT;
-            }
         }
 
         if (vehicle.getServiceOrder().equals(VehicleYesNotEnum.not)) {
-
             if (vehicle.getClientCompanyId() == null || vehicle.getClientCompanyId() == 0 || vehicle.getClientCompanyName().isBlank()) {
                 return ConstantsMessage.ERROR_CLIENTCOMPANY;
             }
-
-            int countDriver = 0;
-            if (!vehicle.getDriverExitName().isBlank()) {
-                countDriver++;
-            }
-            if (!vehicle.getDriverExitCpf().isBlank()) {
-                countDriver++;
-            }
-            if (!vehicle.getDriverExitRg().isBlank()) {
-                countDriver++;
-            }
-            if (countDriver < 2) {
-                return ConstantsMessage.ERROR_DRIVEREXIT;
-            }
-
         }
+
+        if (vehicle.getDriverEntryId() == null || vehicle.getDriverEntryId() == 0)
+            return ConstantsMessage.ERROR_DRIVERENTRY;
+        if (vehicle.getDriverExitId() == null || vehicle.getDriverExitId() == 0)
+            return ConstantsMessage.ERROR_DRIVEREXIT;
 
         if (vehicle.getServiceOrder().equals(VehicleYesNotEnum.yes)) {
 
@@ -284,14 +259,12 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
         }
 
         if (vehicle.getServiceOrder().equals(VehicleYesNotEnum.not)) {
-
             if (authExitDto.userId() != 1) {
                 PermissionUser permission = this.permissionUser.findPermissionId(authExitDto.companyId(), authExitDto.resaleId(), authExitDto.userId(), ADD_AUTH_EXIT_VEHICLE_WITHOUT_O_S);
                 if (permission == null)
                     return ConstantsMessage.ERROR_PERMISSION;
             }
         }
-
         return ConstantsMessage.SUCCESS;
     }
 
@@ -311,7 +284,6 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
             return ConstantsMessage.ERROR_NOTAUTHEXIT;
 
         if (vehicle.getServiceOrder().equals(VehicleYesNotEnum.yes)) {
-
             if (authExitDto.userId() != 1) {
                 if (vehicle.getIdUserExitAuth1() != authExitDto.userId())
                     return ConstantsMessage.ERROR_PERMISSION_ANOTHER_USER;
@@ -323,7 +295,6 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
         }
 
         if (vehicle.getServiceOrder().equals(VehicleYesNotEnum.not)) {
-
             if (authExitDto.userId() != 1) {
                 if (vehicle.getIdUserExitAuth1() != authExitDto.userId())
                     return ConstantsMessage.ERROR_PERMISSION_ANOTHER_USER;
@@ -333,7 +304,6 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
                     return ConstantsMessage.ERROR_PERMISSION;
             }
         }
-
         return ConstantsMessage.SUCCESS;
     }
 
@@ -354,7 +324,6 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
 
         if (vehicle.getServiceOrder().equals(VehicleYesNotEnum.yes)) {
             if (authExitDto.userId() != 1) {
-
                 if (vehicle.getIdUserExitAuth2() != authExitDto.userId())
                     return ConstantsMessage.ERROR_PERMISSION_ANOTHER_USER;
 
@@ -365,7 +334,6 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
         }
 
         if (vehicle.getServiceOrder().equals(VehicleYesNotEnum.not)) {
-
             if (authExitDto.userId() != 1) {
                 if (vehicle.getIdUserExitAuth2() != authExitDto.userId())
                     return ConstantsMessage.ERROR_PERMISSION_ANOTHER_USER;
@@ -375,7 +343,6 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
                     return ConstantsMessage.ERROR_PERMISSION;
             }
         }
-
         return ConstantsMessage.SUCCESS;
     }
 

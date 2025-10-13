@@ -293,7 +293,6 @@ public class VehicleEntryService implements IVehicleEntryService {
 
             String message = this.validation.addAuthExit(vehicle, authExitDto);
             if (ConstantsMessage.SUCCESS.equals(message)) {
-
                 if (vehicle.getIdUserExitAuth1() == null) {
                     vehicle.setIdUserExitAuth1(authExitDto.userId());
                     vehicle.setNameUserExitAuth1(authExitDto.userName());
