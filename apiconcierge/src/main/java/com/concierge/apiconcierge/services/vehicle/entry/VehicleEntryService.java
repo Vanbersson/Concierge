@@ -74,6 +74,10 @@ public class VehicleEntryService implements IVehicleEntryService {
                         this.updateBudget(vehicleEntry);
                     }
                 }
+
+                if (vehicleEntry.getDriverExitId() == 0) {
+                    vehicleEntry.setDriverExitId(null);
+                }
                 this.repository.save(vehicleEntry);
                 return ConstantsMessage.SUCCESS;
             } else {
@@ -231,13 +235,11 @@ public class VehicleEntryService implements IVehicleEntryService {
     public Map<String, Object> filterId(Integer companyId, Integer resaleId, Integer id) {
         try {
             VehicleEntry vehicle = repository.filterVehicleId(companyId, resaleId, id);
-
             if (vehicle == null) {
                 throw new VehicleEntryException(ConstantsMessage.ERROR_VEHICLE_NOT_FOUND);
             } else {
                 return this.loadObject(vehicle);
             }
-
         } catch (Exception ex) {
             throw new VehicleEntryException(ex.getMessage());
         }
@@ -285,40 +287,35 @@ public class VehicleEntryService implements IVehicleEntryService {
     public Map<String, Object> addAuthExit(AuthExitDto authExitDto) {
         Map<String, Object> map = new HashMap<>();
         try {
-            Optional<VehicleEntry> vehicle0 = this.repository.findById(authExitDto.idVehicle());
-            if (vehicle0.isEmpty())
+            VehicleEntry vehicle = this.repository.filterVehicleId(authExitDto.companyId(), authExitDto.resaleId(), authExitDto.vehicleId());
+            if (vehicle == null)
                 throw new VehicleEntryException();
-            VehicleEntry vehicle = vehicle0.get();
-            String message = this.validation.addAuthExit(vehicle, authExitDto);
 
+            String message = this.validation.addAuthExit(vehicle, authExitDto);
             if (ConstantsMessage.SUCCESS.equals(message)) {
 
                 if (vehicle.getIdUserExitAuth1() == null) {
-
-                    vehicle.setIdUserExitAuth1(authExitDto.idUserExitAuth());
-                    vehicle.setNameUserExitAuth1(authExitDto.nameUserExitAuth());
-                    vehicle.setDateExitAuth1(authExitDto.dateExitAuth());
+                    vehicle.setIdUserExitAuth1(authExitDto.userId());
+                    vehicle.setNameUserExitAuth1(authExitDto.userName());
+                    vehicle.setDateExitAuth1(authExitDto.dateAuth());
                     vehicle.setStatusAuthExit(statusAuthorization(vehicle));
-
                     this.repository.save(vehicle);
-
-                    map.put("idVehicle", vehicle.getId());
-                    map.put("idUserExitAuth", vehicle.getIdUserExitAuth1());
-                    map.put("nameUserExitAuth", vehicle.getNameUserExitAuth1());
-                    map.put("dateExitAuth", vehicle.getDateExitAuth1());
+                    map.put("vehicleId", vehicle.getId());
+                    map.put("userId", vehicle.getIdUserExitAuth1());
+                    map.put("userName", vehicle.getNameUserExitAuth1());
+                    map.put("dateAuth", vehicle.getDateExitAuth1());
                     return map;
                 } else if (vehicle.getIdUserExitAuth2() == null) {
-                    vehicle.setIdUserExitAuth2(authExitDto.idUserExitAuth());
-                    vehicle.setNameUserExitAuth2(authExitDto.nameUserExitAuth());
-                    vehicle.setDateExitAuth2(authExitDto.dateExitAuth());
+                    vehicle.setIdUserExitAuth2(authExitDto.userId());
+                    vehicle.setNameUserExitAuth2(authExitDto.userName());
+                    vehicle.setDateExitAuth2(authExitDto.dateAuth());
                     vehicle.setStatusAuthExit(statusAuthorization(vehicle));
-
                     this.repository.save(vehicle);
 
-                    map.put("idVehicle", vehicle.getId());
-                    map.put("idUserExitAuth", vehicle.getIdUserExitAuth2());
-                    map.put("nameUserExitAuth", vehicle.getNameUserExitAuth2());
-                    map.put("dateExitAuth", vehicle.getDateExitAuth2());
+                    map.put("vehicleId", vehicle.getId());
+                    map.put("userId", vehicle.getIdUserExitAuth2());
+                    map.put("userName", vehicle.getNameUserExitAuth2());
+                    map.put("dateAuth", vehicle.getDateExitAuth2());
                     return map;
                 }
             } else {
@@ -334,7 +331,7 @@ public class VehicleEntryService implements IVehicleEntryService {
     @Override
     public String deleteAuthExit1(AuthExitDto authExitDto) {
         try {
-            VehicleEntry vehicle = this.repository.filterVehicleId(authExitDto.companyId(), authExitDto.resaleId(), authExitDto.idVehicle());
+            VehicleEntry vehicle = this.repository.filterVehicleId(authExitDto.companyId(), authExitDto.resaleId(), authExitDto.vehicleId());
             if (vehicle == null)
                 throw new VehicleEntryException("Vehicle not found.");
 
@@ -359,7 +356,7 @@ public class VehicleEntryService implements IVehicleEntryService {
     @Override
     public String deleteAuthExit2(AuthExitDto authExitDto) {
         try {
-            VehicleEntry vehicle = this.repository.filterVehicleId(authExitDto.companyId(), authExitDto.resaleId(), authExitDto.idVehicle());
+            VehicleEntry vehicle = this.repository.filterVehicleId(authExitDto.companyId(), authExitDto.resaleId(), authExitDto.vehicleId());
             if (vehicle == null)
                 throw new VehicleEntryException("Vehicle not found.");
 
@@ -487,6 +484,11 @@ public class VehicleEntryService implements IVehicleEntryService {
         map.put("clientCompanyCpf", vehicle.getClientCompanyCpf());
         map.put("clientCompanyRg", vehicle.getClientCompanyRg());
 
+        if (vehicle.getDriverEntryId() == null) {
+            map.put("driverEntryId", 0);
+        } else {
+            map.put("driverEntryId", vehicle.getDriverEntryId());
+        }
         map.put("driverEntryName", vehicle.getDriverEntryName());
         map.put("driverEntryCpf", vehicle.getDriverEntryCpf());
         if (vehicle.getDriverEntryRg() == null) {
@@ -513,6 +515,12 @@ public class VehicleEntryService implements IVehicleEntryService {
             map.put("driverEntryPhotoDoc2", "");
         } else {
             map.put("driverEntryPhotoDoc2", vehicle.getDriverEntryPhotoDoc2());
+        }
+
+        if (vehicle.getDriverExitId() == null) {
+            map.put("driverExitId", 0);
+        } else {
+            map.put("driverExitId", vehicle.getDriverExitId());
         }
         map.put("driverExitName", vehicle.getDriverExitName());
         map.put("driverExitCpf", vehicle.getDriverExitCpf());

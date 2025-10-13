@@ -253,10 +253,10 @@ export default class VeiculosComponent implements OnInit, OnDestroy {
     var auth = new VehicleEntryAuth();
     auth.companyId = this.storageService.companyId;
     auth.resaleId = this.storageService.resaleId;
-    auth.idVehicle = vehicle.id;
-    auth.idUserExitAuth = this.storageService.id;
-    auth.nameUserExitAuth = this.storageService.name;
-    auth.dateExitAuth = this.formatDateTime(new Date());
+    auth.vehicleId = vehicle.id;
+    auth.userId = this.storageService.id;
+    auth.userName = this.storageService.name;
+    auth.dateAuth = this.formatDateTime(new Date());
 
     try {
       return await lastValueFrom(this.vehicleService.entryAddAuth(auth));

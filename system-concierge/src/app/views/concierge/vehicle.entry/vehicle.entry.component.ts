@@ -209,6 +209,16 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
       this.clientCompany = null;
     }
   }
+  private cleanFormClientCompany() {
+    this.formClientCompany.patchValue({
+      clientCompanyNot: [],
+      clientCompanyId: null,
+      clientCompanyName: '',
+      clientCompanyCnpj: '',
+      clientCompanyCpf: '',
+      clientCompanyRg: null
+    });
+  }
   public async nextStepperClientCompany() {
     if (this.clientCompany != null) {
       //Aba motorista
@@ -221,16 +231,7 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
     //Aba empresa
     this.activeStepper = 0;
   }
-  private cleanFormClientCompany() {
-    this.formClientCompany.patchValue({
-      clientCompanyNot: [],
-      clientCompanyId: null,
-      clientCompanyName: '',
-      clientCompanyCnpj: '',
-      clientCompanyCpf: '',
-      clientCompanyRg: null
-    });
-  }
+
   //Driver
   public nextSterpperDriver() {
     if (this.driver != null) {

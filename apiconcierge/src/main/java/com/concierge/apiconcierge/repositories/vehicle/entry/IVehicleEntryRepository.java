@@ -12,6 +12,7 @@ public interface IVehicleEntryRepository extends JpaRepository<VehicleEntry, Int
     @Query(value = "SELECT * FROM `tb_vehicle_entry` WHERE company_id = ?1 and resale_id = ?2 and id = ?3",
             nativeQuery = true)
     VehicleEntry filterVehicleId(Integer companyId, Integer resaleId, Integer id);
+
     @Query(value = "SELECT * FROM `tb_vehicle_entry` WHERE company_id = ?1 and resale_id = ?2 and placa = ?3",
             nativeQuery = true)
     VehicleEntry findByPlaca(Integer companyId, Integer resaleId, String placa);
