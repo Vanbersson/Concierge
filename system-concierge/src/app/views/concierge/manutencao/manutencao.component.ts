@@ -231,7 +231,7 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
       { color: 'Roxo' },
       { color: 'Outro' }
     ];
-    if (this.detailsVehicle) {
+    if (this.activatedRoute.snapshot.params['id']) {
       //Id vehicle entry
       this.id = this.activatedRoute.snapshot.params['id'];
       this.init();

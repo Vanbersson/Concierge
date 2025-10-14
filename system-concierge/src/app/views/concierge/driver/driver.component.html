@@ -88,7 +88,7 @@
             </div>
             <div class="col-12 md:col-10">
                 <label for="">Nome</label>
-                <input pInputText [style]="{'text-transform':'uppercase'}" formControlName="name"/>
+                <input pInputText maxlength="100" [style]="{'text-transform':'uppercase'}" formControlName="name"/>
                 <small class="p-error block" *ngIf="formDriver.get('name')?.invalid">Campo obrigatório</small>
             </div>
             <div class="col-12 md:col-3">
@@ -103,7 +103,7 @@
             </div>
             <div class="col-12 md:col-3">
                 <label for="">RG</label>
-                <p-inputNumber mode="decimal" [useGrouping]="false" formControlName="rg"/>
+                <p-inputNumber mode="decimal" [useGrouping]="false" maxlength="11" formControlName="rg"/>
                 <small class="p-error block" *ngIf="formDriver.get('rg')?.invalid">Campo obrigatório</small>
             </div>
             <div  class="col-12 md:col-3">
@@ -113,16 +113,16 @@
             </div>
             <div class="col-12 md:col-6">
                 <label for="">E-mail</label>
-                <input pInputText formControlName="email"/>
+                <input pInputText maxlength="100" formControlName="email"/>
             </div>
             <div class="col-12 md:col-3">
                 <label for="">Nº Registro CNH</label>
-                <p-inputNumber mode="decimal" [useGrouping]="false" formControlName="cnhRegister"/>
+                <p-inputNumber mode="decimal" [useGrouping]="false" maxlength="11" formControlName="cnhRegister"/>
                 <small class="p-error block" *ngIf="formDriver.get('cnhRegister')?.invalid">Campo obrigatório</small>
             </div>
             <div class="col-12 md:col-3">
                 <label for="">Categoria CNH</label>
-                <input pInputText [style]="{'text-transform':'uppercase'}" formControlName="cnhCategory"/>
+                <input pInputText maxlength="10" [style]="{'text-transform':'uppercase'}" formControlName="cnhCategory"/>
                 <small class="p-error block" *ngIf="formDriver.get('cnhCategory')?.invalid">Campo obrigatório</small>
             </div>
             <div class="col-12 md:col-3">
@@ -146,7 +146,6 @@
                 <label for="cellphoneId">Celular</label>
                 <p-inputMask id="cellphoneId" mask="99999-9999" [unmask]="true" formControlName="cellphone"/>
             </div>
-
             <div class="col-12 md:col-2">
                 <label for="ClientzipCode">CEP</label>
                 <p-inputGroup>
@@ -155,17 +154,15 @@
                 </p-inputGroup>
                 <small class="p-error block" *ngIf="formDriver.get('zipCode')?.invalid">Campo obrigatório</small>
             </div>
-            
             <div class="col-12 md:col-9">
                 <label for="Clientaddress">Logradouro</label>
-                <input id="Clientaddress" type="text" [style]="{'text-transform':'uppercase'}" pInputText formControlName="address" />
+                <input id="Clientaddress" type="text" [style]="{'text-transform':'uppercase'}" pInputText maxlength="100" formControlName="address" />
                 <small class="p-error block" *ngIf="formDriver.get('address')?.invalid">Campo obrigatório</small>
             </div>
             <div class="col-12 md:col-1">
                 <label for="ClientAddressNumber">Nº</label>
-                <p-inputNumber id="ClientAddressNumber" formControlName="addressNumber" [useGrouping]="false" />
+                <p-inputNumber id="ClientAddressNumber" maxlength="10" formControlName="addressNumber" [useGrouping]="false" />
             </div>
-            
             <div class="col-12 md:col-1">
                 <label for="ClientState">UF</label>
                 <p-inputMask id="ClientState" [style]="{'text-transform':'uppercase'}" mask="aa" [unmask]="true" formControlName="state" />
@@ -173,17 +170,17 @@
             </div>
             <div class="col-12 md:col-4">
                 <label for="ClientCity">Cidade</label>
-                <input id="ClientCity" type="text" [style]="{'text-transform':'uppercase'}" pInputText formControlName="city" />
-                    <small class="p-error block" *ngIf="formDriver.get('city')?.invalid">Campo obrigatório</small>
+                <input id="ClientCity" type="text" [style]="{'text-transform':'uppercase'}" pInputText maxlength="100" formControlName="city" />
+                <small class="p-error block" *ngIf="formDriver.get('city')?.invalid">Campo obrigatório</small>
             </div>
             <div class="col-12 md:col-4">
                 <label for="ClientNeighborhood">Bairro</label>
-                <input id="ClientNeighborhood" type="text" [style]="{'text-transform':'uppercase'}" pInputText formControlName="neighborhood" />
+                <input id="ClientNeighborhood" type="text" [style]="{'text-transform':'uppercase'}" pInputText maxlength="100" formControlName="neighborhood" />
                 <small class="p-error block" *ngIf="formDriver.get('neighborhood')?.invalid">Campo obrigatório</small>
             </div>
             <div class="col-12 md:col-3">
                 <label for="ClientAddressComplement">Complemento</label>
-                <input id="ClientAddressComplement" type="text" [style]="{'text-transform':'uppercase'}" pInputText formControlName="addressComplement" />
+                <input id="ClientAddressComplement" type="text" [style]="{'text-transform':'uppercase'}" pInputText maxlength="100" formControlName="addressComplement" />
             </div>
             <div class="col-12 md:col-4 layout-card-status">
                 <span>Situação</span>

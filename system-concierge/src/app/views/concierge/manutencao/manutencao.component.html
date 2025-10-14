@@ -38,7 +38,7 @@
                         </div>
                         <div class="col-12 md:col-2">
                             <label for="frotaId">Frota</label>
-                            <p-inputNumber inputId="frotaId" [useGrouping]="false"  formControlName="frota" />
+                            <p-inputNumber inputId="frotaId" [useGrouping]="false" maxlength="10" formControlName="frota" />
                         </div>
                         <div class="col-12 md:col-3">
                             <label for="vehiclemodelid">Modelos</label>
@@ -71,11 +71,11 @@
                         </div>
                         <div class="col-12 md:col-2">
                             <label for="kmEntry">KM Entrada</label>
-                            <p-inputNumber mode="decimal" inputId="kmEntry" [useGrouping]="false" formControlName="kmEntry" />
+                            <p-inputNumber mode="decimal" inputId="kmEntry" [useGrouping]="false" maxlength="10" formControlName="kmEntry" />
                         </div>
                         <div class="col-12 md:col-2">
                             <label for="kmExit">KM Saída</label>
-                            <p-inputNumber mode="decimal" inputId="kmExit" [useGrouping]="false" formControlName="kmExit" />
+                            <p-inputNumber mode="decimal" inputId="kmExit" [useGrouping]="false" maxlength="10" formControlName="kmExit" />
                         </div>
                         <div class="col-12 md:col-2">
                             <div class="flex justify-content-between">
@@ -119,15 +119,15 @@
                         </div>
                         <div class="col-12 md:col-2">
                             <label for="numServiceOrder">N. O.S.</label>
-                            <p-inputNumber inputId="numServiceOrder" [useGrouping]="false" formControlName="numServiceOrder" />
+                            <p-inputNumber inputId="numServiceOrder" [useGrouping]="false" maxlength="20" formControlName="numServiceOrder" />
                         </div>
                         <div class="col-12 md:col-2">
                             <label for="numNfe">NFe</label>
-                            <p-inputNumber inputId="numNfe" [useGrouping]="false" formControlName="numNfe" />
+                            <p-inputNumber inputId="numNfe" [useGrouping]="false" maxlength="20" formControlName="numNfe" />
                         </div>
                         <div class="col-12 md:col-2">
                             <label for="numNfse">NFS-e</label>
-                            <p-inputNumber inputId="numNfse" [useGrouping]="false" formControlName="numNfse" />
+                            <p-inputNumber inputId="numNfse" [useGrouping]="false" maxlength="20" formControlName="numNfse" />
                         </div>
                         <div class="col-12 lg:col-4 md:col-12 flex align-items-center gap-2">
                             <div class="layout-file">
@@ -211,7 +211,7 @@
                         </div>
                         <div class="col-12">
                             <label for="informacao" class="ml-2">Informações</label>
-                            <textarea pInputTextarea id="informacao" rows="4" cols="30" formControlName="information"></textarea>
+                            <textarea pInputTextarea maxlength="255" id="informacao" rows="4" cols="30" formControlName="information"></textarea>
                         </div>
                     </div>
                 </form>

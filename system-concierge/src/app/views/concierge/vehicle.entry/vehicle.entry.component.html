@@ -161,7 +161,7 @@
                         </div>
                         <div class="col-12 md:col-1">
                             <label for="frotaId">Frota</label>
-                            <p-inputNumber inputId="frotaId" [useGrouping]="false"  formControlName="frota" />
+                            <p-inputNumber inputId="frotaId" [useGrouping]="false" maxlength="10" formControlName="frota" />
                         </div>
                         <div class="col-12 md:col-2">
                             <label for="vehiclemodelid">Modelos</label>
@@ -185,14 +185,13 @@
                         <div class="col-12 md:col-2 ">
                             <label for="dateEntry">Data Entrada</label>
                             <p-calendar [iconDisplay]="'input'" 
-                            [showIcon]="true" 
-                            [showTime]="true"
+                                [showIcon]="true" 
+                                [showTime]="true"
                                 dateFormat="dd/mm/yy" 
                                 inputId="dateEntry" 
                                 formControlName="dateEntry" />
                             <small class="p-error block" *ngIf="formVehicle.get('dateEntry')?.invalid">Campo obrigatório</small>
                         </div>
-
                         <div class="col-12 md:col-2 ">
                             <label for="datePrevisionExit">Previsão saída</label>
                             <p-calendar [iconDisplay]="'input'" [showIcon]="true" [showTime]="true"  dateFormat="dd/mm/yy" inputId="datePrevisionExit" formControlName="datePrevisionExit" />
@@ -202,12 +201,10 @@
                             <p-multiSelect id="vehiclecolorid" [options]="cores" optionLabel="color"  [selectionLimit]="1" placeholder="Selecione" [style]="{'text-transform':'capitalize'}" formControlName="color" />
                             <small class="p-error block" *ngIf="formVehicle.get('color')?.invalid">Campo obrigatório</small>
                         </div>
-
                         <div class="col-12 md:col-2">
                             <label for="kmatual">KM Atual</label>
-                            <p-inputNumber inputId="kmatual" [useGrouping]="false" formControlName="kmEntry" />
+                            <p-inputNumber inputId="kmatual" [useGrouping]="false" maxlength="10" formControlName="kmEntry" />
                         </div>
-
                         <div class="col-12 md:col-2">
                             <label for="coneid">Cone</label>
                             <p-inputNumber inputId="coneid" [useGrouping]="false" formControlName="quantityTrafficCone" />
@@ -314,7 +311,7 @@
                         </div>
                         <div class="col-12">
                             <label for="informacao" class="ml-2">Informações</label>
-                            <textarea pInputTextarea id="informacao" rows="5" cols="30" formControlName="informationConcierge"></textarea>
+                            <textarea pInputTextarea maxlength="255" id="informacao" rows="5" cols="30" formControlName="informationConcierge"></textarea>
                         </div>
                     </div>
                 </form>

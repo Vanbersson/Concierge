@@ -70,22 +70,22 @@ export default class DriverComponent implements OnInit {
     name: new FormControl<string>("", [Validators.required, Validators.maxLength(100)]),
     dateBirth: new FormControl<string | Date>("", Validators.required),
     cpf: new FormControl<string>("", Validators.required),
-    rg: new FormControl<string | null>(null, Validators.required),
+    rg: new FormControl<string | null>(null, [Validators.required, Validators.maxLength(11)]),
     maleFemale: new FormControl<sexo | null>(null, Validators.required),
     email: new FormControl<string>(""),
-    cnhRegister: new FormControl<string | null>(null, Validators.required),
-    cnhCategory: new FormControl<string>("", Validators.required),
+    cnhRegister: new FormControl<string | null>(null, [Validators.required, Validators.maxLength(11)]),
+    cnhCategory: new FormControl<string>("", [Validators.required, Validators.maxLength(10)]),
     cnhValidation: new FormControl<string | Date>("", Validators.required),
     dddPhone: new FormControl<string>(""),
     phone: new FormControl<string>(""),
     dddCellphone: new FormControl<string>(""),
     cellphone: new FormControl<string>(""),
     zipCode: new FormControl<string>("", Validators.required),
-    address: new FormControl<string>("", Validators.required),
+    address: new FormControl<string>("", [Validators.required, Validators.maxLength(100)]),
     addressNumber: new FormControl<string | null>(null),
     state: new FormControl<string>("", Validators.required),
-    city: new FormControl<string>("", Validators.required),
-    neighborhood: new FormControl<string>("", Validators.required),
+    city: new FormControl<string>("", [Validators.required, Validators.maxLength(100)]),
+    neighborhood: new FormControl<string>("", [Validators.required, Validators.maxLength(100)]),
     addressComplement: new FormControl<string>(""),
   });
 
@@ -406,56 +406,59 @@ export default class DriverComponent implements OnInit {
   }
   private async saveDriver(driver: Driver): Promise<HttpResponse<Driver>> {
     try {
-      return lastValueFrom(this.driverService.save(driver));
+      return await lastValueFrom(this.driverService.save(driver));
     } catch (error) {
+      if (error.error.message == "Driver already exists.") {
+        this.messageService.add({ severity: 'error', summary: 'Motorista', detail: "Já cadastrado", icon: 'pi pi-times' });
+      }
       return error;
     }
   }
   private async updateDriver(driver: Driver): Promise<HttpResponse<Driver>> {
     try {
-      return lastValueFrom(this.driverService.update(driver));
+      return await lastValueFrom(this.driverService.update(driver));
     } catch (error) {
       return error;
     }
   }
   private async filterDriverId(id: number): Promise<HttpResponse<Driver>> {
     try {
-      return lastValueFrom(this.driverService.filterId(id));
+      return await lastValueFrom(this.driverService.filterId(id));
     } catch (error) {
       return error;
     }
   }
   private async filterDriverCPF(cpf: string): Promise<HttpResponse<Driver>> {
     try {
-      return lastValueFrom(this.driverService.filterCPF(cpf));
+      return await lastValueFrom(this.driverService.filterCPF(cpf));
     } catch (error) {
       return error;
     }
   }
   private async filterDriverRG(rg: string): Promise<HttpResponse<Driver>> {
     try {
-      return lastValueFrom(this.driverService.filterRG(rg));
+      return await lastValueFrom(this.driverService.filterRG(rg));
     } catch (error) {
       return error;
     }
   }
   private async filterDriverCNHRegister(cnh: string): Promise<HttpResponse<Driver>> {
     try {
-      return lastValueFrom(this.driverService.filterCNHRegister(cnh));
+      return await lastValueFrom(this.driverService.filterCNHRegister(cnh));
     } catch (error) {
       return error;
     }
   }
   private async filterDriverName(name: string): Promise<Driver[]> {
     try {
-      return lastValueFrom(this.driverService.filterName(name));
+      return await lastValueFrom(this.driverService.filterName(name));
     } catch (error) {
       return [];
     }
   }
   private async listAll(): Promise<Driver[]> {
     try {
-      return lastValueFrom(this.driverService.listAll());
+      return await lastValueFrom(this.driverService.listAll());
     } catch (error) {
       return [];
     }
@@ -479,7 +482,7 @@ export default class DriverComponent implements OnInit {
   }
   private async cep(cep: string): Promise<HttpResponse<any>> {
     try {
-      return lastValueFrom(this.cepService.search(cep));
+      return await lastValueFrom(this.cepService.search(cep));
     } catch (error) {
       return error;
     }

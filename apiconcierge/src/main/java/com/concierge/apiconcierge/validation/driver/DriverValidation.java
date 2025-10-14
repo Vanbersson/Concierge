@@ -1,11 +1,18 @@
 package com.concierge.apiconcierge.validation.driver;
 
 import com.concierge.apiconcierge.models.driver.Driver;
+import com.concierge.apiconcierge.models.status.StatusEnableDisable;
+import com.concierge.apiconcierge.repositories.driver.IDriverRepository;
 import com.concierge.apiconcierge.util.ConstantsMessage;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class DriverValidation implements IDriverValidation {
+
+    @Autowired
+    IDriverRepository repository;
+
     @Override
     public String save(Driver driver) {
         if (driver.getCompanyId() == null || driver.getCompanyId() == 0)
@@ -20,6 +27,10 @@ public class DriverValidation implements IDriverValidation {
             return ConstantsMessage.ERROR_CPF;
         if (driver.getRg().isBlank())
             return ConstantsMessage.ERROR_RG;
+
+        Driver driver1 = this.repository.filterCPF(driver.getCompanyId(), driver.getResaleId(), driver.getCpf());
+        if (driver1 != null)
+            return "Driver already exists.";
 
         return ConstantsMessage.SUCCESS;
     }

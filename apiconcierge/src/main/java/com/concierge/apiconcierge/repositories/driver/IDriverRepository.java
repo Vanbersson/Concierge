@@ -19,6 +19,9 @@ public interface IDriverRepository extends JpaRepository<Driver, Integer> {
     @Query(value = "SELECT * FROM `tb_driver` WHERE company_id=?1 AND resale_id=?2 AND status=?3 AND cpf=?4 ", nativeQuery = true)
     Driver filterCPF(Integer companyId, Integer resaleId, StatusEnableDisable status, String cpf);
 
+    @Query(value = "SELECT * FROM `tb_driver` WHERE company_id=?1 AND resale_id=?2 AND cpf=?3 ", nativeQuery = true)
+    Driver filterCPF(Integer companyId, Integer resaleId, String cpf);
+
     @Query(value = "SELECT * FROM `tb_driver` WHERE company_id=?1 AND resale_id=?2 AND status=?3 AND rg=?4 ", nativeQuery = true)
     Driver filterRG(Integer companyId, Integer resaleId, StatusEnableDisable status, String rg);
 
