@@ -1,9 +1,8 @@
-import { Component, DoCheck, OnInit, signal, ViewChild } from '@angular/core';
+import { Component, DoCheck, OnInit, signal } from '@angular/core';
 import { CommonModule, DatePipe, UpperCasePipe } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { Validators, FormsModule, ReactiveFormsModule, FormGroup, FormControl } from '@angular/forms';
 import { NgxImageCompressService } from 'ngx-image-compress';
-
 //PrimeNg
 import { PrimeNGConfig } from 'primeng/api';
 import { TabViewModule } from 'primeng/tabview';
@@ -19,7 +18,7 @@ import { InputGroupModule } from 'primeng/inputgroup';
 import { ImageModule } from 'primeng/image';
 import { DialogModule } from 'primeng/dialog';
 import { TableModule } from 'primeng/table';
-import { ConfirmationService, MenuItem, MessageService, Message } from 'primeng/api';
+import { ConfirmationService, MenuItem, MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
@@ -28,16 +27,13 @@ import { CheckboxModule } from 'primeng/checkbox';
 import { StepsModule } from 'primeng/steps';
 import { DividerModule } from 'primeng/divider';
 import { MessagesModule } from 'primeng/messages';
-
 //Service
 import { VehicleService } from '../../../services/vehicle/vehicle.service';
 import { UserService } from '../../../services/user/user.service';
 import { VehicleModelService } from '../../../services/vehicle-model/vehicle-model.service';
-
 //Interface
 import { IBudgetNew } from '../../../interfaces/budget/ibudget-new';
 import { IColor } from '../../../interfaces/icolor';
-
 //Constants
 import {
   STATUS_VEHICLE_ENTRY_NOTAUTH, STATUS_VEHICLE_ENTRY_FIRSTAUTH,
@@ -52,7 +48,6 @@ import { ClientCompany } from '../../../models/clientcompany/client-company';
 import { VehicleEntry } from '../../../models/vehicle/vehicle-entry';
 import { ModelVehicle } from '../../../models/vehicle-model/model-vehicle';
 import { Driver } from '../../../models/driver/driver';
-
 //Service
 import { StorageService } from '../../../services/storage/storage.service';
 import { BudgetService } from '../../../services/budget/budget.service';
@@ -66,10 +61,8 @@ import { IBudget } from '../../../interfaces/budget/ibudget';
 import { FilterClientComponent } from '../../../components/filter.client/filter.client.component';
 import { StatusBudgetEnum } from '../../../models/budget/status-budget-enum';
 import { StatusVehicle } from '../../../models/enum/status-vehicle';
-import { ClientFisJurEnum } from '../../../models/clientcompany/client-fisjur-enum';
 import { FilterDriverComponent } from '../../../components/filter.driver/filter.driver.component';
 import { DriverService } from '../../../services/driver/driver.service';
-
 
 @Component({
   selector: 'app-manutencao',
@@ -86,14 +79,11 @@ import { DriverService } from '../../../services/driver/driver.service';
   providers: [ConfirmationService, MessageService]
 })
 export default class ManutencaoComponent implements OnInit, DoCheck {
-
   RESPONSE_SUCCESS: string = "Success.";
   itemsStatus: MenuItem[] | undefined;
   activeIndexStatus: number = 0;
-
   private vehicleEntry: VehicleEntry;
   private id: number = 0;
-
   //Vehicle
   private notAuth = STATUS_VEHICLE_ENTRY_NOTAUTH;
   private firstAuth = STATUS_VEHICLE_ENTRY_FIRSTAUTH;
@@ -126,7 +116,6 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
   });
   public cores: IColor[] = []
   public modelVehicles: ModelVehicle[] = [];
-
   public attendantsUser: User[] = [];
   private attendantUser: User;
   photoVehicle1!: string;
@@ -242,11 +231,11 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
       { color: 'Roxo' },
       { color: 'Outro' }
     ];
-
-    //Id vehicle entry
-    this.id = this.activatedRoute.snapshot.params['id'];
-    this.init();
-    //this.disableInput();
+    if (this.detailsVehicle) {
+      //Id vehicle entry
+      this.id = this.activatedRoute.snapshot.params['id'];
+      this.init();
+    }
   }
   //Details Vehicle
   //mostra os detalhes da entrada do veículos chamar dentro de um dialog 
@@ -254,7 +243,6 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
     this.id = id;
     this.detailsVehicle = true;
     this.init();
-    // this.disableInput();
   }
   ngDoCheck(): void {
     //proprietário

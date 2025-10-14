@@ -20,9 +20,6 @@
                     <div class="p-fluid p-formgrid grid">
                         <div class="col-12 md:col-1">
                             <label for="vehicleId">Código</label>
-                            <!-- <div class="layout-input-disabled">
-                                <span>{{id}}</span>
-                            </div> -->
                             <p-inputNumber inputId="vehicleId" [useGrouping]="false" formControlName="id" />
                         </div>
                         <div class="col-12 md:col-2">
@@ -99,7 +96,6 @@
                                 <input pInputText id="nameUserExitAuth2" type="text" [style]="{'text-transform':'capitalize'}" formControlName="nameUserExitAuth2" />
                                 <button *ngIf="!detailsVehicle" pButton [disabled]="vehicleExit" type="button" icon="pi pi-trash" class="p-button-danger" (click)="deleteAuth2()"></button>
                             </p-inputGroup>
-
                         </div>
                         <div class="col-12 md:col-1">
                             <label for="coneid">Cone</label>
@@ -393,9 +389,7 @@
             </p-tabPanel>
         </p-tabView>
     </div>
-
     <p-divider class="mobile-visible-none" *ngIf="!detailsVehicle" type="solid" />
-
     <div *ngIf="!detailsVehicle" class="flex justify-content-between">
         <div class="flex gap-2">
             <button pButton [disabled]="vehicleExit" type="button" label="Salvar" icon="pi pi-check" size="small" [raised]="true" severity="success-custom" (click)="save()"></button>
