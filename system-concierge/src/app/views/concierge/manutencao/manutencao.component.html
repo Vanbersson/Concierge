@@ -19,10 +19,11 @@
                 <form [formGroup]="formVehicle">
                     <div class="p-fluid p-formgrid grid">
                         <div class="col-12 md:col-1">
-                            <label for="buscarClientCompanyId">Código</label>
-                            <div class="layout-input-disabled">
+                            <label for="vehicleId">Código</label>
+                            <!-- <div class="layout-input-disabled">
                                 <span>{{id}}</span>
-                            </div>
+                            </div> -->
+                            <p-inputNumber inputId="vehicleId" [useGrouping]="false" formControlName="id" />
                         </div>
                         <div class="col-12 md:col-2">
                             <label for="dateEntry">Data Entrada</label>
@@ -80,22 +81,22 @@
                             <p-inputNumber mode="decimal" inputId="kmExit" [useGrouping]="false" formControlName="kmExit" />
                         </div>
                         <div class="col-12 md:col-2">
-                            <div class="flex justify-content-between mb-2">
+                            <div class="flex justify-content-between">
                                 <label for="nameUserExitAuth1">1ª Auto</label>
                                 <small>{{dateExitAuth1() | date: 'dd/MM/yyyy HH:mm' }}</small>
                             </div>
                             <p-inputGroup>
-                                <input pInputText id="nameUserExitAuth1" type="text" formControlName="nameUserExitAuth1" />
+                                <input pInputText id="nameUserExitAuth1" type="text" [style]="{'text-transform':'capitalize'}" formControlName="nameUserExitAuth1" />
                                 <button *ngIf="!detailsVehicle" pButton [disabled]="vehicleExit" type="button" icon="pi pi-trash" class="p-button-danger" (click)="deleteAuth1()"></button>
                             </p-inputGroup>
                         </div>
                         <div class="col-12 md:col-2">
-                            <div class="flex justify-content-between mb-2">
+                            <div class="flex justify-content-between">
                                 <label for="nameUserExitAuth2">2ª Auto</label>
                                 <small>{{dateExitAuth2() | date: 'dd/MM/yyyy HH:mm' }}</small>
                             </div>
                             <p-inputGroup>
-                                <input pInputText id="nameUserExitAuth2" type="text" formControlName="nameUserExitAuth2" />
+                                <input pInputText id="nameUserExitAuth2" type="text" [style]="{'text-transform':'capitalize'}" formControlName="nameUserExitAuth2" />
                                 <button *ngIf="!detailsVehicle" pButton [disabled]="vehicleExit" type="button" icon="pi pi-trash" class="p-button-danger" (click)="deleteAuth2()"></button>
                             </p-inputGroup>
 
@@ -329,7 +330,7 @@
                             <label for="driverEntryRg">RG</label>
                             <p-inputNumber id="driverEntryRg" mode="decimal" [useGrouping]="false" formControlName="driverEntryRg" />
                         </div>
-                        <div class="col-12 md:col-2 flex flex-column">
+                        <div *ngIf="!detailsVehicle" class="col-12 md:col-2 flex flex-column">
                             <label for="">Filtro</label>
                             <app-filterdriver (outputDriver)="selectDriverEntry.set($event)"/>
                         </div>
@@ -377,7 +378,7 @@
                             <label for="driverExitRg">RG</label>
                             <p-inputNumber id="driverExitRg" mode="decimal" [useGrouping]="false" formControlName="driverExitRg" />
                         </div>
-                        <div class="col-12 md:col-2 flex gap-2">
+                        <div *ngIf="!detailsVehicle" class="col-12 md:col-2 flex gap-2">
                             <div class="flex flex-column">
                                 <label for="">Filtro</label>
                                 <app-filterdriver (outputDriver)="selectDriverExit.set($event)"/>

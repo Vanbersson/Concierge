@@ -91,15 +91,16 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
   itemsStatus: MenuItem[] | undefined;
   activeIndexStatus: number = 0;
 
-  vehicleEntry: VehicleEntry;
-  public id: number = 0;
+  private vehicleEntry: VehicleEntry;
+  private id: number = 0;
 
   //Vehicle
   private notAuth = STATUS_VEHICLE_ENTRY_NOTAUTH;
   private firstAuth = STATUS_VEHICLE_ENTRY_FIRSTAUTH;
   private authorized = STATUS_VEHICLE_ENTRY_AUTHORIZED;
+
   formVehicle = new FormGroup({
-    id: new FormControl<number>(0, Validators.required),
+    id: new FormControl<number>({ value: 0, disabled: true }),
     placa: new FormControl<string>(''),
     frota: new FormControl<string | null>(null),
     color: new FormControl<IColor[]>([], Validators.required),
@@ -108,16 +109,8 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
     modelVehicle: new FormControl<ModelVehicle[] | null>([], Validators.required),
     dateEntry: new FormControl<Date | null>(null, Validators.required),
     datePrevisionExit: new FormControl<Date | null>(null),
-
-    idUserExitAuth1: new FormControl<number>(0),
-    nameUserExitAuth1: new FormControl<string>(''),
-    dateExitAuth1: new FormControl<Date | null>(null),
-
-    idUserExitAuth2: new FormControl<number>(0),
-    nameUserExitAuth2: new FormControl<string>(''),
-    dateExitAuth2: new FormControl<Date | null>(null),
-
-    statusAuthExit: new FormControl<string>(''),
+    nameUserExitAuth1: new FormControl<string>({ value: "", disabled: true }),
+    nameUserExitAuth2: new FormControl<string>({ value: "", disabled: true }),
     quantityExtinguisher: new FormControl<number | null>(null),
     quantityTrafficCone: new FormControl<number | null>(null),
     quantityTire: new FormControl<number | null>(null),
@@ -185,7 +178,7 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
   dialogNomeClientCompany!: string;
   dialogIdClientCompany!: number;
   private budget: IBudgetNew;
-  //Details Vehicle
+  //exibi só os detalhe dos veículos
   detailsVehicle: boolean = false;
 
   constructor(
@@ -220,8 +213,6 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
       dateFormat: 'dd/mm/yy',
       weekHeader: 'Sm'
     });
-    //Id vehicle entry
-    this.id = this.activatedRoute.snapshot.params['id'];
     this.itemsStatus = [
       {
         label: 'Atendimento',
@@ -251,59 +242,19 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
       { color: 'Roxo' },
       { color: 'Outro' }
     ];
+
+    //Id vehicle entry
+    this.id = this.activatedRoute.snapshot.params['id'];
     this.init();
-    this.disableInput();
+    //this.disableInput();
   }
   //Details Vehicle
   //mostra os detalhes da entrada do veículos chamar dentro de um dialog 
   showDetailsVehicle(id: number) {
     this.id = id;
     this.detailsVehicle = true;
-    this.primeNGConfig.setTranslation({
-      accept: 'Accept',
-      reject: 'Cancel',
-      firstDayOfWeek: 0,
-      dayNames: ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"],
-      dayNamesShort: ["dom", "seg", "ter", "qua", "qui", "sex", "sáb"],
-      dayNamesMin: ["D", "S", "T", "Q", "Q", "S", "S"],
-      monthNames: ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"],
-      monthNamesShort: ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"],
-      today: 'Hoje',
-      clear: 'Limpar',
-      dateFormat: 'dd/mm/yy',
-      weekHeader: 'Sm'
-    });
-    this.itemsStatus = [
-      {
-        label: 'Atendimento',
-      },
-      {
-        label: 'Orçamento',
-      },
-      {
-        label: 'Serviço em execução',
-      },
-      {
-        label: 'Serviço concluído',
-      },
-      {
-        label: 'Saída concluída'
-      }
-    ];
     this.init();
-    this.cores = [
-      { color: 'Branco' },
-      { color: 'Preto' },
-      { color: 'Azul' },
-      { color: 'Verde' },
-      { color: 'Cinza' },
-      { color: 'Vermelho' },
-      { color: 'Amarelo' },
-      { color: 'Rosa' },
-      { color: 'Roxo' },
-      { color: 'Outro' }
-    ];
-    this.disableInput();
+    // this.disableInput();
   }
   ngDoCheck(): void {
     //proprietário
@@ -407,13 +358,8 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
       kmExit: this.vehicleEntry.kmExit == "" ? null : this.vehicleEntry.kmExit,
       serviceOrder: this.vehicleEntry.serviceOrder,
       vehicleNew: this.vehicleEntry.vehicleNew,
-      idUserExitAuth1: this.vehicleEntry.idUserExitAuth1,
       nameUserExitAuth1: this.vehicleEntry.nameUserExitAuth1,
-      dateExitAuth1: this.vehicleEntry.dateExitAuth1 == "" ? null : new Date(this.vehicleEntry.dateExitAuth1),
-      idUserExitAuth2: this.vehicleEntry.idUserExitAuth2,
       nameUserExitAuth2: this.vehicleEntry.nameUserExitAuth2,
-      dateExitAuth2: this.vehicleEntry.dateExitAuth2 == "" ? null : new Date(this.vehicleEntry.dateExitAuth2),
-      statusAuthExit: this.vehicleEntry.statusAuthExit,
       quantityExtinguisher: this.vehicleEntry.quantityExtinguisher == 0 ? null : this.vehicleEntry.quantityExtinguisher,
       quantityTrafficCone: this.vehicleEntry.quantityTrafficCone == 0 ? null : this.vehicleEntry.quantityTrafficCone,
       quantityTire: this.vehicleEntry.quantityTire == 0 ? null : this.vehicleEntry.quantityTire,
@@ -424,7 +370,6 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
       numNfse: this.vehicleEntry.numNfse == "" ? null : this.vehicleEntry.numNfse,
       information: this.vehicleEntry.information,
     });
-
     this.photoVehicle1 = this.vehicleEntry.photo1;
     this.photoVehicle2 = this.vehicleEntry.photo2;
     this.photoVehicle3 = this.vehicleEntry.photo3;
@@ -530,15 +475,6 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
       this.messageService.add({ severity: 'error', summary: 'Erro', detail: "Vaículo não encontrado", icon: 'pi pi-times' });
       return error;
     }
-  }
-  private disableInput() {
-    this.formVehicle.get('nameUserExitAuth1').disable();
-    this.formVehicle.get('nameUserExitAuth2').disable();
-  }
-  private enableInput() {
-    this.formVehicle.get('nameUserExitAuth1').enable();
-    this.formVehicle.get('nameUserExitAuth2').enable();
-
   }
   private stepStatus(status: string) {
 
@@ -680,15 +616,11 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
     this.photoVehicle4 = "";
   }
   private updateAuthExitStatus() {
-    if (this.formVehicle.value.statusAuthExit == this.firstAuth) {
-      this.formVehicle.patchValue({
-        statusAuthExit: this.notAuth,
-      })
+    if (this.vehicleEntry.statusAuthExit == this.firstAuth) {
+      this.vehicleEntry.statusAuthExit = this.notAuth;
       this.deleteRequireForms();
-    } else if (this.formVehicle.value.statusAuthExit == this.authorized) {
-      this.formVehicle.patchValue({
-        statusAuthExit: this.firstAuth,
-      })
+    } else if (this.vehicleEntry.statusAuthExit == this.authorized) {
+      this.vehicleEntry.statusAuthExit = this.firstAuth;
     }
   }
   private deleteRequireForms() {
@@ -699,7 +631,7 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
   }
   public async authExit() {
     const uppercase = new UpperCasePipe();
-    if (this.formVehicle.value.statusAuthExit != this.authorized) {
+    if (this.vehicleEntry.statusAuthExit != this.authorized) {
       //Inicia loading
       this.busyService.busy();
       var auth = new VehicleEntryAuth();
@@ -709,31 +641,30 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
       auth.userId = this.storageService.id;
       auth.userName = this.storageService.name;
       auth.dateAuth = this.formatDateTime(new Date());
-      const permissionResult = await this.addAuthExit(auth);
 
+      const permissionResult = await this.addAuthExit(auth);
       if (permissionResult.status == 200) {
-        if (this.formVehicle.value.statusAuthExit == this.notAuth) {
-          this.formVehicle.patchValue({
-            statusAuthExit: this.firstAuth,
-          })
-        } else if (this.formVehicle.value.statusAuthExit == this.firstAuth) {
-          this.formVehicle.patchValue({
-            statusAuthExit: this.authorized,
-          })
+        //Status auth exit
+        if (this.vehicleEntry.statusAuthExit == this.notAuth) {
+          this.vehicleEntry.statusAuthExit = this.firstAuth;
+        } else if (this.vehicleEntry.statusAuthExit == this.firstAuth) {
+          this.vehicleEntry.statusAuthExit = this.authorized;
         }
-        if (this.formVehicle.value.idUserExitAuth1 == 0) {
+        if (this.vehicleEntry.idUserExitAuth1 == 0) {
           this.formVehicle.patchValue({
-            idUserExitAuth1: permissionResult.body.userId,
             nameUserExitAuth1: permissionResult.body.userName,
-            dateExitAuth1: new Date(permissionResult.body.dateAuth)
           });
+          this.vehicleEntry.idUserExitAuth1 = permissionResult.body.userId;
+          this.vehicleEntry.nameUserExitAuth1 = permissionResult.body.userName;
+          this.vehicleEntry.dateExitAuth1 = permissionResult.body.dateAuth;
           this.dateExitAuth1.set(permissionResult.body.dateAuth.toString());
         } else {
           this.formVehicle.patchValue({
-            idUserExitAuth2: permissionResult.body.userId,
             nameUserExitAuth2: permissionResult.body.userName,
-            dateExitAuth2: new Date(permissionResult.body.dateAuth)
           });
+          this.vehicleEntry.idUserExitAuth2 = permissionResult.body.userId;
+          this.vehicleEntry.nameUserExitAuth2 = permissionResult.body.userName;
+          this.vehicleEntry.dateExitAuth2 = permissionResult.body.dateAuth;
           this.dateExitAuth2.set(permissionResult.body.dateAuth.toString());
         }
         //Valid
@@ -741,25 +672,23 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
 
         if (this.formVehicle.value.vehicleNew == 'yes') {
           //Autorização de saída
-          if (this.formVehicle.value.statusAuthExit == this.firstAuth) {
+          if (this.vehicleEntry.statusAuthExit == this.firstAuth) {
             this.messageService.add({ severity: 'success', summary: 'Veículo Autorizado', detail: 'Veículo NOVO', icon: 'pi pi-check-circle' });
           }
           //Saída liberada
-          if (this.formVehicle.value.statusAuthExit == this.authorized) {
+          if (this.vehicleEntry.statusAuthExit == this.authorized) {
             this.messageService.add({ severity: 'success', summary: 'Veículo Liberado', detail: 'Veículo NOVO', icon: 'pi pi-thumbs-up-fill' });
           }
         } else {
           //Autorização de saída
-          if (this.formVehicle.value.statusAuthExit == this.firstAuth) {
+          if (this.vehicleEntry.statusAuthExit == this.firstAuth) {
             this.messageService.add({ severity: 'success', summary: 'Veículo Autorizado', detail: 'Placa ' + uppercase.transform(this.formVehicle.value.placa), icon: 'pi pi-check-circle' });
           }
-
           //Saída liberada
-          if (this.formVehicle.value.statusAuthExit == this.authorized) {
+          if (this.vehicleEntry.statusAuthExit == this.authorized) {
             this.messageService.add({ severity: 'success', summary: 'Veículo Liberado', detail: 'Placa ' + uppercase.transform(this.formVehicle.value.placa), icon: 'pi pi-thumbs-up-fill' });
           }
         }
-
       }
       //Fecha loading
       this.busyService.idle();
@@ -788,7 +717,7 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
     }
   }
   public async deleteAuth1() {
-    if (this.formVehicle.value.idUserExitAuth1 != 0) {
+    if (this.vehicleEntry.idUserExitAuth1 != 0) {
       var auth = new VehicleEntryAuth();
       auth.companyId = this.storageService.companyId;
       auth.resaleId = this.storageService.resaleId;
@@ -797,19 +726,17 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
       auth.userName = this.storageService.name;
 
       const authResult = await this.delAuth1(auth);
-
       if (authResult.status == 200) {
         this.messageService.add({ severity: 'success', summary: 'Autorização', detail: 'Removida com sucesso', icon: 'pi pi-check' });
         this.formVehicle.patchValue({
-          idUserExitAuth1: 0,
           nameUserExitAuth1: '',
-          dateExitAuth1: null
         });
-
+        this.vehicleEntry.idUserExitAuth1 = 0;
+        this.vehicleEntry.nameUserExitAuth1 = '';
+        this.vehicleEntry.dateExitAuth1 = '';
         this.dateExitAuth1.set('');
         this.updateAuthExitStatus();
       }
-
     }
   }
   private async delAuth1(auth: VehicleEntryAuth): Promise<HttpResponse<VehicleEntryAuth>> {
@@ -825,7 +752,7 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
     }
   }
   public async deleteAuth2() {
-    if (this.formVehicle.value.idUserExitAuth2 != 0) {
+    if (this.vehicleEntry.idUserExitAuth2 != 0) {
       var auth = new VehicleEntryAuth();
       auth.companyId = this.storageService.companyId;
       auth.resaleId = this.storageService.resaleId;
@@ -837,15 +764,14 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
       if (authResult.status == 200) {
         this.messageService.add({ severity: 'success', summary: 'Autorização', detail: 'Removida com sucesso', icon: 'pi pi-check' });
         this.formVehicle.patchValue({
-          idUserExitAuth2: 0,
           nameUserExitAuth2: '',
-          dateExitAuth2: null
         });
-
+        this.vehicleEntry.idUserExitAuth2 = 0;
+        this.vehicleEntry.nameUserExitAuth2 = '';
+        this.vehicleEntry.dateExitAuth2 = '';
         this.dateExitAuth2.set('');
         this.updateAuthExitStatus();
       }
-
     }
   }
   private async delAuth2(auth: VehicleEntryAuth): Promise<HttpResponse<VehicleEntryAuth>> {
@@ -1018,7 +944,7 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
       return false;
     }
     if (vehicleValue.serviceOrder == "yes") {
-      if (vehicleValue.statusAuthExit != this.notAuth) {
+      if (this.vehicleEntry.statusAuthExit != this.notAuth) {
         if (vehicleValue.userAttendant.length == 0) {
           this.messageService.add({ severity: 'error', summary: 'Consultor', detail: "Não informado", icon: 'pi pi-times' });
           return false;
@@ -1037,7 +963,7 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
       this.messageService.add({ severity: 'error', summary: 'Motorista Entrada', detail: "Não informado", icon: 'pi pi-times' });
       return false;
     }
-    if (vehicleValue.statusAuthExit != this.notAuth) {
+    if (this.vehicleEntry.statusAuthExit != this.notAuth) {
       //Motorista saída
       if (driverValue.driverExitName == "") {
         this.messageService.add({ severity: 'error', summary: 'Motorista Saída', detail: "Não informado", icon: 'pi pi-times' });
@@ -1048,7 +974,6 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
         return false;
       }
     }
-    this.enableInput();
     return true;
   }
   private loadingVehicle() {
@@ -1067,13 +992,6 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
     this.vehicleEntry.nameUserAttendant = vehicleValue.userAttendant.at(0)?.name ?? "";
     this.vehicleEntry.kmEntry = vehicleValue?.kmEntry ?? "";
     this.vehicleEntry.kmExit = vehicleValue?.kmExit ?? "";
-    this.vehicleEntry.idUserExitAuth1 = vehicleValue?.idUserExitAuth1 ?? 0;
-    this.vehicleEntry.nameUserExitAuth1 = vehicleValue?.nameUserExitAuth1 ?? "";
-    this.vehicleEntry.dateExitAuth1 = vehicleValue?.dateExitAuth1 == null ? "" : this.formatDateTime(vehicleValue.dateExitAuth1);
-    this.vehicleEntry.idUserExitAuth2 = vehicleValue?.idUserExitAuth2 ?? 0;
-    this.vehicleEntry.nameUserExitAuth2 = vehicleValue?.nameUserExitAuth2 ?? "";
-    this.vehicleEntry.dateExitAuth2 = vehicleValue?.dateExitAuth2 == null ? "" : this.formatDateTime(vehicleValue.dateExitAuth2);
-    this.vehicleEntry.statusAuthExit = vehicleValue.statusAuthExit;
     this.vehicleEntry.quantityTrafficCone = vehicleValue?.quantityTrafficCone ?? 0;
     this.vehicleEntry.quantityExtinguisher = vehicleValue?.quantityExtinguisher ?? 0;
     this.vehicleEntry.quantityTire = vehicleValue?.quantityTire ?? 0;
@@ -1123,8 +1041,6 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
       const resultVehicle = await this.updateVehicle(this.vehicleEntry);
       if (resultVehicle.status == 200) {
         this.messageService.add({ severity: 'success', summary: 'Veículo', detail: 'Atualizado com sucesso', icon: 'pi pi-check' });
-        this.disableInput();
-
       }
       //Fecha loading
       this.busyService.idle();
