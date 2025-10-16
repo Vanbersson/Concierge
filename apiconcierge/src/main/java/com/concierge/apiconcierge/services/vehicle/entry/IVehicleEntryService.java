@@ -3,6 +3,7 @@ package com.concierge.apiconcierge.services.vehicle.entry;
 import com.concierge.apiconcierge.dtos.vehicle.entry.AuthExitDto;
 import com.concierge.apiconcierge.dtos.vehicle.entry.ExistsPlacaDto;
 import com.concierge.apiconcierge.dtos.vehicle.exit.VehicleExitSaveDto;
+import com.concierge.apiconcierge.models.message.MessageResponse;
 import com.concierge.apiconcierge.models.vehicle.entry.VehicleEntry;
 
 import java.util.List;
@@ -12,7 +13,7 @@ public interface IVehicleEntryService {
 
     public Integer save(VehicleEntry vehicle);
 
-    public String update(VehicleEntry vehicle);
+    public MessageResponse update(VehicleEntry vehicle);
 
     public String exit(VehicleExitSaveDto dataExit);
 
@@ -28,9 +29,9 @@ public interface IVehicleEntryService {
 
     public String existsPlaca(ExistsPlacaDto placa);
 
-    public Map<String, Object> addAuthExit(AuthExitDto authExitDto);
+    public MessageResponse addAuthExit(AuthExitDto authExitDto);
 
-    public String deleteAuthExit1(AuthExitDto authExitDto);
+    public MessageResponse deleteAuthExit1(AuthExitDto authExitDto);
 
-    public String deleteAuthExit2(AuthExitDto authExitDto);
+    public MessageResponse deleteAuthExit2(AuthExitDto authExitDto);
 }

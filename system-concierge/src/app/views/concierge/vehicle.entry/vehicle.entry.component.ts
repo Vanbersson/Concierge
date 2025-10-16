@@ -279,7 +279,6 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
         this.messageService.add({ severity: 'error', summary: 'Imagem', detail: 'Tamanha máximo 3MB', icon: 'pi pi-times', life: 3000 });
       } else {
         this.ngxImageCompressService.compressFile(image, orientation, 50, 40).then((compressedImage) => {
-
           // Remover o prefixo "data:image/jpeg;base64," se existir
           const base64Data = compressedImage.split(',')[1];
           this.photoVehicle1 = base64Data;
@@ -287,8 +286,6 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
         });
       }
     });
-
-
   }
   public async photoFile2Vehicle() {
     this.ngxImageCompressService.uploadFile().then(({ image, orientation }) => {

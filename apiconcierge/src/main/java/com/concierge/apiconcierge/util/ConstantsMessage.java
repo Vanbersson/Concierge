@@ -4,7 +4,10 @@ public class ConstantsMessage {
 
     public static final String SUCCESS = "Success.";
     public static final String ERROR = "Error.";
-    public static final String ERROR_NOTAUTHEXIT = "Unauthorized.";
+
+    public static final String NOT_INFORMED = "Não informado.";
+    public static final String NOT_PERMISSION = "Você não tem permissão.";
+
 
 
     public static final String ERROR_USER_ID = "User Id not informed.";

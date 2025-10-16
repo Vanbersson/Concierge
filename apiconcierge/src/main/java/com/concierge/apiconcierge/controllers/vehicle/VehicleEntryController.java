@@ -6,6 +6,7 @@ import com.concierge.apiconcierge.dtos.vehicle.entry.ExistsPlacaDto;
 import com.concierge.apiconcierge.dtos.vehicle.entry.VehicleEntryDto;
 import com.concierge.apiconcierge.dtos.vehicle.entry.VehicleEntrySaveDto;
 import com.concierge.apiconcierge.dtos.vehicle.exit.VehicleExitSaveDto;
+import com.concierge.apiconcierge.models.message.MessageResponse;
 import com.concierge.apiconcierge.models.vehicle.entry.VehicleEntry;
 import com.concierge.apiconcierge.services.vehicle.entry.VehicleEntryService;
 import org.springframework.beans.BeanUtils;
@@ -42,8 +43,8 @@ public class VehicleEntryController {
         try {
             VehicleEntry vehicleEntry = new VehicleEntry();
             BeanUtils.copyProperties(data, vehicleEntry);
-            String message = this.service.update(vehicleEntry);
-            return ResponseEntity.status(HttpStatus.OK).body(new MessageResponseDto(message));
+            MessageResponse response = this.service.update(vehicleEntry);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
         }
@@ -120,8 +121,8 @@ public class VehicleEntryController {
     @PostMapping("/authorization/add")
     public ResponseEntity<Object> addAuthorizationExit(@RequestBody AuthExitDto data) {
         try {
-            Map<String, Object> map = this.service.addAuthExit(data);
-            return ResponseEntity.status(HttpStatus.OK).body(map);
+            MessageResponse response = this.service.addAuthExit(data);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
         }
@@ -130,8 +131,8 @@ public class VehicleEntryController {
     @PostMapping("/authorization/delete1")
     public ResponseEntity<Object> deleteAuthorizationExit1(@RequestBody AuthExitDto data) {
         try {
-            String result = this.service.deleteAuthExit1(data);
-            return ResponseEntity.status(HttpStatus.OK).body(new MessageResponseDto(result));
+            MessageResponse response = this.service.deleteAuthExit1(data);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
         }
@@ -140,8 +141,8 @@ public class VehicleEntryController {
     @PostMapping("/authorization/delete2")
     public ResponseEntity<Object> deleteAuthorizationExit2(@RequestBody AuthExitDto data) {
         try {
-            String result = this.service.deleteAuthExit2(data);
-            return ResponseEntity.status(HttpStatus.OK).body(new MessageResponseDto(result));
+            MessageResponse response = this.service.deleteAuthExit2(data);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
         }

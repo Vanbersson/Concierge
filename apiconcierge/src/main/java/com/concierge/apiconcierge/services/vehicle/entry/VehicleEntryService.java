@@ -7,6 +7,7 @@ import com.concierge.apiconcierge.exceptions.vehicle.VehicleEntryException;
 
 import com.concierge.apiconcierge.models.budget.Budget;
 import com.concierge.apiconcierge.models.budget.enums.StatusBudgetEnum;
+import com.concierge.apiconcierge.models.message.MessageResponse;
 import com.concierge.apiconcierge.models.vehicle.entry.VehicleEntry;
 import com.concierge.apiconcierge.models.vehicle.enums.StatusAuthExitEnum;
 import com.concierge.apiconcierge.models.vehicle.enums.StatusVehicleEnum;
@@ -64,24 +65,23 @@ public class VehicleEntryService implements IVehicleEntryService {
 
     @SneakyThrows
     @Override
-    public String update(VehicleEntry vehicle) {
+    public MessageResponse update(VehicleEntry vehicle) {
         try {
-            VehicleEntry vehicleEntry = this.loadVehicle(vehicle);
-            String message = this.validation.update(vehicleEntry);
-            if (message.equals(ConstantsMessage.SUCCESS)) {
+            MessageResponse response = this.validation.update(vehicle);
+            if (response.getStatus().equals(ConstantsMessage.SUCCESS)) {
+                VehicleEntry vehicleEntry = this.loadVehicle(vehicle);
                 if (vehicleEntry.getClientCompanyId() != null) {
                     if (vehicle.getBudgetStatus() != StatusBudgetEnum.NotBudget) {
                         this.updateBudget(vehicleEntry);
                     }
                 }
-
                 if (vehicleEntry.getDriverExitId() == 0) {
                     vehicleEntry.setDriverExitId(null);
                 }
                 this.repository.save(vehicleEntry);
-                return ConstantsMessage.SUCCESS;
+                return response;
             } else {
-                throw new VehicleEntryException(message);
+                return response;
             }
         } catch (Exception ex) {
             throw new VehicleEntryException(ex.getMessage());
@@ -284,15 +284,15 @@ public class VehicleEntryService implements IVehicleEntryService {
 
     @SneakyThrows
     @Override
-    public Map<String, Object> addAuthExit(AuthExitDto authExitDto) {
+    public MessageResponse addAuthExit(AuthExitDto authExitDto) {
         Map<String, Object> map = new HashMap<>();
         try {
             VehicleEntry vehicle = this.repository.filterVehicleId(authExitDto.companyId(), authExitDto.resaleId(), authExitDto.vehicleId());
             if (vehicle == null)
                 throw new VehicleEntryException();
 
-            String message = this.validation.addAuthExit(vehicle, authExitDto);
-            if (ConstantsMessage.SUCCESS.equals(message)) {
+            MessageResponse response = this.validation.addAuthExit(vehicle, authExitDto);
+            if (ConstantsMessage.SUCCESS.equals(response.getStatus())) {
                 if (vehicle.getIdUserExitAuth1() == null) {
                     vehicle.setIdUserExitAuth1(authExitDto.userId());
                     vehicle.setNameUserExitAuth1(authExitDto.userName());
@@ -303,7 +303,8 @@ public class VehicleEntryService implements IVehicleEntryService {
                     map.put("userId", vehicle.getIdUserExitAuth1());
                     map.put("userName", vehicle.getNameUserExitAuth1());
                     map.put("dateAuth", vehicle.getDateExitAuth1());
-                    return map;
+                    response.setData(map);
+                    return response;
                 } else if (vehicle.getIdUserExitAuth2() == null) {
                     vehicle.setIdUserExitAuth2(authExitDto.userId());
                     vehicle.setNameUserExitAuth2(authExitDto.userName());
@@ -315,10 +316,11 @@ public class VehicleEntryService implements IVehicleEntryService {
                     map.put("userId", vehicle.getIdUserExitAuth2());
                     map.put("userName", vehicle.getNameUserExitAuth2());
                     map.put("dateAuth", vehicle.getDateExitAuth2());
-                    return map;
+                    response.setData(map);
+                    return response;
                 }
             } else {
-                throw new VehicleEntryException(message);
+                return response;
             }
         } catch (Exception ex) {
             throw new VehicleEntryException(ex.getMessage());
@@ -328,24 +330,20 @@ public class VehicleEntryService implements IVehicleEntryService {
 
     @SneakyThrows
     @Override
-    public String deleteAuthExit1(AuthExitDto authExitDto) {
+    public MessageResponse deleteAuthExit1(AuthExitDto authExitDto) {
         try {
             VehicleEntry vehicle = this.repository.filterVehicleId(authExitDto.companyId(), authExitDto.resaleId(), authExitDto.vehicleId());
             if (vehicle == null)
                 throw new VehicleEntryException("Vehicle not found.");
-
-            String message = this.validation.deleteAuthExit1(vehicle, authExitDto);
-            if (message.equals(ConstantsMessage.SUCCESS)) {
+            MessageResponse response = this.validation.deleteAuthExit1(vehicle, authExitDto);
+            if (ConstantsMessage.SUCCESS.equals(response.getStatus())) {
                 vehicle.setIdUserExitAuth1(null);
                 vehicle.setNameUserExitAuth1("");
                 vehicle.setDateExitAuth1(null);
                 vehicle.setStatusAuthExit(this.deleteAuthExit(vehicle.getStatusAuthExit()));
-
                 this.repository.save(vehicle);
-                return ConstantsMessage.SUCCESS;
-            } else {
-                throw new VehicleEntryException(message);
             }
+            return response;
         } catch (Exception ex) {
             throw new VehicleEntryException(ex.getMessage());
         }
@@ -353,31 +351,26 @@ public class VehicleEntryService implements IVehicleEntryService {
 
     @SneakyThrows
     @Override
-    public String deleteAuthExit2(AuthExitDto authExitDto) {
+    public MessageResponse deleteAuthExit2(AuthExitDto authExitDto) {
         try {
             VehicleEntry vehicle = this.repository.filterVehicleId(authExitDto.companyId(), authExitDto.resaleId(), authExitDto.vehicleId());
             if (vehicle == null)
                 throw new VehicleEntryException("Vehicle not found.");
-
-            String message = this.validation.deleteAuthExit2(vehicle, authExitDto);
-            if (message.equals(ConstantsMessage.SUCCESS)) {
+            MessageResponse response = this.validation.deleteAuthExit2(vehicle, authExitDto);
+            if (ConstantsMessage.SUCCESS.equals(response.getStatus())) {
                 vehicle.setIdUserExitAuth2(null);
                 vehicle.setNameUserExitAuth2("");
                 vehicle.setDateExitAuth2(null);
                 vehicle.setStatusAuthExit(this.deleteAuthExit(vehicle.getStatusAuthExit()));
-
                 this.repository.save(vehicle);
-                return ConstantsMessage.SUCCESS;
-            } else {
-                throw new VehicleEntryException(message);
             }
+            return response;
         } catch (Exception ex) {
             throw new VehicleEntryException(ex.getMessage());
         }
     }
 
     private VehicleEntry loadVehicle(VehicleEntry vehicle) {
-
         if (vehicle.getIdUserAttendant() == null || vehicle.getIdUserAttendant() == 0) {
             vehicle.setIdUserAttendant(null);
             vehicle.setNameUserAttendant("");
@@ -399,7 +392,6 @@ public class VehicleEntryService implements IVehicleEntryService {
             vehicle.setNameUserExitAuth2("");
             vehicle.setDateExitAuth2(null);
         }
-
         return vehicle;
     }
 

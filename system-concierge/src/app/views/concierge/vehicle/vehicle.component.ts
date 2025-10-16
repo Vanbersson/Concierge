@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { CommonModule, DatePipe, UpperCasePipe } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 
@@ -21,7 +21,7 @@ import { LayoutService } from '../../../layouts/layout/service/layout.service';
 import { VehicleService } from '../../../services/vehicle/vehicle.service';
 
 //Constants
-import { STATUS_VEHICLE_ENTRY_NOTAUTH, STATUS_VEHICLE_ENTRY_FIRSTAUTH, STATUS_VEHICLE_ENTRY_AUTHORIZED, MESSAGE_RESPONSE_NOT_CLIENT, MESSAGE_RESPONSE_NOT_ATTENDANT, MESSAGE_RESPONSE_NOT_DRIVEREXIT } from '../../../util/constants';
+import { STATUS_VEHICLE_ENTRY_NOTAUTH, STATUS_VEHICLE_ENTRY_FIRSTAUTH, STATUS_VEHICLE_ENTRY_AUTHORIZED } from '../../../util/constants';
 import { StorageService } from '../../../services/storage/storage.service';
 import { VehicleEntryAuth } from '../../../models/vehicle/vehicle-entry-auth';
 
@@ -29,6 +29,8 @@ import { lastValueFrom } from 'rxjs';
 import { HttpResponse } from '@angular/common/http';
 import { BusyService } from '../../../components/loading/busy.service';
 import { TaskService } from '../../../services/task/task.service';
+import { MessageResponse } from '../../../models/message/message-response';
+import { SuccessError } from '../../../models/enum/success-error';
 
 @Component({
   selector: 'app-veiculos',
@@ -59,7 +61,6 @@ export default class VeiculosComponent implements OnInit, OnDestroy {
     private taskService: TaskService) { }
 
   ngOnInit(): void {
-
     this.primeNGConfig.setTranslation({
       startsWith: 'Inicia',
       contains: 'Contém ',
@@ -69,7 +70,6 @@ export default class VeiculosComponent implements OnInit, OnDestroy {
       notEquals: 'Não igual a',
       noFilter: 'Sem filtro'
     });
-
     this.statusOrcamento = [
       { label: 'Sem Orçamento', value: 'Sem Orçamento' },
       { label: 'Não Enviado', value: 'Não Enviado' },
@@ -77,20 +77,17 @@ export default class VeiculosComponent implements OnInit, OnDestroy {
       { label: 'Aprovado', value: 'Aprovado' },
       { label: 'Não Aprovado', value: 'Não Aprovado' }
     ];
-
     this.statusLiberacao = [
       { label: 'Não Liberado', value: this.notAuth },
       { label: '1ª Liberação', value: this.firstAuth },
       { label: 'Liberado', value: this.authorized }
     ];
-
     this.listVehicles();
     this.taskService.startTask(() => this.listTaskVehicle(), 60000);
   }
   ngOnDestroy(): void {
     this.taskService.stopTask();
   }
-
   private listTaskVehicle() {
     this.vehicleService.allPendingAuthorization$().subscribe({
       next: (data) => {
@@ -102,29 +99,23 @@ export default class VeiculosComponent implements OnInit, OnDestroy {
       error: (data) => { },
       complete: () => { }
     });
-
   }
-
   private preList(vehicle: VehicleEntry): VehicleEntry {
     //Format Date
     const datePipe = new DatePipe('pt-BR');
     vehicle.dateEntry = datePipe.transform(this.formatDateTime(new Date(vehicle.dateEntry)), 'dd/MM/yyyy HH:mm');
-
     if (vehicle.vehicleNew == "yes") {
       vehicle.placa = "NOVO";
     }
-
     if (vehicle.nameUserAttendant == "") {
       vehicle.nameUserAttendant = "FALTA";
     }
-
     if (vehicle.clientCompanyName == "") {
       vehicle.clientCompanyName = "FALTA";
     } else {
       var nome = vehicle.clientCompanyName.split(' ');
       vehicle.clientCompanyName = nome[0] + " " + nome[1];
     }
-
     switch (vehicle.budgetStatus) {
       case 'PendingApproval':
         vehicle.budgetStatus = 'Pendente Aprovação';
@@ -148,15 +139,11 @@ export default class VeiculosComponent implements OnInit, OnDestroy {
         vehicle.budgetStatus = 'Não Aprovado';
         break;
     }
-
     return vehicle;
-
   }
-
   public listVehicles() {
     this.busyService.busy();
     this.vehicleService.allPendingAuthorization$().subscribe((data) => {
-
       for (let index = 0; index < data.length; index++) {
         data[index] = this.preList(data[index]);
       }
@@ -167,9 +154,7 @@ export default class VeiculosComponent implements OnInit, OnDestroy {
       this.messageService.add({ severity: 'error', summary: 'Servidor', detail: "Não disponível", icon: 'pi pi-times' });
     });
   }
-
   getSeverity(value: string): any {
-
     switch (value) {
       case 'Pendente Aprovação':
         return 'warning';
@@ -182,7 +167,6 @@ export default class VeiculosComponent implements OnInit, OnDestroy {
       case 'Não Aprovado':
         return 'danger';
     }
-
     return 'warning';
   }
   editVeiculo(id: number) {
@@ -196,44 +180,27 @@ export default class VeiculosComponent implements OnInit, OnDestroy {
     }
   }
   public async authExit(vehicle: VehicleEntry) {
-
     if (vehicle.statusAuthExit != this.authorized) {
-      var result = await this.addAuthExit(vehicle);
-
-      if (result.status == 200) {
+      const result = await this.addAuthExit(vehicle);
+      if (result.status == 200 && result.body.status == SuccessError.succes) {
         if (vehicle.statusAuthExit == this.notAuth) {
           vehicle.statusAuthExit = this.firstAuth;
         } else if (vehicle.statusAuthExit == this.firstAuth) {
           vehicle.statusAuthExit = this.authorized;
         }
-
-        if (vehicle.vehicleNew == 'yes') {
-          //Autorização de saída
-          if (vehicle.statusAuthExit == this.firstAuth) {
-            this.messageService.add({ severity: 'success', summary: 'Veículo Autorizado', detail: 'Veículo NOVO', icon: 'pi pi-check-circle' });
-          }
-          //Saída liberada
-          if (vehicle.statusAuthExit == this.authorized) {
-            this.messageService.add({ severity: 'success', summary: 'Veículo Liberado', detail: 'Veículo NOVO', icon: 'pi pi-thumbs-up-fill' });
-          }
-
-        } else {
-          const uppercase = new UpperCasePipe();
-          //Autorização de saída
-          if (vehicle.statusAuthExit == this.firstAuth) {
-            this.messageService.add({ severity: 'success', summary: 'Veículo Autorizado', detail: 'Placa ' + uppercase.transform(vehicle.placa), icon: 'pi pi-check-circle' });
-          }
-
-          //Saída liberada
-          if (vehicle.statusAuthExit == this.authorized) {
-            this.messageService.add({ severity: 'success', summary: 'Veículo Liberado', detail: 'Placa ' + uppercase.transform(vehicle.placa), icon: 'pi pi-thumbs-up-fill' });
-          }
-
+        //Autorização de saída
+        if (vehicle.statusAuthExit == this.firstAuth) {
+          this.messageService.add({ severity: 'success', summary: result.body.header, detail: result.body.message, icon: 'pi pi-check-circle' });
         }
-
+        //Saída liberada
+        if (vehicle.statusAuthExit == this.authorized) {
+          this.messageService.add({ severity: 'success', summary: result.body.header, detail: result.body.message, icon: 'pi pi-thumbs-up-fill' });
+        }
+      } else if (result.status == 200 && result.body.status == SuccessError.error) {
+        this.messageService.add({ severity: 'info', summary: result.body.header, detail: result.body.message, icon: 'pi pi-info-circle' });
       }
     } else {
-      this.messageService.add({ severity: 'info', summary: 'Veículo', detail: "Já liberado" });
+      this.messageService.add({ severity: 'info', summary: 'Veículo', detail: "Já liberado", icon: 'pi pi-info-circle' });
     }
   }
   formatDateTime(date: Date): string {
@@ -249,7 +216,7 @@ export default class VeiculosComponent implements OnInit, OnDestroy {
     // Formata a data e adiciona o fuso horário
     return datePipe.transform(date, "yyyy-MM-dd'T'HH:mm:ss.SSS") + timezone;
   }
-  private async addAuthExit(vehicle: VehicleEntry): Promise<HttpResponse<VehicleEntryAuth>> {
+  private async addAuthExit(vehicle: VehicleEntry): Promise<HttpResponse<MessageResponse>> {
     var auth = new VehicleEntryAuth();
     auth.companyId = this.storageService.companyId;
     auth.resaleId = this.storageService.resaleId;
@@ -257,35 +224,13 @@ export default class VeiculosComponent implements OnInit, OnDestroy {
     auth.userId = this.storageService.id;
     auth.userName = this.storageService.name;
     auth.dateAuth = this.formatDateTime(new Date());
-
     try {
       return await lastValueFrom(this.vehicleService.entryAddAuth(auth));
     } catch (error) {
-
-      if (error.error.message == MESSAGE_RESPONSE_NOT_CLIENT) {
-        this.messageService.add({ severity: 'error', summary: 'Empresa', detail: "Não informada", icon: 'pi pi-times' });
-      } else if (error.error.message == MESSAGE_RESPONSE_NOT_ATTENDANT) {
-        this.messageService.add({ severity: 'error', summary: 'Consultor', detail: "Não informado", icon: 'pi pi-times' });
-      } else if (error.error.message == MESSAGE_RESPONSE_NOT_DRIVEREXIT) {
-        this.messageService.add({ severity: 'error', summary: 'Motorista Saída', detail: "Não informado", icon: 'pi pi-times' });
-      } else if (error.error.message == "Permission not informed.") {
-        this.permissionNot();
-      } else {
-        this.messageService.add({ severity: 'error', summary: 'Erro', detail: "Não autorizado", icon: 'pi pi-times' });
-      }
-
+      this.messageService.add({ severity: 'error', summary: 'Erro', detail: "Não catalogado.", icon: 'pi pi-times' });
       return error;
     }
-
   }
-
-  //Permission Not
-  private permissionNot() {
-    this.messageService.add({ severity: 'error', summary: 'Permissão', detail: "Você não tem permissão", icon: 'pi pi-times' });
-  }
-
-
-
 }
 
 

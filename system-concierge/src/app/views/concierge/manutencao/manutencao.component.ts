@@ -63,6 +63,8 @@ import { StatusBudgetEnum } from '../../../models/budget/status-budget-enum';
 import { StatusVehicle } from '../../../models/enum/status-vehicle';
 import { FilterDriverComponent } from '../../../components/filter.driver/filter.driver.component';
 import { DriverService } from '../../../services/driver/driver.service';
+import { MessageResponse } from '../../../models/message/message-response';
+import { SuccessError } from '../../../models/enum/success-error';
 
 @Component({
   selector: 'app-manutencao',
@@ -485,6 +487,17 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
     }
 
   }
+  formatDateTime(date: Date): string {
+    const datePipe = new DatePipe('en-US');
+    // Obtém o fuso horário local no formato ±hh:mm
+    const tzOffset = -date.getTimezoneOffset();
+    const sign = tzOffset >= 0 ? '+' : '-';
+    const hours = Math.floor(Math.abs(tzOffset) / 60).toString().padStart(2, '0');
+    const minutes = (Math.abs(tzOffset) % 60).toString().padStart(2, '0');
+    const timezone = `${sign}${hours}:${minutes}`;
+    // Formata a data e adiciona o fuso horário
+    return datePipe.transform(date, "yyyy-MM-dd'T'HH:mm:ss.SSS") + timezone;
+  }
   //Vehicle
   public placaRequiredAdd() {
     this.addRequirePlaca();
@@ -631,7 +644,7 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
       auth.dateAuth = this.formatDateTime(new Date());
 
       const permissionResult = await this.addAuthExit(auth);
-      if (permissionResult.status == 200) {
+      if (permissionResult.status == 200 && permissionResult.body.status == SuccessError.succes) {
         //Status auth exit
         if (this.vehicleEntry.statusAuthExit == this.notAuth) {
           this.vehicleEntry.statusAuthExit = this.firstAuth;
@@ -640,43 +653,31 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
         }
         if (this.vehicleEntry.idUserExitAuth1 == 0) {
           this.formVehicle.patchValue({
-            nameUserExitAuth1: permissionResult.body.userName,
+            nameUserExitAuth1: permissionResult.body.data.userName,
           });
-          this.vehicleEntry.idUserExitAuth1 = permissionResult.body.userId;
-          this.vehicleEntry.nameUserExitAuth1 = permissionResult.body.userName;
-          this.vehicleEntry.dateExitAuth1 = permissionResult.body.dateAuth;
-          this.dateExitAuth1.set(permissionResult.body.dateAuth.toString());
+          this.vehicleEntry.idUserExitAuth1 = permissionResult.body.data.userId;
+          this.vehicleEntry.nameUserExitAuth1 = permissionResult.body.data.userName;
+          this.vehicleEntry.dateExitAuth1 = permissionResult.body.data.dateAuth;
+          this.dateExitAuth1.set(permissionResult.body.data.dateAuth.toString());
         } else {
           this.formVehicle.patchValue({
-            nameUserExitAuth2: permissionResult.body.userName,
+            nameUserExitAuth2: permissionResult.body.data.userName,
           });
-          this.vehicleEntry.idUserExitAuth2 = permissionResult.body.userId;
-          this.vehicleEntry.nameUserExitAuth2 = permissionResult.body.userName;
-          this.vehicleEntry.dateExitAuth2 = permissionResult.body.dateAuth;
-          this.dateExitAuth2.set(permissionResult.body.dateAuth.toString());
+          this.vehicleEntry.idUserExitAuth2 = permissionResult.body.data.userId;
+          this.vehicleEntry.nameUserExitAuth2 = permissionResult.body.data.userName;
+          this.vehicleEntry.dateExitAuth2 = permissionResult.body.data.dateAuth;
+          this.dateExitAuth2.set(permissionResult.body.data.dateAuth.toString());
+        }
+        //Autorização de saída
+        if (this.vehicleEntry.statusAuthExit == this.firstAuth) {
+          this.messageService.add({ severity: 'success', summary: permissionResult.body.header, detail: permissionResult.body.message, icon: 'pi pi-check-circle' });
+        }
+        //Saída liberada
+        if (this.vehicleEntry.statusAuthExit == this.authorized) {
+          this.messageService.add({ severity: 'success', summary: permissionResult.body.header, detail: permissionResult.body.message, icon: 'pi pi-thumbs-up-fill' });
         }
         //Valid
         this.addRequireForms();
-
-        if (this.formVehicle.value.vehicleNew == 'yes') {
-          //Autorização de saída
-          if (this.vehicleEntry.statusAuthExit == this.firstAuth) {
-            this.messageService.add({ severity: 'success', summary: 'Veículo Autorizado', detail: 'Veículo NOVO', icon: 'pi pi-check-circle' });
-          }
-          //Saída liberada
-          if (this.vehicleEntry.statusAuthExit == this.authorized) {
-            this.messageService.add({ severity: 'success', summary: 'Veículo Liberado', detail: 'Veículo NOVO', icon: 'pi pi-thumbs-up-fill' });
-          }
-        } else {
-          //Autorização de saída
-          if (this.vehicleEntry.statusAuthExit == this.firstAuth) {
-            this.messageService.add({ severity: 'success', summary: 'Veículo Autorizado', detail: 'Placa ' + uppercase.transform(this.formVehicle.value.placa), icon: 'pi pi-check-circle' });
-          }
-          //Saída liberada
-          if (this.vehicleEntry.statusAuthExit == this.authorized) {
-            this.messageService.add({ severity: 'success', summary: 'Veículo Liberado', detail: 'Placa ' + uppercase.transform(this.formVehicle.value.placa), icon: 'pi pi-thumbs-up-fill' });
-          }
-        }
       }
       //Fecha loading
       this.busyService.idle();
@@ -684,23 +685,11 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
       this.messageService.add({ severity: 'info', summary: 'Veículo Liberado', detail: "Placa " + uppercase.transform(this.formVehicle.value.placa), icon: 'pi pi-thumbs-up-fill' });
     }
   }
-  private async addAuthExit(auth: VehicleEntryAuth): Promise<HttpResponse<VehicleEntryAuth>> {
+  private async addAuthExit(auth: VehicleEntryAuth): Promise<HttpResponse<MessageResponse>> {
     try {
       return await lastValueFrom(this.vehicleService.entryAddAuth(auth));
     } catch (error) {
-      if (error.error.message == MESSAGE_RESPONSE_NOT_CLIENT) {
-        this.showClientCompany();
-      } else if (error.error.message == MESSAGE_RESPONSE_NOT_ATTENDANT) {
-        this.showUserAttendant();
-      } else if (error.error.message == MESSAGE_RESPONSE_NOT_DRIVERENTRY) {
-        this.messageService.add({ severity: 'error', summary: 'Motorista entrada', detail: "Não informado", icon: 'pi pi-times' });
-      } else if (error.error.message == MESSAGE_RESPONSE_NOT_DRIVEREXIT) {
-        this.messageService.add({ severity: 'error', summary: 'Motorista Saída', detail: "Não informado", icon: 'pi pi-times' });
-      } else if (error.error.message == "Permission not informed.") {
-        this.permissionNot();
-      } else {
-        this.messageService.add({ severity: 'error', summary: 'Erro', detail: "Não autorizado", icon: 'pi pi-times' });
-      }
+      this.messageService.add({ severity: 'error', summary: 'Erro', detail: "Não catalogado.", icon: 'pi pi-times' });
       return error;
     }
   }
@@ -714,8 +703,8 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
       auth.userName = this.storageService.name;
 
       const authResult = await this.delAuth1(auth);
-      if (authResult.status == 200) {
-        this.messageService.add({ severity: 'success', summary: 'Autorização', detail: 'Removida com sucesso', icon: 'pi pi-check' });
+      if (authResult.status == 200 && authResult.body.status == SuccessError.succes) {
+        this.messageService.add({ severity: 'success', summary: authResult.body.header, detail: authResult.body.message, icon: 'pi pi-check' });
         this.formVehicle.patchValue({
           nameUserExitAuth1: '',
         });
@@ -724,18 +713,16 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
         this.vehicleEntry.dateExitAuth1 = '';
         this.dateExitAuth1.set('');
         this.updateAuthExitStatus();
+      } else if (authResult.status == 200 && authResult.body.status == SuccessError.succes) {
+        this.messageService.add({ severity: 'info', summary: authResult.body.header, detail: authResult.body.message, icon: 'pi pi-info-circle' });
       }
     }
   }
-  private async delAuth1(auth: VehicleEntryAuth): Promise<HttpResponse<VehicleEntryAuth>> {
+  private async delAuth1(auth: VehicleEntryAuth): Promise<HttpResponse<MessageResponse>> {
     try {
       return await lastValueFrom(this.vehicleService.entryDeleteAuth1(auth));
     } catch (error) {
-      if (error.error.message == "Permission not informed.") {
-        this.permissionNot();
-      } else if (error.error.message == "Authorization of another user.") {
-        this.messageService.add({ severity: 'error', summary: 'Permissão', detail: "Autorização de outro usuário", icon: 'pi pi-times' });
-      }
+      this.messageService.add({ severity: 'error', summary: 'Erro', detail: "Não catalogado.", icon: 'pi pi-times' });
       return error;
     }
   }
@@ -749,8 +736,8 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
       auth.userName = this.storageService.name;
 
       const authResult = await this.delAuth2(auth);
-      if (authResult.status == 200) {
-        this.messageService.add({ severity: 'success', summary: 'Autorização', detail: 'Removida com sucesso', icon: 'pi pi-check' });
+      if (authResult.status == 200 && authResult.body.status == SuccessError.succes) {
+        this.messageService.add({ severity: 'success', summary: authResult.body.header, detail: authResult.body.message, icon: 'pi pi-check' });
         this.formVehicle.patchValue({
           nameUserExitAuth2: '',
         });
@@ -759,27 +746,18 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
         this.vehicleEntry.dateExitAuth2 = '';
         this.dateExitAuth2.set('');
         this.updateAuthExitStatus();
+      } else if (authResult.status == 200 && authResult.body.status == SuccessError.error) {
+        this.messageService.add({ severity: 'info', summary: authResult.body.header, detail: authResult.body.message, icon: 'pi pi-info-circle' });
       }
     }
   }
-  private async delAuth2(auth: VehicleEntryAuth): Promise<HttpResponse<VehicleEntryAuth>> {
+  private async delAuth2(auth: VehicleEntryAuth): Promise<HttpResponse<MessageResponse>> {
     try {
-
       return await lastValueFrom(this.vehicleService.entryDeleteAuth2(auth));
     } catch (error) {
-      if (error.error.message == "Permission not informed.") {
-        this.permissionNot();
-      } else if (error.error.message == "Authorization of another user.") {
-        this.messageService.add({ severity: 'error', summary: 'Permissão', detail: "Autorização de outro usuário", icon: 'pi pi-times' });
-      }
+      this.messageService.add({ severity: 'error', summary: 'Erro', detail: "Não catalogado.", icon: 'pi pi-times' });
       return error;
     }
-  }
-  private showUserAttendant() {
-    this.messageService.add({ severity: 'error', summary: 'Consultor', detail: "Não informado", icon: 'pi pi-times' });
-  }
-  private showClientCompany() {
-    this.messageService.add({ severity: 'error', summary: 'Empresa', detail: "Não informada", icon: 'pi pi-times' });
   }
   //Porteiro
   public validationClientCompany() {
@@ -829,9 +807,8 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
     }
 
     if (this.vehicleEntry.budgetStatus != StatusBudgetEnum.NotBudget) {
-      this.router.navigateByUrl("/oficina/manutencao-orcamento/" + this.formVehicle.value.id);
+      this.router.navigateByUrl("/oficina/manutencao-orcamento/" + this.vehicleEntry.id);
     } else {
-
       this.confirmationService.confirm({
         header: 'Confirmar',
         message: 'Gerar um orçamento.',
@@ -842,22 +819,17 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
         acceptButtonStyleClass: 'p-button-outlined p-button-sm',
         acceptLabel: 'Sim',
         accept: async () => {
-
-          this.budget = { companyId: this.storageService.companyId, resaleId: this.storageService.resaleId, vehicleEntryId: this.formVehicle.value.id };
+          this.budget = { companyId: this.storageService.companyId, resaleId: this.storageService.resaleId, vehicleEntryId: this.vehicleEntry.id };
 
           const budgetResult = await this.saveBudget(this.budget);
           if (budgetResult.status == 201) {
             this.vehicleEntry.budgetStatus = budgetResult.body.status;
             this.messageService.add({ severity: 'info', summary: 'Orçamento - ' + budgetResult.body.id, detail: 'Gerado com sucesso', life: 2000 });
             setTimeout(() => {
-              this.router.navigateByUrl('/oficina/manutencao-orcamento/' + this.formVehicle.value.id);
+              this.router.navigateByUrl('/oficina/manutencao-orcamento/' + this.vehicleEntry.id);
             }, 2000);
           }
-
-        }/* ,
-        reject: () => {
-          this.messageService.add({ severity: 'error', summary: 'Rejected', detail: 'You have rejected', life: 3000 });
-        } */
+        }
       });
     }
   }
@@ -881,19 +853,6 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
 
       return error;
     }
-  }
-  formatDateTime(date: Date): string {
-    const datePipe = new DatePipe('en-US');
-
-    // Obtém o fuso horário local no formato ±hh:mm
-    const tzOffset = -date.getTimezoneOffset();
-    const sign = tzOffset >= 0 ? '+' : '-';
-    const hours = Math.floor(Math.abs(tzOffset) / 60).toString().padStart(2, '0');
-    const minutes = (Math.abs(tzOffset) % 60).toString().padStart(2, '0');
-    const timezone = `${sign}${hours}:${minutes}`;
-
-    // Formata a data e adiciona o fuso horário
-    return datePipe.transform(date, "yyyy-MM-dd'T'HH:mm:ss.SSS") + timezone;
   }
   //Permission Not
   private permissionNot() {
@@ -1027,46 +986,20 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
       this.loadingVehicle();
 
       const resultVehicle = await this.updateVehicle(this.vehicleEntry);
-      if (resultVehicle.status == 200) {
-        this.messageService.add({ severity: 'success', summary: 'Veículo', detail: 'Atualizado com sucesso', icon: 'pi pi-check' });
+      if (resultVehicle.status == 200 && resultVehicle.body.status == SuccessError.succes) {
+        this.messageService.add({ severity: 'success', summary: resultVehicle.body.header, detail: resultVehicle.body.message, icon: 'pi pi-check' });
+      } else if (resultVehicle.status == 200 && resultVehicle.body.status == SuccessError.error) {
+        this.messageService.add({ severity: 'info', summary: resultVehicle.body.header, detail: resultVehicle.body.message, icon: 'pi pi-info-circle' });
       }
       //Fecha loading
       this.busyService.idle();
     }
   }
-  private async updateVehicle(vehicle: VehicleEntry): Promise<HttpResponse<VehicleEntry>> {
+  private async updateVehicle(vehicle: VehicleEntry): Promise<HttpResponse<MessageResponse>> {
     try {
       return await lastValueFrom(this.vehicleService.entryUpdate(vehicle));
     } catch (error) {
-      const BUDGET_ATTENDANT = "BUDGET-Attendant not informed.";
-      const BUDGET_CLIENTCOMPANY = "BUDGET-ClientCompany not informed.";
-      const SERVICEORDER = "Equal service order not.";
-      const SERVICEORDER_NUMBER = "Number Service order not informed.";
-      if (error.error.message == MESSAGE_RESPONSE_NOT_ATTENDANT) {
-        this.showUserAttendant();
-      }
-      if (error.error.message == MESSAGE_RESPONSE_NOT_CLIENT) {
-        this.showClientCompany();
-      }
-      if (error.error.message == BUDGET_ATTENDANT) {
-        this.messageService.add({ severity: 'info', summary: 'Informação', detail: "Véiculo possui orçamento" });
-        this.showUserAttendant();
-      }
-      if (error.error.message == BUDGET_CLIENTCOMPANY) {
-        this.messageService.add({ severity: 'info', summary: 'Informação', detail: "Véiculo possui orçamento" });
-        this.showClientCompany();
-      }
-      if (error.error.message == MESSAGE_RESPONSE_ERROR_AUTH_EXIT) {
-        this.messageService.add({ severity: 'info', summary: 'Informação', detail: "Remova autorização de saída" });
-      }
-
-      if (error.error.message == SERVICEORDER) {
-        this.messageService.add({ severity: 'error', summary: 'Ordem Serviço', detail: "Informado não", icon: 'pi pi-times' });
-      }
-
-      if (error.error.message == SERVICEORDER_NUMBER) {
-        this.messageService.add({ severity: 'error', summary: 'Número O.S.', detail: "Não informado", icon: 'pi pi-times' });
-      }
+      this.messageService.add({ severity: 'error', summary: 'Erro', detail: "Não catalogado.", icon: 'pi pi-times' });
       return error;
     }
 
