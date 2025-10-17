@@ -2,6 +2,7 @@ package com.concierge.apiconcierge.controllers.workshop.toolcontrol;
 
 import com.concierge.apiconcierge.dtos.message.MessageResponseDto;
 import com.concierge.apiconcierge.dtos.workshop.toolcontrol.ToolControlMaterialDto;
+import com.concierge.apiconcierge.models.message.MessageResponse;
 import com.concierge.apiconcierge.models.workshop.toolcontrol.ToolControlMaterial;
 import com.concierge.apiconcierge.services.workshop.toolcontrol.material.ToolControlMaterialService;
 import org.springframework.beans.BeanUtils;
@@ -37,8 +38,8 @@ public class ToolControlMaterialController {
         try {
             ToolControlMaterial mat = new ToolControlMaterial();
             BeanUtils.copyProperties(data, mat);
-            Map<String, Object> result = this.service.update(mat);
-            return ResponseEntity.status(HttpStatus.OK).body(result);
+            MessageResponse response = this.service.update(mat);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
         }

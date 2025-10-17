@@ -31,6 +31,9 @@ import { ToolControlMaterialService } from '../../../../../services/workshop/too
 import { HttpResponse } from '@angular/common/http';
 import { lastValueFrom } from 'rxjs';
 import { BusyService } from '../../../../../components/loading/busy.service';
+import { MessageResponse } from '../../../../../models/message/message-response';
+import { SuccessError } from '../../../../../models/enum/success-error';
+import { TypeCategory } from '../../../../../models/enum/type-category';
 
 
 enum typeMaterial {
@@ -53,10 +56,13 @@ export default class MaterialComponent implements OnInit {
   visibleDialog = false;
   enabled = StatusEnabledDisabled.enabled;
   disabled = StatusEnabledDisabled.disabled;
-  material: ToolControlMaterial;
+  material!: ToolControlMaterial;
+  category!: ToolControlCategory;
   listMat: ToolControlMaterial[] = [];
   listCat: ToolControlCategory[] = [];
   photoMat: string = "";
+
+  visible: boolean = true;
 
   //Dialog
   editQuantityLoan = false;
@@ -112,7 +118,6 @@ export default class MaterialComponent implements OnInit {
         desc = cat.description;
       }
     }
-
     return desc;
   }
 
@@ -143,7 +148,7 @@ export default class MaterialComponent implements OnInit {
       quantityAvailableKit: 0,
       photo: "",
       type: this.loan,
-      numberCA:null
+      numberCA: null
     });
     this.photoMat = "";
     this.material = null;
@@ -170,7 +175,6 @@ export default class MaterialComponent implements OnInit {
         this.messageService.add({ severity: 'error', summary: 'Imagem', detail: 'Tamanha máximo 3MB', icon: 'pi pi-times', life: 3000 });
       } else {
         this.ngxImageCompressService.compressFile(image, orientation, 50, 40).then((compressedImage) => {
-
           // Remover o prefixo "data:image/jpeg;base64," se existir
           const base64Data = compressedImage.split(',')[1];
           this.photoMat = base64Data;
@@ -243,6 +247,13 @@ export default class MaterialComponent implements OnInit {
   editMat(mat: ToolControlMaterial) {
     this.showDialog();
     this.material = mat;
+    this.category = this.listCat.find(cat => cat.id == this.material.categoryId);
+    if (this.category.type == TypeCategory.EPI || this.category.type == TypeCategory.Uniforme) {
+      this.visible = false;
+    }else{
+      this.visible = true;
+    }
+
     this.formMat.patchValue({
       description: mat.description,
       status: mat.status,
@@ -263,6 +274,8 @@ export default class MaterialComponent implements OnInit {
     this.disableQuantityAccountingKit();
     this.disableQuantityAvailableKit();
     this.editQuantityKit = false;
+
+
   }
   async saveMaterial() {
     this.enableQuantityAccountingLoan();
@@ -332,18 +345,17 @@ export default class MaterialComponent implements OnInit {
       this.material.photo = value.photo;
 
       const resultSave = await this.updateMat(this.material);
-      if (resultSave.status == 200) {
-        this.material = resultSave.body;
+      if (resultSave.status == 200 && resultSave.body.status == SuccessError.succes) {
+        this.messageService.add({ severity: 'success', summary: resultSave.body.header, detail: resultSave.body.message, icon: 'pi pi-check' });
+        this.material = resultSave.body.data;
         this.formMat.patchValue({
-          quantityAccountingLoan: resultSave.body.quantityAccountingLoan,
-          quantityAvailableLoan: resultSave.body.quantityAvailableLoan,
-          quantityAccountingKit: resultSave.body.quantityAccountingKit,
-          quantityAvailableKit: resultSave.body.quantityAvailableKit
+          quantityAccountingLoan: resultSave.body.data.quantityAccountingLoan,
+          quantityAvailableLoan: resultSave.body.data.quantityAvailableLoan,
+          quantityAccountingKit: resultSave.body.data.quantityAccountingKit,
+          quantityAvailableKit: resultSave.body.data.quantityAvailableKit
         });
-        this.messageService.add({ severity: 'success', summary: 'Material', detail: 'Atualizado com sucesso', icon: 'pi pi-check' });
-      } else {
-        this.hideDialog();
-        this.messageService.add({ severity: 'error', summary: 'Material', detail: 'Inválido', icon: 'pi pi-times' });
+      } else if (resultSave.status == 200 && resultSave.body.status == SuccessError.error) {
+        this.messageService.add({ severity: 'info', summary: resultSave.body.header, detail: resultSave.body.message, icon: 'pi pi-info-circle' });
       }
     }
     this.disableQuantityAccountingLoan();
@@ -361,10 +373,11 @@ export default class MaterialComponent implements OnInit {
       return error;
     }
   }
-  private async updateMat(mat: ToolControlMaterial): Promise<HttpResponse<ToolControlMaterial>> {
+  private async updateMat(mat: ToolControlMaterial): Promise<HttpResponse<MessageResponse>> {
     try {
       return await lastValueFrom(this.materialService.updateMat(mat));
     } catch (error) {
+      this.messageService.add({ severity: 'error', summary: "Erro", detail: error.error.message, icon: 'pi pi-times' });
       return error;
     }
   }

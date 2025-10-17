@@ -119,12 +119,10 @@
                 <div class="flex gap-2 w-6 p-1 pt-2  border-1 border-round-md border-200">
                     <div class="flex flex-column field">
                         <label for="quantityAccountingId">Contábil</label>
-                        <p-inputNumber *ngIf="editQuantityLoan" [minFractionDigits]="2"
-                            formControlName="quantityAccountingLoan" />
+                        <p-inputNumber *ngIf="editQuantityLoan" [minFractionDigits]="2" formControlName="quantityAccountingLoan" />
                         <p-inputGroup *ngIf="!editQuantityLoan">
                             <p-inputNumber [minFractionDigits]="2" formControlName="quantityAccountingLoan" />
-                            <button type="button" pButton icon="pi pi-lock" class="p-button-secondary"
-                                (click)="confirmEditQuant()"></button>
+                            <button type="button" pButton icon="pi pi-lock" class="p-button-secondary" (click)="confirmEditQuant()"></button>
                         </p-inputGroup>
                         <small class="p-error block" *ngIf="formMat.get('quantityAccountingLoan')?.invalid">Campo obrigatório</small>
                     </div>
@@ -136,15 +134,12 @@
                 <div class="flex gap-2 w-6 p-1 pt-2 border-1 border-round-md border-200">
                     <div class="flex flex-column field">
                         <label for="quantityAccountingId">Contábil</label>
-                        <p-inputNumber *ngIf="editQuantityKit" [minFractionDigits]="2"
-                            formControlName="quantityAccountingKit" />
+                        <p-inputNumber *ngIf="editQuantityKit" [minFractionDigits]="2" formControlName="quantityAccountingKit" />
                         <p-inputGroup *ngIf="!editQuantityKit">
                             <p-inputNumber [minFractionDigits]="2" formControlName="quantityAccountingKit" />
-                            <button type="button" pButton icon="pi pi-lock" class="p-button-secondary"
-                                (click)="confirmEditQuant()"></button>
+                            <button type="button" pButton icon="pi pi-lock" class="p-button-secondary" (click)="confirmEditQuant()"></button>
                         </p-inputGroup>
-                        <small class="p-error block" *ngIf="formMat.get('quantityAccountingKit')?.invalid">Campo
-                            obrigatório</small>
+                        <small class="p-error block" *ngIf="formMat.get('quantityAccountingKit')?.invalid">Campo obrigatório</small>
                     </div>
                     <div class="flex flex-column field">
                         <label for="quantityAvailableId">Disponível</label>

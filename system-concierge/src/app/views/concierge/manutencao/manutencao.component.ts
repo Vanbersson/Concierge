@@ -713,7 +713,7 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
         this.vehicleEntry.dateExitAuth1 = '';
         this.dateExitAuth1.set('');
         this.updateAuthExitStatus();
-      } else if (authResult.status == 200 && authResult.body.status == SuccessError.succes) {
+      } else if (authResult.status == 200 && authResult.body.status == SuccessError.error) {
         this.messageService.add({ severity: 'info', summary: authResult.body.header, detail: authResult.body.message, icon: 'pi pi-info-circle' });
       }
     }

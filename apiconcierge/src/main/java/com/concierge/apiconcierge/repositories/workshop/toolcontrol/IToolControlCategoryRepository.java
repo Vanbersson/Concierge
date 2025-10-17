@@ -10,6 +10,9 @@ import java.util.List;
 @Repository
 public interface IToolControlCategoryRepository extends JpaRepository<ToolControlCategory, Integer> {
 
+    @Query(value = "SELECT * FROM `tb_tool_control_category` WHERE company_id=?1 AND resale_id=?2 AND id=?3", nativeQuery = true)
+    ToolControlCategory filterId(Integer companyId, Integer resaleId, Integer id);
+
     @Query(value = "SELECT * FROM `tb_tool_control_category` WHERE company_id=?1 AND resale_id=?2 ", nativeQuery = true)
     List<ToolControlCategory> listAll(Integer companyId, Integer resaleId);
 

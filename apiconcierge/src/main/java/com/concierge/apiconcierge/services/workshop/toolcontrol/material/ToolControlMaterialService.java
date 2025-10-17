@@ -1,13 +1,18 @@
 package com.concierge.apiconcierge.services.workshop.toolcontrol.material;
 
 import com.concierge.apiconcierge.exceptions.workshop.toolcontrol.ToolControlException;
+import com.concierge.apiconcierge.models.message.MessageResponse;
+import com.concierge.apiconcierge.models.workshop.toolcontrol.ToolControlCategory;
 import com.concierge.apiconcierge.models.workshop.toolcontrol.ToolControlKitMec;
 import com.concierge.apiconcierge.models.workshop.toolcontrol.ToolControlMatMec;
 import com.concierge.apiconcierge.models.workshop.toolcontrol.ToolControlMaterial;
+import com.concierge.apiconcierge.models.workshop.toolcontrol.enums.TypeCategory;
 import com.concierge.apiconcierge.models.workshop.toolcontrol.enums.TypeRequest;
+import com.concierge.apiconcierge.repositories.workshop.toolcontrol.IToolControlCategoryRepository;
 import com.concierge.apiconcierge.repositories.workshop.toolcontrol.IToolControlKitMecRepository;
 import com.concierge.apiconcierge.repositories.workshop.toolcontrol.IToolControlMatMecRepository;
 import com.concierge.apiconcierge.repositories.workshop.toolcontrol.IToolControlMaterialRepository;
+import com.concierge.apiconcierge.services.workshop.toolcontrol.category.IToolControlCategoryService;
 import com.concierge.apiconcierge.util.ConstantsMessage;
 import com.concierge.apiconcierge.validation.workshop.toolcontrol.material.ToolControlMaterialValidation;
 import lombok.SneakyThrows;
@@ -34,6 +39,9 @@ public class ToolControlMaterialService implements IToolControlMaterialService {
     @Autowired
     IToolControlKitMecRepository repositoryKitMec;
 
+    @Autowired
+    IToolControlCategoryRepository categoryRepository;
+
     @SneakyThrows
     @Override
     public Map<String, Object> save(ToolControlMaterial mat) {
@@ -55,53 +63,59 @@ public class ToolControlMaterialService implements IToolControlMaterialService {
 
     @SneakyThrows
     @Override
-    public Map<String, Object> update(ToolControlMaterial mat) {
+    public MessageResponse update(ToolControlMaterial mat) {
         try {
-            String message = this.validation.update(mat);
-            if (ConstantsMessage.SUCCESS.equals(message)) {
-                ToolControlMaterial resultRole = this.calQuantity(mat);
-
-                //Loan
-                if (resultRole.getQuantityAccountingLoan() < resultRole.getQuantityAvailableLoan() || resultRole.getQuantityAvailableLoan() < 0)
-                    throw new ToolControlException("Quantity error.");
-
-                ToolControlMaterial resultSave = this.repository.save(resultRole);
-                return this.loadMat(resultSave);
-            } else {
-                throw new ToolControlException(message);
+            MessageResponse response = this.validation.update(mat);
+            if (ConstantsMessage.SUCCESS.equals(response.getStatus())) {
+                ToolControlMaterial resultSaveMat;
+                ToolControlCategory category = this.categoryRepository.filterId(mat.getCompanyId(), mat.getResaleId(), mat.getCategoryId());
+                if (category.getType() == TypeCategory.Ferramenta) {
+                    if (mat.getType() == TypeRequest.Loan) {
+                        //Emprestimo
+                        resultSaveMat = this.calQuantityAvailableMatMec(mat);
+                        this.repository.save(resultSaveMat);
+                        response.setData(this.loadMat(resultSaveMat));
+                    } else if (mat.getType() == TypeRequest.Kit) {
+                        //Kit mecânico
+                    } else if (mat.getType() == TypeRequest.Ambos) {
+                        //Ambos
+                        resultSaveMat = this.calQuantityAvailableMatMec(mat);
+                        this.repository.save(resultSaveMat);
+                        response.setData(this.loadMat(resultSaveMat));
+                    }
+                } else if (category.getType() == TypeCategory.EPI) {
+                    //Epi não alterar a quantidade disponivel
+                    mat.setQuantityAvailableLoan(mat.getQuantityAccountingLoan());
+                    this.repository.save(mat);
+                    response.setData(this.loadMat(mat));
+                } else if (category.getType() == TypeCategory.Uniforme) {
+                    //Uniforme não altera a quantidade disponivel
+                    mat.setQuantityAvailableLoan(mat.getQuantityAccountingLoan());
+                    this.repository.save(mat);
+                    response.setData(this.loadMat(mat));
+                } else if (category.getType() == TypeCategory.Outro) {
+                    resultSaveMat = this.calQuantityAvailableMatMec(mat);
+                    this.repository.save(resultSaveMat);
+                    response.setData(this.loadMat(resultSaveMat));
+                }
             }
+            return response;
         } catch (Exception ex) {
             throw new ToolControlException(ex.getMessage());
         }
     }
 
-    private ToolControlMaterial calQuantity(ToolControlMaterial mat) {
-
-        if (mat.getType().equals(TypeRequest.Loan)) {
-            float quantityLoan = (float) this.repositoryMatMec.filterMatIdDevPend(mat.getCompanyId(), mat.getResaleId(), mat.getId())
-                    .stream()
-                    .mapToDouble(ToolControlMatMec::getDeliveryQuantity)
-                    .sum();
-            mat.setQuantityAvailableLoan(mat.getQuantityAccountingLoan() - quantityLoan);
-        } else if (mat.getType().equals(TypeRequest.Kit)) {
-//            float quantityKit = (float) this.repositoryKitMec.filterMatIdDevPend(mat.getCompanyId(), mat.getResaleId(), mat.getId())
-//                    .stream()
-//                    .mapToDouble(ToolControlKitMec::getQuantityReq)
-//                    .sum();
-//            mat.setQuantityAvailableKit(mat.getQuantityAccountingKit() - quantityKit);
-        } else if (mat.getType().equals(TypeRequest.Ambos)) {
-            float quantityLoan = (float) this.repositoryMatMec.filterMatIdDevPend(mat.getCompanyId(), mat.getResaleId(), mat.getId())
-                    .stream()
-                    .mapToDouble(ToolControlMatMec::getDeliveryQuantity)
-                    .sum();
-            mat.setQuantityAvailableLoan(mat.getQuantityAccountingLoan() - quantityLoan);
-
-//            float quantityKit = (float) this.repositoryKitMec.filterMatIdDevPend(mat.getCompanyId(), mat.getResaleId(), mat.getId())
-//                    .stream()
-//                    .mapToDouble(ToolControlKitMec::getQuantityReq)
-//                    .sum();
-//            mat.setQuantityAvailableKit(mat.getQuantityAccountingKit() - quantityKit);
+    @SneakyThrows
+    private ToolControlMaterial calQuantityAvailableMatMec(ToolControlMaterial mat) {
+        float quantityLoan = (float) this.repositoryMatMec.filterMatIdDevPend(mat.getCompanyId(), mat.getResaleId(), mat.getId())
+                .stream()
+                .mapToDouble(ToolControlMatMec::getDeliveryQuantity)
+                .sum();
+        float qtd = mat.getQuantityAccountingLoan() - quantityLoan;
+        if (qtd < 0.0) {
+            throw new ToolControlException("Quantidade contabil menor que a requisitada.");
         }
+        mat.setQuantityAvailableLoan(mat.getQuantityAccountingLoan() - quantityLoan);
         return mat;
     }
 
@@ -154,7 +168,7 @@ public class ToolControlMaterialService implements IToolControlMaterialService {
         map.put("id", mat.getId());
         map.put("status", mat.getStatus());
         map.put("type", mat.getType());
-        map.put("numberCA",mat.getNumberCA());
+        map.put("numberCA", mat.getNumberCA());
         map.put("description", mat.getDescription());
         map.put("categoryId", mat.getCategoryId());
         map.put("quantityAccountingLoan", mat.getQuantityAccountingLoan());
@@ -162,7 +176,6 @@ public class ToolControlMaterialService implements IToolControlMaterialService {
         map.put("quantityAccountingKit", mat.getQuantityAccountingKit());
         map.put("quantityAvailableKit", mat.getQuantityAvailableKit());
         map.put("validityDay", mat.getValidityDay());
-
         if (mat.getPhoto() == null) {
             map.put("photo", "");
         } else {
