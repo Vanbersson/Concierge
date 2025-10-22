@@ -40,6 +40,7 @@ import { IMAGE_MAX_SIZE, MESSAGE_RESPONSE_SUCCESS } from '../../../util/constant
 import { NgxImageCompressService } from 'ngx-image-compress';
 import { StorageService } from '../../../services/storage/storage.service';
 import { StatusEnabledDisabled } from '../../../models/enum/status-enabled-disabled';
+import { SuccessError } from '../../../models/enum/success-error';
 
 @Component({
   selector: 'app-user',
@@ -284,11 +285,26 @@ export default class UserComponent implements OnInit {
     this.getPermissionUser();
   }
 
-  private getPermissionUser() {
+  private async getPermissionUser() {
     this.permissionsSelect = [];
-
+    const result = await this.permissionFilterUser();
+    if (result.status == 200 && result.body.status == SuccessError.succes) {
+      if (result.body.data.length > 0) {
+        var perTemp: Permission[] = [];
+        for (var item of result.body.data) {
+          for (var per of this.permissions) {
+            if (item.permissionId == per.id) {
+              perTemp.push(per);
+            }
+          }
+        }
+        this.permissionsSelect = perTemp;
+      }
+    } else if (result.status == 200 && result.body.status == SuccessError.error) {
+      this.messageService.add({ severity: 'info', summary: result.body.header, detail: result.body.message, icon: 'pi pi-info-circle' });
+    }
     //Permission user selected
-    this.permissionService.getAllUser(this.userSelect.companyId, this.userSelect.resaleId, this.userSelect.id).subscribe(data => {
+    /* this.permissionService.filterUser(this.userSelect.companyId, this.userSelect.resaleId, this.userSelect.id).subscribe(data => {
 
       if (data.length > 0) {
         var perTemp: Permission[] = [];
@@ -304,7 +320,16 @@ export default class UserComponent implements OnInit {
         }
         this.permissionsSelect = perTemp;
       }
-    });
+    }); */
+  }
+
+  private async permissionFilterUser(): Promise<HttpResponse<MessageResponse>> {
+    try {
+      return await lastValueFrom(this.permissionService.filterUser(this.userSelect.companyId, this.userSelect.resaleId, this.userSelect.id));
+    } catch (error) {
+      this.messageService.add({ severity: 'error', summary: 'Erro', detail: error.error.message, icon: 'pi pi-times' });
+      return error;
+    }
   }
   public hideDialogUser() {
     this.visibleDialogUser = false;
@@ -393,7 +418,6 @@ export default class UserComponent implements OnInit {
     }
   }
   private saveUser() {
-
     const { value } = this.formUser;
     var userNew = new User();
 
@@ -463,7 +487,7 @@ export default class UserComponent implements OnInit {
     this.visibleDialogFunc = false;
   }
   private getPermissions() {
-    this.permissionService.getAll$().subscribe(data => {
+    this.permissionService.listAll().subscribe(data => {
       this.permissions = data;
     });
   }
@@ -482,7 +506,6 @@ export default class UserComponent implements OnInit {
         pUser.permissionId = per.id;
 
         const responseSave = await this.savePermission(pUser);
-
         if (responseSave.status == 201) {
           if (i == (this.permissionsSelect.length - 1)) {
             this.alertPermisionSave();
@@ -495,16 +518,16 @@ export default class UserComponent implements OnInit {
     }
 
   }
-  private async savePermission(per: PermissionUser): Promise<HttpResponse<PermissionUser>> {
+  private async savePermission(per: PermissionUser): Promise<HttpResponse<MessageResponse>> {
     try {
-      return lastValueFrom(this.permissionService.saveUser(per));
+      return await lastValueFrom(this.permissionService.saveUser(per));
     } catch (error) {
       return error;
     }
   }
   private async deletePermissionUser(permissionUser: PermissionUser): Promise<HttpResponse<MessageResponse>> {
     try {
-      return lastValueFrom(this.permissionService.deleteUser(permissionUser));
+      return await lastValueFrom(this.permissionService.deleteAllUser(permissionUser));
     } catch (error) {
       return error;
     }

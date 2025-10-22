@@ -98,16 +98,17 @@ public class VehicleEntryService implements IVehicleEntryService {
 
     @SneakyThrows
     @Override
-    public String exit(VehicleExitSaveDto dataExit) {
+    public MessageResponse exit(VehicleExitSaveDto dataExit) {
         try {
-            String message = this.validation.exit(dataExit);
-
-            if (message.equals(ConstantsMessage.SUCCESS)) {
-
+            MessageResponse response = this.validation.exit(dataExit);
+            if (ConstantsMessage.SUCCESS.equals(response.getStatus())) {
                 VehicleEntry vehicleEntry = this.repository.filterVehicleId(dataExit.companyId(), dataExit.resaleId(), dataExit.vehicleId());
-                if (vehicleEntry.getStatusAuthExit() != StatusAuthExitEnum.Authorized)
-                    throw new VehicleEntryException("Vehicle not authorized.");
-
+                if (vehicleEntry.getStatusAuthExit() != StatusAuthExitEnum.Authorized){
+                    response.setStatus(ConstantsMessage.ERROR);
+                    response.setHeader(ConstantsMessage.ERROR);
+                    response.setMessage("Veículo não autorizado.");
+                    response.setData(null);
+                }
                 vehicleEntry.setStatus(StatusVehicleEnum.saidaAutorizada);
                 vehicleEntry.setStepEntry(StepVehicleEnum.Exit);
                 vehicleEntry.setUserIdExit(dataExit.userId());
@@ -115,9 +116,9 @@ public class VehicleEntryService implements IVehicleEntryService {
                 vehicleEntry.setDateExit(dataExit.dateExit());
 
                 this.repository.save(vehicleEntry);
-                return ConstantsMessage.SUCCESS;
+                return response;
             } else {
-                throw new VehicleEntryException(message);
+                return response;
             }
         } catch (Exception ex) {
             throw new VehicleEntryException(ex.getMessage());

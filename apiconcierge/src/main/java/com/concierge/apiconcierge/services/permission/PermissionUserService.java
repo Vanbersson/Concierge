@@ -1,6 +1,7 @@
 package com.concierge.apiconcierge.services.permission;
 
 import com.concierge.apiconcierge.exceptions.permission.PermissionUserException;
+import com.concierge.apiconcierge.models.message.MessageResponse;
 import com.concierge.apiconcierge.models.permission.PermissionUser;
 import com.concierge.apiconcierge.repositories.permission.IPermissionUserRepository;
 import com.concierge.apiconcierge.util.ConstantsMessage;
@@ -21,34 +22,15 @@ public class PermissionUserService implements IPermissionUserService {
 
     @SneakyThrows
     @Override
-    public String save(PermissionUser permission) {
+    public MessageResponse save(PermissionUser permission) {
         try {
-            String message = this.validation.save(permission);
-            if (ConstantsMessage.SUCCESS.equals(message)) {
-
+            MessageResponse response = this.validation.save(permission);
+            if (ConstantsMessage.SUCCESS.equals(response.getStatus())) {
                 permission.setId(null);
                 this.repository.save(permission);
-
-                return ConstantsMessage.SUCCESS;
+                return response;
             } else {
-                throw new PermissionUserException(message);
-            }
-
-        } catch (Exception ex) {
-            throw new PermissionUserException(ex.getMessage());
-        }
-
-    }
-
-    @SneakyThrows
-    @Override
-    public List<PermissionUser> filterPermissionUser(Integer companyId, Integer resaleId, Integer userId) {
-        try {
-            String message = this.validation.filterPermissionUser(companyId, resaleId, userId);
-            if (ConstantsMessage.SUCCESS.equals(message)) {
-                return this.repository.listPermissionUser(companyId, resaleId, userId);
-            } else {
-                throw new PermissionUserException(message);
+                return response;
             }
         } catch (Exception ex) {
             throw new PermissionUserException(ex.getMessage());
@@ -57,14 +39,62 @@ public class PermissionUserService implements IPermissionUserService {
 
     @SneakyThrows
     @Override
-    public String deletePermissionsUser(Integer companyId, Integer resaleId, Integer userId) {
+    public MessageResponse filterUser(Integer companyId, Integer resaleId, Integer userId) {
         try {
-            String message = this.validation.deletePermissionsUser(companyId, resaleId, userId);
-            if (ConstantsMessage.SUCCESS.equals(message)) {
+            MessageResponse response = this.validation.filterUser(companyId, resaleId, userId);
+            if (ConstantsMessage.SUCCESS.equals(response.getStatus())) {
+                List<PermissionUser> p = this.repository.listPermissionUser(companyId, resaleId, userId);
+                if (p.isEmpty()) {
+                    response.setStatus(ConstantsMessage.ERROR);
+                    response.setHeader(ConstantsMessage.ERROR);
+                    response.setMessage("Permissões não encontrada.");
+                    response.setData(null);
+                    return response;
+                }
+                response.setData(p);
+                return response;
+            } else {
+                return response;
+            }
+        } catch (Exception ex) {
+            throw new PermissionUserException(ex.getMessage());
+        }
+    }
+
+    @SneakyThrows
+    @Override
+    public MessageResponse filterUserPermission(Integer companyId, Integer resaleId, Integer userId, Integer permissionId) {
+        try {
+            MessageResponse response = this.validation.filterUserPermission(companyId, resaleId, userId, permissionId);
+            if (ConstantsMessage.SUCCESS.equals(response.getStatus())) {
+                PermissionUser p = this.repository.findPermissionId(companyId, resaleId, userId, permissionId);
+                if (p == null) {
+                    response.setStatus(ConstantsMessage.ERROR);
+                    response.setHeader("Permissão - " + permissionId);
+                    response.setMessage(ConstantsMessage.NOT_PERMISSION);
+                    response.setData(null);
+                    return response;
+                }
+                response.setData(p);
+                return response;
+            } else {
+                return response;
+            }
+        } catch (Exception ex) {
+            throw new PermissionUserException(ex.getMessage());
+        }
+    }
+
+    @SneakyThrows
+    @Override
+    public MessageResponse deletePermissionsUser(Integer companyId, Integer resaleId, Integer userId) {
+        try {
+            MessageResponse response = this.validation.deletePermissionsUser(companyId, resaleId, userId);
+            if (ConstantsMessage.SUCCESS.equals(response.getStatus())) {
                 this.repository.deleteUser(companyId, resaleId, userId);
-                return ConstantsMessage.SUCCESS;
+                return response;
             } else {
-                throw new PermissionUserException(message);
+                return response;
             }
         } catch (Exception ex) {
             throw new PermissionUserException(ex.getMessage());

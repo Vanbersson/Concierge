@@ -3,6 +3,7 @@ package com.concierge.apiconcierge.controllers.permission;
 import com.concierge.apiconcierge.dtos.message.MessageResponseDto;
 import com.concierge.apiconcierge.dtos.permission.PermissionUserDto;
 import com.concierge.apiconcierge.dtos.permission.PermissionUserSaveDto;
+import com.concierge.apiconcierge.models.message.MessageResponse;
 import com.concierge.apiconcierge.models.permission.PermissionUser;
 import com.concierge.apiconcierge.repositories.permission.IPermissionRepository;
 import com.concierge.apiconcierge.repositories.permission.IPermissionUserRepository;
@@ -31,35 +32,45 @@ public class PermissionUserController {
         try {
             PermissionUser permission = new PermissionUser();
             BeanUtils.copyProperties(data, permission);
-
-            String message = this.service.save(permission);
-
-            return ResponseEntity.status(HttpStatus.CREATED).body(new MessageResponseDto(message));
+            MessageResponse response = this.service.save(permission);
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
         }
     }
 
-    @GetMapping("/{companyId}/{resaleId}/filter/user/{userId}")
-    public ResponseEntity<Object> filterPermissionUser(@PathVariable(name = "companyId") Integer companyId,
-                                                       @PathVariable(name = "resaleId") Integer resaleId,
-                                                       @PathVariable(value = "userId") Integer userId) {
+    @GetMapping("/{companyId}/{resaleId}/filter/u/{userId}")
+    public ResponseEntity<Object> filterUser(@PathVariable(name = "companyId") Integer companyId,
+                                             @PathVariable(name = "resaleId") Integer resaleId,
+                                             @PathVariable(value = "userId") Integer userId) {
         try {
-            List<PermissionUser> permissions = this.service.filterPermissionUser(companyId, resaleId, userId);
-            return ResponseEntity.status(HttpStatus.OK).body(permissions);
+            MessageResponse response = this.service.filterUser(companyId, resaleId, userId);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
+        }
+    }
+
+    @GetMapping("/{companyId}/{resaleId}/filter/u/{userId}/p/{permission}")
+    public ResponseEntity<Object> filterUserPermission(@PathVariable(name = "companyId") Integer companyId,
+                                                       @PathVariable(name = "resaleId") Integer resaleId,
+                                                       @PathVariable(value = "userId") Integer userId,
+                                                       @PathVariable(value = "permission") Integer permission) {
+        try {
+            MessageResponse response = this.service.filterUserPermission(companyId, resaleId, userId, permission);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
         }
     }
 
     @PostMapping("/all/delete")
-    public ResponseEntity<Object> deleteAllPermissionUser(@RequestBody PermissionUserDto data) {
+    public ResponseEntity<Object> deleteAllUser(@RequestBody PermissionUserDto data) {
         try {
-            String message = this.service.deletePermissionsUser(data.companyId(), data.resaleId(), data.userId());
-            return ResponseEntity.status(HttpStatus.OK).body(new MessageResponseDto(message));
+            MessageResponse response = this.service.deletePermissionsUser(data.companyId(), data.resaleId(), data.userId());
+            return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
         }
-
     }
 }

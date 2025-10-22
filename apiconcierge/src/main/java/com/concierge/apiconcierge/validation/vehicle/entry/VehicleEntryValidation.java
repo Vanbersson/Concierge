@@ -233,28 +233,59 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
         return response;
     }
 
-    public String exit(VehicleExitSaveDto dataExit) {
-
-        if (dataExit.companyId() == null || dataExit.companyId() == 0)
-            return ConstantsMessage.ERROR_COMPANY;
-        if (dataExit.resaleId() == null || dataExit.resaleId() == 0)
-            return ConstantsMessage.ERROR_RESALE;
-        if (dataExit.vehicleId() == null || dataExit.vehicleId() == 0)
-            return ConstantsMessage.ERROR_VEHICLE_ID;
-        if (dataExit.userId() == null || dataExit.userId() == 0)
-            return ConstantsMessage.ERROR_USER_ID;
-        if (dataExit.userName().isBlank())
-            return ConstantsMessage.ERROR_NAME;
-        if (dataExit.dateExit() == null)
-            return ConstantsMessage.ERROR;
-
+    @Override
+    public MessageResponse exit(VehicleExitSaveDto dataExit) {
+        MessageResponse response = new MessageResponse();
+        if (dataExit.companyId() == null || dataExit.companyId() == 0) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Empresa");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (dataExit.resaleId() == null || dataExit.resaleId() == 0) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Revenda");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (dataExit.vehicleId() == null || dataExit.vehicleId() == 0) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Veículo");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (dataExit.userId() == null || dataExit.userId() == 0) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Usuário");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (dataExit.userName().isBlank()) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Usuário");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (dataExit.dateExit() == null) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Data e Hora");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        //Permissão
         if (dataExit.userId() != 1) {
             PermissionUser permission = this.permissionUser.findPermissionId(dataExit.companyId(), dataExit.resaleId(), dataExit.userId(), AUTH_EXIT_VEHICLE);
-            if (permission == null)
-                return ConstantsMessage.ERROR_PERMISSION;
+            if (permission == null) {
+                response.setStatus(ConstantsMessage.ERROR);
+                response.setHeader("Permissão - " + AUTH_EXIT_VEHICLE);
+                response.setMessage(ConstantsMessage.NOT_PERMISSION);
+                return response;
+            }
         }
-
-        return ConstantsMessage.SUCCESS;
+        response.setStatus(ConstantsMessage.SUCCESS);
+        response.setHeader("Saída Veículo");
+        response.setMessage("Saída realizada com sucesso.");
+        return response;
     }
 
     @Override

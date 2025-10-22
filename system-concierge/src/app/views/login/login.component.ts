@@ -27,6 +27,8 @@ import { IAuthResponse } from '../../interfaces/auth/iauthresponse';
 
 //Class
 import { PermissionUser } from '../../models/permission/permission-user';
+import { MessageResponse } from '../../models/message/message-response';
+import { SuccessError } from '../../models/enum/success-error';
 
 @Component({
   selector: 'app-login',
@@ -53,7 +55,7 @@ export default class LoginComponent {
     private busyService: BusyService,
     private menuUserService: MenuUserService,
     private permissionService: PermissionService
-  ) { 
+  ) {
   }
 
   async loginUser() {
@@ -65,10 +67,8 @@ export default class LoginComponent {
       this.busyService.busy();
 
       const resultLogin = await this.login(login);
-
       if (resultLogin.status == 200) {
         this.messageService.add({ severity: 'success', summary: 'Bem-vindo', detail: resultLogin.body.name, icon: 'pi pi-lock-open', life: 2000 });
-
         this.storageService.companyId = resultLogin.body.companyId.toString();
         this.storageService.resaleId = resultLogin.body.resaleId.toString();
         this.storageService.photo = resultLogin.body.photo;
@@ -87,24 +87,12 @@ export default class LoginComponent {
           keys += element.key + ",";
         }
         this.storageService.menus = keys;
-
-        const resultPermission = await this.permissionUser(resultLogin.body.companyId, resultLogin.body.resaleId, resultLogin.body.id);
-
-        var permissionKey = "";
-        for (let a = 0; a < resultPermission.length; a++) {
-          const element = resultPermission[a];
-          permissionKey += element.permissionId + ",";
-        }
-        this.storageService.permissions = permissionKey;
-
-        setTimeout(() => {
-          this.router.navigateByUrl('/dashboard');
-        }, 1000);
+         setTimeout(() => {
+            this.router.navigateByUrl('/dashboard');
+          }, 1000);
       }
-
       this.busyService.idle();
     }
-
   }
   forgetPass() {
     this.confirmationService.confirm({
@@ -129,12 +117,4 @@ export default class LoginComponent {
       return [];
     }
   }
-  private async permissionUser(compamyId: number, resaleId: number, userId: number): Promise<PermissionUser[]> {
-    try {
-      return await lastValueFrom(this.permissionService.getAllUser(compamyId, resaleId, userId));
-    } catch (error) {
-      return error;
-    }
-  }
-
 }

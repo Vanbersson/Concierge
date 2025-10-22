@@ -28,8 +28,8 @@ export class VehicleService {
     return this.http.post<MessageResponse>(environment.apiuUrl + "/vehicle/entry/update", vehicle, { headers: this.myHeaders(), observe: 'response' });
   }
 
-  entryExit$(vehicle: VehicleExit): Observable<HttpResponse<VehicleExit>> {
-    return this.http.post<VehicleExit>(environment.apiuUrl + "/vehicle/entry/exit", vehicle, { headers: this.myHeaders(), observe: 'response' });
+  entryExit(vehicle: VehicleExit): Observable<HttpResponse<MessageResponse>> {
+    return this.http.post<MessageResponse>(environment.apiuUrl + "/vehicle/entry/exit", vehicle, { headers: this.myHeaders(), observe: 'response' });
   }
 
   allAuthorized$(): Observable<VehicleEntry[]> {

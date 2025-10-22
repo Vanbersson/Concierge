@@ -65,6 +65,7 @@ import { FilterDriverComponent } from '../../../components/filter.driver/filter.
 import { DriverService } from '../../../services/driver/driver.service';
 import { MessageResponse } from '../../../models/message/message-response';
 import { SuccessError } from '../../../models/enum/success-error';
+import { PermissionService } from '../../../services/permission/permission.service';
 
 @Component({
   selector: 'app-manutencao',
@@ -173,6 +174,7 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
   detailsVehicle: boolean = false;
 
   constructor(
+    private permissionService: PermissionService,
     private primeNGConfig: PrimeNGConfig,
     private vehicleService: VehicleService,
     private activatedRoute: ActivatedRoute,
@@ -678,6 +680,8 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
         }
         //Valid
         this.addRequireForms();
+      } else if (permissionResult.status == 200 && permissionResult.body.status == SuccessError.error) {
+        this.messageService.add({ severity: 'info', summary: permissionResult.body.header, detail: permissionResult.body.message, icon: 'pi pi-info-circle' });
       }
       //Fecha loading
       this.busyService.idle();
@@ -727,6 +731,7 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
     }
   }
   public async deleteAuth2() {
+
     if (this.vehicleEntry.idUserExitAuth2 != 0) {
       var auth = new VehicleEntryAuth();
       auth.companyId = this.storageService.companyId;
@@ -800,15 +805,20 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
     this.messageService.add({ severity: 'error', summary: 'Placa ' + uppercase.transform(placa), detail: "Vaículo já se encontra na empresa", icon: 'pi pi-truck' });
   }
   //Budget
-  public confirmGerarOrcamento() {
+  public async confirmGerarOrcamento() {
     if (this.formVehicle.value.numServiceOrder == "" || this.formVehicle.value.numServiceOrder == null) {
       this.messageService.add({ severity: 'info', summary: 'Número O.S.', detail: 'Não informado', icon: 'pi pi-info-circle' });
       return;
     }
 
     if (this.vehicleEntry.budgetStatus != StatusBudgetEnum.NotBudget) {
+      /* PERMISSION - 152 */
+      /* VISUALIZAR ORÇAMENTO */
+      const permission = await this.searchPermission(152);
+      if (!permission) { return; }
       this.router.navigateByUrl("/oficina/manutencao-orcamento/" + this.vehicleEntry.id);
     } else {
+
       this.confirmationService.confirm({
         header: 'Confirmar',
         message: 'Gerar um orçamento.',
@@ -819,13 +829,21 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
         acceptButtonStyleClass: 'p-button-outlined p-button-sm',
         acceptLabel: 'Sim',
         accept: async () => {
+          /* PERMISSION - 150 */
+          /* GERAR ORÇAMENTO */
+          const permission = await this.searchPermission(150);
+          if (!permission) { return; }
           this.budget = { companyId: this.storageService.companyId, resaleId: this.storageService.resaleId, vehicleEntryId: this.vehicleEntry.id };
-
           const budgetResult = await this.saveBudget(this.budget);
           if (budgetResult.status == 201) {
             this.vehicleEntry.budgetStatus = budgetResult.body.status;
             this.messageService.add({ severity: 'info', summary: 'Orçamento - ' + budgetResult.body.id, detail: 'Gerado com sucesso', life: 2000 });
-            setTimeout(() => {
+
+            setTimeout(async () => {
+              /* PERMISSION - 152 */
+              /* VISUALIZAR ORÇAMENTO */
+              const permission = await this.searchPermission(152);
+              if (!permission) { return; }
               this.router.navigateByUrl('/oficina/manutencao-orcamento/' + this.vehicleEntry.id);
             }, 2000);
           }
@@ -979,6 +997,11 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
     }
   }
   public async save() {
+    /* PERMISSION - 100 */
+    /* EDITAR ENTRADA DO VEÍCULO */
+    const permission = await this.searchPermission(100);
+    if (!permission) { return; }
+
     if (this.validInformation()) {
       //Inicia loading
       this.busyService.busy();
@@ -1003,5 +1026,19 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
       return error;
     }
 
+  }
+  private async searchPermission(permission: number): Promise<boolean> {
+    try {
+      var result = await lastValueFrom(this.permissionService.filterUserPermission(this.storageService.companyId, this.storageService.resaleId, this.storageService.id, permission));
+      if (result.status == 200 && result.body.status == SuccessError.succes) {
+        return true;
+      } else if (result.status == 200 && result.body.status == SuccessError.error) {
+        this.messageService.add({ severity: 'info', summary: result.body.header, detail: result.body.message, icon: 'pi pi-info-circle' });
+      }
+      return false;
+    } catch (error) {
+      this.messageService.add({ severity: 'error', summary: 'Erro', detail: error.error.message, icon: 'pi pi-times' });
+      return false;
+    }
   }
 }

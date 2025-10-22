@@ -31,6 +31,7 @@ import { BusyService } from '../../../components/loading/busy.service';
 import { TaskService } from '../../../services/task/task.service';
 import { MessageResponse } from '../../../models/message/message-response';
 import { SuccessError } from '../../../models/enum/success-error';
+import { PermissionService } from '../../../services/permission/permission.service';
 
 @Component({
   selector: 'app-veiculos',
@@ -51,7 +52,9 @@ export default class VeiculosComponent implements OnInit, OnDestroy {
   listVehicleEntry: VehicleEntry[] = [];
   selectedItems: VehicleEntry[] = [];
 
-  constructor(private primeNGConfig: PrimeNGConfig,
+  constructor(
+    private permissionService: PermissionService,
+    private primeNGConfig: PrimeNGConfig,
     private vehicleService: VehicleService,
     public layoutService: LayoutService,
     private storageService: StorageService,
@@ -169,7 +172,11 @@ export default class VeiculosComponent implements OnInit, OnDestroy {
     }
     return 'warning';
   }
-  editVeiculo(id: number) {
+  async editVeiculo(id: number) {
+    /* PERMISSION - 100 */
+    /* EDITAR ENTRADA DO VEÍCULO */
+    const permission = await this.searchPermission(100);
+    if (!permission) { return; }
     this.router.navigateByUrl('portaria/mannutencao-entrada-veiculo/' + id);
   }
   //Authorization exit
@@ -229,6 +236,20 @@ export default class VeiculosComponent implements OnInit, OnDestroy {
     } catch (error) {
       this.messageService.add({ severity: 'error', summary: 'Erro', detail: "Não catalogado.", icon: 'pi pi-times' });
       return error;
+    }
+  }
+  private async searchPermission(permission: number): Promise<boolean> {
+    try {
+      var result = await lastValueFrom(this.permissionService.filterUserPermission(this.storageService.companyId, this.storageService.resaleId, this.storageService.id, permission));
+      if (result.status == 200 && result.body.status == SuccessError.succes) {
+        return true;
+      } else if (result.status == 200 && result.body.status == SuccessError.error) {
+        this.messageService.add({ severity: 'info', summary: result.body.header, detail: result.body.message, icon: 'pi pi-info-circle' });
+      }
+      return false;
+    } catch (error) {
+      this.messageService.add({ severity: 'error', summary: 'Erro', detail: error.error.message, icon: 'pi pi-times' });
+      return false;
     }
   }
 }

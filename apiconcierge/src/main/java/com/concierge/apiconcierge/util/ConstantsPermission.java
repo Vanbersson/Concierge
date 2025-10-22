@@ -14,4 +14,8 @@ public class ConstantsPermission {
     public static final Integer BUDGET_NEW = 150;
     public static final Integer BUDGET_UPDATE = 151;
     public static final Integer BUDGET_SHOW = 152;
+
+    //WORKSHOP
+    public static final Integer EDIT_QTD_MATERIAL = 300;
+
 }

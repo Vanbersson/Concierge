@@ -10,7 +10,7 @@ import com.concierge.apiconcierge.models.vehicle.entry.VehicleEntry;
 public interface IVehicleEntryValidation {
     public String save(VehicleEntry vehicle);
     public MessageResponse update(VehicleEntry vehicle);
-    public String exit(VehicleExitSaveDto dataExit);
+    public MessageResponse exit(VehicleExitSaveDto dataExit);
     public MessageResponse addAuthExit(VehicleEntry vehicle, AuthExitDto authExitDto);
     public MessageResponse deleteAuthExit1(VehicleEntry vehicle, AuthExitDto authExitDto);
     public MessageResponse deleteAuthExit2(VehicleEntry vehicle, AuthExitDto authExitDto);

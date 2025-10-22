@@ -20,6 +20,8 @@ import { HttpResponse } from '@angular/common/http';
 import { TaskService } from '../../../services/task/task.service';
 import { StorageService } from '../../../services/storage/storage.service';
 import { VehicleExit } from '../../../models/vehicle/vehicle-exit';
+import { MessageResponse } from '../../../models/message/message-response';
+import { SuccessError } from '../../../models/enum/success-error';
 
 @Component({
   selector: 'app-vehicleexit',
@@ -52,14 +54,12 @@ export class VehicleExitComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.listVehicles();
-
     this.taskService.startTask(() => this.listVehicles(), 60000);
   }
   ngOnDestroy(): void {
     this.taskService.stopTask();
   }
   confirm() {
-
     this.confirmationService.confirm({
       header: 'Confirmar saída?',
       message: 'Por favor confirme para continuar.',
@@ -91,7 +91,6 @@ export class VehicleExitComponent implements OnInit, OnDestroy {
     // Formata a data e adiciona o fuso horário
     return datePipe.transform(date, "yyyy-MM-dd'T'HH:mm:ss.SSS") + timezone;
   }
-
   private async confirmationExit() {
     for (let index = 0; index < this.selectedVehicle.length; index++) {
       var element = this.selectedVehicle[index];
@@ -104,25 +103,23 @@ export class VehicleExitComponent implements OnInit, OnDestroy {
       this.vehicleExit.dateExit = this.formatDateTime(new Date());
 
       var result = await this.confirmationExitVehicle(this.vehicleExit);
-      if (result.status == 200) {
+      if (result.status == 200 && result.body.status == SuccessError.succes) {
         var upper = new UpperCasePipe();
-        this.messageService.add({ severity: 'success', summary: 'Saída de veículo', detail: "Realizada com sucesso " + upper.transform(element.placa) });
+        this.messageService.add({ severity: 'success', summary: result.body.header, detail: result.body.message + " " + upper.transform(element.placa), icon: 'pi pi-check' });
+      } else if (result.status == 200 && result.body.status == SuccessError.error) {
+        this.messageService.add({ severity: 'info', summary: result.body.header, detail: result.body.message, icon: 'pi pi-info-circle' });
       }
-
     }
     this.cleanSelectionVehicle();
     this.listVehicles();
   }
-  private async confirmationExitVehicle(vehicle: VehicleExit): Promise<HttpResponse<VehicleExit>> {
+  private async confirmationExitVehicle(vehicle: VehicleExit): Promise<HttpResponse<MessageResponse>> {
     try {
-      return await lastValueFrom(this.vehicleService.entryExit$(vehicle))
+      return await lastValueFrom(this.vehicleService.entryExit(vehicle))
     } catch (error) {
-      if (error.error.message == "Permission not informed.") {
-        this.messageService.add({ severity: 'error', summary: 'Permissão', detail: "Você não tem permissão", icon: 'pi pi-times' });
-      } 
+      this.messageService.add({ severity: 'error', summary: 'Erro', detail: error.error.message, icon: 'pi pi-times' });
       return error;
     }
-
   }
   public listVehicles() {
 

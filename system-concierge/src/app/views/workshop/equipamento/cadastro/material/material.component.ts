@@ -34,6 +34,8 @@ import { BusyService } from '../../../../../components/loading/busy.service';
 import { MessageResponse } from '../../../../../models/message/message-response';
 import { SuccessError } from '../../../../../models/enum/success-error';
 import { TypeCategory } from '../../../../../models/enum/type-category';
+import { PermissionService } from '../../../../../services/permission/permission.service';
+import { PermissionUser } from '../../../../../models/permission/permission-user';
 
 
 enum typeMaterial {
@@ -87,6 +89,7 @@ export default class MaterialComponent implements OnInit {
   });
 
   constructor(
+    private permissionService: PermissionService,
     private busyService: BusyService,
     private materialService: ToolControlMaterialService,
     private messageService: MessageService,
@@ -110,7 +113,6 @@ export default class MaterialComponent implements OnInit {
       this.listCat = data;
     });
   }
-
   allCategoriesDesc(id: number): string {
     var desc = "";
     for (var cat of this.listCat) {
@@ -120,7 +122,6 @@ export default class MaterialComponent implements OnInit {
     }
     return desc;
   }
-
   getCategory(id: number): ToolControlCategory {
     var category: ToolControlCategory;
     for (var cat of this.listCat) {
@@ -211,7 +212,13 @@ export default class MaterialComponent implements OnInit {
   disableQuantityAvailableKit() {
     this.formMat.get("quantityAvailableKit").disable();
   }
-  confirmEditQuant() {
+
+  async confirmEditQuant() {
+    /* PERMISSION - 300 */
+    /* PERMITIR ALTERAR A QUANTIDADE DE MATERIAIS */
+    const permission = await this.searchPermission(300);
+    if (!permission) { return; }
+
     this.confirmationService.confirm({
       header: 'Alterar Quantidade?',
       message: 'Por favor comfirme para alterar.',
@@ -243,6 +250,7 @@ export default class MaterialComponent implements OnInit {
 
       }
     });
+
   }
   editMat(mat: ToolControlMaterial) {
     this.showDialog();
@@ -250,7 +258,7 @@ export default class MaterialComponent implements OnInit {
     this.category = this.listCat.find(cat => cat.id == this.material.categoryId);
     if (this.category.type == TypeCategory.EPI || this.category.type == TypeCategory.Uniforme) {
       this.visible = false;
-    }else{
+    } else {
       this.visible = true;
     }
 
@@ -379,6 +387,20 @@ export default class MaterialComponent implements OnInit {
     } catch (error) {
       this.messageService.add({ severity: 'error', summary: "Erro", detail: error.error.message, icon: 'pi pi-times' });
       return error;
+    }
+  }
+  private async searchPermission(permission: number): Promise<boolean> {
+    try {
+      var result = await lastValueFrom(this.permissionService.filterUserPermission(this.storageService.companyId, this.storageService.resaleId, this.storageService.id, permission));
+      if (result.status == 200 && result.body.status == SuccessError.succes) {
+        return true;
+      } else if (result.status == 200 && result.body.status == SuccessError.error) {
+        this.messageService.add({ severity: 'info', summary: result.body.header, detail: result.body.message, icon: 'pi pi-info-circle' });
+      }
+      return false;
+    } catch (error) {
+      this.messageService.add({ severity: 'error', summary: 'Erro', detail: error.error.message, icon: 'pi pi-times' });
+      return false;
     }
   }
 

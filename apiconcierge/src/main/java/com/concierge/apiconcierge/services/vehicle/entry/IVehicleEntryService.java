@@ -15,7 +15,7 @@ public interface IVehicleEntryService {
 
     public MessageResponse update(VehicleEntry vehicle);
 
-    public String exit(VehicleExitSaveDto dataExit);
+    public MessageResponse exit(VehicleExitSaveDto dataExit);
 
     public List<Object> allAuthorized(Integer companyId, Integer resaleId);
 
