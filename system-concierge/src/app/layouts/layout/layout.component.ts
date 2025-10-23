@@ -70,11 +70,13 @@ export default class LayoutComponent implements OnDestroy {
     this.router.events.pipe(filter(event => event instanceof NavigationEnd)).subscribe(() => {
       this.hideMenu();
       this.blockBodyScroll();
-    })
+    });
 
+     if(this.layoutService.isMobile()){
+      const elem = document.documentElement;
+      elem.requestFullscreen();
+     }
   }
-
-  
 
   hideMenu() {
     this.layoutService.state.overlayMenuActive = false;
@@ -98,8 +100,7 @@ export default class LayoutComponent implements OnDestroy {
   blockBodyScroll(): void {
     if (document.body.classList) {
       document.body.classList.add('blocked-scroll');
-    }
-    else {
+    } else {
       document.body.className += ' blocked-scroll';
     }
   }

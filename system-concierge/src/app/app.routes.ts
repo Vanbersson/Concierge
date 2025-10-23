@@ -3,6 +3,7 @@ import { authGuardGuard } from './services/login/auth-guard.guard';
 import { DriverMenuGuard } from './views/concierge/driver/driver.menu.guard';
 import { VehicleEntryMenuGuard } from './views/concierge/vehicle.entry/vehicle.entry.menu.guard';
 import { VehicleMenuGuard } from './views/concierge/vehicle/vehicle.menu';
+import { UserGuard } from './views/settings/user/user.guard';
 
 export const routes: Routes = [
     {
@@ -44,13 +45,13 @@ export const routes: Routes = [
                         path: 'lista-entrada-veiculo',
                         title: 'Lista Veículos',
                         loadComponent: () => import('./views/concierge/vehicle/vehicle.component'),
-                        canActivate:[VehicleMenuGuard]
+                        canActivate: [VehicleMenuGuard]
                     },
                     {
                         path: 'manutencao-motorista',
                         title: 'Motorista',
                         loadComponent: () => import('./views/concierge/driver/driver.component'),
-                        canActivate:[DriverMenuGuard]
+                        canActivate: [DriverMenuGuard]
                     },
                     {
                         path: 'mannutencao-entrada-veiculo/:id',
@@ -137,7 +138,8 @@ export const routes: Routes = [
                     {
                         path: 'usuario',
                         title: 'Usuário',
-                        loadComponent: () => import('./views/settings/user/user.component')
+                        loadComponent: () => import('./views/settings/user/user.component'),
+                        canActivate: [UserGuard]
 
                     }
                 ]

@@ -451,18 +451,14 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
   }
   //Add or Delete Vehicle entry
   public async addVehicleEntry() {
-
     if (this.validVehicleEntry()) {
-
       if (this.formVehicle.value.vehicleNew == "not") {
-
         const resultPlaca = await this.existsPlaca();
         if (resultPlaca.body.message == "yes") {
           this.messageService.add({ severity: 'error', summary: 'Veículo ' + this.upperCasePipe.transform(this.formVehicle.value.placa), detail: "Já se encontra na empresa", icon: 'pi pi-truck', life: 10000 });
         } else {
           this.loadVehicleEntry();
         }
-
       } else {
         this.loadVehicleEntry();
       }

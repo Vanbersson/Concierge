@@ -1,17 +1,12 @@
 import { Component, ElementRef, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-
 //PrimeNg
 import { PanelMenuModule } from 'primeng/panelmenu';
 import { ButtonModule } from 'primeng/button';
-import { MenuItem, TreeNode } from 'primeng/api';
-
+import { MenuItem } from 'primeng/api';
+//Service
 import { LayoutService } from '../../layout/service/layout.service';
 import { StorageService } from '../../../services/storage/storage.service';
-import { MenuUserService } from '../../../services/menu/menu-user.service';
-import { lastValueFrom } from 'rxjs';
-
-
 
 @Component({
   selector: 'app-sidebar',
@@ -24,14 +19,10 @@ import { lastValueFrom } from 'rxjs';
 export class SidebarComponent implements OnInit {
 
   menuItem!: MenuItem[];
-  userId: number = 0;
-
+ 
   constructor(private storageService: StorageService, public layoutService: LayoutService, public el: ElementRef) { }
 
   ngOnInit(): void {
-
-    this.userId = this.storageService.id;
-
     this.menuItem = [
       {
         key: '0_0',
@@ -248,30 +239,21 @@ export class SidebarComponent implements OnInit {
         ]
       }
     ];
-
     // Converte a string em um array de keys
     const keysToShow = this.storageService.menus.split(',');
     this.menuItem = this.menuItem.map(item => this.updateVisibility(item, keysToShow));
   }
 
   updateVisibility(item: MenuItem, keys: string[]): MenuItem {
-
-    if (this.userId == 1) {
+    if (this.storageService.id == 1) {
       item.visible = true;
     }
-
-
     if (keys.includes(item['key'])) {
       item.visible = true;
     }
-
     if (item.items) {
       item.items = item.items.map(subItem => this.updateVisibility(subItem, keys));
     }
-
     return item;
   }
-
-
-
 }

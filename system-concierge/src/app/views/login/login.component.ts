@@ -25,11 +25,6 @@ import { PermissionService } from '../../services/permission/permission.service'
 import { IAuth } from '../../interfaces/auth/iauth';
 import { IAuthResponse } from '../../interfaces/auth/iauthresponse';
 
-//Class
-import { PermissionUser } from '../../models/permission/permission-user';
-import { MessageResponse } from '../../models/message/message-response';
-import { SuccessError } from '../../models/enum/success-error';
-
 @Component({
   selector: 'app-login',
   standalone: true,
@@ -53,8 +48,7 @@ export default class LoginComponent {
     public layoutService: LayoutService,
     private storageService: StorageService,
     private busyService: BusyService,
-    private menuUserService: MenuUserService,
-    private permissionService: PermissionService
+    private menuUserService: MenuUserService
   ) {
   }
 
@@ -87,9 +81,9 @@ export default class LoginComponent {
           keys += element.key + ",";
         }
         this.storageService.menus = keys;
-         setTimeout(() => {
-            this.router.navigateByUrl('/dashboard');
-          }, 1000);
+        setTimeout(() => {
+          this.router.navigateByUrl('/dashboard');
+        }, 1000);
       }
       this.busyService.idle();
     }

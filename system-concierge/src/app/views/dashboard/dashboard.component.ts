@@ -48,7 +48,6 @@ export default class DashboardComponent implements OnInit, OnDestroy {
     this.qtdVehicles();
   }
   ngOnDestroy(): void {
-
   }
 
   qtdVehicles() {
@@ -74,7 +73,4 @@ export default class DashboardComponent implements OnInit, OnDestroy {
       this.qtdVehicleExit.set(data.length);
     });
   }
-
-
-
 }

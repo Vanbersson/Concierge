@@ -1,6 +1,5 @@
 import { Injectable, effect, signal } from '@angular/core';
 import { Subject } from 'rxjs';
-import { Router } from '@angular/router';
 
 export interface AppConfig {
     inputStyle: string;
@@ -24,7 +23,6 @@ interface LayoutState {
     providedIn: 'root',
 })
 export class LayoutService {
-
 
     _config: AppConfig = {
         ripple: false,
@@ -54,7 +52,7 @@ export class LayoutService {
 
     overlayOpen$ = this.overlayOpen.asObservable();
 
-    constructor(private router: Router) {
+    constructor() {
         effect(() => {
             const config = this.config();
             if (this.updateStyle(config)) {
@@ -81,8 +79,7 @@ export class LayoutService {
         }
 
         if (this.isDesktop()) {
-            this.state.staticMenuDesktopInactive =
-                !this.state.staticMenuDesktopInactive;
+            this.state.staticMenuDesktopInactive = !this.state.staticMenuDesktopInactive;
         } else {
             this.state.staticMenuMobileActive =
                 !this.state.staticMenuMobileActive;
