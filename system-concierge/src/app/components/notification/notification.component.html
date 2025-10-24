@@ -1,0 +1,48 @@
+<button class="p-link layout-topbar-button" (click)="op.toggle($event)">
+    <i class="pi pi-bell"></i>
+    <span>Notificação</span>
+</button>
+<p-overlayPanel #op>
+    <div class="flex flex-column">
+        <div class="text-base text-900 font-normal mb-3">
+            <span>Você tem <strong>4</strong> notificações</span>
+        </div>
+
+        <div class="layout-notification">
+            <div class="flex justify-content-between text-900 font-normal mb-1">
+                <span><strong>Entrada de veículo</strong></span>
+                <p class="text-sm text-900">2 min atrás</p>
+            </div>
+            <div class="layout-btn-a">
+                <a href="http://localhost:4200/portaria/mannutencao-entrada-veiculo/7">
+                    <span><strong>Antonio</strong> realizou a entrada do veículo.</span>
+                    <span>1023, NOVO, CAVALO MECÂNICO</span>
+                </a>
+                <div class="flex gap-1">
+                    <p-button icon="pi pi-share-alt" size="small" [rounded]="true" text="true" />
+                    <p-button icon="pi pi-trash" size="small" [rounded]="true" text="true" severity="danger" />
+                </div>
+            </div>
+        </div>
+
+        <div class="border-top-1 border-200 m-2"></div>
+
+        <div class="layout-notification">
+            <div class="flex justify-content-between text-900 font-normal mb-1">
+                <span><strong>Entrada de veículo</strong></span>
+                <p class="text-sm text-900">12 min atrás</p>
+            </div>
+            <div class="layout-btn-a">
+                <a href="http://localhost:4200/portaria/mannutencao-entrada-veiculo/7">
+                    <span><strong>Antonio</strong> realizou a entrada do veículo.</span>
+                    <span>1023, HTF-5256, CAVALO MECÂNICO</span>
+                </a>
+                <div class="flex gap-1">
+                    <p-button icon="pi pi-share-alt" size="small" [rounded]="true" text="true" />
+                    <p-button icon="pi pi-trash" size="small" [rounded]="true" text="true" severity="danger" />
+                </div>
+            </div>
+        </div>
+
+    </div>
+</p-overlayPanel>

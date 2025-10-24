@@ -1,0 +1,21 @@
+.layout-notification {
+    display: flex;
+    flex-direction: column;
+
+    .layout-btn-a {
+        display: flex;
+
+        a {
+            display: flex;
+            flex-direction: column;
+            text-decoration: none;
+            color: var(--color-text-primary);
+            padding: 0.5rem;
+        }
+
+        a:hover {
+            background-color: var(--color-grey-100);
+            border-radius: 12px;
+        }
+    }
+}
