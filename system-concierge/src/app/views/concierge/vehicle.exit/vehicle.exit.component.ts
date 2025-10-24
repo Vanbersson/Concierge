@@ -12,7 +12,8 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { OverlayPanelModule } from 'primeng/overlaypanel';
 import { OverlayPanel } from 'primeng/overlaypanel';
 import { BadgeModule } from 'primeng/badge';
-
+import { DividerModule } from 'primeng/divider';
+//Service
 import { VehicleService } from '../../../services/vehicle/vehicle.service';
 import { VehicleEntry } from '../../../models/vehicle/vehicle-entry';
 import { lastValueFrom } from 'rxjs';
@@ -28,13 +29,13 @@ import { SuccessError } from '../../../models/enum/success-error';
   standalone: true,
   imports: [
     CommonModule, ButtonModule, TableModule,
-    InputTextModule, IconFieldModule, InputIconModule,
+    InputTextModule, IconFieldModule, InputIconModule, DividerModule,
     ConfirmDialogModule, ToastModule, OverlayPanelModule, BadgeModule],
   providers: [ConfirmationService, MessageService],
   templateUrl: './vehicle.exit.component.html',
   styleUrl: './vehicle.exit.component.scss'
 })
-export class VehicleExitComponent implements OnInit, OnDestroy {
+export default class VehicleExitComponent implements OnInit, OnDestroy {
 
   private vehicleExit: VehicleExit;
   listVehicleExit: VehicleEntry[] = [];
@@ -49,12 +50,11 @@ export class VehicleExitComponent implements OnInit, OnDestroy {
     private confirmationService: ConfirmationService,
     private taskService: TaskService,
     private storageService: StorageService) {
-
   }
 
   ngOnInit(): void {
     this.listVehicles();
-    this.taskService.startTask(() => this.listVehicles(), 60000);
+    this.taskService.startTask(() => this.listVehicles(), 120000);
   }
   ngOnDestroy(): void {
     this.taskService.stopTask();
@@ -122,29 +122,23 @@ export class VehicleExitComponent implements OnInit, OnDestroy {
     }
   }
   public listVehicles() {
-
+    const datePipe = new DatePipe('pt-BR');
     this.vehicleService.allAuthorized$().subscribe({
       next: (data) => {
-
         for (let index = 0; index < data.length; index++) {
-
+          data[index].dateEntry = datePipe.transform(this.formatDateTime(new Date(data[index].dateEntry)), 'dd/MM/yyyy HH:mm');
           if (data[index].vehicleNew == "yes") {
             data[index].placa = "NOVO";
           }
-
           var nome = data[index].clientCompanyName.split(' ');
           data[index].clientCompanyName = nome[0] + " " + nome[1];
-
         }
         this.listVehicleExit = data;
-
         this.total.set(data.length);
       },
       error: (error) => {
-
       },
       complete: () => {
-
       }
     });
 

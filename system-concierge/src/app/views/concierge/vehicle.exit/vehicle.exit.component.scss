@@ -1,4 +1,18 @@
 :host {
+    .layout-card-title {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 1rem;
+
+        span {
+            display: flex;
+            align-items: center;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--color-grey-800);
+        }
+
+    }
 
     .layout-badge-info {
         display: flex;
@@ -9,7 +23,33 @@
         }
     }
 
+    .whatsapp-btn {
+        background-color: #25D366;
+        color: white;
+        border: none;
+        padding: 10px 16px;
+        border-radius: 8px;
+        cursor: pointer;
+    }
+
+    .mobile-enabled {
+        display: none;
+    }
+
+    .mobile-disabled {
+        display: flex;
+    }
+
     @media (max-width: 991px) {
+
+        .mobile-enabled {
+            display: flex;
+        }
+
+        .mobile-disabled {
+            display: none;
+        }
+
         .layout-badge-info {
             display: flex;
             flex-direction: row;

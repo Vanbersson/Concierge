@@ -1,84 +1,96 @@
-<div class="layout-badge-info">
-    <button #target  class="p-link layout-topbar-button"  (click)="showOverPanel(target)">
-        <i class="pi pi-car"></i>
-        <span>Veículos</span>
-    </button>
-    <p-badge [value]="total()" severity="info" />
-</div>
-
-<p-overlayPanel #overPanel>
-    <div class="layout-card-title">
-        <span class="text-700 font-bold" style="font-size: 1.25rem;color: #424242;">Saída de veículos</span>
-    </div>
+<div class="layout-card">
     <p-toast />
-
-    <p-confirmDialog #cd>
-        <ng-template pTemplate="headless" let-message>
-            <div class="flex flex-column align-items-center p-5 surface-overlay border-round">
-                <div class="border-circle bg-primary inline-flex justify-content-center align-items-center h-6rem w-6rem">
-                    <i class="pi pi-question text-5xl"></i>
+    <div class="layout-card-title">
+        <span>Saída de veículos</span>
+        <div class="mobile-disabled">
+            <p-button icon="pi pi-sign-out" [text]="true" label="Saída" severity="danger" [disabled]="selectedVehicle.length == 0" (onClick)="confirm()" />
+            <p-divider layout="vertical" />
+            <p-button icon="pi pi-refresh" [text]="true" label="Recarregar" (onClick)="listVehicles()"/> 
+        </div>
+        <div class="mobile-enabled">
+            <p-button (onClick)="op.toggle($event)" icon="pi pi-ellipsis-v"  text="true" severity="secondary" [rounded]="true"/>
+            <p-overlayPanel #op>
+                <div class="flex flex-column">
+                    <p-button icon="pi pi-sign-out" [text]="true" label="Saída" severity="danger" [disabled]="selectedVehicle.length == 0" (onClick)="confirm()" />
+                    <p-button icon="pi pi-refresh" [text]="true" label="Recarregar" (onClick)="listVehicles()"/>
                 </div>
-                <span class="font-bold text-2xl block mb-2 mt-4">
-                    {{ message.header }}
-                </span>
-                <p class="mb-0">{{ message.message }}</p>
-                <div class="flex align-items-center gap-2 mt-4">
-                    <button pButton label="Confirmar" (click)="cd.accept()" class="w-8rem">
-                    </button>
-                    <button pButton label="Cancelar" (click)="cd.reject()" class="p-button-outlined w-8rem ">
-                    </button>
-                </div>
-            </div>
-        </ng-template>
-    </p-confirmDialog>
-    
+            </p-overlayPanel>
+        </div>
+              
+    </div>
     <p-table #tableFilter dataKey="id" [value]="listVehicleExit"
         [globalFilterFields]="['id','placa','modelDescription', 'frota','dateEntry','clientCompanyName','nameUserAttendant']"
         [(selection)]="selectedVehicle" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 25, 50]"
         styleClass="p-datatable-sm">
         <ng-template pTemplate="caption">
             <div class="flex align-items-center">
-                <p-iconField iconPosition="left" class="mr-2">
+                <p-iconField iconPosition="left">
                     <p-inputIcon>
                         <i class="pi pi-search"></i>
                     </p-inputIcon>
                     <input pInputText type="text" (input)="tableFilter.filterGlobal($any($event.target).value, 'contains')" placeholder="Pesquisar" />
                 </p-iconField>
-                <p-button type="button" icon="pi pi-refresh" size="small" (onClick)="listVehicles()"></p-button>
-                <p-button *ngIf="selectedVehicle.length > 0" label="Saída" icon="pi pi-sign-out" severity="danger" size="small" class="ml-2" (click)="confirm()"></p-button>
             </div>
         </ng-template>
         <ng-template pTemplate="header">
             <tr>
                 <th>
-                    <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+                    Sel.
                 </th>
                 <th pSortableColumn="id">Código<p-sortIcon field="id"></p-sortIcon></th>
                 <th pSortableColumn="placa">Placa<p-sortIcon field="placa"></p-sortIcon></th>
                 <th pSortableColumn="modelDescription">Modelo<p-sortIcon field="modelDescription"></p-sortIcon></th>
+                <th pSortableColumn="frota">Frota<p-sortIcon field="frota"></p-sortIcon></th>
+                <th pSortableColumn="dateEntry">Entrada<p-sortIcon field="dateEntry"></p-sortIcon></th>
                 <th pSortableColumn="clientCompanyName">Empresa<p-sortIcon field="clientCompanyName"></p-sortIcon></th>
                 <th pSortableColumn="nameUserAttendant">Consultor<p-sortIcon field="nameUserAttendant"></p-sortIcon></th>
+                <th pSortableColumn="nameUserExitAuth1">1ª Auto<p-sortIcon field="nameUserExitAuth1"></p-sortIcon></th>
+                <th pSortableColumn="nameUserExitAuth2">2ª Auto<p-sortIcon field="nameUserExitAuth2"></p-sortIcon></th>
             </tr>
         </ng-template>
         <ng-template pTemplate="body" let-vehicle>
             <tr [pSelectableRow]="vehicle">
-                <td> <p-tableCheckbox [value]="vehicle" /> </td>
+                <td> <p-tableCheckbox [value]="vehicle" /></td>
                 <td><span class="text-500">{{ vehicle.id }}</span></td>
                 <td>
                     @if(vehicle.placa == "NOVO"){
-                    <div class="flex align-items-center justify-content-center bg-blue-100 border-round" [ngStyle]="{width: '3.5rem', height: '2.5rem'}">
+                    <div class="flex align-items-center justify-content-center bg-blue-100 border-round"
+                        [ngStyle]="{width: '3.5rem', height: '2.5rem'}">
                         <span class="text-500">NOVO</span>
                     </div>
                     }@else {
                     <span class="text-500">{{vehicle.placa | uppercase}}</span>
                     }
                 </td>
-                <td><span class="text-500">{{ vehicle.modelDescription | uppercase }}</span>
-                <td><span class="text-500">{{ vehicle.clientCompanyName | uppercase }}</span>
-                <td>
-                    <span class="text-500">{{ vehicle.nameUserAttendant | uppercase }}</span>
-                </td>
+                <td><span class="text-500">{{ vehicle.modelDescription | uppercase }}</span></td>
+                <td><span class="text-500">{{ vehicle.frota | uppercase }}</span></td>
+                <td><span class="text-500">{{ vehicle.dateEntry }}</span></td>
+                <td><span class="text-500">{{ vehicle.clientCompanyName | uppercase }}</span></td>
+                <td><span class="text-500">{{ vehicle.nameUserAttendant | uppercase }}</span></td>
+                <td><span class="text-500">{{ vehicle.nameUserExitAuth1 | uppercase }}</span></td>
+                <td><span class="text-500">{{ vehicle.nameUserExitAuth2 | uppercase }}</span></td>
             </tr>
         </ng-template>
     </p-table>
-</p-overlayPanel>
+</div>
+
+<p-confirmDialog #cd>
+    <ng-template pTemplate="headless" let-message>
+        <div class="flex flex-column align-items-center p-5 surface-overlay border-round">
+            <div
+                class="border-circle bg-primary inline-flex justify-content-center align-items-center h-6rem w-6rem">
+                <i class="pi pi-question text-5xl"></i>
+            </div>
+            <span class="font-bold text-2xl block mb-2 mt-4">
+                {{ message.header }}
+            </span>
+            <p class="mb-0">{{ message.message }}</p>
+            <div class="flex align-items-center gap-2 mt-4">
+                <button pButton label="Confirmar" (click)="cd.accept()" class="w-8rem">
+                </button>
+                <button pButton label="Cancelar" (click)="cd.reject()" class="p-button-outlined w-8rem ">
+                </button>
+            </div>
+        </div>
+    </ng-template>
+</p-confirmDialog>
