@@ -41,18 +41,20 @@
     }
 
     .mobile-enabled {
-        display: none !important;
+        display: none;
+    }
+    .mobile-disabled {
+        display: flex;
     }
 
     @media (max-width: 991px) {
 
-        .mobile-disabled {
-            display: none !important;
-        }
-
         .mobile-enabled {
-            display: flex !important;
+            display: flex;
         }
+        .mobile-disabled {
+        display: none;
+    }
 
     }
 

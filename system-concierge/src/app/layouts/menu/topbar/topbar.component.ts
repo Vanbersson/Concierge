@@ -6,20 +6,19 @@ import { Router, RouterLink } from '@angular/router';
 import { Sidebar, SidebarModule } from 'primeng/sidebar';
 import { AvatarModule } from 'primeng/avatar';
 import { ImageModule } from 'primeng/image';
-
 //Service
 import { LayoutService } from '../../layout/service/layout.service';
 import { StorageService } from '../../../services/storage/storage.service';
-
 //component
-import { VehicleExitComponent } from '../../../views/concierge/vehicle.exit/vehicle.exit.component';
 import { UserProfileComponent } from '../../../components/user.profile/user.profile.component';
+import { NotificationComponent } from '../../../components/notification/notification.component';
+//Class
 import { User } from '../../../models/user/user';
 
 @Component({
   selector: 'app-topbar',
   standalone: true,
-  imports: [CommonModule, VehicleExitComponent, UserProfileComponent,
+  imports: [CommonModule, UserProfileComponent,NotificationComponent,
     RouterLink, SidebarModule, AvatarModule,
     ImageModule],
   templateUrl: './topbar.component.html',

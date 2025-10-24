@@ -38,7 +38,7 @@ export class SidebarComponent implements OnInit {
         items: [
           {
             key: '1_1',
-            label: 'Atendimento',
+            label: 'Entrada Veículo',
             visible: false,
             routerLink: 'portaria/atendimento-veiculo'
           },
@@ -47,6 +47,12 @@ export class SidebarComponent implements OnInit {
             label: 'Veículos',
             visible: false,
             routerLink: 'portaria/lista-entrada-veiculo'
+          },
+          {
+            key: '1_5',
+            label: 'Saída Veículo',
+            visible: false,
+            routerLink: 'portaria/saida-veiculo'
           },
           {
             key: '1_3',

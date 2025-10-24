@@ -1,7 +1,7 @@
 <button pButton type="button" icon="pi pi-filter" class="p-button-warning" (click)="showDialog()"></button>
 
 <!-- Filter Driver -->
-<p-dialog [(visible)]="dialogVisibleDriver" header="Empresas" [modal]="true" [style]="{ width: '70rem'}"
+<p-dialog [(visible)]="dialogVisibleDriver" header="Pesquisa de motorista" [modal]="true" [style]="{ width: '70rem'}"
     [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }" [draggable]="false" [resizable]="false">
     <form [formGroup]="formDriver" (ngSubmit)="filterDriver()">
         <div class="p-fluid p-formgrid grid">

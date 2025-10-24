@@ -107,8 +107,9 @@ export default class UserComponent implements OnInit {
       { key: '0_0', label: 'Dashboard', icon: 'pi pi-home' },
       {
         key: '1_0', label: 'Portaria', children: [
-          { key: '1_1', label: 'Atendimento', },
+          { key: '1_1', label: 'Entrada Veículo', },
           { key: '1_2', label: 'Veículos' },
+          { key: '1_5', label: 'Saída Veiculo' },
           { key: '1_3', label: 'Motorista' },
           {
             key: '1_4', label: 'Cadastros', children: [

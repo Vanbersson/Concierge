@@ -86,7 +86,7 @@ export default class VeiculosComponent implements OnInit, OnDestroy {
       { label: 'Liberado', value: this.authorized }
     ];
     this.listVehicles();
-    this.taskService.startTask(() => this.listTaskVehicle(), 60000);
+    this.taskService.startTask(() => this.listTaskVehicle(), 120000);
   }
   ngOnDestroy(): void {
     this.taskService.stopTask();

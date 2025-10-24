@@ -149,8 +149,9 @@ public class VehicleEntryService implements IVehicleEntryService {
                 map.put("days", TimeUnit.DAYS.convert(differenceMilliseconds, TimeUnit.MILLISECONDS));
                 map.put("nameUserAttendant", item.getNameUserAttendant());
                 map.put("clientCompanyName", item.getClientCompanyName());
-                map.put("budgetStatus", item.getBudgetStatus());
                 map.put("statusAuthExit", item.getStatusAuthExit());
+                map.put("nameUserExitAuth1",item.getNameUserExitAuth1());
+                map.put("nameUserExitAuth2",item.getNameUserExitAuth2());
                 list.add(map);
             }
         } catch (Exception ex) {

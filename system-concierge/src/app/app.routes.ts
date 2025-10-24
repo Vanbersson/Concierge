@@ -37,15 +37,21 @@ export const routes: Routes = [
 
                     {
                         path: 'atendimento-veiculo',
-                        title: 'Atendimento',
+                        title: 'Entrada Veículo',
                         loadComponent: () => import('./views/concierge/vehicle.entry/vehicle.entry.component'),
                         canActivate: [VehicleEntryMenuGuard]
                     },
                     {
                         path: 'lista-entrada-veiculo',
-                        title: 'Lista Veículos',
+                        title: 'Veículos',
                         loadComponent: () => import('./views/concierge/vehicle/vehicle.component'),
                         canActivate: [VehicleMenuGuard]
+                    },
+                    {
+                        path: 'saida-veiculo',
+                        title: 'Saída Veículo',
+                        loadComponent: () => import('./views/concierge/vehicle.exit/vehicle.exit.component'),
+                        
                     },
                     {
                         path: 'manutencao-motorista',

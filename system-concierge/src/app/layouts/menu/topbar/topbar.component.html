@@ -13,17 +13,11 @@
     </button>
 
     <div #topbarmenu class="layout-topbar-menu" [ngClass]="{'layout-topbar-menu-mobile-active':layoutService.state.profileSidebarVisible}">
-
-        <app-vehicleexit></app-vehicleexit>
-        <button class="p-link layout-topbar-button">
-            <i class="pi pi-bell"></i>
-            <span>Notificação</span>
-        </button>
+        <app-notification/>
         <button class="p-link layout-topbar-button" (click)="showSideBarRight()">
             <i class="pi pi-align-right"></i>
             <span>Configuração</span>
         </button>
-
     </div>
 
 </div>
