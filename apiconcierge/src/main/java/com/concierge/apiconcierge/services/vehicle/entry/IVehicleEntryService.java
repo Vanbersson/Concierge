@@ -11,11 +11,11 @@ import java.util.Map;
 
 public interface IVehicleEntryService {
 
-    public Integer save(VehicleEntry vehicle);
+    public Integer save(VehicleEntry vehicle,String userEmail);
 
-    public MessageResponse update(VehicleEntry vehicle);
+    public MessageResponse update(VehicleEntry vehicle,String userEmail);
 
-    public MessageResponse exit(VehicleExitSaveDto dataExit);
+    public MessageResponse exit(VehicleExitSaveDto dataExit,String userEmail);
 
     public List<Object> allAuthorized(Integer companyId, Integer resaleId);
 

@@ -40,7 +40,7 @@ export class VehicleService {
     return this.http.get<VehicleEntry[]>(environment.apiuUrl + "/vehicle/entry/"+this.companyResale+"/allPendingAuthorization", { headers: this.myHeaders() });
   }
 
-  entryFilterId$(id: number): Observable<HttpResponse<VehicleEntry>> {
+  entryFilterId(id: number): Observable<HttpResponse<VehicleEntry>> {
     return this.http.get<VehicleEntry>(environment.apiuUrl + "/vehicle/entry/"+this.companyResale+"/filter/id/" + id, { headers: this.myHeaders(), observe: 'response' });
   }
 

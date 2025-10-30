@@ -1,14 +1,4 @@
 :host {
-
-    .layout-input-disabled {
-        display: flex;
-        font-size: 1rem;
-        padding: 0.75rem;
-        border-radius: 6px;
-        border: 1px solid var(--color-grey-300);
-
-    }
-
     .layout-sidebar-header {
         display: flex;
         flex-direction: column;
@@ -49,7 +39,6 @@
 
             >i {
                 font-size: 1.5rem;
-                /* color: var(--color-primary); */
             }
 
             .layout-sidebar-content-card-item {
@@ -61,26 +50,6 @@
                     font-size: 16px;
                     font-weight: 700;
                 }
-            }
-        }
-
-        .layout-notification {
-            margin-top: 44px;
-            display: flex;
-            flex-direction: column;
-            gap: 18px;
-
-            .layout-notification-title {
-                font-size: 16px;
-                color: var(--color-grey-700);
-                font-weight: 700;
-
-            }
-
-            .layout-notification-message {
-                font-size: 16px;
-                color: var(--color-grey-700);
-                
             }
         }
 

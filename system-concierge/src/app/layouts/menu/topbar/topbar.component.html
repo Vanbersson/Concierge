@@ -16,7 +16,7 @@
         <app-notification/>
         <button class="p-link layout-topbar-button" (click)="showSideBarRight()">
             <i class="pi pi-align-right"></i>
-            <span>Configuração</span>
+             <label>Configuração</label>
         </button>
     </div>
 
@@ -53,40 +53,16 @@
                     <span>Informações do sistema</span>
                 </div>
             </a>
-
+            
+            <div class="border-top-1 border-200 m-4"></div>
+            
             <a class="layout-sidebar-content-card" (click)="closeSession()">
-                <i class="pi pi-power-off" style="color: red;"></i>
+                <i class="pi pi-sign-out"></i>
                 <div class="layout-sidebar-content-card-item">
                     <span class="sidebar-content-card-item-title">Sair</span>
                     <span>Encerrar a sessão</span>
                 </div>
             </a>
-
-            <div class="layout-notification">
-
-                <span class="layout-notification-title">Notificações</span>
-
-                @if ( qtdNotification() == 0 ) {
-                <span class="layout-notification-message">Você não tem notificação</span>
-                }@else{
-                    @if ( qtdNotification() > 1 ) {
-                    <span class="layout-notification-message">Você tem {{qtdNotification()}} notificações</span>
-                    }@else {
-                        @if ( qtdNotification() > 0 ) {
-                        <span class="layout-notification-message">Você tem {{qtdNotification()}} notificação</span>
-                        }
-                    }
-                }
-            </div>
-            <a class="layout-sidebar-content-card">
-                <i class="pi pi-bell"></i>
-                <div class="layout-sidebar-content-card-item">
-                    <span class="sidebar-content-card-item-title">Notificação</span>
-                    <span>Acessar notificação</span>
-                </div>
-            </a>
-
-
         </div>
     </ng-template>
 </p-sidebar>

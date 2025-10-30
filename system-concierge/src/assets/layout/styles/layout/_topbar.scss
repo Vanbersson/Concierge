@@ -38,8 +38,8 @@
         position: relative;
         color: var(--text-color-secondary);
         border-radius: 50%;
-        width: 3rem;
-        height: 3rem;
+        width: 3.5rem;
+        height: 3.5rem;
         cursor: pointer;
         transition: background-color $transitionDuration;
 
@@ -56,7 +56,7 @@
             font-size: 1.5rem;
         }
 
-        span {
+        label {
             font-size: 1rem;
             display: none;
         }
@@ -139,7 +139,7 @@
                     margin-right: .5rem;
                 }
 
-                span {
+                label {
                     font-weight: medium;
                     display: block;
                 }

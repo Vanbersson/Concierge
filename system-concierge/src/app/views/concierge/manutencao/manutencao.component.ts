@@ -462,7 +462,7 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
   }
   private async getVehicleEntry(): Promise<HttpResponse<VehicleEntry>> {
     try {
-      return await lastValueFrom(this.vehicleService.entryFilterId$(this.id));
+      return await lastValueFrom(this.vehicleService.entryFilterId(this.id));
     } catch (error) {
       this.messageService.add({ severity: 'error', summary: 'Erro', detail: "Vaículo não encontrado", icon: 'pi pi-times' });
       return error;

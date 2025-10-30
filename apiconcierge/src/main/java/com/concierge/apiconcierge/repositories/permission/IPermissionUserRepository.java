@@ -20,6 +20,9 @@ public interface IPermissionUserRepository extends JpaRepository<PermissionUser,
     @Query(value = "select * from tb_user_permission where company_id=?1 and resale_id=?2 and user_id=?3 and permission_id=?4", nativeQuery = true)
     PermissionUser findPermissionId(Integer companyId, Integer resaleId, Integer userId, Integer permissionId);
 
+    @Query(value = "select * from tb_user_permission where company_id=?1 and resale_id=?2 and permission_id=?3", nativeQuery = true)
+    List<PermissionUser> filterPermissionId(Integer companyId, Integer resaleId, Integer permissionId);
+
     @Transactional
     @Modifying
     @Query(value = "delete from tb_user_permission where company_id=?1 and resale_id=?2 and user_id=?3", nativeQuery = true)

@@ -1,48 +1,33 @@
-<button class="p-link layout-topbar-button" (click)="op.toggle($event)">
-    <i class="pi pi-bell"></i>
-    <span>Notificação</span>
+<p-toast />
+<button pButton class="p-link layout-topbar-button" (click)="op.toggle($event)">
+    <i class="pi pi-bell" pBadge [value]="listMessage.length"></i>
+    <!-- <span>Notificação</span> -->
+     <label>Notificação</label>
 </button>
 <p-overlayPanel #op>
     <div class="flex flex-column">
-        <div class="text-base text-900 font-normal mb-3">
-            <span>Você tem <strong>4</strong> notificações</span>
+        <div class="text-base text-900 font-normal mb-4">
+            <span>Você tem <strong>{{listMessage.length}}</strong> notificações</span>
         </div>
-
-        <div class="layout-notification">
-            <div class="flex justify-content-between text-900 font-normal mb-1">
-                <span><strong>Entrada de veículo</strong></span>
-                <p class="text-sm text-900">2 min atrás</p>
-            </div>
-            <div class="layout-btn-a">
-                <a href="http://localhost:4200/portaria/mannutencao-entrada-veiculo/7">
-                    <span><strong>Antonio</strong> realizou a entrada do veículo.</span>
-                    <span>1023, NOVO, CAVALO MECÂNICO</span>
-                </a>
-                <div class="flex gap-1">
-                    <p-button icon="pi pi-share-alt" size="small" [rounded]="true" text="true" />
-                    <p-button icon="pi pi-trash" size="small" [rounded]="true" text="true" severity="danger" />
+        <div *ngFor="let item of listMessage">
+            <div class="layout-notification">
+                <div class="flex justify-content-between text-900 font-normal mb-1">
+                    <span><strong>{{item.header}}</strong></span>
+                    <p class="text-sm text-900">{{getTempoDecorrido(item.origDate)}}</p>
+                </div>
+                <div class="layout-btn-a">
+                    <a (click)="editVehicle(item.vehicleId)">
+                        <span>{{item.origRoleDesc}}, <strong>{{firstName(item.origUserName) }}</strong> {{item.message1}}</span>
+                        <span>{{item.message2 | uppercase}}</span>
+                        <span>{{item.message3 | uppercase}}</span>
+                    </a>
+                    <div class="flex gap-1">
+                        <p-button *ngIf="item.shareMessage == Yes" icon="pi pi-share-alt" size="small" [rounded]="true" text="true" (onClick)="shareVehicle(item.vehicleId)" />
+                        <p-button *ngIf="item.deleteMessage == Yes" icon="pi pi-trash" size="small" [rounded]="true" text="true" severity="danger" />
+                    </div>
                 </div>
             </div>
+            <div class="border-top-1 border-200 m-2"></div>
         </div>
-
-        <div class="border-top-1 border-200 m-2"></div>
-
-        <div class="layout-notification">
-            <div class="flex justify-content-between text-900 font-normal mb-1">
-                <span><strong>Entrada de veículo</strong></span>
-                <p class="text-sm text-900">12 min atrás</p>
-            </div>
-            <div class="layout-btn-a">
-                <a href="http://localhost:4200/portaria/mannutencao-entrada-veiculo/7">
-                    <span><strong>Antonio</strong> realizou a entrada do veículo.</span>
-                    <span>1023, HTF-5256, CAVALO MECÂNICO</span>
-                </a>
-                <div class="flex gap-1">
-                    <p-button icon="pi pi-share-alt" size="small" [rounded]="true" text="true" />
-                    <p-button icon="pi pi-trash" size="small" [rounded]="true" text="true" severity="danger" />
-                </div>
-            </div>
-        </div>
-
     </div>
 </p-overlayPanel>

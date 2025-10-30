@@ -364,7 +364,7 @@ export default class BudgetComponent implements OnInit, OnDestroy, DoCheck {
   }
   private async getVehicleEntry(id: number): Promise<HttpResponse<VehicleEntry>> {
     try {
-      return await lastValueFrom(this.vehicleService.entryFilterId$(id));
+      return await lastValueFrom(this.vehicleService.entryFilterId(id));
     } catch (error) {
       this.messageService.add({ severity: 'error', summary: 'Erro', detail: "Vaículo não encontrado", icon: 'pi pi-times' });
       return error;

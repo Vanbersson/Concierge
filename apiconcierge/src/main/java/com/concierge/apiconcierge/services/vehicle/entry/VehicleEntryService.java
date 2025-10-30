@@ -4,18 +4,28 @@ import com.concierge.apiconcierge.dtos.vehicle.entry.AuthExitDto;
 import com.concierge.apiconcierge.dtos.vehicle.entry.ExistsPlacaDto;
 import com.concierge.apiconcierge.dtos.vehicle.exit.VehicleExitSaveDto;
 import com.concierge.apiconcierge.exceptions.vehicle.VehicleEntryException;
-
 import com.concierge.apiconcierge.models.budget.Budget;
 import com.concierge.apiconcierge.models.budget.enums.StatusBudgetEnum;
+import com.concierge.apiconcierge.models.enums.YesNot;
 import com.concierge.apiconcierge.models.message.MessageResponse;
+import com.concierge.apiconcierge.models.notification.Notification;
+import com.concierge.apiconcierge.models.notification.NotificationMenu;
+import com.concierge.apiconcierge.models.notification.NotificationUser;
+import com.concierge.apiconcierge.models.permission.PermissionUser;
+import com.concierge.apiconcierge.models.user.User;
 import com.concierge.apiconcierge.models.vehicle.entry.VehicleEntry;
 import com.concierge.apiconcierge.models.vehicle.enums.StatusAuthExitEnum;
 import com.concierge.apiconcierge.models.vehicle.enums.StatusVehicleEnum;
 import com.concierge.apiconcierge.models.vehicle.enums.StepVehicleEnum;
+import com.concierge.apiconcierge.models.vehicle.enums.VehicleYesNotEnum;
 import com.concierge.apiconcierge.repositories.budget.IBudgetRepository;
+import com.concierge.apiconcierge.repositories.permission.IPermissionUserRepository;
+import com.concierge.apiconcierge.repositories.user.IUserRepository;
 import com.concierge.apiconcierge.repositories.vehicle.entry.IVehicleEntryRepository;
+import com.concierge.apiconcierge.services.notification.notification.INotificationService;
+import com.concierge.apiconcierge.services.notification.user.INotificationUserService;
 import com.concierge.apiconcierge.util.ConstantsMessage;
-import com.concierge.apiconcierge.validation.vehicle.entry.VehicleEntryValidation;
+import com.concierge.apiconcierge.validation.vehicle.entry.IVehicleEntryValidation;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,22 +34,35 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
+import static com.concierge.apiconcierge.util.ConstantsPermission.*;
+
 @Service
 public class VehicleEntryService implements IVehicleEntryService {
-
 
     @Autowired
     private IVehicleEntryRepository repository;
 
     @Autowired
-    private VehicleEntryValidation validation;
+    private IVehicleEntryValidation validation;
 
     @Autowired
     private IBudgetRepository repositoryBudget;
 
+    @Autowired
+    private INotificationService notificationService;
+
+    @Autowired
+    private INotificationUserService notificationUserService;
+
+    @Autowired
+    private IUserRepository userRepository;
+
+    @Autowired
+    private IPermissionUserRepository permissionUser;
+
     @SneakyThrows
     @Override
-    public Integer save(VehicleEntry vehicle) {
+    public Integer save(VehicleEntry vehicle, String userEmail) {
         try {
             vehicle.setId(null);
             vehicle.setStatus(StatusVehicleEnum.entradaAutorizada);
@@ -47,13 +70,14 @@ public class VehicleEntryService implements IVehicleEntryService {
             vehicle.setBudgetStatus(StatusBudgetEnum.NotBudget);
             vehicle.setStatusAuthExit(StatusAuthExitEnum.NotAuth);
             vehicle.setUserNameExit("");
-
             vehicle.setDriverExitId(null);
-
             VehicleEntry vehicleEntry = this.loadVehicle(vehicle);
             String message = this.validation.save(vehicleEntry);
             if (message.equals(ConstantsMessage.SUCCESS)) {
                 VehicleEntry result = this.repository.save(vehicleEntry);
+                //Notification
+                User userOrigem = this.userRepository.filterEmail(result.getCompanyId(), result.getResaleId(), userEmail);
+                this.notification("Entry", result, RECEIVE_VEHICLE_ENTRY_NOTIFICATIONS, userOrigem);
                 return result.getId();
             } else {
                 throw new VehicleEntryException(message);
@@ -65,7 +89,7 @@ public class VehicleEntryService implements IVehicleEntryService {
 
     @SneakyThrows
     @Override
-    public MessageResponse update(VehicleEntry vehicle) {
+    public MessageResponse update(VehicleEntry vehicle, String userEmail) {
         try {
             MessageResponse response = this.validation.update(vehicle);
             if (response.getStatus().equals(ConstantsMessage.SUCCESS)) {
@@ -88,22 +112,14 @@ public class VehicleEntryService implements IVehicleEntryService {
         }
     }
 
-    private void updateBudget(VehicleEntry vehicle) {
-        //update client budget
-        Budget budget = this.repositoryBudget.filterVehicleId(vehicle.getCompanyId(), vehicle.getResaleId(), vehicle.getId());
-        budget.setClientCompanyId(vehicle.getClientCompanyId());
-        budget.setIdUserAttendant(vehicle.getIdUserAttendant());
-        this.repositoryBudget.save(budget);
-    }
-
     @SneakyThrows
     @Override
-    public MessageResponse exit(VehicleExitSaveDto dataExit) {
+    public MessageResponse exit(VehicleExitSaveDto dataExit, String userEmail) {
         try {
             MessageResponse response = this.validation.exit(dataExit);
             if (ConstantsMessage.SUCCESS.equals(response.getStatus())) {
                 VehicleEntry vehicleEntry = this.repository.filterVehicleId(dataExit.companyId(), dataExit.resaleId(), dataExit.vehicleId());
-                if (vehicleEntry.getStatusAuthExit() != StatusAuthExitEnum.Authorized){
+                if (vehicleEntry.getStatusAuthExit() != StatusAuthExitEnum.Authorized) {
                     response.setStatus(ConstantsMessage.ERROR);
                     response.setHeader(ConstantsMessage.ERROR);
                     response.setMessage("Veículo não autorizado.");
@@ -114,8 +130,10 @@ public class VehicleEntryService implements IVehicleEntryService {
                 vehicleEntry.setUserIdExit(dataExit.userId());
                 vehicleEntry.setUserNameExit(dataExit.userName());
                 vehicleEntry.setDateExit(dataExit.dateExit());
-
-                this.repository.save(vehicleEntry);
+                VehicleEntry result = this.repository.save(vehicleEntry);
+                //Notification
+                User userOrigem = this.userRepository.filterEmail(result.getCompanyId(), result.getResaleId(), userEmail);
+                this.notification("Exit", result, RECEIVE_VEHICLE_EXIT_NOTIFICATIONS, userOrigem);
                 return response;
             } else {
                 return response;
@@ -150,8 +168,8 @@ public class VehicleEntryService implements IVehicleEntryService {
                 map.put("nameUserAttendant", item.getNameUserAttendant());
                 map.put("clientCompanyName", item.getClientCompanyName());
                 map.put("statusAuthExit", item.getStatusAuthExit());
-                map.put("nameUserExitAuth1",item.getNameUserExitAuth1());
-                map.put("nameUserExitAuth2",item.getNameUserExitAuth2());
+                map.put("nameUserExitAuth1", item.getNameUserExitAuth1());
+                map.put("nameUserExitAuth2", item.getNameUserExitAuth2());
                 list.add(map);
             }
         } catch (Exception ex) {
@@ -372,6 +390,14 @@ public class VehicleEntryService implements IVehicleEntryService {
         }
     }
 
+    private void updateBudget(VehicleEntry vehicle) {
+        //update client budget
+        Budget budget = this.repositoryBudget.filterVehicleId(vehicle.getCompanyId(), vehicle.getResaleId(), vehicle.getId());
+        budget.setClientCompanyId(vehicle.getClientCompanyId());
+        budget.setIdUserAttendant(vehicle.getIdUserAttendant());
+        this.repositoryBudget.save(budget);
+    }
+
     private VehicleEntry loadVehicle(VehicleEntry vehicle) {
         if (vehicle.getIdUserAttendant() == null || vehicle.getIdUserAttendant() == 0) {
             vehicle.setIdUserAttendant(null);
@@ -428,8 +454,20 @@ public class VehicleEntryService implements IVehicleEntryService {
         map.put("budgetStatus", vehicle.getBudgetStatus());
         map.put("idUserEntry", vehicle.getIdUserEntry());
         map.put("nameUserEntry", vehicle.getNameUserEntry());
-
         map.put("dateEntry", vehicle.getDateEntry());
+
+        if (vehicle.getUserIdExit() == null) {
+            map.put("userIdExit", 0);
+        } else {
+            map.put("userIdExit", vehicle.getUserIdExit());
+        }
+
+        map.put("userNameExit", vehicle.getUserNameExit());
+        if (vehicle.getDateExit() == null) {
+            map.put("dateExit", "");
+        } else {
+            map.put("dateExit", vehicle.getDateExit());
+        }
 
         if (vehicle.getDatePrevisionExit() == null) {
             map.put("datePrevisionExit", "");
@@ -583,4 +621,70 @@ public class VehicleEntryService implements IVehicleEntryService {
         return map;
     }
 
+    private String notification(String tipo, VehicleEntry vehicle, Integer permissionId, User userOrig) {
+        List<PermissionUser> permissions = this.permissionUser.filterPermissionId(vehicle.getCompanyId(), vehicle.getResaleId(), permissionId);
+        if (permissions.isEmpty()) {
+            return ConstantsMessage.FAILED;
+        }
+        Notification n = new Notification();
+        switch (tipo) {
+            case "Entry":
+                n.setCompanyId(userOrig.getCompanyId());
+                n.setResaleId(userOrig.getResaleId());
+                n.setOrigUserId(userOrig.getId());
+                n.setOrigUserName(userOrig.getName());
+                n.setOrigRoleId(userOrig.getRoleId());
+                n.setOrigRoleDesc(userOrig.getRoleDesc());
+                n.setOrigDate(new Date());
+                n.setOrigNotificationMenu(NotificationMenu.Vehicle_Entry);
+                n.setDestUserAll(YesNot.Not);
+                n.setVehicleId(vehicle.getId());
+                n.setHeader("Entrada de Veículo");
+                n.setMessage1("realizou a entrada do veículo.");
+                if (vehicle.getVehicleNew() == VehicleYesNotEnum.yes) {
+                    n.setMessage2(vehicle.getId() + ", novo, " + vehicle.getModelDescription());
+                } else {
+                    n.setMessage2(vehicle.getId() + ", " + vehicle.getPlaca() + ", " + vehicle.getModelDescription());
+                }
+                n.setMessage3("");
+                n.setShareMessage(YesNot.Yes);
+                n.setDeleteMessage(YesNot.Yes);
+                break;
+            case "Exit":
+                n.setCompanyId(userOrig.getCompanyId());
+                n.setResaleId(userOrig.getResaleId());
+                n.setOrigUserId(userOrig.getId());
+                n.setOrigUserName(userOrig.getName());
+                n.setOrigRoleId(userOrig.getRoleId());
+                n.setOrigRoleDesc(userOrig.getRoleDesc());
+                n.setOrigDate(new Date());
+                n.setOrigNotificationMenu(NotificationMenu.Vehicle_Exit);
+                n.setDestUserAll(YesNot.Not);
+                n.setVehicleId(vehicle.getId());
+                n.setHeader("Saída de Veículo");
+                n.setMessage1("realizou a saída do veículo.");
+                if (vehicle.getVehicleNew() == VehicleYesNotEnum.yes) {
+                    n.setMessage2(vehicle.getId() + ", novo, " + vehicle.getModelDescription());
+                } else {
+                    n.setMessage2(vehicle.getId() + ", " + vehicle.getPlaca() + ", " + vehicle.getModelDescription());
+                }
+                n.setMessage3("");
+                n.setShareMessage(YesNot.Yes);
+                n.setDeleteMessage(YesNot.Yes);
+                break;
+        }
+        //Save notification
+        MessageResponse resultNotification = this.notificationService.save(n);
+        Notification dataNotifi = (Notification) resultNotification.getData();
+        for (PermissionUser p : permissions) {
+            User u = this.userRepository.findById(vehicle.getCompanyId(), vehicle.getResaleId(), p.getUserId());
+            NotificationUser nuDest = new NotificationUser();
+            nuDest.setCompanyId(userOrig.getCompanyId());
+            nuDest.setResaleId(userOrig.getResaleId());
+            nuDest.setNotificationId(dataNotifi.getId());
+            nuDest.setUserId(u.getId());
+            this.notificationUserService.save(nuDest);
+        }
+        return ConstantsMessage.SUCCESS;
+    }
 }

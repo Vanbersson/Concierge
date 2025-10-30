@@ -1,30 +1,40 @@
-:host{
-    
-    .layout-sidebar-content-card {
-        display: flex;
-        align-items: center;
-        border-radius: 8px;
-        border: 1px solid var(--color-grey-300);
-        cursor: pointer;
-        padding: 1.5rem 1rem;
-        gap: 18px;
+:host {
 
-
-        >i {
-            font-size: 1.5rem;
+    .layout-sidebar-button {
+        >a:hover {
+            background-color: var(--color-grey-100);
         }
-
-        .layout-sidebar-content-card-item {
+        .layout-sidebar-content-card {
             display: flex;
-            flex-direction: column;
-            gap: 6px;
+            align-items: center;
+            border-radius: 8px;
+            border: 1px solid var(--color-grey-300);
+            cursor: pointer;
+            padding: 1.5rem 1rem;
+            gap: 18px;
 
-            .sidebar-content-card-item-title {
-                font-size: 16px;
-                font-weight: 700;
+
+            >i {
+                font-size: 1.5rem;
+            }
+
+            >a:hover {
+                background-color: var(--color-grey-100);
+            }
+
+            .layout-sidebar-content-card-item {
+                display: flex;
+                flex-direction: column;
+                gap: 6px;
+
+                .sidebar-content-card-item-title {
+                    font-size: 16px;
+                    font-weight: 700;
+                }
             }
         }
     }
+
 
     .layout-photo-person {
         display: flex;
@@ -59,7 +69,7 @@
                 cursor: pointer;
             }
 
-            
+
         }
 
 

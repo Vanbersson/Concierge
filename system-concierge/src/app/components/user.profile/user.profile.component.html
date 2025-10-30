@@ -1,11 +1,14 @@
 
-<a class="layout-sidebar-content-card" (click)="showDialogUser()">
-    <i class="pi pi-user"></i>
-    <div class="layout-sidebar-content-card-item">
-        <span class="sidebar-content-card-item-title">Perfil</span>
-        <span>Dados do usuário</span>
-    </div>
-</a>
+<div class="layout-sidebar-button">
+    <a class="layout-sidebar-content-card" (click)="showDialogUser()">
+        <i class="pi pi-user"></i>
+        <div class="layout-sidebar-content-card-item">
+            <span class="sidebar-content-card-item-title">Perfil</span>
+            <span>Dados do usuário</span>
+        </div>
+    </a>
+</div>
+
 <p-toast/>
 <p-dialog [(visible)]="visibleDialogUser" [modal]="true" [style]="{ width: '50rem' }"
     [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }">
