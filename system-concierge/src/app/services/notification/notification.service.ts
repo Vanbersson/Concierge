@@ -4,18 +4,22 @@ import { StorageService } from '../storage/storage.service';
 import { Observable } from 'rxjs';
 import { MessageResponse } from '../../models/message/message-response';
 import { environment } from '../../../environments/environment';
+import { Notification } from '../../models/notification/notification';
 
 @Injectable({
   providedIn: 'root'
 })
 export class NotificationService {
 
- private companyResale: string = this.storage.companyId + "/" + this.storage.resaleId;
+  private companyResale: string = this.storage.companyId + "/" + this.storage.resaleId;
   constructor(private http: HttpClient, private storage: StorageService) { }
 
-   filterUser(userId: number): Observable<HttpResponse<MessageResponse>> {
-          return this.http.get<MessageResponse>(environment.apiuUrl + "/notification/user/" + this.companyResale + "/filter/u/" + userId , { headers: this.myHeaders(), observe: 'response' });
-      }
+  filterUser(userId: number): Observable<HttpResponse<MessageResponse>> {
+    return this.http.get<MessageResponse>(environment.apiuUrl + "/notification/user/" + this.companyResale + "/filter/u/" + userId, { headers: this.myHeaders(), observe: 'response' });
+  }
+  deleteNotification(no: Notification): Observable<HttpResponse<MessageResponse>> {
+    return this.http.post<MessageResponse>(environment.apiuUrl + "/notification/user/delete", no, { headers: this.myHeaders(), observe: 'response' });
+  }
 
   private myHeaders(): HttpHeaders {
     const httpOptions = new HttpHeaders({

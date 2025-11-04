@@ -71,11 +71,6 @@ export default class LayoutComponent implements OnDestroy {
       this.hideMenu();
       this.blockBodyScroll();
     });
-
-     if(this.layoutService.isMobile()){
-      const elem = document.documentElement;
-      elem.requestFullscreen();
-     }
   }
 
   hideMenu() {

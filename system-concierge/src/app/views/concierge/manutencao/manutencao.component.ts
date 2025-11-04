@@ -235,10 +235,12 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
       { color: 'Roxo' },
       { color: 'Outro' }
     ];
+
     if (this.activatedRoute.snapshot.params['id']) {
-      //Id vehicle entry
-      this.id = this.activatedRoute.snapshot.params['id'];
-      this.init();
+      this.activatedRoute.params.subscribe(params => {
+        this.id = params['id'];
+        this.init();
+      });
     }
   }
   //Details Vehicle
@@ -323,6 +325,8 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
       //Vehicle has already left
       if (this.vehicleEntry.status == StatusVehicle.exit) {
         this.vehicleExit = true;
+      } else {
+        this.vehicleExit = false;
       }
       this.loadForms();
     }
@@ -406,6 +410,9 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
       this.formClientCompany.patchValue({
         clientCompanyNot: ['not'],
         clientCompanyId: null,
+        clientCompanyName: "",
+        clientCompanyCpf: "",
+        clientCompanyCnpj: "",
         clientCompanyRg: null
       });
     }
@@ -439,6 +446,19 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
       this.driverExitPhotoDoc1 = this.driverExit.photoDoc1;
       this.driverExitPhotoDoc2 = this.driverExit.photoDoc2;
     }
+    /* Motorista de saída não informado */
+    if (this.vehicleEntry.driverExitId == 0 && this.vehicleEntry.driverExitName == "" && this.vehicleEntry.driverExitCpf == "") {
+      this.formDriver.patchValue({
+        driverExitId: null,
+        driverExitName: "",
+        driverExitCpf: "",
+        driverExitRg: null
+      });
+      this.driverExitPhoto = "";
+      this.driverExitPhotoDoc1 = "";
+      this.driverExitPhotoDoc2 = "";
+    }
+
     //Verificar essa função
     if (this.vehicleEntry.statusAuthExit != this.notAuth) {
       if (this.vehicleEntry.serviceOrder == "yes") {

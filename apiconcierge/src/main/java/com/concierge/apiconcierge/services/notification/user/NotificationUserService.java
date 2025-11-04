@@ -1,5 +1,6 @@
 package com.concierge.apiconcierge.services.notification.user;
 
+import com.concierge.apiconcierge.dtos.notification.NotificationUserDto;
 import com.concierge.apiconcierge.models.message.MessageResponse;
 import com.concierge.apiconcierge.models.notification.Notification;
 import com.concierge.apiconcierge.models.notification.NotificationUser;
@@ -35,8 +36,17 @@ public class NotificationUserService implements INotificationUserService {
     }
 
     @Override
-    public MessageResponse delete(UUID id) {
-        return null;
+    public MessageResponse delete(NotificationUserDto notification) {
+        try{
+            this.repository.delete(notification.companyId(), notification.resaleId(), notification.id());
+            MessageResponse response = new MessageResponse();
+            response.setStatus(ConstantsMessage.SUCCESS);
+            response.setHeader("Notificação");
+            response.setMessage("Removida com sucesso.");
+            return response;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

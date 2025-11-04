@@ -3,8 +3,10 @@ package com.concierge.apiconcierge.repositories.notification;
 import com.concierge.apiconcierge.models.notification.Notification;
 import com.concierge.apiconcierge.models.notification.NotificationUser;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -12,7 +14,7 @@ import java.util.UUID;
 @Repository
 public interface INotificationUserRepository extends JpaRepository<NotificationUser, UUID> {
 
-    @Query(value = "SELECT tbn.* FROM tb_notification_user AS tbnu\n" +
+    @Query(value = "SELECT DISTINCT tbn.company_id, tbn.resale_id, tbnu.id, tbn.orig_user_id, tbn.orig_user_name, tbn.orig_date, tbn.orig_role_id, tbn.orig_role_desc, tbn.orig_notification_menu, tbn.dest_user_id, tbn.dest_user_role_id, tbn.dest_user_all, tbn.vehicle_id, tbn.budget_id, tbn.purchase_order_id, tbn.tool_control_request_id, tbn.header, tbn.message1, tbn.message2, tbn.message3, tbn.share_message, tbn.delete_message FROM tb_notification_user AS tbnu\n" +
             "INNER JOIN tb_notification AS tbn \n" +
             "    ON tbnu.company_id = tbn.company_id\n" +
             "    AND tbnu.resale_id = tbn.resale_id\n" +
@@ -21,9 +23,12 @@ public interface INotificationUserRepository extends JpaRepository<NotificationU
             "  tbnu.company_id = ?1\n" +
             "  AND tbnu.resale_id = ?2\n" +
             "  AND tbnu.user_id = ?3\n" +
-            "GROUP BY \n" +
-            "tbn.id \n" +
             "ORDER BY \n" +
             "  tbn.orig_date DESC", nativeQuery = true)
     List<Notification> filterUser(Integer companyId, Integer resaleId, Integer userId);
+
+    @Transactional
+    @Modifying
+    @Query(value = "DELETE FROM tb_notification_user WHERE company_id=?1 AND resale_id=?2 AND id=?3", nativeQuery = true)
+    void delete(Integer companyId, Integer resaleId, UUID id);
 }

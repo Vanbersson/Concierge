@@ -1,16 +1,15 @@
 package com.concierge.apiconcierge.controllers.notification;
 
 import com.concierge.apiconcierge.dtos.message.MessageResponseDto;
+import com.concierge.apiconcierge.dtos.notification.NotificationUserDto;
 import com.concierge.apiconcierge.models.message.MessageResponse;
 import com.concierge.apiconcierge.models.notification.NotificationUser;
 import com.concierge.apiconcierge.services.notification.user.INotificationUserService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
@@ -27,6 +26,16 @@ public class NotificationUserController {
                                              @PathVariable(name = "user") Integer userId) {
         try {
             MessageResponse result = this.service.filterUser(companyId, resaleId, userId);
+            return ResponseEntity.status(HttpStatus.OK).body(result);
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
+        }
+    }
+
+    @PostMapping("/delete")
+    public ResponseEntity<Object> deleteNotification(@RequestBody NotificationUserDto data, HttpServletRequest request) {
+        try {
+            MessageResponse result = this.service.delete(data);
             return ResponseEntity.status(HttpStatus.OK).body(result);
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));

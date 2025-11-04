@@ -228,7 +228,7 @@
                     <div class="p-fluid p-formgrid grid">
                         <div *ngIf="!detailsVehicle" class="col-12 flex align-items-center gap-2">
                             <p-checkbox inputId="ClientCompanyNotId" value="not" formControlName="clientCompanyNot" (click)="validationClientCompany()" />
-                            <label for="ClientCompanyNotId" style="color: #3B82F6;">Empresa sem cadastro!</label>
+                            <label  for="ClientCompanyNotId" style="color: #3B82F6;">Empresa sem cadastro!</label>
                         </div>
                         <div class="col-12 md:col-1">
                             <label for="clientCompanyId">Código</label>
@@ -306,9 +306,9 @@
                             <label for="driverEntryRg">RG</label>
                             <p-inputNumber id="driverEntryRg" mode="decimal" [useGrouping]="false" formControlName="driverEntryRg" />
                         </div>
-                        <div *ngIf="!detailsVehicle" class="col-12 md:col-2 flex flex-column">
-                            <label for="">Filtro</label>
-                            <app-filterdriver (outputDriver)="selectDriverEntry.set($event)"/>
+                        <div *ngIf="!vehicleExit" class="col-12 md:col-2 flex flex-column">
+                            <label *ngIf="!detailsVehicle" for="">Filtro</label>
+                            <app-filterdriver *ngIf="!detailsVehicle" (outputDriver)="selectDriverEntry.set($event)"/>
                         </div>
                     </div>
                     <!-- Motorista saída -->
@@ -354,7 +354,7 @@
                             <label for="driverExitRg">RG</label>
                             <p-inputNumber id="driverExitRg" mode="decimal" [useGrouping]="false" formControlName="driverExitRg" />
                         </div>
-                        <div *ngIf="!detailsVehicle" class="col-12 md:col-2 flex gap-2">
+                        <div *ngIf="!vehicleExit" class="col-12 md:col-2 flex gap-2">
                             <div class="flex flex-column">
                                 <label for="">Filtro</label>
                                 <app-filterdriver (outputDriver)="selectDriverExit.set($event)"/>
@@ -372,9 +372,9 @@
     <p-divider class="mobile-visible-none" *ngIf="!detailsVehicle" type="solid" />
     <div *ngIf="!detailsVehicle" class="flex justify-content-between">
         <div class="flex gap-2">
-            <button pButton [disabled]="vehicleExit" type="button" label="Salvar" icon="pi pi-check" size="small" [raised]="true" severity="success-custom" (click)="save()"></button>
-            <button pButton [disabled]="vehicleExit" type="button" label="Orçamento" icon="pi pi-file" size="small" [raised]="true" severity="secondary-custom" (click)="confirmGerarOrcamento()"></button>
-            <button pButton [disabled]="vehicleExit" type="button" label="Liberar" icon="pi pi-car" size="small" [raised]="true" severity="secondary-custom" (click)="authExit()"></button>
+            <button pButton *ngIf="!vehicleExit" [disabled]="vehicleExit" type="button" label="Salvar" icon="pi pi-check" size="small" [raised]="true" severity="success-custom" (click)="save()"></button>
+            <button pButton *ngIf="!vehicleExit" [disabled]="vehicleExit" type="button" label="Orçamento" icon="pi pi-file" size="small" [raised]="true" severity="secondary-custom" (click)="confirmGerarOrcamento()"></button>
+            <button pButton *ngIf="!vehicleExit" [disabled]="vehicleExit" type="button" label="Liberar" icon="pi pi-car" size="small" [raised]="true" severity="secondary-custom" (click)="authExit()"></button>
         </div>
     </div>    
     <!-- Orçamento -->

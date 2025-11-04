@@ -1,46 +1,47 @@
-import { Component, OnDestroy, OnInit, signal } from '@angular/core';
+import { Component, OnDestroy, OnInit, signal, ViewChild } from '@angular/core';
 import { CommonModule, DatePipe, UpperCasePipe } from '@angular/common';
 import { lastValueFrom } from 'rxjs';
 import { HttpResponse } from '@angular/common/http';
-
-import { OverlayPanelModule } from 'primeng/overlaypanel';
+import { Router } from '@angular/router';
+//PrimeNG
+import { OverlayPanel, OverlayPanelModule } from 'primeng/overlaypanel';
 import { BadgeModule } from 'primeng/badge';
 import { ButtonModule } from 'primeng/button';
-
+import { ToastModule } from 'primeng/toast';
+import { MessageService } from 'primeng/api';
+import { TableModule } from 'primeng/table';
+//Service
 import { NotificationService } from '../../services/notification/notification.service';
 import { StorageService } from '../../services/storage/storage.service';
 import { MessageResponse } from '../../models/message/message-response';
-import { Notification } from '../../models/notification/notification';
-import { YesNot } from '../../models/enum/yes-not';
-import { VehicleEntry } from '../../models/vehicle/vehicle-entry';
 import { VehicleService } from '../../services/vehicle/vehicle.service';
 import { BusyService } from '../loading/busy.service';
 import { TaskService } from '../../services/task/task.service';
 import { PermissionService } from '../../services/permission/permission.service';
-import { Router } from '@angular/router';
+//Class
+import { Notification } from '../../models/notification/notification';
+import { YesNot } from '../../models/enum/yes-not';
+import { VehicleEntry } from '../../models/vehicle/vehicle-entry';
 import { SuccessError } from '../../models/enum/success-error';
-import { ToastModule } from 'primeng/toast';
-import { MessageService } from 'primeng/api';
 
 @Component({
   selector: 'app-notification',
   standalone: true,
-  imports: [CommonModule, OverlayPanelModule, ButtonModule, BadgeModule,ToastModule],
+  imports: [CommonModule, OverlayPanelModule, ButtonModule, BadgeModule, ToastModule, TableModule],
   templateUrl: './notification.component.html',
   styleUrl: './notification.component.scss',
-  providers:[MessageService]
+  providers: [MessageService]
 })
 export class NotificationComponent implements OnInit, OnDestroy {
-
+  @ViewChild('op') overlayPanel!: OverlayPanel;
   listMessage: Notification[] = [];
-
   Yes = YesNot.yes;
   Not = YesNot.not;
 
   constructor(private storageService: StorageService,
     private permissionService: PermissionService,
     private messageService: MessageService,
-     private router: Router,
+    private router: Router,
     private taskService: TaskService,
     private busyService: BusyService,
     private notificationService: NotificationService,
@@ -98,51 +99,45 @@ export class NotificationComponent implements OnInit, OnDestroy {
     // Formata a data e adiciona o fuso horário
     return datePipe.transform(date, "yyyy-MM-dd'T'HH:mm:ss.SSS") + timezone;
   }
-  private async listNotification(): Promise<HttpResponse<MessageResponse>> {
-    try {
-      return await lastValueFrom(this.notificationService.filterUser(this.storageService.id));
-    } catch (error) {
-      return error;
-    }
-  }
-
   firstName(name: string): string {
     return name.split(" ")[0];
   }
-
   async editVehicle(id: number) {
     /* PERMISSION - 100 */
     /* EDITAR ENTRADA DO VEÍCULO */
     const permission = await this.searchPermission(100);
     if (!permission) { return; }
-    this.router.navigateByUrl('portaria/mannutencao-entrada-veiculo/' + id);
+    this.overlayPanel.hide();
+    this.router.navigate(['portaria', 'mannutencao-entrada-veiculo', id]);
+
+
   }
   private async searchPermission(permission: number): Promise<boolean> {
-      try {
-        var result = await lastValueFrom(this.permissionService.filterUserPermission(this.storageService.companyId, this.storageService.resaleId, this.storageService.id, permission));
-         if (result.status == 200 && result.body.status == SuccessError.succes) {
-          return true;
-        } else if (result.status == 200 && result.body.status == SuccessError.error) {
-          this.messageService.add({ severity: 'info', summary: result.body.header, detail: result.body.message, icon: 'pi pi-info-circle' });
-        } 
-        return false;
-      } catch (error) {
-        this.messageService.add({ severity: 'error', summary: 'Erro', detail: error.error.message, icon: 'pi pi-times' });
-        return false;
+    try {
+      var result = await lastValueFrom(this.permissionService.filterUserPermission(this.storageService.companyId, this.storageService.resaleId, this.storageService.id, permission));
+      if (result.status == 200 && result.body.status == SuccessError.succes) {
+        return true;
+      } else if (result.status == 200 && result.body.status == SuccessError.error) {
+        this.messageService.add({ severity: 'info', summary: result.body.header, detail: result.body.message, icon: 'pi pi-info-circle' });
       }
+      return false;
+    } catch (error) {
+      this.messageService.add({ severity: 'error', summary: 'Erro', detail: error.error.message, icon: 'pi pi-times' });
+      return false;
     }
-
+  }
   async shareVehicle(vehicleId: number) {
     //Show load
     this.busyService.busy();
     const result = await this.getVehicleEntry(vehicleId);
     if (result.status == 200) {
-      this.shareWhatsApp(result.body);
+      this.shareNotification(result.body);
     }
     //Close load
     this.busyService.idle();
   }
-  private shareWhatsApp(vehicle: VehicleEntry) {
+  /* Share vehicle data via WhatsApp */
+  private shareNotification(vehicle: VehicleEntry) {
     const uppercase = new UpperCasePipe();
     const datePipe = new DatePipe('pt-BR');
     //Alterar o fuso horário para o horário local
@@ -158,6 +153,8 @@ export class NotificationComponent implements OnInit, OnDestroy {
       Código: ${vehicle.id}
       Placa: ${uppercase.transform(vehicle.placa)}
       Modelo: ${uppercase.transform(vehicle.modelDescription)}
+      KM Entrada: ${vehicle.kmEntry}
+      KM Saída: ${vehicle.kmExit}
       Empresa Código: ${vehicle.clientCompanyId == 0 ? "" : vehicle.clientCompanyId}
       Empresa Nome: ${vehicle.clientCompanyName}
       Consultor: ${uppercase.transform(vehicle.nameUserAttendant)}
@@ -179,6 +176,16 @@ export class NotificationComponent implements OnInit, OnDestroy {
       `);
     window.open(`https://wa.me/?text=${message}`, '_blank');
   }
+  /* delete notification   */
+  async deleteMessage(no: Notification) {
+    const result = await this.deleteNotitication(no);
+    if (result.status == 200 && result.body.status == SuccessError.succes) {
+      this.messageService.add({ severity: 'success', summary: result.body.header, detail: result.body.message, icon: 'pi pi-check' });
+      this.init();
+    } else if (result.status == 200 && result.body.status == SuccessError.error) {
+      this.messageService.add({ severity: 'info', summary: result.body.header, detail: result.body.message, icon: 'pi pi-info-circle' });
+    }
+  }
   private async getVehicleEntry(vehicleId: number): Promise<HttpResponse<VehicleEntry>> {
     try {
       return await lastValueFrom(this.vehicleService.entryFilterId(vehicleId));
@@ -186,19 +193,20 @@ export class NotificationComponent implements OnInit, OnDestroy {
       return error;
     }
   }
-
-  /*  "Código: ${vehicle.id}\n"
-     "Empresa código: ${vehicle.clientCompanyId}\n"
-     "Empresa nome: ${vehicle.clientCompanyName}\n"
-     "Modelo: ${vehicle.modelDescription}\nCor: ${vehicle.color} \n"
-     "Placa: ${maskPlaca(vehicle.placa!)}\nFrota: ${vehicle.frota}\nKM: ${vehicle.kmEntry}\n"
-     "Data entrada: ${formatDate(vehicle.dateEntry!)}\nPorteiro entrada: ${vehicle.nameUserEntry}\n"
-     "Data saída: ${vehicle.dateExit == null ? '' : formatDate(vehicle.dateExit!)}\nPorteiro saída: ${vehicle.userNameExit ?? ''}\n"
-     "Consultor: ${vehicle.nameUserAttendant ?? ''}\n"
-     "O.S.: ${vehicle.numServiceOrder != 0 ? vehicle.numServiceOrder : ''}\n"
-     "NFe: ${vehicle.numNfe != 0 ? vehicle.numNfe : ''}\n"
-     "NFS-e: ${vehicle.numNfse != 0 ? vehicle.numNfse : ''}\n"
-     "Obs Porteiro: ${vehicle.informationConcierge}\n"
-     "Obs Consultor: ${vehicle.information}\n", */
+  private async listNotification(): Promise<HttpResponse<MessageResponse>> {
+    try {
+      return await lastValueFrom(this.notificationService.filterUser(this.storageService.id));
+    } catch (error) {
+      return error;
+    }
+  }
+  private async deleteNotitication(no: Notification): Promise<HttpResponse<MessageResponse>> {
+    try {
+      return await lastValueFrom(this.notificationService.deleteNotification(no));
+    } catch (error) {
+      this.messageService.add({ severity: 'error', summary: 'Erro', detail: error.error.message, icon: 'pi pi-times' });
+      return error;
+    }
+  }
 
 }
