@@ -1,14 +1,15 @@
 package com.concierge.apiconcierge.services.driver;
 
 import com.concierge.apiconcierge.models.driver.Driver;
+import com.concierge.apiconcierge.models.message.MessageResponse;
 
 import java.util.List;
 import java.util.Map;
 
 public interface IDriverService {
-    public Map<String, Object> save(Driver driver);
+    public MessageResponse save(Driver driver);
 
-    public String update(Driver driver);
+    public MessageResponse update(Driver driver);
 
     public List<Map<String, Object>> listAll(Integer companyId, Integer resaleId);
 

@@ -76,7 +76,7 @@ export class TopbarComponent implements OnInit, OnDestroy, DoCheck {
 
   }
   closeSession() {
-    this.storageService.deleteStorage();
+    //this.storageService.deleteStorage();
     this.navigatorLogin();
   }
 

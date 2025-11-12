@@ -34,6 +34,8 @@ import { BusyService } from '../../../components/loading/busy.service';
 import { CEPService } from '../../../services/cep/cep.service';
 //enum
 import { MaleFemale } from '../../../models/enum/male-female';
+import { MessageResponse } from '../../../models/message/message-response';
+import { SuccessError } from '../../../models/enum/success-error';
 
 interface sexo {
   type: string;
@@ -316,13 +318,15 @@ export default class DriverComponent implements OnInit {
       this.driver.userName = this.storageService.name;
 
       const resultSave = await this.saveDriver(this.driver);
-      if (resultSave.status == 201) {
-        this.driver.id = resultSave.body.id;
-        this.driver.dateRegister = resultSave.body.dateRegister;
-        this.formDriver.get('id').setValue(resultSave.body.id);
-        this.messageService.add({ severity: 'success', summary: 'Motorista', detail: 'Salvo com sucesso', icon: 'pi pi-check' });
+      if (resultSave.status == 201 && resultSave.body.status == SuccessError.succes) {
+        this.messageService.add({ severity: 'success', summary: resultSave.body.header, detail: resultSave.body.message, icon: 'pi pi-check' });
+        this.driver.id = resultSave.body.data.id;
+        this.driver.dateRegister = resultSave.body.data.dateRegister;
+        this.formDriver.get('id').setValue(resultSave.body.data.id);
         //Lista motoristas
         this.listDrivers();
+      } else if (resultSave.status == 201 && resultSave.body.status == SuccessError.error) {
+        this.messageService.add({ severity: 'info', summary: resultSave.body.header, detail: resultSave.body.message, icon: 'pi pi-info-circle' });
       }
       //Fecha load
       this.busyService.idle();
@@ -356,10 +360,12 @@ export default class DriverComponent implements OnInit {
       this.driver.photoDoc2 = this.driverPhotoDoc2;
 
       const resultSave = await this.updateDriver(this.driver);
-      if (resultSave.status == 200) {
-        this.messageService.add({ severity: 'success', summary: 'Motorista', detail: 'Atualizado com sucesso', icon: 'pi pi-check' });
+      if (resultSave.status == 200 && resultSave.body.status == SuccessError.succes) {
+        this.messageService.add({ severity: 'success', summary: resultSave.body.header, detail: resultSave.body.message, icon: 'pi pi-check' });
         //Lista motoristas
         this.listDrivers();
+      } else if (resultSave.status == 200 && resultSave.body.status == SuccessError.error) {
+        this.messageService.add({ severity: 'info', summary: resultSave.body.header, detail: resultSave.body.message, icon: 'pi pi-info-circle' });
       }
       //Fecha load
       this.busyService.idle();
@@ -404,20 +410,19 @@ export default class DriverComponent implements OnInit {
       this.driverPhotoDoc2 = this.driver.photoDoc2;
     }
   }
-  private async saveDriver(driver: Driver): Promise<HttpResponse<Driver>> {
+  private async saveDriver(driver: Driver): Promise<HttpResponse<MessageResponse>> {
     try {
       return await lastValueFrom(this.driverService.save(driver));
     } catch (error) {
-      if (error.error.message == "Driver already exists.") {
-        this.messageService.add({ severity: 'error', summary: 'Motorista', detail: "Já cadastrado", icon: 'pi pi-times' });
-      }
+      this.messageService.add({ severity: 'error', summary: 'Erro', detail: error.error.message, icon: 'pi pi-times' });
       return error;
     }
   }
-  private async updateDriver(driver: Driver): Promise<HttpResponse<Driver>> {
+  private async updateDriver(driver: Driver): Promise<HttpResponse<MessageResponse>> {
     try {
       return await lastValueFrom(this.driverService.update(driver));
     } catch (error) {
+      this.messageService.add({ severity: 'error', summary: 'Erro', detail: error.error.message, icon: 'pi pi-times' });
       return error;
     }
   }

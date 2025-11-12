@@ -3,25 +3,26 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
+        margin-bottom: 1rem;
 
         span {
             display: flex;
             align-items: center;
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: var(--color-text-primary);
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--color-grey-800);
         }
     }
 
-    .card {
-        min-height: 41rem;
+    .layout-card-aba {
+        min-height: 33rem;
     }
 
     ::ng-deep {
         .p-button.p-button-icon-only {
             padding: 0.5rem 0;
         }
-        
+
         .p-inputgroup .p-inputtext,
         .p-fluid .p-inputgroup .p-inputtext,
         .p-inputgroup .p-inputwrapper,

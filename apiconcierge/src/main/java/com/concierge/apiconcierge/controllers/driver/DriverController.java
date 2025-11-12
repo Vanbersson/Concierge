@@ -4,6 +4,7 @@ package com.concierge.apiconcierge.controllers.driver;
 import com.concierge.apiconcierge.dtos.driver.DriverDto;
 import com.concierge.apiconcierge.dtos.message.MessageResponseDto;
 import com.concierge.apiconcierge.models.driver.Driver;
+import com.concierge.apiconcierge.models.message.MessageResponse;
 import com.concierge.apiconcierge.models.workshop.mechanic.Mechanic;
 import com.concierge.apiconcierge.services.driver.DriverService;
 import org.springframework.beans.BeanUtils;
@@ -27,8 +28,8 @@ public class DriverController {
         try {
             Driver driver = new Driver();
             BeanUtils.copyProperties(data, driver);
-            Map<String, Object> result = this.service.save(driver);
-            return ResponseEntity.status(HttpStatus.CREATED).body(result);
+            MessageResponse response = this.service.save(driver);
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
         }
@@ -39,8 +40,8 @@ public class DriverController {
         try {
             Driver driver = new Driver();
             BeanUtils.copyProperties(data, driver);
-            String message = this.service.update(driver);
-            return ResponseEntity.status(HttpStatus.OK).body(new MessageResponseDto(message));
+            MessageResponse response = this.service.update(driver);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
         }

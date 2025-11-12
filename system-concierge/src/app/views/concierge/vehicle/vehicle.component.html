@@ -6,9 +6,10 @@
     </div>
     <!-- Desktop -->
     <div class="mobile-visible-none">
-        <p-table dataKey="id" [value]="listVehicleEntry" [rowHover]="true" [showCurrentPageReport]="true"
-            currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} entradas" [(selection)]="selectedItems"
-            [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 25, 50]" styleClass="p-datatable-sm">
+        <p-table dataKey="id" [value]="listVehicleEntry" [(selection)]="selectedItems" [rowHover]="true" 
+            currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords}" [showCurrentPageReport]="true"
+            [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 25, 50]" 
+            styleClass="p-datatable-sm">
             <ng-template pTemplate="header">
                 <tr>
                     <th>Sel.</th>
@@ -141,10 +142,11 @@
     </div>
     <!-- Mobile -->
     <div class="mobile-visible">
-        <p-table #tableFilter dataKey="id" [value]="listVehicleEntry" [rowHover]="true" [showCurrentPageReport]="true"
-        currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} entradas"
+        <p-table #tableFilter dataKey="id" [value]="listVehicleEntry" [rowHover]="true" 
+        currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords}" [showCurrentPageReport]="true"
         [globalFilterFields]="['id','placa','modelDescription', 'frota','dateEntry','clientCompanyName','nameUserAttendant']"
-        [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 25, 50]" styleClass="p-datatable-sm">
+        [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 25, 50]" 
+        styleClass="p-datatable-sm">
         <ng-template pTemplate="caption">
             <div class="flex">
                  <p-iconField iconPosition="left">

@@ -1,4 +1,4 @@
-import { Component, inject, OnDestroy, OnInit, Renderer2, ViewChild } from '@angular/core';
+import { Component, OnDestroy, Renderer2, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 
@@ -8,11 +8,10 @@ import { LayoutService } from './service/layout.service';
 import { filter, Subscription } from 'rxjs';
 import { IUser } from '../../interfaces/user/iuser';
 
-
 @Component({
   selector: 'app-layout',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, TopbarComponent, SidebarComponent],
+  imports: [CommonModule, RouterOutlet, TopbarComponent, SidebarComponent,],
   templateUrl: './layout.component.html',
   styleUrl: './layout.component.scss',
   providers: []
@@ -31,7 +30,8 @@ export default class LayoutComponent implements OnDestroy {
 
   @ViewChild(SidebarComponent) appSidebar!: SidebarComponent;
 
-  constructor(public layoutService: LayoutService, public renderer: Renderer2, public router: Router) {
+  constructor(
+    public layoutService: LayoutService, public renderer: Renderer2, public router: Router) {
 
     this.overlayMenuOpenSubscription = this.layoutService.overlayOpen$.subscribe(() => {
 
@@ -133,6 +133,8 @@ export default class LayoutComponent implements OnDestroy {
       this.menuOutsideClickListener();
     }
   }
+
+
 
 
 

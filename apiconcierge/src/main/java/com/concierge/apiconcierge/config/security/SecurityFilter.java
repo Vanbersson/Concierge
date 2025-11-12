@@ -1,6 +1,5 @@
 package com.concierge.apiconcierge.config.security;
 
-
 import com.concierge.apiconcierge.models.user.User;
 import com.concierge.apiconcierge.repositories.user.IUserRepository;
 import com.concierge.apiconcierge.services.auth.TokenService;

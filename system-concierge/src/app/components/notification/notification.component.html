@@ -8,12 +8,9 @@
     <div class="flex flex-column">
         <div class="flex justify-content-between align-items-center text-base text-900 font-normal mb-4 ">
             <span>Você tem <strong>{{listMessage.length}}</strong> notificações</span>
-            <p-button [text]="true" icon="pi pi-times" size="small" [rounded]="true" severity="secondary" (onClick)="op.toggle($event)"/> 
+            <p-button icon="pi pi-times" size="small" [rounded]="true" severity="secondary-custom" (onClick)="op.toggle($event)"/> 
         </div>
-        <p-table [value]="listMessage"  
-        [paginator]="true"
-        [rows]="8"
-        styleClass="p-datatable-sm">
+        <p-table [value]="listMessage" [paginator]="true" [rows]="8" styleClass="p-datatable-sm">
             <ng-template pTemplate="body" let-item>
                 <tr>
                     <td>

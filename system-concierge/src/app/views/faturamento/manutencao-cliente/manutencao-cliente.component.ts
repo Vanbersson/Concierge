@@ -16,6 +16,7 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { RadioButtonModule } from 'primeng/radiobutton';
+import { DividerModule } from 'primeng/divider';
 
 
 import { ClientCompany } from '../../../models/clientcompany/client-company';
@@ -26,12 +27,16 @@ import { ITypeClient } from '../../../interfaces/clientcompany/itype-client';
 import { HttpResponse } from '@angular/common/http';
 import { lastValueFrom } from 'rxjs';
 import { ClientFisJurEnum } from '../../../models/clientcompany/client-fisjur-enum';
+import { MessageResponse } from '../../../models/message/message-response';
+import { SuccessError } from '../../../models/enum/success-error';
+import { BudgetService } from '../../../services/budget/budget.service';
+import { BusyService } from '../../../components/loading/busy.service';
 
 @Component({
   selector: 'app-manutencao-cliente',
   standalone: true,
   imports: [CommonModule, TabViewModule, ButtonModule, InputTextModule, TableModule,
-    MultiSelectModule, InputNumberModule, IconFieldModule, InputIconModule, DialogModule,
+    MultiSelectModule, InputNumberModule, IconFieldModule, InputIconModule, DialogModule, DividerModule,
     InputMaskModule, InputGroupModule, ConfirmDialogModule, ToastModule, RadioButtonModule,
     ReactiveFormsModule],
   templateUrl: './manutencao-cliente.component.html',
@@ -45,7 +50,6 @@ export default class ManutencaoClienteComponent implements OnInit, OnDestroy, Do
   clients: ClientCompany[] = [];
   client: ClientCompany;
   isClientNew = true;
-
   formClient = new FormGroup({
     id: new FormControl<number | null>(null),
     fantasia: new FormControl<string>(""),
@@ -68,7 +72,6 @@ export default class ManutencaoClienteComponent implements OnInit, OnDestroy, Do
     city: new FormControl<string>("", Validators.required),
     neighborhood: new FormControl<string>("", Validators.required),
     addressComplement: new FormControl<string>(""),
-
     contactName: new FormControl<string>(""),
     contactEmail: new FormControl<string>(""),
     contactDDDPhone: new FormControl<number | null>(null),
@@ -76,7 +79,6 @@ export default class ManutencaoClienteComponent implements OnInit, OnDestroy, Do
     contactDDDCellphone: new FormControl<number | null>(null),
     contactCellphone: new FormControl<number | null>(null),
   });
-
   formClientFilter = new FormGroup({
     id: new FormControl<number | null>(null),
     fantasia: new FormControl<string>(""),
@@ -86,22 +88,19 @@ export default class ManutencaoClienteComponent implements OnInit, OnDestroy, Do
     fisjur: new FormControl<string>(""),
     clifor: new FormControl<string>(""),
   });
-
   //Dialog edit
   visibleDialog: boolean = false;
   showJuridica = false;
   showFisica = false;
-
   editCNPJCPF = true;
-
   //Dialog filter
   visibleDialogFilter: boolean = false;
 
   constructor(
+    private busyService: BusyService,
     private confirmationService: ConfirmationService,
     private messageService: MessageService,
     private clienteService: ClientecompanyService) {
-
   }
   ngDoCheck(): void {
     if (this.formClient.value.fisjur.at(0)) {
@@ -116,21 +115,30 @@ export default class ManutencaoClienteComponent implements OnInit, OnDestroy, Do
       this.showJuridica = false;
       this.showFisica = false;
     }
-
-
   }
-
   ngOnInit(): void {
-
     this.clifor = [{ type: 'Cliente', value: 'Cliente' }, { type: 'Fornecedor', value: 'Fornecedor' }, { type: 'Ambos', value: 'Ambos' }];
     this.fisjur = [{ type: 'Jurídica', value: 'Jurídica' }, { type: 'Física', value: 'Física' }];
-
-    this.clienteService.getAll().subscribe(data => {
-      this.clients = data;
-    })
+    this.init();
   }
   ngOnDestroy(): void {
-
+  }
+  async init() {
+    //Show load
+    this.busyService.busy();
+    const result = await this.listAll();
+    if (result.status == 200 && result.body.status == SuccessError.succes) {
+      this.clients = result.body.data;
+    }
+    //Close load
+    this.busyService.idle();
+  }
+  private async listAll(): Promise<HttpResponse<MessageResponse>> {
+    try {
+      return await lastValueFrom(this.clienteService.listAll());
+    } catch (error) {
+      return error;
+    }
   }
   private addValidCNPJ() {
     this.formClient.controls['cnpj'].addValidators(Validators.required);
@@ -176,8 +184,20 @@ export default class ManutencaoClienteComponent implements OnInit, OnDestroy, Do
     this.enableClientCnpj();
     this.enableClientCpf();
     this.isClientNew = true;
-    this.editCNPJCPF = true;
+   // this.editCNPJCPF = true;
   }
+  saveClient() {
+    if (this.isClientNew) {
+      this.saveNewClient();
+    } else {
+      this.update();
+    }
+  }
+
+  private async saveNewClient() {
+
+  }
+
   editClient(cli: ClientCompany) {
 
     this.disableClientId();
@@ -227,16 +247,12 @@ export default class ManutencaoClienteComponent implements OnInit, OnDestroy, Do
       this.addValidCNPJ();
       this.removeValidCPF();
     }
-
   }
-
   async update() {
-
     this.enableClientCnpj();
     this.enableClientCpf();
 
     const { value, valid } = this.formClient;
-
     if (!valid) {
       this.disableClientCnpj();
       this.disableClientCpf();
@@ -244,21 +260,19 @@ export default class ManutencaoClienteComponent implements OnInit, OnDestroy, Do
       return;
     }
 
+    //Show load
+    this.busyService.busy();
+
     this.client.name = value.name;
     this.client.fantasia = value.fantasia;
-
     this.client.clifor = value.clifor.at(0).value;
     this.client.fisjur = value.fisjur.at(0).value;
-
     this.client.dddPhone = value.dddPhone != null ? value.dddPhone.toString() : "";
     this.client.phone = value.phone != null ? value.phone.toString() : "";
-
     this.client.dddCellphone = value.dddCellphone != null ? value.dddCellphone.toString() : "";
     this.client.cellphone = value.cellphone != null ? value.cellphone.toString() : "";
-
     this.client.emailHome = value.emailHome;
     this.client.emailWork = value.emailWork;
-
     this.client.zipCode = value.zipCode;
     this.client.address = value.address;
     this.client.addressNumber = value.addressNumber.toString();
@@ -266,11 +280,9 @@ export default class ManutencaoClienteComponent implements OnInit, OnDestroy, Do
     this.client.state = value.state;
     this.client.neighborhood = value.neighborhood;
     this.client.addressComplement = value.addressComplement;
-
     this.client.cnpj = value.cnpj;
     this.client.cpf = value.cpf;
     this.client.rg = value.rg;
-
     this.client.contactName = value.contactName;
     this.client.contactEmail = value.contactEmail;
     this.client.contactDDDPhone = value.contactDDDPhone != null ? value.contactDDDPhone.toString() : "";
@@ -278,22 +290,25 @@ export default class ManutencaoClienteComponent implements OnInit, OnDestroy, Do
     this.client.contactDDDCellphone = value.contactDDDCellphone != null ? value.contactDDDCellphone.toString() : "";
     this.client.contactCellphone = value.contactCellphone != null ? value.contactCellphone.toString() : "";
 
-
     const resultClient = await this.updateClient();
-    if (resultClient.status == 200) {
-      this.messageService.add({ severity: 'success', summary: 'Cadastro', detail: 'Alterado com sucesso', icon: 'pi pi-check' });
+    if (resultClient.status == 200 && resultClient.body.status == SuccessError.succes) {
+      this.messageService.add({ severity: 'success', summary: resultClient.body.header, detail: resultClient.body.message, icon: 'pi pi-check' });
+    } else if (resultClient.status == 200 && resultClient.body.status == SuccessError.error) {
+      this.messageService.add({ severity: 'info', summary: resultClient.body.header, detail: resultClient.body.message, icon: 'pi pi-info-circle' });
     }
 
     this.disableClientCnpj();
     this.disableClientCpf();
     this.editCNPJCPF = false;
 
+    //close load
+    this.busyService.idle();
   }
-
-  private async updateClient(): Promise<HttpResponse<ClientCompany>> {
+  private async updateClient(): Promise<HttpResponse<MessageResponse>> {
     try {
       return await lastValueFrom(this.clienteService.update(this.client));
     } catch (error) {
+      this.messageService.add({ severity: 'error', summary: 'Erro', detail: error.error.message, icon: 'pi pi-times' });
       return error;
     }
   }
@@ -349,13 +364,9 @@ export default class ManutencaoClienteComponent implements OnInit, OnDestroy, Do
           this.enableClientCnpj();
         }
         if (value == "CPF") {
-
           this.enableClientCpf();
         }
         this.editCNPJCPF = true;
-      },
-      reject: () => {
-
       }
     });
   }

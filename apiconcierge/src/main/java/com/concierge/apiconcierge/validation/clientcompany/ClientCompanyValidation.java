@@ -2,6 +2,7 @@ package com.concierge.apiconcierge.validation.clientcompany;
 
 import com.concierge.apiconcierge.models.clientcompany.ClientCompany;
 import com.concierge.apiconcierge.models.clientcompany.FisJurEnum;
+import com.concierge.apiconcierge.models.message.MessageResponse;
 import com.concierge.apiconcierge.repositories.clientcompany.IClientCompanyRepository;
 import com.concierge.apiconcierge.util.ConstantsMessage;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,123 +17,303 @@ public class ClientCompanyValidation implements IClientCompanyValidation {
     private IClientCompanyRepository repository;
 
     @Override
-    public String save(ClientCompany client) {
-        if (client.getCompanyId() == null || client.getCompanyId() == 0)
-            return ConstantsMessage.ERROR_COMPANY;
-        if (client.getResaleId() == null || client.getResaleId() == 0)
-            return ConstantsMessage.ERROR_RESALE;
-        if (client.getId() == null || client.getId() == 0)
-            return ConstantsMessage.ERROR_ID;
-        if (client.getStatus() == null)
-            return ConstantsMessage.ERROR_STATUS;
-        if (client.getName().isBlank())
-            return ConstantsMessage.ERROR_NAME;
-        if (client.getFisjur() == null)
-            return ConstantsMessage.ERROR_TYPE_FISJUS;
-        if (client.getFisjur() == FisJurEnum.Física) {
-            if (client.getCpf().isBlank())
-                return ConstantsMessage.ERROR_CPF;
-        } else {
-            if (client.getCnpj().isBlank())
-                return ConstantsMessage.ERROR_CNPJ;
+    public MessageResponse save(ClientCompany client) {
+        MessageResponse response = new MessageResponse();
+        if (client.getCompanyId() == null || client.getCompanyId() == 0) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Empresa");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
         }
-        if (client.getClifor() == null)
-            return ConstantsMessage.ERROR_TYPE_CLIFOR;
-
-        ClientCompany clientResult = this.repository.filterId(client.getCompanyId(), client.getResaleId(), client.getId());
-        if (clientResult != null)
-            return ConstantsMessage.ERROR_CLIENT_EXISTS;
-
-        return ConstantsMessage.SUCCESS;
-    }
-
-    @Override
-    public String update(ClientCompany client) {
-
-        if (client.getCompanyId() == null || client.getCompanyId() == 0)
-            return ConstantsMessage.ERROR_COMPANY;
-        if (client.getResaleId() == null || client.getResaleId() == 0)
-            return ConstantsMessage.ERROR_RESALE;
-        if (client.getId() == null || client.getId() == 0)
-            return ConstantsMessage.ERROR_ID;
-        if (client.getStatus() == null)
-            return ConstantsMessage.ERROR_STATUS;
-        if (client.getName().isBlank())
-            return ConstantsMessage.ERROR_NAME;
-        if (client.getFisjur() == null)
-            return ConstantsMessage.ERROR_TYPE_FISJUS;
-        if (client.getFisjur() == FisJurEnum.Física) {
-            if (client.getCpf().isBlank())
-                return ConstantsMessage.ERROR_CPF;
-        } else {
-            if (client.getCnpj().isBlank())
-                return ConstantsMessage.ERROR_CNPJ;
+        if (client.getResaleId() == null || client.getResaleId() == 0) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Revenda");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
         }
-        if (client.getClifor() == null)
-            return ConstantsMessage.ERROR_TYPE_CLIFOR;
-
-        return ConstantsMessage.SUCCESS;
-    }
-
-    public String listAll(Integer companyId, Integer resaleId) {
-        if (companyId == null || companyId == 0)
-            return ConstantsMessage.ERROR_COMPANY;
-        if (resaleId == null || resaleId == 0)
-            return ConstantsMessage.ERROR_COMPANY;
-
-        return ConstantsMessage.SUCCESS;
+        if (client.getId() == null || client.getId() == 0) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Código");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (client.getStatus() == null) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Status");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (client.getName().isBlank()) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Nome");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (client.getFisjur() == null) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("FisJur");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (client.getFisjur() == FisJurEnum.Física) {
+            if (client.getCpf().isBlank()) {
+                response.setStatus(ConstantsMessage.ERROR);
+                response.setHeader("CPF");
+                response.setMessage(ConstantsMessage.NOT_INFORMED);
+                return response;
+            }
+            ClientCompany clientResult = this.repository.filterCNPJ(client.getCompanyId(), client.getResaleId(), client.getCpf());
+            if (clientResult != null) {
+                response.setStatus(ConstantsMessage.ERROR);
+                response.setHeader("Cliente");
+                response.setMessage("Já cadastrado.");
+                return response;
+            }
+        } else if (client.getFisjur() == FisJurEnum.Jurídica) {
+            if (client.getCnpj().isBlank()) {
+                response.setStatus(ConstantsMessage.ERROR);
+                response.setHeader("CNPJ");
+                response.setMessage(ConstantsMessage.NOT_INFORMED);
+                return response;
+            }
+            ClientCompany clientResult = this.repository.filterCNPJ(client.getCompanyId(), client.getResaleId(), client.getCnpj());
+            if (clientResult != null) {
+                response.setStatus(ConstantsMessage.ERROR);
+                response.setHeader("Empresa");
+                response.setMessage("Já cadastrada.");
+                return response;
+            }
+        }
+        if (client.getClifor() == null) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("CliFor");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        response.setStatus(ConstantsMessage.SUCCESS);
+        response.setHeader("Informações");
+        response.setMessage("Salvo com sucesso.");
+        return response;
     }
 
     @Override
-    public String filterId(Integer companyId, Integer resaleId, Integer clientId) {
-        if (companyId == null || companyId == 0)
-            return ConstantsMessage.ERROR_COMPANY;
-        if (resaleId == null || resaleId == 0)
-            return ConstantsMessage.ERROR_COMPANY;
-        if (clientId == null || clientId == 0)
-            return ConstantsMessage.ERROR_ID;
-        return ConstantsMessage.SUCCESS;
+    public MessageResponse update(ClientCompany client) {
+        MessageResponse response = new MessageResponse();
+        if (client.getCompanyId() == null || client.getCompanyId() == 0) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Empresa");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (client.getResaleId() == null || client.getResaleId() == 0) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Revenda");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (client.getId() == null || client.getId() == 0) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Código");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (client.getStatus() == null) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Status");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (client.getName().isBlank()) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Nome");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (client.getFisjur() == null) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("FisJur");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (client.getFisjur() == FisJurEnum.Física) {
+            if (client.getCpf().isBlank()) {
+                response.setStatus(ConstantsMessage.ERROR);
+                response.setHeader("CPF");
+                response.setMessage(ConstantsMessage.NOT_INFORMED);
+                return response;
+            }
+        } else {
+            if (client.getCnpj().isBlank()) {
+                response.setStatus(ConstantsMessage.ERROR);
+                response.setHeader("CNPJ");
+                response.setMessage(ConstantsMessage.NOT_INFORMED);
+                return response;
+            }
+        }
+        if (client.getClifor() == null) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("CliFor");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        response.setStatus(ConstantsMessage.SUCCESS);
+        response.setHeader("Informações");
+        response.setMessage("Atualizado com sucesso.");
+        return response;
+    }
+
+    public MessageResponse listAll(Integer companyId, Integer resaleId) {
+        MessageResponse response = new MessageResponse();
+        if (companyId == null || companyId == 0) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Empresa");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (resaleId == null || resaleId == 0) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Empresa");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        response.setStatus(ConstantsMessage.SUCCESS);
+        response.setHeader(ConstantsMessage.SUCCESS);
+        response.setMessage(ConstantsMessage.SUCCESS);
+        return response;
     }
 
     @Override
-    public String filterJFantasia(String fantasia) {
-        if (fantasia.isBlank())
-            return ConstantsMessage.ERROR_FANTASIA;
-        return ConstantsMessage.SUCCESS;
+    public MessageResponse filterId(Integer companyId, Integer resaleId, Integer clientId) {
+        MessageResponse response = new MessageResponse();
+        if (companyId == null || companyId == 0) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Empresa");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (resaleId == null || resaleId == 0) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Empresa");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (clientId == null || clientId == 0) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Código");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        response.setStatus(ConstantsMessage.SUCCESS);
+        response.setHeader(ConstantsMessage.SUCCESS);
+        response.setMessage(ConstantsMessage.SUCCESS);
+        return response;
     }
 
     @Override
-    public String filterFFantasia(String fantasia) {
-        if (fantasia.isBlank())
-            return ConstantsMessage.ERROR_FANTASIA;
-        return ConstantsMessage.SUCCESS;
+    public MessageResponse filterFantasia(Integer companyId, Integer resaleId, String fantasia) {
+        MessageResponse response = new MessageResponse();
+        if (companyId == null || companyId == 0) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Empresa");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (resaleId == null || resaleId == 0) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Empresa");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (fantasia.isBlank()) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Fantasia");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        response.setStatus(ConstantsMessage.SUCCESS);
+        response.setHeader(ConstantsMessage.SUCCESS);
+        response.setMessage(ConstantsMessage.SUCCESS);
+        return response;
     }
 
     @Override
-    public String filterJNome(String name) {
-        if (name.isBlank())
-            return ConstantsMessage.ERROR_NAME;
-        return ConstantsMessage.SUCCESS;
+    public MessageResponse filterName(Integer companyId, Integer resaleId, String name) {
+        MessageResponse response = new MessageResponse();
+        if (companyId == null || companyId == 0) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Empresa");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (resaleId == null || resaleId == 0) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Empresa");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (name.isBlank()) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Nome");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        response.setStatus(ConstantsMessage.SUCCESS);
+        response.setHeader(ConstantsMessage.SUCCESS);
+        response.setMessage(ConstantsMessage.SUCCESS);
+        return response;
     }
 
     @Override
-    public String filterFNome(String name) {
-        if (name.isBlank())
-            return ConstantsMessage.ERROR_NAME;
-        return ConstantsMessage.SUCCESS;
+    public MessageResponse filterCNPJ(Integer companyId, Integer resaleId, String cnpj) {
+        MessageResponse response = new MessageResponse();
+        if (companyId == null || companyId == 0) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Empresa");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (resaleId == null || resaleId == 0) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Empresa");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (cnpj.isBlank()) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("CNPJ");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        response.setStatus(ConstantsMessage.SUCCESS);
+        response.setHeader(ConstantsMessage.SUCCESS);
+        response.setMessage(ConstantsMessage.SUCCESS);
+        return response;
     }
 
     @Override
-    public String filterCNPJ(String cnpj) {
-        if (cnpj.isBlank())
-            return ConstantsMessage.ERROR_CNPJ;
-        return ConstantsMessage.SUCCESS;
-    }
-
-    @Override
-    public String filterCPF(String cpf) {
-        if (cpf.isBlank())
-            return ConstantsMessage.ERROR_CPF;
-        return ConstantsMessage.SUCCESS;
+    public MessageResponse filterCPF(Integer companyId, Integer resaleId, String cpf) {
+        MessageResponse response = new MessageResponse();
+        if (companyId == null || companyId == 0) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Empresa");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (resaleId == null || resaleId == 0) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Empresa");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (cpf.isBlank()) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("CPF");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        response.setStatus(ConstantsMessage.SUCCESS);
+        response.setHeader(ConstantsMessage.SUCCESS);
+        response.setMessage(ConstantsMessage.SUCCESS);
+        return response;
     }
 }

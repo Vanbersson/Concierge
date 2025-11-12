@@ -15,13 +15,13 @@
                     <p-button icon="pi pi-refresh" [text]="true" label="Recarregar" (onClick)="listVehicles()"/>
                 </div>
             </p-overlayPanel>
-        </div>
-              
+        </div>      
     </div>
-    <p-table #tableFilter dataKey="id" [value]="listVehicleExit"
+    <p-table #tableFilter dataKey="id" [value]="listVehicleExit" [(selection)]="selectedVehicle" 
+        currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords}" [showCurrentPageReport]="true"
         [globalFilterFields]="['id','placa','modelDescription', 'frota','dateEntry','clientCompanyName','nameUserAttendant']"
-        [(selection)]="selectedVehicle" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 25, 50]"
-        styleClass="p-datatable-sm">
+        [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 25, 50]"
+        [tableStyle]="{ 'min-width': '80rem' }" styleClass="p-datatable-sm">
         <ng-template pTemplate="caption">
             <div class="flex align-items-center">
                 <p-iconField iconPosition="left">

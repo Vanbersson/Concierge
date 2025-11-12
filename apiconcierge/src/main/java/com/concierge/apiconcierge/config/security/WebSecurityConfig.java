@@ -15,13 +15,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-
-import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -36,7 +31,8 @@ public class WebSecurityConfig {
         return new WebMvcConfigurer() {
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOrigins("*")
+                        //.allowedOrigins("https://www.atenatruck.com.br") // frontend
+                        .allowedOrigins("*")// frontend dev
                         .allowedMethods(HttpMethod.POST.name(), HttpMethod.GET.name())
                         .allowedHeaders(HttpHeaders.CONTENT_TYPE, HttpHeaders.AUTHORIZATION);
             }
@@ -49,7 +45,6 @@ public class WebSecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
-                        // liberar pré-flight OPTIONS (opcional, mas garante)
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/vehicle/entry/budget/token/valid/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/vehicle/entry/budget/token/approbation/**").permitAll()

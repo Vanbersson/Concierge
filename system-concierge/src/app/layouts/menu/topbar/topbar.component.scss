@@ -111,4 +111,11 @@
         }
     }
 
+    ::ng-deep {
+        .p-button .p-badge {
+            background-color: transparent;
+        }
+    }
+
+
 }

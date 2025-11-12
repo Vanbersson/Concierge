@@ -1,34 +1,44 @@
-import { Component, OnDestroy, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 //PrimeNg
-import { PrimeNGConfig } from 'primeng/api';
+import { ConfirmationService, MessageService, PrimeNGConfig } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { CalendarModule } from 'primeng/calendar';
-import { Router } from '@angular/router';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { ToastModule } from 'primeng/toast';
 
-
+//Service
 import { VehicleService } from '../../services/vehicle/vehicle.service';
+import { StorageService } from '../../services/storage/storage.service';
+import { RouterStateSnapshot } from '@angular/router';
+import { CanComponentDeactivate } from './can-deactivate.guard.ts';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule, ButtonModule, CalendarModule],
+  imports: [CommonModule, FormsModule, ButtonModule, CalendarModule,ConfirmDialogModule, ToastModule],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
-  providers: []
+  providers: [ConfirmationService, MessageService]
 })
-export default class DashboardComponent implements OnInit, OnDestroy {
-
+export default class DashboardComponent implements OnInit, CanComponentDeactivate {
   qtdVehicleEntry = signal<number>(0);
   qtdVehicleExit = signal<number>(0);
 
   qtdVehicleBudgetWith = signal<number>(0);
   qtdVehicleBudgetWithout = signal<number>(0);
 
-  constructor(private primeNGConfig: PrimeNGConfig, private router: Router, private vehicleService: VehicleService) {
+  btnBack = false; // controle para saber se o usuário clicou no button voltar
+
+  constructor(private confirmationService: ConfirmationService,
+    private messageService: MessageService, private storageService: StorageService,
+    private primeNGConfig: PrimeNGConfig,
+    private vehicleService: VehicleService,
+  ) {
   }
+
   ngOnInit(): void {
     this.primeNGConfig.setTranslation({
       accept: 'Accept',
@@ -46,8 +56,11 @@ export default class DashboardComponent implements OnInit, OnDestroy {
     });
 
     this.qtdVehicles();
-  }
-  ngOnDestroy(): void {
+
+    // Detecta o botão de voltar
+    window.onpopstate = () => {
+      this.btnBack = true;
+    };
   }
 
   qtdVehicles() {
@@ -72,5 +85,34 @@ export default class DashboardComponent implements OnInit, OnDestroy {
     this.vehicleService.allAuthorized$().subscribe((data) => {
       this.qtdVehicleExit.set(data.length);
     });
+  }
+
+  canDeactivate(nextState?: RouterStateSnapshot): Promise<boolean> | boolean {
+    // Apenas confirmar se for sair para o login
+    const nextUrl = nextState?.url || '';
+    console.log(nextUrl)
+
+    if (nextUrl.includes('/login')) {
+      return new Promise<boolean>((resolve) => {
+        this.confirmationService.confirm({
+          header: 'Sair?',
+          message: 'Deseja realmente sair e ir para a tela de login?',
+          accept: () => {
+            this.storageService.deleteStorage();
+            resolve(true);
+          },
+          reject: () => {
+            this.btnBack = false;
+            resolve(false);
+          }
+        });
+      });
+    }
+
+    // Caso contrário, permite sair sem perguntar
+    return true;
+  }
+  onChange() {
+    this.btnBack = true;
   }
 }

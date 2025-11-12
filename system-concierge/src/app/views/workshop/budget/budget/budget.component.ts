@@ -230,7 +230,7 @@ export default class BudgetComponent implements OnInit, OnDestroy, DoCheck {
       //Client
       const clientResult = await this.getClient(this.budget.clientCompanyId);
       if (clientResult.status == 200) {
-        this.clientCompany = clientResult.body;
+        this.clientCompany = clientResult.body.data;
 
         //Emails de clientes
         var arr = [];
@@ -355,9 +355,9 @@ export default class BudgetComponent implements OnInit, OnDestroy, DoCheck {
       return error;
     }
   }
-  private async getClient(id: number): Promise<HttpResponse<ClientCompany>> {
+  private async getClient(id: number): Promise<HttpResponse<MessageResponse>> {
     try {
-      return await lastValueFrom(this.serviceClienteCompany.getId$(id));
+      return await lastValueFrom(this.serviceClienteCompany.filterId(id));
     } catch (error) {
       return error;
     }

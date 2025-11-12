@@ -50,6 +50,7 @@ export default class LoginComponent {
     private busyService: BusyService,
     private menuUserService: MenuUserService
   ) {
+    this.storageService.deleteStorage();
   }
 
   async loginUser() {

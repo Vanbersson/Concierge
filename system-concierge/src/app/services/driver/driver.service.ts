@@ -4,6 +4,7 @@ import { HttpClient, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { StorageService } from '../storage/storage.service';
 import { Driver } from '../../models/driver/driver';
+import { MessageResponse } from '../../models/message/message-response';
 
 @Injectable({
     providedIn: 'root'
@@ -12,11 +13,11 @@ export class DriverService {
     companyResale: string = this.storage.companyId + "/" + this.storage.resaleId;
     constructor(private http: HttpClient, private storage: StorageService) { }
 
-    save(driver: Driver): Observable<HttpResponse<Driver>> {
-        return this.http.post<Driver>(environment.apiuUrl + "/driver/save", driver, { headers: this.myHeaders(), observe: 'response' });
+    save(driver: Driver): Observable<HttpResponse<MessageResponse>> {
+        return this.http.post<MessageResponse>(environment.apiuUrl + "/driver/save", driver, { headers: this.myHeaders(), observe: 'response' });
     }
-    update(driver: Driver): Observable<HttpResponse<Driver>> {
-        return this.http.post<Driver>(environment.apiuUrl + "/driver/update", driver, { headers: this.myHeaders(), observe: 'response' });
+    update(driver: Driver): Observable<HttpResponse<MessageResponse>> {
+        return this.http.post<MessageResponse>(environment.apiuUrl + "/driver/update", driver, { headers: this.myHeaders(), observe: 'response' });
     }
     listAll(): Observable<Driver[]> {
         return this.http.get<Driver[]>(environment.apiuUrl + "/driver/" + this.companyResale + "/filter/all", { headers: this.myHeaders() });

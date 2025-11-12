@@ -8,10 +8,10 @@
         <version>3.5.4</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <!--<packaging>war</packaging>-->
+<!--    <packaging>war</packaging>-->
     <groupId>com.concierge</groupId>
     <artifactId>atenatruck-api</artifactId>
-    <version>1.0.13</version>
+    <version>1.0.14</version>
     <name>atenatruck-api</name>
     <description>controle de acesso de veiculos</description>
     <url/>

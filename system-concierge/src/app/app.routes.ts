@@ -4,6 +4,7 @@ import { DriverMenuGuard } from './views/concierge/driver/driver.menu.guard';
 import { VehicleEntryMenuGuard } from './views/concierge/vehicle.entry/vehicle.entry.menu.guard';
 import { VehicleMenuGuard } from './views/concierge/vehicle/vehicle.menu';
 import { UserGuard } from './views/settings/user/user.guard';
+import { CanDeactivateGuard } from './views/dashboard/can-deactivate.guard.ts';
 
 export const routes: Routes = [
     {
@@ -24,12 +25,14 @@ export const routes: Routes = [
             {
                 path: '',
                 title: 'Dashboard',
-                loadComponent: () => import('./views/dashboard/dashboard.component')
+                loadComponent: () => import('./views/dashboard/dashboard.component'),
+                canDeactivate: [CanDeactivateGuard]
             },
             {
                 path: 'dashboard',
                 title: 'Dashboard',
-                loadComponent: () => import('./views/dashboard/dashboard.component')
+                loadComponent: () => import('./views/dashboard/dashboard.component'),
+                canDeactivate: [CanDeactivateGuard]
             },
             {
                 path: 'portaria',
@@ -51,7 +54,7 @@ export const routes: Routes = [
                         path: 'saida-veiculo',
                         title: 'Saída Veículo',
                         loadComponent: () => import('./views/concierge/vehicle.exit/vehicle.exit.component'),
-                        
+
                     },
                     {
                         path: 'manutencao-motorista',

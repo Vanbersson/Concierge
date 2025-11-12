@@ -2,6 +2,7 @@ package com.concierge.apiconcierge.services.driver;
 
 import com.concierge.apiconcierge.exceptions.driver.DriverException;
 import com.concierge.apiconcierge.models.driver.Driver;
+import com.concierge.apiconcierge.models.message.MessageResponse;
 import com.concierge.apiconcierge.models.status.StatusEnableDisable;
 import com.concierge.apiconcierge.repositories.driver.IDriverRepository;
 import com.concierge.apiconcierge.util.ConstantsMessage;
@@ -23,16 +24,17 @@ public class DriverService implements IDriverService {
 
     @SneakyThrows
     @Override
-    public Map<String, Object> save(Driver driver) {
+    public MessageResponse save(Driver driver) {
         try {
-            String message = this.validation.save(driver);
-            if (ConstantsMessage.SUCCESS.equals(message)) {
+            MessageResponse response = this.validation.save(driver);
+            if (ConstantsMessage.SUCCESS.equals(response.getStatus())) {
                 driver.setId(null);
                 driver.setDateRegister(new Date());
                 Driver result = this.repository.save(driver);
-                return this.load(result);
+                response.setData(result);
+                return response;
             } else {
-                throw new DriverException(message);
+                return response;
             }
         } catch (Exception e) {
             throw new DriverException(e.getMessage());
@@ -41,14 +43,14 @@ public class DriverService implements IDriverService {
 
     @SneakyThrows
     @Override
-    public String update(Driver driver) {
+    public MessageResponse update(Driver driver) {
         try {
-            String message = this.validation.update(driver);
-            if (ConstantsMessage.SUCCESS.equals(message)) {
+            MessageResponse response = this.validation.update(driver);
+            if (ConstantsMessage.SUCCESS.equals(response.getStatus())) {
                 this.repository.save(driver);
-                return ConstantsMessage.SUCCESS;
+                return response;
             } else {
-                throw new DriverException(message);
+                return response;
             }
         } catch (Exception e) {
             throw new DriverException(e.getMessage());

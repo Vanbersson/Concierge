@@ -1,14 +1,15 @@
 package com.concierge.apiconcierge.validation.driver;
 
 import com.concierge.apiconcierge.models.driver.Driver;
+import com.concierge.apiconcierge.models.message.MessageResponse;
 
 import java.util.Map;
 
 public interface IDriverValidation {
 
-    public String save(Driver driver);
+    public MessageResponse save(Driver driver);
 
-    public String update(Driver driver);
+    public MessageResponse update(Driver driver);
 
     public String listAll(Integer companyId, Integer resaleId);
 

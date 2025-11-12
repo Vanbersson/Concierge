@@ -552,8 +552,19 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
     //Add list of vehicle
     this.listVehicleEntry.push(this.vehicleEntry);
     this.messageService.add({ severity: 'success', summary: 'Veículo adicionado', detail: this.vehicleEntry.modelDescription, icon: 'pi pi-car' });
-
     this.cleanFormVehicle();
+    this.scrollTop();
+  }
+  scrollTop() {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
+  }
+  firstSecondaryName(name: string): string{
+    var nameArr = name.split(' ');
+      name = nameArr[0] + " " + nameArr[1];
+      return name;
   }
   public async saveVehicleEntry() {
     //Save vehicles

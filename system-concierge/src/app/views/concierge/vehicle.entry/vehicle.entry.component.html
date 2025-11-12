@@ -91,7 +91,7 @@
                     <div class="p-fluid p-formgrid grid">
                         <div class="col-12 flex align-items-center mt-2">
                             <div class="layout-photo-person">
-                                <p-image *ngIf="driverEntryPhoto" [imageStyle]="{'border-radius':'100%','object-fit':'cover'}" src="data:image/png;base64,{{driverEntryPhoto}}" alt="imagem motorista" [preview]="true" />  
+                                <p-image *ngIf="driverEntryPhoto" [imageStyle]="{'border-radius':'100%','object-fit':'cover','width':'80px','height':'80px'}" src="data:image/png;base64,{{driverEntryPhoto}}" alt="imagem motorista" [preview]="true" />  
                             </div>
                         </div>
                             <div class="col-12 md:col-1">
@@ -119,12 +119,12 @@
                         <div class="col-12 md:col-6 flex align-items-center gap-2">
                             <div class="layout-file">
                                 <div class="layout-file-img">
-                                    <p-image *ngIf="driverEntryPhotoDoc1" [imageStyle]="{'object-fit':'cover'}" src="data:image/png;base64,{{driverEntryPhotoDoc1}}" alt="" height="80" width="80" [preview]="true" />
+                                    <p-image *ngIf="driverEntryPhotoDoc1"  [imageStyle]="{'border-radius':'8px','object-fit':'cover'}" src="data:image/png;base64,{{driverEntryPhotoDoc1}}" alt="" [preview]="true" />
                                 </div>
                             </div>
                             <div class="layout-file">
                                 <div class="layout-file-img">
-                                    <p-image *ngIf="driverEntryPhotoDoc2" [imageStyle]="{'object-fit':'cover'}" src="data:image/png;base64,{{driverEntryPhotoDoc2}}" alt="" height="80" width="80" [preview]="true" />
+                                    <p-image *ngIf="driverEntryPhotoDoc2"  [imageStyle]="{'border-radius':'8px','object-fit':'cover'}" src="data:image/png;base64,{{driverEntryPhotoDoc2}}" alt="" [preview]="true" />
                                 </div>
                             </div>
                         </div>
@@ -305,8 +305,9 @@
 </div>
 
 <!-- Dialog Veículos -->
-<p-dialog header="Veículos" [(visible)]="dialogVehicleVisible" [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }">
-    <p-table [value]="listVehicleEntry">
+<p-dialog header="Lista de veículos" [(visible)]="dialogVehicleVisible" [modal]="true"
+    [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }">
+    <p-table [value]="listVehicleEntry"  [tableStyle]="{ 'min-width': '60rem' }" styleClass="p-datatable-sm">
         <ng-template pTemplate="header">
             <tr>
                 <th pSortableColumn="placa">Placa<p-sortIcon field="placa"></p-sortIcon></th>
@@ -314,7 +315,7 @@
                 <th pSortableColumn="modelDescription">Modelo<p-sortIcon field="modelDescription"></p-sortIcon></th>
                 <th pSortableColumn="nameUserAttendant">Consultor<p-sortIcon field="nameUserAttendant"></p-sortIcon></th>
                 <th pSortableColumn="clientCompanyName">Empresa<p-sortIcon field="clientCompanyName"></p-sortIcon></th>
-                <th>Remover</th>
+                <th></th>
             </tr>
         </ng-template>
         <ng-template pTemplate="body" let-vehicle let-index="rowIndex">
@@ -326,7 +327,7 @@
                     <span class="text-500">{{vehicle.placa | uppercase}}</span>
                     }
                 </td>
-                <td><span class="text-500">{{vehicle.frota | uppercase}}</span></td>
+                <td><span class="text-500">{{vehicle.frota}}</span></td>
                 <td><span class="text-500">{{vehicle.modelDescription | uppercase}}</span></td>
                 @if(vehicle.nameUserAttendant == ""){
                 <td><p-tag value="FALTA" severity="danger"></p-tag></td>
@@ -336,7 +337,7 @@
                 @if(vehicle.clientCompanyName ==""){
                 <td> <p-tag value="FALTA" severity="danger"></p-tag> </td>
                 }@else {
-                <td><span class="text-500">{{ vehicle.clientCompanyName | uppercase }}</span></td>
+                <td><span class="text-500">{{ firstSecondaryName(vehicle.clientCompanyName)  | uppercase }}</span></td>
                 }
                 <td>
                     <button pButton [text]="true" icon="pi pi-trash" severity="danger" (click)="deleteVehicleEntry(index)"></button>

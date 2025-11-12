@@ -5,10 +5,11 @@
         <span>Motorista</span>
         <p-button icon="pi pi-plus" [text]="true" label="Novo" (onClick)="newDriver()" />
     </div>
-    <p-table #dt1 dataKey="id" [value]="listDriver" [rowHover]="true" [showCurrentPageReport]="true"
-        currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} entradas"
-        [globalFilterFields]="['id', 'name', 'cpf', 'rg']" [paginator]="true" [rows]="10"
-        [rowsPerPageOptions]="[10, 25, 50]" styleClass="p-datatable-sm">
+    <p-table #dt1 dataKey="id" [value]="listDriver" [rowHover]="true" 
+        currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords}" [showCurrentPageReport]="true"
+        [globalFilterFields]="['id', 'name', 'cpf', 'rg']" 
+        [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 25, 50]" 
+        [tableStyle]="{ 'min-width': '80rem' }"  styleClass="p-datatable-sm">
         <ng-template pTemplate="caption">
             <div class="flex justify-content-between">
                 <p-iconField iconPosition="left">
@@ -25,8 +26,8 @@
                 <th pSortableColumn="id" style="width:10%">
                     Código <p-sortIcon field="id" />
                 </th>
-                <th pSortableColumn="Name" style="width:40%">
-                    Nome <p-sortIcon field="Name" />
+                <th pSortableColumn="name" style="width:40%">
+                    Nome <p-sortIcon field="name" />
                 </th>
                 <th pSortableColumn="cpf" style="width:15%">
                     CPF <p-sortIcon field="cpf" />
@@ -64,7 +65,7 @@
     </p-table>
 </div>
 <!-- Dialog new driver -->
-<p-dialog [(visible)]="visibleDialogNew" header="Cadastro motorista" [modal]="true"
+<p-dialog [(visible)]="visibleDialogNew" header="Cadastro motorista" [modal]="true" [maximizable]="true"
     [style]="{ width: '70rem',height:'60rem' }" [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }">
     <form [formGroup]="formDriver">
         <div class="p-fluid p-formgrid grid">

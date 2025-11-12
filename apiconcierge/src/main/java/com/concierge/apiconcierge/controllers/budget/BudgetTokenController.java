@@ -5,6 +5,7 @@ import com.concierge.apiconcierge.dtos.message.MessageResponseDto;
 import com.concierge.apiconcierge.models.budget.*;
 import com.concierge.apiconcierge.models.budget.enums.StatusBudgetEnum;
 import com.concierge.apiconcierge.models.clientcompany.ClientCompany;
+import com.concierge.apiconcierge.models.message.MessageResponse;
 import com.concierge.apiconcierge.repositories.budget.IBudgetTokenRepository;
 import com.concierge.apiconcierge.services.budget.BudgetService;
 import com.concierge.apiconcierge.services.budget.part.BudgetItemPartService;
@@ -110,7 +111,8 @@ public class BudgetTokenController {
 
             List<BudgetItemPart> listParts = this.budgetItemPartService.listAllParts(token.getCompanyId(), token.getResaleId(), token.getBudgetId());
 
-            ClientCompany client = this.clientCompanyService.filterId(token.getCompanyId(), token.getResaleId(), Integer.parseInt(budget.get("clientCompanyId").toString()));
+            MessageResponse response = this.clientCompanyService.filterId(token.getCompanyId(), token.getResaleId(), Integer.parseInt(budget.get("clientCompanyId").toString()));
+            ClientCompany client = (ClientCompany) response.getData();
 
             Map<String, Object> vehicle = this.vehicleEntryService.filterId(token.getCompanyId(), token.getResaleId(), Integer.parseInt(budget.get("vehicleEntryId").toString()));
 

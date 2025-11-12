@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output, signal } from '@angular/core';
+import { Component, EventEmitter, Input, Output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormGroup, FormControl, ReactiveFormsModule, FormsModule } from '@angular/forms'
 
@@ -31,6 +31,7 @@ import { lastValueFrom } from 'rxjs';
 export class FilterDriverComponent {
 
   @Output() public outputDriver = new EventEmitter<Driver>();
+  @Input() isDisabled: boolean = false;
 
   //Filter Client
   listDrivers: Driver[] = [];

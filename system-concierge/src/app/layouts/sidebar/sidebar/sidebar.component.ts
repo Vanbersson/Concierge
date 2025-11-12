@@ -28,7 +28,7 @@ export class SidebarComponent implements OnInit {
         key: '0_0',
         label: 'Dashboard',
         icon: 'pi pi-home',
-        routerLink: '/',
+        routerLink: '/dashboard',
         visible: false
       },
       {

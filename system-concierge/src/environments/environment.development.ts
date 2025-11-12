@@ -2,7 +2,7 @@ export const environment = {
 
     production: false,
     apiuUrl: 'http://localhost:8080',
-    apiApollo:'https://www.atenatruck.com.br:8443/apollo-api/api/v1',
+    apiApollo:'http://10.0.0.20:8080/api/v1',
     site:'http://localhost'
 
 };

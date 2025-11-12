@@ -134,29 +134,29 @@
                                 <div class="layout-file-img">
                                     <p-image *ngIf="photoVehicle1" [imageStyle]="{'object-fit':'cover'}" src="data:image/png;base64,{{photoVehicle1}}" alt="" [preview]="true" />
                                 </div>
-                                <button *ngIf="photoVehicle1"  pButton label="Remover" severity="danger" (click)="deleteFileVehicle1()"></button>
-                                <button *ngIf="!photoVehicle1" pButton type="button" label="Selecionar" severity="secondary" (click)="photoFile1Vehicle()"></button>   
+                                <button *ngIf="photoVehicle1"  pButton label="Remover" severity="danger" [disabled]="vehicleExit" (click)="deleteFileVehicle1()"></button>
+                                <button *ngIf="!photoVehicle1" pButton type="button" label="Selecionar" severity="secondary" [disabled]="vehicleExit" (click)="photoFile1Vehicle()"></button>   
                             </div>
                             <div class="layout-file">
                                 <div class="layout-file-img">
                                     <p-image *ngIf="photoVehicle2" [imageStyle]="{'object-fit':'cover'}" src="data:image/png;base64,{{photoVehicle2}}" alt="" [preview]="true" />
                                 </div>
-                                <button *ngIf="photoVehicle2" pButton label="Remover" severity="danger" (click)="deleteFileVehicle2()"></button>        
-                                <button *ngIf="!photoVehicle2" pButton type="button" label="Selecionar" severity="secondary" (click)="photoFile2Vehicle()"></button>       
+                                <button *ngIf="photoVehicle2" pButton label="Remover" severity="danger" [disabled]="vehicleExit" (click)="deleteFileVehicle2()"></button>        
+                                <button *ngIf="!photoVehicle2" pButton type="button" label="Selecionar" severity="secondary" [disabled]="vehicleExit" (click)="photoFile2Vehicle()"></button>       
                             </div>
                             <div class="layout-file">
                                 <div class="layout-file-img">
                                     <p-image *ngIf="photoVehicle3" [imageStyle]="{'object-fit':'cover'}" src="data:image/png;base64,{{photoVehicle3}}" alt="" [preview]="true" />
                                 </div>
-                                <button *ngIf="photoVehicle3" pButton label="Remover" severity="danger" (click)="deleteFileVehicle3()"></button>        
-                                <button *ngIf="!photoVehicle3" pButton type="button" label="Selecionar" severity="secondary" (click)="photoFile3Vehicle()"></button>
+                                <button *ngIf="photoVehicle3" pButton label="Remover" severity="danger" [disabled]="vehicleExit" (click)="deleteFileVehicle3()"></button>        
+                                <button *ngIf="!photoVehicle3" pButton type="button" label="Selecionar" severity="secondary" [disabled]="vehicleExit" (click)="photoFile3Vehicle()"></button>
                             </div>
                             <div class="layout-file">
                                 <div class="layout-file-img">
                                     <p-image *ngIf="photoVehicle4" [imageStyle]="{'object-fit':'cover'}" src="data:image/png;base64,{{photoVehicle4}}" alt="" [preview]="true" />
                                 </div>
-                                <button *ngIf="photoVehicle4" pButton label="Remover" severity="danger" (click)="deleteFileVehicle4()"></button>       
-                                <button *ngIf="!photoVehicle4" pButton type="button" label="Selecionar" severity="secondary" (click)="photoFile4Vehicle()"></button>       
+                                <button *ngIf="photoVehicle4" pButton label="Remover" severity="danger" [disabled]="vehicleExit" (click)="deleteFileVehicle4()"></button>       
+                                <button *ngIf="!photoVehicle4" pButton type="button" label="Selecionar" severity="secondary" [disabled]="vehicleExit" (click)="photoFile4Vehicle()"></button>       
                             </div>
                         </div>
                         <div class="col-12 lg:col-2 md:col-12">
@@ -178,13 +178,11 @@
                             <div class="layout-card-option">
                                 <div class="layout-card-option-title">Ordem serviço</div>
                                 <div class="flex align-items-center">
-                                    <p-radioButton inputId="serviceyes" value="yes"
-                                        formControlName="serviceOrder"></p-radioButton>
+                                    <p-radioButton inputId="serviceyes" value="yes" formControlName="serviceOrder"></p-radioButton>
                                     <label for="serviceyes" class="ml-2">Sim</label>
                                 </div>
                                 <div class="flex align-items-center">
-                                    <p-radioButton inputId="serviceno" value="not"
-                                        formControlName="serviceOrder"></p-radioButton>
+                                    <p-radioButton inputId="serviceno" value="not" formControlName="serviceOrder"></p-radioButton>
                                     <label for="serviceno" class="ml-2">Não</label>
                                 </div>
                             </div>
@@ -198,26 +196,42 @@
             </p-tabPanel>
 
             <p-tabPanel header="Porteiro">
-                <form>
+                <form [formGroup]="formConcierge">
                     <div class="p-fluid p-formgrid grid">
-                        <div class="col-12 md:col-1">
-                            <label for="idUserEntry">Código</label>
-                            <div class="layout-input-disabled">
-                                <span>{{proteiroId}}</span>
-                            </div>
+                        <div class="col-12 flex align-items-center">
+                            <span class="w-15rem font-semibold">Porteiro Entrada</span>
+                            <div class="layout-card-divid"></div>
                         </div>
-                        <div class="md:col-11"></div>
+                        <div class="col-12 md:col-2">
+                            <label for="entryId">Código</label>
+                            <input pInputText type="text" formControlName="entryId">
+                        </div>
                         <div class="col-12 md:col-6">
-                            <label for="nameUserEntry">Nome</label>
-                            <div class="layout-input-disabled">
-                                <span>{{porteiroName}}</span>
-                            </div>
+                            <label for="entryName">Nome</label>
+                             <input pInputText type="text"  formControlName="entryName">
                         </div>
+                        <div class="md:col-4"></div>
                         <div class="col-12">
-                            <label for="informationConcierge" class="ml-2">Informações</label>
-                            <div class="layout-input-disabled-area-text">
-                                <span>{{porteiroInfo}}</span>
-                            </div>
+                            <label for="entryInf" class="ml-2">Informações</label>
+                            <textarea pInputTextarea maxlength="255" id="entryInf" rows="4" cols="30" formControlName="entryInf"></textarea>
+                        </div>
+                        <!-- Exit -->
+                        <div class="col-12 flex align-items-center">
+                            <span class="w-15rem font-semibold">Porteiro Saída</span>
+                            <div class="layout-card-divid"></div>
+                        </div>
+                        <div class="col-12 md:col-2">
+                            <label for="exitId">Código</label>
+                            <input pInputText type="text" formControlName="exitId">
+                        </div>
+                        <div class="col-12 md:col-6">
+                            <label for="exitName">Nome</label>
+                             <input pInputText type="text"  formControlName="exitName">
+                        </div>
+                        <div class="md:col-4"></div>
+                        <div class="col-12">
+                            <label for="exitInf" class="ml-2">Informações</label>
+                            <textarea pInputTextarea maxlength="255" id="entryInf" rows="4" cols="30" formControlName="exitInf"></textarea>
                         </div>
                     </div>
                 </form>
@@ -239,9 +253,9 @@
                             <label for="clientCompanyName">Empresa</label>
                             <input pInputText id="clientCompanyName" type="text" formControlName="clientCompanyName" />
                         </div>
-                        <div *ngIf="!vehicleExit"  class="col-2 md:col-1 flex flex-column">
-                            <label *ngIf="!detailsVehicle" for="">Filtro</label>
-                            <app-filterclient *ngIf="!detailsVehicle"  (outputClient)="selectClientCompany.set($event)" />
+                        <div   class="col-2 md:col-1 flex flex-column">
+                            <label  for="">Filtro</label>
+                            <app-filterclient  [isDisabled]="vehicleExit" (outputClient)="selectClientCompany.set($event)" />
                         </div>
                         <div class="md:col-5"></div>
                         <div class="col-12 md:col-2">
@@ -265,8 +279,7 @@
                     <!-- Motorista entrada -->
                     <div class="p-fluid p-formgrid grid ">
                         <div class="col-12 flex align-items-center">
-                            <span class="w-12rem">Motorista Entrada</span>
-                            
+                            <span class="w-15rem font-semibold">Motorista Entrada</span>
                             <div class="layout-card-divid"></div>
                         </div>
                         <!-- versão antiga do sistema -->
@@ -306,15 +319,15 @@
                             <label for="driverEntryRg">RG</label>
                             <p-inputNumber id="driverEntryRg" mode="decimal" [useGrouping]="false" formControlName="driverEntryRg" />
                         </div>
-                        <div *ngIf="!vehicleExit" class="col-12 md:col-2 flex flex-column">
-                            <label *ngIf="!detailsVehicle" for="">Filtro</label>
-                            <app-filterdriver *ngIf="!detailsVehicle" (outputDriver)="selectDriverEntry.set($event)"/>
+                        <div class="col-12 md:col-2 flex flex-column">
+                            <label for="">Filtro</label>
+                            <app-filterdriver [isDisabled]="vehicleExit" (outputDriver)="selectDriverEntry.set($event)"/>
                         </div>
                     </div>
                     <!-- Motorista saída -->
                     <div class="p-fluid p-formgrid grid">
                         <div class="col-12 flex align-items-center">
-                            <span class="w-10rem">Motorista Saída</span>
+                            <span class="w-15rem font-semibold">Motorista Saída</span>
                             <div class="layout-card-divid"></div>
                         </div>
                         <!-- versão antiga do sistema -->
@@ -354,14 +367,14 @@
                             <label for="driverExitRg">RG</label>
                             <p-inputNumber id="driverExitRg" mode="decimal" [useGrouping]="false" formControlName="driverExitRg" />
                         </div>
-                        <div *ngIf="!vehicleExit" class="col-12 md:col-2 flex gap-2">
+                        <div class="col-12 md:col-2 flex gap-2">
                             <div class="flex flex-column">
                                 <label for="">Filtro</label>
-                                <app-filterdriver (outputDriver)="selectDriverExit.set($event)"/>
+                                <app-filterdriver [isDisabled]="vehicleExit" (outputDriver)="selectDriverExit.set($event)"/>
                             </div>
                             <div class="flex flex-column">
                                 <label for="">Limpar</label>
-                                <button pButton type="button" icon="pi pi-trash" text="true" class="p-button-danger" (click)="cleanDriverExit()"></button>
+                                <button pButton type="button" icon="pi pi-trash" text="true" class="p-button-danger" [disabled]="vehicleExit" (click)="cleanDriverExit()"></button>
                             </div>
                         </div>
                     </div>
@@ -369,12 +382,12 @@
             </p-tabPanel>
         </p-tabView>
     </div>
-    <p-divider class="mobile-visible-none" *ngIf="!detailsVehicle" type="solid" />
-    <div *ngIf="!detailsVehicle" class="flex justify-content-between">
+    <p-divider class="mobile-visible-none" type="solid" />
+    <div class="flex justify-content-between">
         <div class="flex gap-2">
-            <button pButton *ngIf="!vehicleExit" [disabled]="vehicleExit" type="button" label="Salvar" icon="pi pi-check" size="small" [raised]="true" severity="success-custom" (click)="save()"></button>
-            <button pButton *ngIf="!vehicleExit" [disabled]="vehicleExit" type="button" label="Orçamento" icon="pi pi-file" size="small" [raised]="true" severity="secondary-custom" (click)="confirmGerarOrcamento()"></button>
-            <button pButton *ngIf="!vehicleExit" [disabled]="vehicleExit" type="button" label="Liberar" icon="pi pi-car" size="small" [raised]="true" severity="secondary-custom" (click)="authExit()"></button>
+            <button pButton [disabled]="vehicleExit" type="button" label="Salvar" icon="pi pi-check" size="small" [raised]="true" severity="success-custom" (click)="save()"></button>
+            <button pButton [disabled]="vehicleExit" type="button" label="Orçamento" icon="pi pi-file" size="small" [raised]="true" severity="secondary-custom" (click)="confirmGerarOrcamento()"></button>
+            <button pButton [disabled]="vehicleExit" type="button" label="Liberar" icon="pi pi-car" size="small" [raised]="true" severity="secondary-custom" (click)="authExit()"></button>
         </div>
     </div>    
     <!-- Orçamento -->

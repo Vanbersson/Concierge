@@ -85,12 +85,25 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
   RESPONSE_SUCCESS: string = "Success.";
   itemsStatus: MenuItem[] | undefined;
   activeIndexStatus: number = 0;
-  private vehicleEntry: VehicleEntry;
+  vehicleEntry: VehicleEntry;
   private id: number = 0;
   //Vehicle
   private notAuth = STATUS_VEHICLE_ENTRY_NOTAUTH;
   private firstAuth = STATUS_VEHICLE_ENTRY_FIRSTAUTH;
   private authorized = STATUS_VEHICLE_ENTRY_AUTHORIZED;
+
+
+  public cores: IColor[] = []
+  public modelVehicles: ModelVehicle[] = [];
+  public attendantsUser: User[] = [];
+  private attendantUser: User;
+  photoVehicle1!: string;
+  photoVehicle2!: string;
+  photoVehicle3!: string;
+  photoVehicle4!: string;
+  public dateExitAuth1 = signal<string>('');
+  public dateExitAuth2 = signal<string>('');
+  vehicleExit = false;
 
   formVehicle = new FormGroup({
     id: new FormControl<number>({ value: 0, disabled: true }),
@@ -117,21 +130,15 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
     numNfse: new FormControl<string | null>(null),
     information: new FormControl<string>('')
   });
-  public cores: IColor[] = []
-  public modelVehicles: ModelVehicle[] = [];
-  public attendantsUser: User[] = [];
-  private attendantUser: User;
-  photoVehicle1!: string;
-  photoVehicle2!: string;
-  photoVehicle3!: string;
-  photoVehicle4!: string;
-  public dateExitAuth1 = signal<string>('');
-  public dateExitAuth2 = signal<string>('');
-  vehicleExit = false;
   //Porteiro
-  proteiroId: number = 0;
-  porteiroName: string = '';
-  porteiroInfo: String = '';
+  formConcierge = new FormGroup({
+    entryId: new FormControl<number | null>({ value: null, disabled: true }),
+    entryName: new FormControl<string>({ value: '', disabled: true }),
+    entryInf: new FormControl<string>({ value: '', disabled: true }),
+    exitId: new FormControl<number | null>({ value: null, disabled: true }),
+    exitName: new FormControl<string>({ value: '', disabled: true }),
+    exitInf: new FormControl<string>({ value: '', disabled: true }),
+  });
   //ClientCompany
   selectClientCompany = signal<ClientCompany>(new ClientCompany());
   clientCompany!: ClientCompany;
@@ -325,8 +332,12 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
       //Vehicle has already left
       if (this.vehicleEntry.status == StatusVehicle.exit) {
         this.vehicleExit = true;
+        this.formVehicle.get('vehicleNew').disable();
+        this.formVehicle.get('serviceOrder').disable();
       } else {
         this.vehicleExit = false;
+        this.formVehicle.get('vehicleNew').enable();
+        this.formVehicle.get('serviceOrder').enable();
       }
       this.loadForms();
     }
@@ -388,9 +399,13 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
     this.photoVehicle3 = this.vehicleEntry.photo3!;
     this.photoVehicle4 = this.vehicleEntry.photo4!;
     //Form Porteiro
-    this.proteiroId = this.vehicleEntry.idUserEntry;
-    this.porteiroName = this.vehicleEntry.nameUserEntry;
-    this.porteiroInfo = this.vehicleEntry.informationConcierge!;
+    this.formConcierge.patchValue({
+      entryId: this.vehicleEntry.idUserEntry,
+      entryName: this.vehicleEntry.nameUserEntry,
+      entryInf: this.vehicleEntry.informationConcierge,
+      exitId: this.vehicleEntry.userIdExit == 0 ? null : this.vehicleEntry.userIdExit,
+      exitName: this.vehicleEntry.userNameExit
+    });
     //Form Proprietario
     if (this.vehicleEntry.clientCompanyId != 0) {
       this.formClientCompany.patchValue({
@@ -585,7 +600,6 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
         });
       }
     });
-
   }
   public async photoFile2Vehicle() {
     this.ngxImageCompressService.uploadFile().then(({ image, orientation }) => {
