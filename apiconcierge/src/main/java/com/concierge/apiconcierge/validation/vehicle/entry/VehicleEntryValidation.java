@@ -145,6 +145,12 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
             return response;
         }
         if (vehicle.getServiceOrder() == VehicleYesNotEnum.yes) {
+            if(vehicle.getNumServiceOrder().isBlank()){
+                response.setStatus(ConstantsMessage.ERROR);
+                response.setHeader("Número O.S.");
+                response.setMessage(ConstantsMessage.NOT_INFORMED);
+                return response;
+            }
             //Verifica autorização de saída
             if (vehicle.getStatusAuthExit() != StatusAuthExitEnum.NotAuth) {
                 if (vehicle.getIdUserAttendant() == null || vehicle.getIdUserAttendant() == 0 || vehicle.getNameUserAttendant().isBlank()) {
