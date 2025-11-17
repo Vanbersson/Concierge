@@ -431,6 +431,20 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
         clientCompanyRg: null
       });
     }
+    //tab driver
+    this.loadDriver();
+    //Verificar essa função
+    if (this.vehicleEntry.statusAuthExit != this.notAuth) {
+      if (this.vehicleEntry.serviceOrder == "yes") {
+        this.addRequireAttendant();
+      }
+    }
+  }
+
+  private loadDriver() {
+    //Clear notifications
+    this.messageService.clear("messageDriverEntry");
+    this.messageService.clear("messageDriverExit");
     //Form Driver entrada
     //Menssagem de motorista sem cadastro
     if (this.vehicleEntry.driverEntryId == 0 && this.vehicleEntry.driverEntryName != "") {
@@ -472,13 +486,6 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
       this.driverExitPhoto = "";
       this.driverExitPhotoDoc1 = "";
       this.driverExitPhotoDoc2 = "";
-    }
-
-    //Verificar essa função
-    if (this.vehicleEntry.statusAuthExit != this.notAuth) {
-      if (this.vehicleEntry.serviceOrder == "yes") {
-        this.addRequireAttendant();
-      }
     }
   }
   private async getUserRole(): Promise<User[]> {
@@ -1045,6 +1052,7 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
       const resultVehicle = await this.updateVehicle(this.vehicleEntry);
       if (resultVehicle.status == 200 && resultVehicle.body.status == SuccessError.succes) {
         this.messageService.add({ severity: 'success', summary: resultVehicle.body.header, detail: resultVehicle.body.message, icon: 'pi pi-check' });
+        this.loadDriver();
       } else if (resultVehicle.status == 200 && resultVehicle.body.status == SuccessError.error) {
         this.messageService.add({ severity: 'info', summary: resultVehicle.body.header, detail: resultVehicle.body.message, icon: 'pi pi-info-circle' });
       }

@@ -1,6 +1,7 @@
 package com.concierge.apiconcierge.dtos.vehicle.entry;
 
 import com.concierge.apiconcierge.models.budget.enums.StatusBudgetEnum;
+import com.concierge.apiconcierge.models.enums.YesNot;
 import com.concierge.apiconcierge.models.vehicle.enums.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -51,7 +52,7 @@ public record VehicleEntryResponseDto(
         @NotNull ColorVehicleEnum color,
         String placa,
         String frota,
-        @NotNull VehicleYesNotEnum vehicleNew,
+        @NotNull YesNot vehicleNew,
         String kmEntry,
         String kmExit,
         byte[] photo1,
@@ -63,7 +64,7 @@ public record VehicleEntryResponseDto(
         Integer quantityTire,
         Integer quantityTireComplete,
         Integer quantityToolBox,
-        @NotNull VehicleYesNotEnum serviceOrder,
+        @NotNull YesNot serviceOrder,
         String numServiceOrder,
         String numNfe,
         String numNfse,

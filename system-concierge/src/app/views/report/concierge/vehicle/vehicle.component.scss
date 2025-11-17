@@ -9,10 +9,13 @@
             display: flex;
             align-items: center;
             font-size: 1.25rem;
-            font-weight: 400;
-            color: #64748b;
+            font-weight: 700;
+            color: var(--color-grey-800);
         }
 
+    }
+    .layout-card-filter {
+        min-height: 46rem;
     }
 
     ::ng-deep {

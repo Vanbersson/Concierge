@@ -1,12 +1,11 @@
 package com.concierge.apiconcierge.dtos.reports.concierge;
 
-import com.concierge.apiconcierge.models.vehicle.enums.VehicleYesNotEnum;
-
+import com.concierge.apiconcierge.models.enums.YesNot;
 import java.util.Date;
 
 public record VehicleReportDto(
         String type,
-        VehicleYesNotEnum vehicleNew,
+        YesNot vehicleNew,
         Integer companyId,
         Integer resaleId,
         Date dateInit,

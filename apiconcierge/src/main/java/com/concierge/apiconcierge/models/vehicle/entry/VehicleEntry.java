@@ -1,6 +1,7 @@
 package com.concierge.apiconcierge.models.vehicle.entry;
 
 import com.concierge.apiconcierge.models.budget.enums.StatusBudgetEnum;
+import com.concierge.apiconcierge.models.enums.YesNot;
 import com.concierge.apiconcierge.models.vehicle.enums.*;
 import jakarta.persistence.*;
 import lombok.*;
@@ -192,7 +193,7 @@ public class VehicleEntry implements Serializable {
     private String frota;
 
     @Column(name = "vehicle_new")
-    private VehicleYesNotEnum vehicleNew;
+    private YesNot vehicleNew;
 
     @Column(name = "km_entry")
     private String kmEntry;
@@ -228,7 +229,7 @@ public class VehicleEntry implements Serializable {
     private Integer quantityToolBox;
 
     @Column(name = "service_order")
-    private VehicleYesNotEnum serviceOrder;
+    private YesNot serviceOrder;
 
     @Column(name = "num_service_order")
     private String numServiceOrder;

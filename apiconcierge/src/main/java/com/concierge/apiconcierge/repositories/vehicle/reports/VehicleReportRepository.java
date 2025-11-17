@@ -1,8 +1,8 @@
 package com.concierge.apiconcierge.repositories.vehicle.reports;
 
 import com.concierge.apiconcierge.dtos.reports.concierge.VehicleReportDto;
+import com.concierge.apiconcierge.models.enums.YesNot;
 import com.concierge.apiconcierge.models.vehicle.entry.VehicleEntry;
-import com.concierge.apiconcierge.models.vehicle.enums.VehicleYesNotEnum;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.criteria.CriteriaBuilder;
@@ -81,7 +81,7 @@ public class VehicleReportRepository {
             predicates.add(cb.equal(vehicle.get("placa"), vehicleFilters.placa()));
         if(vehicleFilters.frota() != "")
             predicates.add(cb.equal(vehicle.get("frota"), vehicleFilters.frota()));
-        if(vehicleFilters.vehicleNew() == VehicleYesNotEnum.yes)
+        if(vehicleFilters.vehicleNew() == YesNot.yes)
             predicates.add(cb.equal(vehicle.get("vehicleNew"), vehicleFilters.vehicleNew()));
 
         cq.where(predicates.toArray(new Predicate[0]));

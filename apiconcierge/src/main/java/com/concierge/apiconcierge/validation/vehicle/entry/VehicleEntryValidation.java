@@ -5,13 +5,13 @@ import com.concierge.apiconcierge.dtos.vehicle.entry.ExistsPlacaDto;
 import com.concierge.apiconcierge.dtos.vehicle.entry.VehicleEntryDto;
 import com.concierge.apiconcierge.dtos.vehicle.exit.VehicleExitSaveDto;
 import com.concierge.apiconcierge.models.budget.enums.StatusBudgetEnum;
+import com.concierge.apiconcierge.models.enums.YesNot;
 import com.concierge.apiconcierge.models.message.MessageResponse;
 import com.concierge.apiconcierge.models.permission.PermissionUser;
 import com.concierge.apiconcierge.models.vehicle.entry.VehicleEntry;
 import com.concierge.apiconcierge.models.vehicle.enums.StatusAuthExitEnum;
 import com.concierge.apiconcierge.models.vehicle.enums.StatusVehicleEnum;
 import com.concierge.apiconcierge.models.vehicle.enums.StepVehicleEnum;
-import com.concierge.apiconcierge.models.vehicle.enums.VehicleYesNotEnum;
 import com.concierge.apiconcierge.repositories.permission.IPermissionUserRepository;
 import com.concierge.apiconcierge.repositories.vehicle.entry.IVehicleEntryRepository;
 import com.concierge.apiconcierge.util.ConstantsMessage;
@@ -56,7 +56,7 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
         if (vehicle.getDriverEntryRg().isBlank())
             return ConstantsMessage.ERROR_DRIVERENTRY;
 
-        if (vehicle.getVehicleNew() == VehicleYesNotEnum.not) {
+        if (vehicle.getVehicleNew() == YesNot.not) {
             if (vehicle.getPlaca().isBlank())
                 return ConstantsMessage.ERROR_PLACA;
             if (vehicle.getPlaca().length() != 7)
@@ -111,7 +111,7 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
             response.setMessage(ConstantsMessage.NOT_INFORMED);
             return response;
         }
-        if (vehicle.getVehicleNew() == VehicleYesNotEnum.not) {
+        if (vehicle.getVehicleNew() == YesNot.not) {
             if (vehicle.getPlaca().isBlank()) {
                 response.setStatus(ConstantsMessage.ERROR);
                 response.setHeader("Placa");
@@ -144,18 +144,18 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
             response.setMessage(ConstantsMessage.NOT_INFORMED);
             return response;
         }
-        if (vehicle.getServiceOrder() == VehicleYesNotEnum.yes) {
-            if(vehicle.getNumServiceOrder().isBlank()){
-                response.setStatus(ConstantsMessage.ERROR);
-                response.setHeader("Número O.S.");
-                response.setMessage(ConstantsMessage.NOT_INFORMED);
-                return response;
-            }
+        if (vehicle.getServiceOrder() == YesNot.yes) {
             //Verifica autorização de saída
             if (vehicle.getStatusAuthExit() != StatusAuthExitEnum.NotAuth) {
                 if (vehicle.getIdUserAttendant() == null || vehicle.getIdUserAttendant() == 0 || vehicle.getNameUserAttendant().isBlank()) {
                     response.setStatus(ConstantsMessage.ERROR);
                     response.setHeader("Consultor");
+                    response.setMessage(ConstantsMessage.NOT_INFORMED);
+                    return response;
+                }
+                if(vehicle.getNumServiceOrder().isBlank()){
+                    response.setStatus(ConstantsMessage.ERROR);
+                    response.setHeader("Número O.S.");
                     response.setMessage(ConstantsMessage.NOT_INFORMED);
                     return response;
                 }
@@ -187,7 +187,7 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
                 response.setMessage(ConstantsMessage.NOT_INFORMED);
                 return response;
             }
-            if (vehicle.getServiceOrder() == VehicleYesNotEnum.not) {
+            if (vehicle.getServiceOrder() == YesNot.not) {
                 response.setStatus(ConstantsMessage.ERROR);
                 response.setHeader("Ordem serviço");
                 response.setMessage("Ordem de serviço iqual a não.");
@@ -202,7 +202,7 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
 
         }
 
-        if (vehicle.getServiceOrder() == VehicleYesNotEnum.not) {
+        if (vehicle.getServiceOrder() == YesNot.not) {
             if (vehicle.getBudgetStatus() != StatusBudgetEnum.NotBudget) {
                 response.setStatus(ConstantsMessage.ERROR);
                 response.setHeader("Ordem de serviço");
@@ -351,10 +351,16 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
             response.setMessage(ConstantsMessage.NOT_INFORMED);
             return response;
         }
-        if (vehicle.getServiceOrder().equals(VehicleYesNotEnum.yes)) {
+        if (vehicle.getServiceOrder().equals(YesNot.yes)) {
             if (vehicle.getIdUserAttendant() == null || vehicle.getIdUserAttendant() == 0 || vehicle.getNameUserAttendant().isBlank()) {
                 response.setStatus(ConstantsMessage.ERROR);
                 response.setHeader("Consultor");
+                response.setMessage(ConstantsMessage.NOT_INFORMED);
+                return response;
+            }
+            if(vehicle.getNumServiceOrder().isBlank()){
+                response.setStatus(ConstantsMessage.ERROR);
+                response.setHeader("Número O.S.");
                 response.setMessage(ConstantsMessage.NOT_INFORMED);
                 return response;
             }
@@ -366,7 +372,7 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
             }
         }
 
-        if (vehicle.getServiceOrder().equals(VehicleYesNotEnum.not)) {
+        if (vehicle.getServiceOrder().equals(YesNot.not)) {
             if (vehicle.getClientCompanyId() == null || vehicle.getClientCompanyId() == 0 || vehicle.getClientCompanyName().isBlank()) {
                 response.setStatus(ConstantsMessage.ERROR);
                 response.setHeader("Proprietário");
@@ -376,7 +382,7 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
         }
 
         //Permission
-        if (vehicle.getServiceOrder().equals(VehicleYesNotEnum.yes)) {
+        if (vehicle.getServiceOrder().equals(YesNot.yes)) {
             if (vehicle.getIdUserExitAuth1() == null) {
                 if (authExitDto.userId() != 1) {
                     PermissionUser permission = this.permissionUser.findPermissionId(authExitDto.companyId(), authExitDto.resaleId(), authExitDto.userId(), ADD_AUTH_EXIT_VEHICLE_1);
@@ -401,7 +407,7 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
 
         }
         //Permission
-        if (vehicle.getServiceOrder().equals(VehicleYesNotEnum.not)) {
+        if (vehicle.getServiceOrder().equals(YesNot.not)) {
             if (authExitDto.userId() != 1) {
                 PermissionUser permission = this.permissionUser.findPermissionId(authExitDto.companyId(), authExitDto.resaleId(), authExitDto.userId(), ADD_AUTH_EXIT_VEHICLE_WITHOUT_O_S);
                 if (permission == null) {
@@ -435,7 +441,7 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
             return response;
         }
         //Permission
-        if (vehicle.getServiceOrder().equals(VehicleYesNotEnum.yes)) {
+        if (vehicle.getServiceOrder().equals(YesNot.yes)) {
             if (authExitDto.userId() != 1) {
                 //Permissão de outro usuário
 //                if (vehicle.getIdUserExitAuth1() != authExitDto.userId()){
@@ -451,7 +457,7 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
             }
         }
         //Permission
-        if (vehicle.getServiceOrder().equals(VehicleYesNotEnum.not)) {
+        if (vehicle.getServiceOrder().equals(YesNot.not)) {
             if (authExitDto.userId() != 1) {
                 //Permissão de outro usuário
 //                if (vehicle.getIdUserExitAuth1() != authExitDto.userId()){
@@ -488,7 +494,7 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
             return response;
         }
         //Permission
-        if (vehicle.getServiceOrder().equals(VehicleYesNotEnum.yes)) {
+        if (vehicle.getServiceOrder().equals(YesNot.yes)) {
             if (authExitDto.userId() != 1) {
 //                if (vehicle.getIdUserExitAuth2() != authExitDto.userId()){
 //                    return ConstantsMessage.ERROR_PERMISSION_ANOTHER_USER;
@@ -503,7 +509,7 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
             }
         }
         //Permission
-        if (vehicle.getServiceOrder().equals(VehicleYesNotEnum.not)) {
+        if (vehicle.getServiceOrder().equals(YesNot.not)) {
             if (authExitDto.userId() != 1) {
 //                if (vehicle.getIdUserExitAuth2() != authExitDto.userId()){
 //                    return ConstantsMessage.ERROR_PERMISSION_ANOTHER_USER;

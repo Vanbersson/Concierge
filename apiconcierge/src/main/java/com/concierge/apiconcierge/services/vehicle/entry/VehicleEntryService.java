@@ -17,7 +17,6 @@ import com.concierge.apiconcierge.models.vehicle.entry.VehicleEntry;
 import com.concierge.apiconcierge.models.vehicle.enums.StatusAuthExitEnum;
 import com.concierge.apiconcierge.models.vehicle.enums.StatusVehicleEnum;
 import com.concierge.apiconcierge.models.vehicle.enums.StepVehicleEnum;
-import com.concierge.apiconcierge.models.vehicle.enums.VehicleYesNotEnum;
 import com.concierge.apiconcierge.repositories.budget.IBudgetRepository;
 import com.concierge.apiconcierge.repositories.permission.IPermissionUserRepository;
 import com.concierge.apiconcierge.repositories.user.IUserRepository;
@@ -443,9 +442,7 @@ public class VehicleEntryService implements IVehicleEntryService {
     }
 
     private Map<String, Object> loadObject(VehicleEntry vehicle) {
-
         Map<String, Object> map = new HashMap<>();
-
         map.put("companyId", vehicle.getCompanyId());
         map.put("resaleId", vehicle.getResaleId());
         map.put("id", vehicle.getId());
@@ -637,18 +634,18 @@ public class VehicleEntryService implements IVehicleEntryService {
                 n.setOrigRoleDesc(userOrig.getRoleDesc());
                 n.setOrigDate(new Date());
                 n.setOrigNotificationMenu(NotificationMenu.Vehicle_Entry);
-                n.setDestUserAll(YesNot.Not);
+                n.setDestUserAll(YesNot.not);
                 n.setVehicleId(vehicle.getId());
                 n.setHeader("Entrada de Veículo");
                 n.setMessage1("realizou a entrada do veículo.");
-                if (vehicle.getVehicleNew() == VehicleYesNotEnum.yes) {
+                if (vehicle.getVehicleNew() == YesNot.yes) {
                     n.setMessage2(vehicle.getId() + ", novo, " + vehicle.getModelDescription());
                 } else {
                     n.setMessage2(vehicle.getId() + ", " + vehicle.getPlaca() + ", " + vehicle.getModelDescription());
                 }
                 n.setMessage3("");
-                n.setShareMessage(YesNot.Yes);
-                n.setDeleteMessage(YesNot.Yes);
+                n.setShareMessage(YesNot.yes);
+                n.setDeleteMessage(YesNot.yes);
                 break;
             case "Exit":
                 n.setCompanyId(userOrig.getCompanyId());
@@ -659,18 +656,18 @@ public class VehicleEntryService implements IVehicleEntryService {
                 n.setOrigRoleDesc(userOrig.getRoleDesc());
                 n.setOrigDate(new Date());
                 n.setOrigNotificationMenu(NotificationMenu.Vehicle_Exit);
-                n.setDestUserAll(YesNot.Not);
+                n.setDestUserAll(YesNot.not);
                 n.setVehicleId(vehicle.getId());
                 n.setHeader("Saída de Veículo");
                 n.setMessage1("realizou a saída do veículo.");
-                if (vehicle.getVehicleNew() == VehicleYesNotEnum.yes) {
+                if (vehicle.getVehicleNew() == YesNot.yes) {
                     n.setMessage2(vehicle.getId() + ", novo, " + vehicle.getModelDescription());
                 } else {
                     n.setMessage2(vehicle.getId() + ", " + vehicle.getPlaca() + ", " + vehicle.getModelDescription());
                 }
                 n.setMessage3("");
-                n.setShareMessage(YesNot.Yes);
-                n.setDeleteMessage(YesNot.Yes);
+                n.setShareMessage(YesNot.yes);
+                n.setDeleteMessage(YesNot.yes);
                 break;
         }
         //Save notification

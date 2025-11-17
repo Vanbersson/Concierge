@@ -1,6 +1,7 @@
 package com.concierge.apiconcierge.dtos.vehicle.entry;
 
 import com.concierge.apiconcierge.models.budget.enums.StatusBudgetEnum;
+import com.concierge.apiconcierge.models.enums.YesNot;
 import com.concierge.apiconcierge.models.vehicle.enums.*;
 
 import java.util.Date;
@@ -40,7 +41,7 @@ public record VehicleEntrySaveDto(
         ColorVehicleEnum color,
         String placa,
         String frota,
-        VehicleYesNotEnum vehicleNew,
+        YesNot vehicleNew,
         String kmEntry,
         String kmExit,
         byte[] photo1,
@@ -52,7 +53,7 @@ public record VehicleEntrySaveDto(
         Integer quantityTire,
         Integer quantityTireComplete,
         Integer quantityToolBox,
-        VehicleYesNotEnum serviceOrder,
+        YesNot serviceOrder,
         String numServiceOrder,
         String numNfe,
         String numNfse,

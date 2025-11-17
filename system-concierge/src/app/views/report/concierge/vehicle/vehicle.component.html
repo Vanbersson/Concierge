@@ -1,13 +1,14 @@
 <div class="layout-card">
     <p-toast />
     <div class="layout-card-title">
-        <span class="text-500 font-medium">Veículos</span>
+        <span>Relatório de veículos</span>
         <p-button icon="pi pi-refresh" [text]="true" label="Limpar" (onClick)="cleanList()" />
     </div>
-    <p-table #dt1 dataKey="id" [value]="listVehicleEntry" [rowHover]="true" [showCurrentPageReport]="true"
+    <p-table #dt1 dataKey="id" [value]="listVehicleEntry" [rowHover]="true" 
         currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} entradas"
-        [globalFilterFields]="['id', 'placa', 'modelDescription', 'frota', 'dateEntry','dateExit','clientCompanyName','nameUserAttendant','budgetStatus']"
-        [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 25, 50]" styleClass="p-datatable-sm">
+        [globalFilterFields]="['id', 'placa', 'modelDescription', 'frota', 'numServiceOrder', 'dateEntry','dateExit','clientCompanyName','nameUserAttendant','budgetStatus']"
+        [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 25, 50]" [showCurrentPageReport]="true"
+        [tableStyle]="{ 'min-width': '100rem' }"  styleClass="p-datatable-sm">
         <ng-template pTemplate="caption">
             <div class="flex justify-content-between">
                 <p-iconField iconPosition="left">
@@ -16,42 +17,47 @@
                     </p-inputIcon>
                     <input pInputText type="text" (input)="dt1.filterGlobal($event.target.value, 'contains')" placeholder="Pesquisar" />
                 </p-iconField>
-                <p-button icon="pi pi-filter" severity="warning" [text]="true" (onClick)="showDialog()" label="Filtros" />
+                <div >
+                    <p-button icon="pi pi-file-excel" severity="success" [text]="true" [disabled]="disabledExport" (onClick)="exportExcel()"/>
+                    <p-button icon="pi pi-filter" severity="warning" [text]="true" (onClick)="showDialog()" label="Filtros" />
+                </div>
             </div>
         </ng-template>
         <ng-template pTemplate="header">
             <tr>
-                <th class="font-normal" pSortableColumn="id" style="width:10%">
+                <th pSortableColumn="id">
                     Código <p-sortIcon field="id" />
                 </th>
-                <th class="font-normal" pSortableColumn="placa" style="width:10%">
+                <th pSortableColumn="placa">
                     Placa <p-sortIcon field="placa" />
                 </th>
-                <th class="font-normal" pSortableColumn="modelDescription" style="width:10%">
+                <th pSortableColumn="modelDescription">
                     Modelo <p-sortIcon field="modelDescription" />
                 </th>
-                <th class="font-normal" pSortableColumn="frota" style="width:10%">
+                <th pSortableColumn="frota">
                     Frota <p-sortIcon field="frota" />
                 </th>
-                <th class="font-normal" pSortableColumn="dateEntry" style="width:10%">
+                <th pSortableColumn="numServiceOrder">
+                    Nr O.S. <p-sortIcon field="numServiceOrder" />
+                </th>
+                <th pSortableColumn="dateEntry">
                     Entrada <p-sortIcon field="dateEntry" />
                 </th>
-                <th class="font-normal" pSortableColumn="dateExit" style="width:10%">
+                <th pSortableColumn="dateExit" >
                     Saída <p-sortIcon field="dateExit" />
                 </th>
-                <th class="font-normal" pSortableColumn="clientCompanyName">
+                <th pSortableColumn="clientCompanyName">
                     Empresa <p-sortIcon field="clientCompanyName" />
                 </th>
-                <th class="font-normal" pSortableColumn="nameUserAttendant">
+                <th pSortableColumn="nameUserAttendant">
                     Consultor <p-sortIcon field="nameUserAttendant" />
                 </th>
-                <th class="font-normal" pSortableColumn="budgetStatus">
+                <th pSortableColumn="budgetStatus">
                     Orçamento <p-sortIcon field="budgetStatus" />
                 </th>
-                <th class="font-normal">
+                <th>
                     Ver
                 </th>
-
             </tr>
         </ng-template>
         <ng-template pTemplate="body" let-vehicle>
@@ -64,19 +70,20 @@
                         <span class="text-500">NOVO</span>
                     </div>
                     }@else {
-                    <span class="text-500">{{vehicle.placa | uppercase}}</span>
+                    <span class="text-500">{{vehicle.placa}}</span>
                     }
                 </td>
-                <td><span class="text-500">{{ vehicle.modelDescription | uppercase }}</span>
+                <td><span class="text-500">{{ vehicle.modelDescription}}</span>
                 </td>
-                <td><span class="text-500">{{ vehicle.frota | uppercase }}</span></td>
+                <td><span class="text-500">{{ vehicle.frota}}</span></td>
+                <td><span class="text-500">{{ vehicle.numServiceOrder}}</span></td>
                 <td><span class="text-500">{{ vehicle.dateEntry }}</span></td>
                 <td><span class="text-500">{{ vehicle.dateExit }}</span></td>
                 <td>
                     <span class="text-500">{{ vehicle.clientCompanyName | uppercase }}</span>
                 </td>
                 <td>
-                    <span class="text-500">{{ vehicle.nameUserAttendant | uppercase }}</span>
+                    <span class="text-500">{{ vehicle.nameUserAttendant}}</span>
                 </td>
                 <td><p-tag [value]="vehicle.budgetStatus" [severity]="getSeverity(vehicle.budgetStatus)"></p-tag></td>
                 <td>
@@ -87,24 +94,23 @@
     </p-table>
 </div>
 
-<p-dialog [(visible)]="dialogVisible" header="Filtro" [modal]="true" [style]="{ width: '70rem',height:'55rem' }"
+<p-dialog [(visible)]="dialogVisible" header="Filtros" [modal]="true" [style]="{ width: '74rem',height:'58rem' }"
     [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }" [maximizable]="true">
-    <form [formGroup]="formFilter">
+    <form [formGroup]="formFilter" class="layout-card-filter">
         <div class="p-fluid p-formgrid grid">
-            
-            <div class="field col-12 flex justify-content-end mt-2">
+            <div class="col-12 flex justify-content-end mt-2">
                 <p-button icon="pi pi-refresh" [text]="true" label="Limpar" (onClick)="cleanform()" />
             </div>
-            <div class="field col-12 md:col-3">
+            <div class="col-12 md:col-3">
                 <label for="dateIniId">Período inicial</label>
-                <p-calendar dateFormat="dd/mm/yy" [iconDisplay]="'input'" [showIcon]="true" inputId="buttondisplay" formControlName="dateInit" />
+                <p-calendar [iconDisplay]="'input'" [showIcon]="true" inputId="buttondisplay" formControlName="dateInit" />
             </div>
-            <div class="field col-12 md:col-3">
+            <div class="col-12 md:col-3">
                 <label for="dateIniId">Período final</label>
-                <p-calendar dateFormat="dd/mm/yy" [iconDisplay]="'input'" [showIcon]="true" inputId="buttondisplay" formControlName="dateFinal" />
+                <p-calendar [iconDisplay]="'input'" [showIcon]="true" inputId="buttondisplay" formControlName="dateFinal" />
             </div>
             <div class="md:col-6"></div>
-            <div class="field col-12 md:col-6 ">
+            <div class="col-12 md:col-6 ">
                 <label for="">Tipo</label>
                 <div class="flex align-items-center gap-2 border-1 border-round border-300 p-3">
                     <div class="flex align-items-center">
@@ -127,21 +133,15 @@
                     </div>
                 </div>
             </div>
-            <div class="md:col-6"></div>
-            <div class="field col-12 md:col-2">
-                <label for="clientCompanyCodeId">Código</label>
-                <p-inputNumber inputId="clientCompanyCodeId" mode="decimal" [useGrouping]="false" formControlName="clientCompanyId" />
-            </div>
-            <div class="field col-10 md:col-6">
-                <label for="clientCompanyNameId">Empresa</label>
-                <input pInputText id="clientCompanyNameId" type="text" formControlName="clientCompanyName" />
-            </div>
-            <div class="field col-2 md:col-1">
-                <label for="">Filtro</label>
-                <app-filterclient (outputClient)="selectClientCompany.set($event)" />
+            <div class="col-12 md:col-3">
+                <label>Veículos Novos</label>
+                <div class="flex align-items-center gap-2 p-3 border-1 border-round border-300">
+                    <p-checkbox formControlName="vehicleNew" value="yes" inputId="vehicleNewId" />
+                    <label for="vehicleNewId">Sim</label>
+                </div>
             </div>
             <div class="md:col-3"></div>
-            <div class="field col-12 md:col-4">
+            <div class="col-12 md:col-4">
                 <label for="vehiclemodelid">Modelos</label>
                 <p-multiSelect [options]="vehicleModels$ | async" [selectionLimit]="1" placeholder="Selecione" optionLabel="description" formControlName="modelVehicle">
                     <ng-template let-value pTemplate="selectedItems">
@@ -159,46 +159,39 @@
                     </ng-template>
                 </p-multiSelect>
             </div>
-            <div class="field col-12 md:col-3">
-                <label>Selecionar</label>
-                <div class="flex align-items-center gap-2 mt-2">
-                    <p-checkbox formControlName="vehicleNew" value="yes" inputId="vehicleNewId" />
-                    <label for="vehicleNewId">Veículos novos</label>
-                </div>
+            <div class="md:col-8"></div>
+            <div class="col-12 md:col-2">
+                <label for="clientCompanyCodeId">Código</label>
+                <p-inputNumber inputId="clientCompanyCodeId" mode="decimal" [useGrouping]="false" formControlName="clientCompanyId" />
             </div>
-            <div class="md:col-5"></div>
-            <div class=" field col-12 md:col-2">
+            <div class="col-10 md:col-6">
+                <label for="clientCompanyNameId">Empresa</label>
+                <input pInputText id="clientCompanyNameId" type="text" formControlName="clientCompanyName" />
+            </div>
+            <div class="col-2 md:col-1">
+                <label for="">Filtro</label>
+                <app-filterclient (outputClient)="selectClientCompany.set($event)" />
+            </div>          
+            <div class="md:col-3"></div>
+            <div class=" col-12 md:col-2">
                 <label for="codeId">Código</label>
                 <p-inputNumber inputId="codeId" mode="decimal" [useGrouping]="false" formControlName="vehicleId" />
             </div>
-            <div class=" field col-12 md:col-4">
+            <div class=" col-12 md:col-2">
                 <label for="placaId">Placa</label>
                 <p-inputMask id="placaId" mask="***-****" [unmask]="true" [style]="{'text-transform':'uppercase'}" formControlName="placa" />
             </div>
-            <div class=" field col-12 md:col-2">
+            <div class=" col-12 md:col-2">
                 <label for="frotaId">Frota</label>
-                <input pInputText id="placaId" type="text" formControlName="frota" />
+                 <p-inputNumber inputId="frotaId" [useGrouping]="false" maxlength="10" formControlName="frota" />
             </div>
-
-            <div class="md:col-12">
-            </div>
-            <div class="md:col-4">
-            </div>
-            <div class="md:col-12">
-            </div>
-            <div class="md:col-12">
-            </div>
-            <div class="md:col-4">
-            </div>
-            <div class="md:col-12">
-            </div>
-        </div>
-
-        <div class="flex justify-content-end gap-2 mt-5">
-            <button pButton type="button" pRipple label="Fechar" icon="pi pi-times" class="p-button-text" (click)="hideDialog()"></button>
-            <button pButton type="button" pRipple label="Pesquisar" icon="pi pi-search" class="p-button-text" (click)="searchFilter()"></button>
+            <div class="md:col-6"></div>
         </div>
     </form>
+    <div class="flex justify-content-end gap-2 mt-4">
+        <button pButton type="button" pRipple label="Fechar" icon="pi pi-times" class="p-button-text" (click)="hideDialog()"></button>
+        <button pButton type="button" pRipple label="Pesquisar" icon="pi pi-search" class="p-button-text" (click)="searchFilter()"></button>
+    </div>
 </p-dialog>
 
 <p-dialog [(visible)]="dialogVisibleVehicleDetails" [modal]="true" [style]="{ width: '110rem',height:'60rem' }">

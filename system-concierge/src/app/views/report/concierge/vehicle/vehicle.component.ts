@@ -1,5 +1,5 @@
-import { CommonModule, DatePipe } from '@angular/common';
-import { Component, DoCheck, OnInit, signal, ViewChild } from '@angular/core';
+import { CommonModule, DatePipe, UpperCasePipe } from '@angular/common';
+import { Component, DoCheck, OnInit, Pipe, signal, ViewChild } from '@angular/core';
 import { FormGroup, FormControl, ReactiveFormsModule, FormsModule, Validators } from '@angular/forms'
 import { HttpResponse } from '@angular/common/http';
 import { lastValueFrom } from 'rxjs';
@@ -39,7 +39,11 @@ import { StorageService } from '../../../../services/storage/storage.service';
 import { Router } from '@angular/router';
 import ManutencaoComponent from '../../../concierge/manutencao/manutencao.component';
 
-export interface IFilterVehicles {
+import * as XLSX from 'xlsx';
+import { saveAs } from 'file-saver';
+import { YesNot } from '../../../../models/enum/yes-not';
+
+interface IFilterVehicles {
   type: string;
   vehicleNew?: string;
   companyId: number;
@@ -53,6 +57,38 @@ export interface IFilterVehicles {
   frota?: string;
 }
 
+interface IExportVehicle {
+  Empresa: number,
+  Revenda: number,
+  Codigo: number,
+
+  Ent_Usuario: number,
+  Ent_Usuario_Nome: string,
+  Ent_Usuario_Data: string,
+
+  Said_Usuario?: string,
+  Said_Usuario_Nome?: string,
+  Said_Usuario_Data?: string,
+  Said_Previsao_Data?: string,
+
+  Placa: string,
+  Frota: string,
+  Modelo: string,
+  Consultor?: string,
+  Consultor_Nome?: string,
+  Cliente?: string,
+  Cliente_Nome?: string,
+  Cliente_CNPJ?: string,
+  Cliente_Cpf?: string,
+
+  Km_entrada?: string,
+  Km_saida?: string,
+
+  Nr_OS:string,
+  Nr_NFe:string,
+  Nr_NFEs:string,
+}
+
 @Component({
   selector: 'app-vehicle',
   standalone: true,
@@ -60,37 +96,34 @@ export interface IFilterVehicles {
     InputTextModule, IconFieldModule, InputIconModule, TagModule,
     DialogModule, ReactiveFormsModule, FormsModule, InputNumberModule,
     CalendarModule, InputGroupModule, MultiSelectModule, ImageModule,
-    InputMaskModule, RadioButtonModule, CheckboxModule,ManutencaoComponent],
+    InputMaskModule, RadioButtonModule, CheckboxModule, ManutencaoComponent],
   templateUrl: './vehicle.component.html',
   styleUrl: './vehicle.component.scss',
   providers: [MessageService]
 })
 export default class VehicleComponent implements OnInit, DoCheck {
-
+  private upperCasePipe: UpperCasePipe = new UpperCasePipe();
+  private datePipeBR: DatePipe = new DatePipe('pt-BR');
   dialogVisible: boolean = false;
   listVehicleEntry: VehicleEntry[] = [];
-
   selectClientCompany = signal<ClientCompany>(new ClientCompany());
-
   vehicleModels$ = this.vehicleModelService.getAllEnabled();
-
   formFilter = new FormGroup({
     type: new FormControl<string>('E'),
     vehicleNew: new FormControl<string | null>(null),
-    dateInit: new FormControl<Date | string>('', Validators.required),
-    dateFinal: new FormControl<Date | string>('', Validators.required),
+    dateInit: new FormControl<Date | string>(''),
+    dateFinal: new FormControl<Date | string>(''),
     clientCompanyId: new FormControl<number>(null),
     clientCompanyName: new FormControl<string>(''),
     modelVehicle: new FormControl<ModelVehicle[]>([]),
     vehicleId: new FormControl<number>(null),
     placa: new FormControl<string>(''),
-    frota: new FormControl<string>('')
+    frota: new FormControl<number | null>(null)
   });
-
   //Dialog details vehicles
   dialogVisibleVehicleDetails: boolean = false;
-
-  @ViewChild('detailsVehicle') detailsVehicle!:ManutencaoComponent;
+  disabledExport: boolean = true;
+  @ViewChild('detailsVehicle') detailsVehicle!: ManutencaoComponent;
 
   constructor(
     private primeNGConfig: PrimeNGConfig,
@@ -101,7 +134,6 @@ export default class VehicleComponent implements OnInit, DoCheck {
   }
   ngOnInit(): void {
     this.clientdisable();
-
     this.primeNGConfig.setTranslation({
       accept: 'Accept',
       reject: 'Cancel',
@@ -126,6 +158,8 @@ export default class VehicleComponent implements OnInit, DoCheck {
     }
 
   }
+
+
   private clientEnable() {
     this.formFilter.get('clientCompanyId').enable();
     this.formFilter.get('clientCompanyName').enable();
@@ -150,13 +184,23 @@ export default class VehicleComponent implements OnInit, DoCheck {
   }
   private preList(vehicle: VehicleEntry): VehicleEntry {
     //Format Date
-    const datePipe = new DatePipe('pt-BR');
-    vehicle.dateEntry = datePipe.transform(this.formatDateTime(new Date(vehicle.dateEntry)), 'dd/MM/yyyy HH:mm');
-    vehicle.dateExit = vehicle.dateExit != "" ? datePipe.transform(this.formatDateTime(new Date(vehicle.dateExit)), 'dd/MM/yyyy HH:mm') : "";
+    vehicle.dateEntry = this.datePipeBR.transform(this.formatDateTime(new Date(vehicle.dateEntry)), 'dd/MM/yyyy HH:mm');
+    vehicle.dateExit = vehicle.dateExit != "" ? this.datePipeBR.transform(this.formatDateTime(new Date(vehicle.dateExit)), 'dd/MM/yyyy HH:mm') : "";
+    vehicle.datePrevisionExit = vehicle.datePrevisionExit != "" ? this.datePipeBR.transform(this.formatDateTime(new Date(vehicle.datePrevisionExit)), 'dd/MM/yyyy HH:mm') : "";
 
-    if (vehicle.vehicleNew == "yes") {
+    if (vehicle.vehicleNew == YesNot.yes) {
       vehicle.placa = "NOVO";
+    } else {
+      vehicle.placa = this.upperCasePipe.transform(vehicle.placa);
+      vehicle.placa = vehicle.placa.substring(0, 3) + "-" + vehicle.placa.substring(3, 7);
     }
+    //Model
+    vehicle.modelDescription = this.upperCasePipe.transform(vehicle.modelDescription);
+
+    if (vehicle.idUserAttendant != 0) {
+      vehicle.nameUserAttendant = this.upperCasePipe.transform(vehicle.nameUserAttendant);
+    }
+
     if (vehicle.clientCompanyName != "") {
       var names = vehicle.clientCompanyName.split(' ');
       if (names.length >= 2) {
@@ -164,8 +208,10 @@ export default class VehicleComponent implements OnInit, DoCheck {
       } else {
         vehicle.clientCompanyName = names[0];
       }
-
     }
+
+
+
     switch (vehicle.budgetStatus) {
       case 'PendingApproval':
         vehicle.budgetStatus = 'Pendente Aprovação';
@@ -218,12 +264,13 @@ export default class VehicleComponent implements OnInit, DoCheck {
       modelVehicle: [],
       vehicleId: null,
       placa: '',
-      frota: ''
+      frota: null
     });
 
     this.selectClientCompany.set(new ClientCompany());
   }
   public cleanList() {
+    this.disabledExport = true;
     this.listVehicleEntry = [];
     this.cleanform();
   }
@@ -251,12 +298,13 @@ export default class VehicleComponent implements OnInit, DoCheck {
       modelId: value.modelVehicle.at(0)?.id ?? 0,
       vehicleId: value?.vehicleId ?? 0,
       placa: value.placa,
-      frota: value.frota,
+      frota: value.frota == null ? "" : value.frota.toString(),
       vehicleNew: value.vehicleNew?.at(0) ?? "not"
     }
     const resultFilter = await this.filterVehicles(filters);
 
     if (resultFilter.status == 200) {
+      this.disabledExport = false;
       for (let index = 0; index < resultFilter.body.length; index++) {
         const element = resultFilter.body[index];
         resultFilter.body[index] = this.preList(element);
@@ -279,6 +327,55 @@ export default class VehicleComponent implements OnInit, DoCheck {
     this.dialogVisibleVehicleDetails = true;
     //Details vehicle
     this.detailsVehicle.showDetailsVehicle(id);
+  }
+
+  exportExcel() {
+    var listExp: IExportVehicle[] = [];
+    for (let item of this.listVehicleEntry) {
+      listExp.push({
+        Empresa: item.companyId,
+        Revenda: item.resaleId,
+        Codigo: item.id,
+        Ent_Usuario: item.idUserEntry,
+        Ent_Usuario_Nome: item.nameUserEntry,
+        Ent_Usuario_Data: item.dateEntry.toString(),
+        Said_Usuario: item.userIdExit == 0 ? "" : item.userIdExit.toString(),
+        Said_Usuario_Nome: item.userNameExit,
+        Said_Usuario_Data: item.dateExit.toString(),
+        Said_Previsao_Data: item.datePrevisionExit.toString(),
+        Placa: item.placa,
+        Frota: item.frota,
+        Modelo: item.modelDescription,
+        Consultor: item.idUserAttendant == 0 ? "" : item.idUserAttendant.toString(),
+        Consultor_Nome: item.nameUserAttendant,
+        Cliente: item.clientCompanyId == 0 ? "" : item.clientCompanyId.toString(),
+        Cliente_Nome: item.clientCompanyName,
+        Cliente_CNPJ: item.clientCompanyCnpj,
+        Cliente_Cpf: item.clientCompanyCpf,
+        Km_entrada: item.kmEntry,
+        Km_saida: item.kmExit,
+        Nr_OS: item.numServiceOrder,
+        Nr_NFe:item.numNfe,
+        Nr_NFEs: item.numNfse
+      });
+    }
+
+    // converte JSON → planilha
+    const worksheet = XLSX.utils.json_to_sheet(listExp);
+    const workbook = { Sheets: { 'Dados': worksheet }, SheetNames: ['Dados'] };
+
+    // cria o arquivo excel em memória
+    const excelBuffer: any = XLSX.write(workbook, {
+      bookType: 'xlsx',
+      type: 'array'
+    });
+
+    // salva arquivo
+    const blob = new Blob([excelBuffer], {
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    });
+
+    saveAs(blob, 'relatorio ' + this.datePipeBR.transform(new Date(), 'dd-MM-yyyy HH:mm') + ".xlsx");
   }
 
 

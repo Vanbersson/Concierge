@@ -3,10 +3,10 @@ package com.concierge.apiconcierge.validation.budget;
 import com.concierge.apiconcierge.dtos.budget.BudgetNewDto;
 import com.concierge.apiconcierge.models.budget.Budget;
 import com.concierge.apiconcierge.models.budget.enums.StatusBudgetEnum;
+import com.concierge.apiconcierge.models.enums.YesNot;
 import com.concierge.apiconcierge.models.permission.PermissionUser;
 import com.concierge.apiconcierge.models.user.User;
 import com.concierge.apiconcierge.models.vehicle.entry.VehicleEntry;
-import com.concierge.apiconcierge.models.vehicle.enums.VehicleYesNotEnum;
 import com.concierge.apiconcierge.repositories.budget.IBudgetRepository;
 import com.concierge.apiconcierge.repositories.permission.IPermissionUserRepository;
 import com.concierge.apiconcierge.repositories.user.IUserRepository;
@@ -63,7 +63,7 @@ public class BudgetValidation implements IBudgetValidation {
             return ConstantsMessage.ERROR_ATTENDANT;
         if (vehicle.getClientCompanyId() == null || vehicle.getClientCompanyId() == 0 || vehicle.getClientCompanyName().isBlank())
             return ConstantsMessage.ERROR_CLIENTCOMPANY;
-        if (vehicle.getServiceOrder() == VehicleYesNotEnum.not)
+        if (vehicle.getServiceOrder() == YesNot.not)
             return ConstantsMessage.ERROR_SERVICE_ORDER_NOT;
         if (vehicle.getNumServiceOrder().isBlank())
             return ConstantsMessage.ERROR_VEHICLE_NUMBER_O_S;
