@@ -204,6 +204,7 @@ public class VehicleEntryService implements IVehicleEntryService {
                 map.put("clientCompanyName", item.getClientCompanyName());
                 map.put("budgetStatus", item.getBudgetStatus());
                 map.put("statusAuthExit", item.getStatusAuthExit());
+                map.put("numServiceOrder", item.getNumServiceOrder());
                 list.add(map);
             }
         } catch (Exception ex) {
@@ -441,7 +442,7 @@ public class VehicleEntryService implements IVehicleEntryService {
         return status;
     }
 
-    private Map<String, Object> loadObject(VehicleEntry vehicle) {
+    public Map<String, Object> loadObject(VehicleEntry vehicle) {
         Map<String, Object> map = new HashMap<>();
         map.put("companyId", vehicle.getCompanyId());
         map.put("resaleId", vehicle.getResaleId());
@@ -453,156 +454,60 @@ public class VehicleEntryService implements IVehicleEntryService {
         map.put("nameUserEntry", vehicle.getNameUserEntry());
         map.put("dateEntry", vehicle.getDateEntry());
 
-        if (vehicle.getUserIdExit() == null) {
-            map.put("userIdExit", 0);
-        } else {
-            map.put("userIdExit", vehicle.getUserIdExit());
-        }
-
+        map.put("userIdExit", vehicle.getUserIdExit() == null ? 0 : vehicle.getUserIdExit());
         map.put("userNameExit", vehicle.getUserNameExit());
-        if (vehicle.getDateExit() == null) {
-            map.put("dateExit", "");
-        } else {
-            map.put("dateExit", vehicle.getDateExit());
-        }
+        map.put("dateExit", vehicle.getDateExit() == null ? "" : vehicle.getDateExit());
+        map.put("datePrevisionExit", vehicle.getDatePrevisionExit() == null ? "" : vehicle.getDatePrevisionExit());
 
-        if (vehicle.getDatePrevisionExit() == null) {
-            map.put("datePrevisionExit", "");
-        } else {
-            map.put("datePrevisionExit", vehicle.getDatePrevisionExit());
-        }
-        if (vehicle.getIdUserAttendant() == null) {
-            map.put("idUserAttendant", 0);
-        } else {
-            map.put("idUserAttendant", vehicle.getIdUserAttendant());
-        }
+        map.put("idUserAttendant", vehicle.getIdUserAttendant() == null ? 0 : vehicle.getIdUserAttendant());
         map.put("nameUserAttendant", vehicle.getNameUserAttendant());
-        if (vehicle.getIdUserExitAuth1() == null) {
-            map.put("idUserExitAuth1", 0);
-        } else {
-            map.put("idUserExitAuth1", vehicle.getIdUserExitAuth1());
-        }
+
+        map.put("idUserExitAuth1", vehicle.getIdUserExitAuth1() == null ? 0 : vehicle.getIdUserExitAuth1());
         map.put("nameUserExitAuth1", vehicle.getNameUserExitAuth1());
-        if (vehicle.getDateExitAuth1() == null) {
-            map.put("dateExitAuth1", "");
-        } else {
-            map.put("dateExitAuth1", vehicle.getDateExitAuth1());
-        }
-        if (vehicle.getIdUserExitAuth2() == null) {
-            map.put("idUserExitAuth2", 0);
-        } else {
-            map.put("idUserExitAuth2", vehicle.getIdUserExitAuth2());
-        }
+        map.put("dateExitAuth1", vehicle.getDateExitAuth1() == null ? "" : vehicle.getDateExitAuth1());
+
+        map.put("idUserExitAuth2", vehicle.getIdUserExitAuth2() == null ? 0 : vehicle.getIdUserExitAuth2());
         map.put("nameUserExitAuth2", vehicle.getNameUserExitAuth2());
-        if (vehicle.getDateExitAuth2() == null) {
-            map.put("dateExitAuth2", "");
-        } else {
-            map.put("dateExitAuth2", vehicle.getDateExitAuth2());
-        }
+        map.put("dateExitAuth2", vehicle.getDateExitAuth2() == null ? "" : vehicle.getDateExitAuth2());
+
         map.put("statusAuthExit", vehicle.getStatusAuthExit());
         map.put("modelId", vehicle.getModelId());
         map.put("modelDescription", vehicle.getModelDescription());
-        if (vehicle.getClientCompanyId() == null) {
-            map.put("clientCompanyId", 0);
-        } else {
-            map.put("clientCompanyId", vehicle.getClientCompanyId());
-        }
+
+        map.put("clientCompanyId", vehicle.getClientCompanyId() == null ? 0 : vehicle.getClientCompanyId());
         map.put("clientCompanyName", vehicle.getClientCompanyName());
         map.put("clientCompanyCnpj", vehicle.getClientCompanyCnpj());
         map.put("clientCompanyCpf", vehicle.getClientCompanyCpf());
         map.put("clientCompanyRg", vehicle.getClientCompanyRg());
 
-        if (vehicle.getDriverEntryId() == null) {
-            map.put("driverEntryId", 0);
-        } else {
-            map.put("driverEntryId", vehicle.getDriverEntryId());
-        }
+        map.put("driverEntryId", vehicle.getDriverEntryId() == null ? 0 : vehicle.getDriverEntryId());
         map.put("driverEntryName", vehicle.getDriverEntryName());
         map.put("driverEntryCpf", vehicle.getDriverEntryCpf());
-        if (vehicle.getDriverEntryRg() == null) {
-            map.put("driverEntryRg", 0);
-        } else {
-            map.put("driverEntryRg", vehicle.getDriverEntryRg());
-        }
-        if (vehicle.getDriverEntryPhoto() == null) {
-            map.put("driverEntryPhoto", "");
-        } else {
-            map.put("driverEntryPhoto", vehicle.getDriverEntryPhoto());
-        }
-        if (vehicle.getDriverEntrySignature() == null) {
-            map.put("driverEntrySignature", "");
-        } else {
-            map.put("driverEntrySignature", vehicle.getDriverEntrySignature());
-        }
-        if (vehicle.getDriverEntryPhotoDoc1() == null) {
-            map.put("driverEntryPhotoDoc1", "");
-        } else {
-            map.put("driverEntryPhotoDoc1", vehicle.getDriverEntryPhotoDoc1());
-        }
-        if (vehicle.getDriverEntryPhotoDoc2() == null) {
-            map.put("driverEntryPhotoDoc2", "");
-        } else {
-            map.put("driverEntryPhotoDoc2", vehicle.getDriverEntryPhotoDoc2());
-        }
+        map.put("driverEntryRg", vehicle.getDriverEntryRg());
+        map.put("driverEntryPhoto", vehicle.getDriverEntryPhoto() == null ? "" : vehicle.getDriverEntryPhoto());
+        map.put("driverEntrySignature", vehicle.getDriverEntrySignature() == null ? "" : vehicle.getDriverEntrySignature());
+        map.put("driverEntryPhotoDoc1", vehicle.getDriverEntryPhotoDoc1() == null ? "" : vehicle.getDriverEntryPhotoDoc1());
+        map.put("driverEntryPhotoDoc2", vehicle.getDriverEntryPhotoDoc2() == null ? "" : vehicle.getDriverEntryPhotoDoc2());
 
-        if (vehicle.getDriverExitId() == null) {
-            map.put("driverExitId", 0);
-        } else {
-            map.put("driverExitId", vehicle.getDriverExitId());
-        }
+        map.put("driverExitId", vehicle.getDriverExitId() == null ? 0 : vehicle.getDriverExitId());
         map.put("driverExitName", vehicle.getDriverExitName());
         map.put("driverExitCpf", vehicle.getDriverExitCpf());
-        if (vehicle.getDriverExitRg() == null) {
-            map.put("driverExitRg", "");
-        } else {
-            map.put("driverExitRg", vehicle.getDriverExitRg());
-        }
-        if (vehicle.getDriverExitPhoto() == null) {
-            map.put("driverExitPhoto", "");
-        } else {
-            map.put("driverExitPhoto", vehicle.getDriverExitPhoto());
-        }
-        if (vehicle.getDriverExitSignature() == null) {
-            map.put("driverExitSignature", "");
-        } else {
-            map.put("driverExitSignature", vehicle.getDriverExitSignature());
-        }
-        if (vehicle.getDriverExitPhotoDoc1() == null) {
-            map.put("driverExitPhotoDoc1", "");
-        } else {
-            map.put("driverExitPhotoDoc1", vehicle.getDriverExitPhotoDoc1());
-        }
-        if (vehicle.getDriverExitPhotoDoc2() == null) {
-            map.put("driverExitPhotoDoc2", "");
-        } else {
-            map.put("driverExitPhotoDoc2", vehicle.getDriverExitPhotoDoc2());
-        }
+        map.put("driverExitRg", vehicle.getDriverExitRg());
+        map.put("driverExitPhoto", vehicle.getDriverExitPhoto() == null ? "" : vehicle.getDriverExitPhoto());
+        map.put("driverExitSignature", vehicle.getDriverExitSignature() == null ? "" : vehicle.getDriverExitSignature());
+        map.put("driverExitPhotoDoc1", vehicle.getDriverExitPhotoDoc1() == null ? "" : vehicle.getDriverExitPhotoDoc1());
+        map.put("driverExitPhotoDoc2", vehicle.getDriverExitPhotoDoc2() == null ? "" : vehicle.getDriverExitPhotoDoc2());
         map.put("color", vehicle.getColor());
         map.put("placa", vehicle.getPlaca());
+        map.put("placasJunto", vehicle.getPlacasJunto());
         map.put("frota", vehicle.getFrota());
         map.put("vehicleNew", vehicle.getVehicleNew());
         map.put("kmEntry", vehicle.getKmEntry());
         map.put("kmExit", vehicle.getKmExit());
-        if (vehicle.getPhoto1() == null) {
-            map.put("photo1", "");
-        } else {
-            map.put("photo1", vehicle.getPhoto1());
-        }
-        if (vehicle.getPhoto2() == null) {
-            map.put("photo2", "");
-        } else {
-            map.put("photo2", vehicle.getPhoto2());
-        }
-        if (vehicle.getPhoto3() == null) {
-            map.put("photo3", "");
-        } else {
-            map.put("photo3", vehicle.getPhoto3());
-        }
-        if (vehicle.getPhoto4() == null) {
-            map.put("photo4", "");
-        } else {
-            map.put("photo4", vehicle.getPhoto4());
-        }
+        map.put("photo1", vehicle.getPhoto1() == null ? "" : vehicle.getPhoto1());
+        map.put("photo2", vehicle.getPhoto2() == null ? "" : vehicle.getPhoto2());
+        map.put("photo3", vehicle.getPhoto3() == null ? "" : vehicle.getPhoto3());
+        map.put("photo4", vehicle.getPhoto4() == null ? "" : vehicle.getPhoto4());
         map.put("quantityExtinguisher", vehicle.getQuantityExtinguisher());
         map.put("quantityTrafficCone", vehicle.getQuantityTrafficCone());
         map.put("quantityTire", vehicle.getQuantityTire());
@@ -614,7 +519,6 @@ public class VehicleEntryService implements IVehicleEntryService {
         map.put("numNfse", vehicle.getNumNfse());
         map.put("information", vehicle.getInformation());
         map.put("informationConcierge", vehicle.getInformationConcierge());
-
         return map;
     }
 

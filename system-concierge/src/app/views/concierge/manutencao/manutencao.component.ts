@@ -114,6 +114,7 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
     kmExit: new FormControl<string | null>(''),
     modelVehicle: new FormControl<ModelVehicle[] | null>([], Validators.required),
     dateEntry: new FormControl<Date | null>(null, Validators.required),
+    dateExit: new FormControl<Date | null>({ value: null, disabled: true }),
     datePrevisionExit: new FormControl<Date | null>(null),
     nameUserExitAuth1: new FormControl<string>({ value: "", disabled: true }),
     nameUserExitAuth2: new FormControl<string>({ value: "", disabled: true }),
@@ -356,6 +357,7 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
     this.formVehicle.patchValue({
       id: this.vehicleEntry.id,
       dateEntry: new Date(this.vehicleEntry.dateEntry),
+      dateExit: this.vehicleEntry.dateExit != "" ? new Date(this.vehicleEntry.dateExit) : null,
       datePrevisionExit: this.vehicleEntry.datePrevisionExit != "" ? new Date(this.vehicleEntry.datePrevisionExit) : null,
       color: [{ color: this.vehicleEntry.color }],
       placa: this.vehicleEntry.placa,

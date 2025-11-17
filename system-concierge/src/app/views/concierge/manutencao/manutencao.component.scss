@@ -92,22 +92,6 @@
         background-color: var(--color-grey-300);
     }
 
-    .layout-card-option {
-        display: flex;
-        flex-direction: column;
-        height: 119px;
-        width: 100%;
-        padding: 0.5rem 2rem 2rem 2rem;
-        border-radius: 8px;
-        border: 1px solid var(--color-grey-300);
-        gap: 8px;
-
-        .layout-card-option-title {
-            font-weight: 400px;
-
-        }
-    }
-
     .layout-card-option-type {
         display: flex;
         height: 100px;
