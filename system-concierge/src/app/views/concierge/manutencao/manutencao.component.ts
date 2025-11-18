@@ -27,6 +27,7 @@ import { CheckboxModule } from 'primeng/checkbox';
 import { StepsModule } from 'primeng/steps';
 import { DividerModule } from 'primeng/divider';
 import { MessagesModule } from 'primeng/messages';
+import { SpeedDialModule } from 'primeng/speeddial';
 //Service
 import { VehicleService } from '../../../services/vehicle/vehicle.service';
 import { UserService } from '../../../services/user/user.service';
@@ -66,11 +67,12 @@ import { DriverService } from '../../../services/driver/driver.service';
 import { MessageResponse } from '../../../models/message/message-response';
 import { SuccessError } from '../../../models/enum/success-error';
 import { PermissionService } from '../../../services/permission/permission.service';
+import { ShareWhatsAppService } from '../../../services/share/share-whatsapp.service';
 
 @Component({
   selector: 'app-manutencao',
   standalone: true,
-  imports: [CommonModule, FilterClientComponent, FilterDriverComponent, RouterModule, MessagesModule,
+  imports: [CommonModule, FilterClientComponent, FilterDriverComponent, RouterModule, MessagesModule, SpeedDialModule,
     TabViewModule, FormsModule, IconFieldModule, DividerModule,
     CheckboxModule, StepsModule, ConfirmDialogModule, InputIconModule, ImageModule,
     DialogModule, ToastModule, TableModule, ReactiveFormsModule,
@@ -83,6 +85,7 @@ import { PermissionService } from '../../../services/permission/permission.servi
 })
 export default class ManutencaoComponent implements OnInit, DoCheck {
   RESPONSE_SUCCESS: string = "Success.";
+  items: MenuItem[] | undefined;
   itemsStatus: MenuItem[] | undefined;
   activeIndexStatus: number = 0;
   vehicleEntry: VehicleEntry;
@@ -91,8 +94,6 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
   private notAuth = STATUS_VEHICLE_ENTRY_NOTAUTH;
   private firstAuth = STATUS_VEHICLE_ENTRY_FIRSTAUTH;
   private authorized = STATUS_VEHICLE_ENTRY_AUTHORIZED;
-
-
   public cores: IColor[] = []
   public modelVehicles: ModelVehicle[] = [];
   public attendantsUser: User[] = [];
@@ -103,7 +104,7 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
   photoVehicle4!: string;
   public dateExitAuth1 = signal<string>('');
   public dateExitAuth2 = signal<string>('');
-  vehicleExit = false;
+  vehicleExit: boolean = false;
 
   formVehicle = new FormGroup({
     id: new FormControl<number>({ value: 0, disabled: true }),
@@ -182,6 +183,7 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
   detailsVehicle: boolean = false;
 
   constructor(
+    private shareWhatsAppService: ShareWhatsAppService,
     private permissionService: PermissionService,
     private primeNGConfig: PrimeNGConfig,
     private vehicleService: VehicleService,
@@ -214,6 +216,44 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
       dateFormat: 'dd/mm/yy',
       weekHeader: 'Sm'
     });
+    this.items = [
+      {
+        tooltipOptions: {
+          tooltipLabel: 'Salvar'
+        },
+        icon: 'pi pi-check',
+        command: () => {
+          this.save();
+        }
+      },
+      {
+        tooltipOptions: {
+          tooltipLabel: 'Orçamento'
+        },
+        icon: 'pi pi-file',
+        command: () => {
+          this.confirmGerarOrcamento();
+        }
+      },
+      {
+        tooltipOptions: {
+          tooltipLabel: 'Liberar'
+        },
+        icon: 'pi pi-car',
+        command: () => {
+          this.authExit();
+        }
+      },
+      {
+        tooltipOptions: {
+          tooltipLabel: 'Compartilhar'
+        },
+        icon: 'pi pi-share-alt',
+        command: () => {
+          this.shareVehicle();
+        }
+      }
+    ];
     this.itemsStatus = [
       {
         label: 'Atendimento',
@@ -330,16 +370,26 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
           this.driverExit = resultDriverExit.body;
         }
       }
-      //Vehicle has already left
-      if (this.vehicleEntry.status == StatusVehicle.exit) {
+
+      //Show only details
+      if (this.detailsVehicle) {
         this.vehicleExit = true;
         this.formVehicle.get('vehicleNew').disable();
         this.formVehicle.get('serviceOrder').disable();
       } else {
-        this.vehicleExit = false;
-        this.formVehicle.get('vehicleNew').enable();
-        this.formVehicle.get('serviceOrder').enable();
+        //Vehicle has already left
+        if (this.vehicleEntry.status == StatusVehicle.exit) {
+          this.vehicleExit = true;
+          this.formVehicle.get('vehicleNew').disable();
+          this.formVehicle.get('serviceOrder').disable();
+        } else {
+          this.vehicleExit = false;
+          this.formVehicle.get('vehicleNew').enable();
+          this.formVehicle.get('serviceOrder').enable();
+        }
       }
+
+
       this.loadForms();
     }
   }
@@ -1084,5 +1134,9 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
       this.messageService.add({ severity: 'error', summary: 'Erro', detail: error.error.message, icon: 'pi pi-times' });
       return false;
     }
+  }
+  /* Share vehicle data via WhatsApp */
+  shareVehicle() {
+    this.shareWhatsAppService.shareVehicle(this.vehicleEntry);
   }
 }

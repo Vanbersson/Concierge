@@ -10,9 +10,7 @@
       </span>
       <p class="mb-0">{{ message.message }}</p>
       <div class="flex align-items-center gap-2 mt-4">
-        <button pButton label="Entendi" (click)="cd.accept()" class="w-8rem">
-        </button>
-
+        <button pButton label="Entendi" (click)="cd.accept()" class="w-8rem"></button>
       </div>
     </div>
   </ng-template>
@@ -25,7 +23,6 @@
     </div>
     <P class=" mb-4">Faça login em sua conta</P>
     <form [formGroup]="loginForm" (ngSubmit)="loginUser()">
-
       <div class="grid p-fluid p-formgrid">
         <div class="field col-12">
           <label for="emailId">Digite seu email</label>
@@ -38,14 +35,12 @@
       </div>
       <div class="grid p-fluid p-formgrid">
         <div class="field col-5">
-          <p-button type="submit" label="Entrar" />
+          <p-button type="submit" icon="pi pi-sign-in" label="Entrar" />
         </div>
         <div class="field col-7">
-          <p-button type="button" label="Esqueceu a senha?" [text]="true" severity="secondary"
-            (onClick)="forgetPass()" />
+          <p-button type="button" label="Esqueceu a senha?" [text]="true" (onClick)="forgetPass()" />
         </div>
       </div>
-
     </form>
   </div>
 
