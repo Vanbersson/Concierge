@@ -9,7 +9,6 @@ public interface INotificationService {
 
     public MessageResponse save(Notification n);
 
-    public MessageResponse delete(UUID id);
+    public MessageResponse delete(Integer companyId, Integer resaleId, UUID id);
 
-    public MessageResponse filterId(Integer companyId, Integer resaleId, UUID id);
 }

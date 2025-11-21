@@ -17,9 +17,15 @@
                     </p-inputIcon>
                     <input pInputText type="text" (input)="dt1.filterGlobal($event.target.value, 'contains')" placeholder="Pesquisar" />
                 </p-iconField>
-                <div >
-                    <p-button icon="pi pi-file-excel" severity="success" [text]="true" [disabled]="disabledExport" (onClick)="exportExcel()"/>
-                    <p-button icon="pi pi-filter" severity="warning" [text]="true" (onClick)="showDialog()" label="Filtros" />
+                <div class="layout-mobile-button">
+                    <button pButton [disabled]="disabledExport" type="button" [text]="true" severity="success" (click)="exportExcel()">
+                        <i class="pi pi-file-excel"></i>
+                        <span>Excel</span>
+                    </button>
+                    <button pButton type="button" [text]="true" severity="warning" (click)="showDialog()">
+                        <i class="pi pi-filter"></i>
+                        <span>Filtros</span>
+                    </button>
                 </div>
             </div>
         </ng-template>

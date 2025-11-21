@@ -27,7 +27,6 @@ import { CheckboxModule } from 'primeng/checkbox';
 import { StepsModule } from 'primeng/steps';
 import { DividerModule } from 'primeng/divider';
 import { MessagesModule } from 'primeng/messages';
-import { SpeedDialModule } from 'primeng/speeddial';
 //Service
 import { VehicleService } from '../../../services/vehicle/vehicle.service';
 import { UserService } from '../../../services/user/user.service';
@@ -72,7 +71,7 @@ import { ShareWhatsAppService } from '../../../services/share/share-whatsapp.ser
 @Component({
   selector: 'app-manutencao',
   standalone: true,
-  imports: [CommonModule, FilterClientComponent, FilterDriverComponent, RouterModule, MessagesModule, SpeedDialModule,
+  imports: [CommonModule, FilterClientComponent, FilterDriverComponent, RouterModule, MessagesModule,
     TabViewModule, FormsModule, IconFieldModule, DividerModule,
     CheckboxModule, StepsModule, ConfirmDialogModule, InputIconModule, ImageModule,
     DialogModule, ToastModule, TableModule, ReactiveFormsModule,
@@ -85,7 +84,7 @@ import { ShareWhatsAppService } from '../../../services/share/share-whatsapp.ser
 })
 export default class ManutencaoComponent implements OnInit, DoCheck {
   RESPONSE_SUCCESS: string = "Success.";
-  items: MenuItem[] | undefined;
+ 
   itemsStatus: MenuItem[] | undefined;
   activeIndexStatus: number = 0;
   vehicleEntry: VehicleEntry;
@@ -216,44 +215,6 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
       dateFormat: 'dd/mm/yy',
       weekHeader: 'Sm'
     });
-    this.items = [
-      {
-        tooltipOptions: {
-          tooltipLabel: 'Salvar'
-        },
-        icon: 'pi pi-check',
-        command: () => {
-          this.save();
-        }
-      },
-      {
-        tooltipOptions: {
-          tooltipLabel: 'Orçamento'
-        },
-        icon: 'pi pi-file',
-        command: () => {
-          this.confirmGerarOrcamento();
-        }
-      },
-      {
-        tooltipOptions: {
-          tooltipLabel: 'Liberar'
-        },
-        icon: 'pi pi-car',
-        command: () => {
-          this.authExit();
-        }
-      },
-      {
-        tooltipOptions: {
-          tooltipLabel: 'Compartilhar'
-        },
-        icon: 'pi pi-share-alt',
-        command: () => {
-          this.shareVehicle();
-        }
-      }
-    ];
     this.itemsStatus = [
       {
         label: 'Atendimento',

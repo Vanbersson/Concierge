@@ -8,8 +8,9 @@ import { OverlayPanel, OverlayPanelModule } from 'primeng/overlaypanel';
 import { BadgeModule } from 'primeng/badge';
 import { ButtonModule } from 'primeng/button';
 import { ToastModule } from 'primeng/toast';
-import { MessageService } from 'primeng/api';
+import { MessageService, ConfirmationService } from 'primeng/api';
 import { TableModule } from 'primeng/table';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 //Service
 import { NotificationService } from '../../services/notification/notification.service';
 import { StorageService } from '../../services/storage/storage.service';
@@ -24,14 +25,15 @@ import { YesNot } from '../../models/enum/yes-not';
 import { VehicleEntry } from '../../models/vehicle/vehicle-entry';
 import { SuccessError } from '../../models/enum/success-error';
 import { ShareWhatsAppService } from '../../services/share/share-whatsapp.service';
+import { NotificationUser } from '../../models/notification/notification-user';
 
 @Component({
   selector: 'app-notification',
   standalone: true,
-  imports: [CommonModule, OverlayPanelModule, ButtonModule, BadgeModule, ToastModule, TableModule],
+  imports: [CommonModule, OverlayPanelModule, ButtonModule, BadgeModule, ToastModule, TableModule, ConfirmDialogModule],
   templateUrl: './notification.component.html',
   styleUrl: './notification.component.scss',
-  providers: [MessageService]
+  providers: [MessageService, ConfirmationService]
 })
 export class NotificationComponent implements OnInit, OnDestroy {
   @ViewChild('op') overlayPanel!: OverlayPanel;
@@ -40,6 +42,7 @@ export class NotificationComponent implements OnInit, OnDestroy {
   Not = YesNot.not;
 
   constructor(
+    private confirmationService: ConfirmationService,
     private shareWhatsAppService: ShareWhatsAppService,
     private storageService: StorageService,
     private permissionService: PermissionService,
@@ -153,6 +156,21 @@ export class NotificationComponent implements OnInit, OnDestroy {
       this.messageService.add({ severity: 'info', summary: result.body.header, detail: result.body.message, icon: 'pi pi-info-circle' });
     }
   }
+  /* delete All notification   */
+  async deleteAllMessage() {
+    var no: NotificationUser = new NotificationUser();
+    no.companyId = this.storageService.companyId;
+    no.resaleId = this.storageService.resaleId;
+    no.userId = this.storageService.id;
+
+    const result = await this.deleteAllNotitication(no);
+    if (result.status == 200 && result.body.status == SuccessError.succes) {
+      this.messageService.add({ severity: 'success', summary: result.body.header, detail: result.body.message, icon: 'pi pi-check' });
+      this.init();
+    } else if (result.status == 200 && result.body.status == SuccessError.error) {
+      this.messageService.add({ severity: 'info', summary: result.body.header, detail: result.body.message, icon: 'pi pi-info-circle' });
+    }
+  }
   private async getVehicleEntry(vehicleId: number): Promise<HttpResponse<VehicleEntry>> {
     try {
       return await lastValueFrom(this.vehicleService.entryFilterId(vehicleId));
@@ -174,6 +192,24 @@ export class NotificationComponent implements OnInit, OnDestroy {
       this.messageService.add({ severity: 'error', summary: 'Erro', detail: error.error.message, icon: 'pi pi-times' });
       return error;
     }
+  }
+  private async deleteAllNotitication(no: NotificationUser): Promise<HttpResponse<MessageResponse>> {
+    try {
+      return await lastValueFrom(this.notificationService.deleteAllNotification(no));
+    } catch (error) {
+      this.messageService.add({ severity: 'error', summary: 'Erro', detail: error.error.message, icon: 'pi pi-times' });
+      return error;
+    }
+  }
+
+  confirm() {
+    this.confirmationService.confirm({
+      header: 'Apagar notificações?',
+      message: 'Confirme para apagar todas as notificações.',
+      accept: () => {
+        this.deleteAllMessage();
+      }
+    });
   }
 
 }

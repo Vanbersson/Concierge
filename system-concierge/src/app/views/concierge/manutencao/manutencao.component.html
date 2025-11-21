@@ -395,18 +395,23 @@
                 <button pButton [disabled]="vehicleExit" type="button" label="Orçamento" icon="pi pi-file" size="small" [raised]="true" severity="secondary-custom" (click)="confirmGerarOrcamento()"></button>
                 <button pButton [disabled]="vehicleExit" type="button" label="Liberar" icon="pi pi-car" size="small" [raised]="true" severity="secondary-custom" (click)="authExit()"></button>
             </div>
-            <p-button [rounded]="true" [outlined]="true" label="Compartilhar" icon="pi pi-share-alt" (onClick)="shareVehicle()"></p-button>
+             <p-button icon="pi pi-share-alt" [rounded]="true" severity="info"  size="small" label="Compartilhar" (onClick)="shareVehicle()"/>
         </div> 
     </div>
     <!-- Mobile -->
     <div *ngIf="!vehicleExit" class="mobile-visible"> 
-        <div style="position: relative; height: 50px;" class="speeddial-linear-demo">
-            <p-speedDial [model]="items" className="speeddial-le"  transitionDelay="80" direction="up" />
+        <div class="flex align-items-center justify-content-center w-full gap-3">
+            <p-button icon="pi pi-check" [rounded]="true" severity="success-custom" label="Salvar" (onClick)="save()"/>
+            <p-button icon="pi pi-file" [rounded]="true" severity="secondary-custom" (onClick)="confirmGerarOrcamento()"/>
+            <p-button icon="pi pi-car" [rounded]="true" severity="secondary-custom" (onClick)="authExit()"/>
+            <p-button icon="pi pi-share-alt" [rounded]="true" severity="info" (onClick)="shareVehicle()" />
         </div>
     </div>
     <!-- Mobile -->
     <div *ngIf="vehicleExit" class="mobile-visible">
-        <p-button [rounded]="true" [outlined]="true" label="Compartilhar" icon="pi pi-share-alt" (onClick)="shareVehicle()"></p-button>
+        <div class="flex align-items-center justify-content-center w-full gap-3">
+            <p-button icon="pi pi-share-alt" [rounded]="true" severity="info" size="small" label="Compartilhar" (onClick)="shareVehicle()"/>
+        </div>
     </div>
 </div>
  <!-- Orçamento -->

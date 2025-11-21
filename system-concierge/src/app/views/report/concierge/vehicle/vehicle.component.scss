@@ -14,6 +14,7 @@
         }
 
     }
+
     .layout-card-filter {
         min-height: 46rem;
     }
@@ -30,6 +31,29 @@
         .p-tag.p-tag-secondary {
             background-color: var(--color-grey-300);
             color: var(--color-text-primary);
+        }
+    }
+
+    .layout-mobile-button {
+        display: inline-block;
+
+        button {
+            span {
+                display: block;
+                margin-left: 0.25rem;
+            }
+        }
+    }
+
+    @media (max-width: 991px) {
+        .layout-mobile-button {
+           
+            button {
+                span {
+                    display: none;
+                    margin: 0;
+                }
+            }
         }
     }
 

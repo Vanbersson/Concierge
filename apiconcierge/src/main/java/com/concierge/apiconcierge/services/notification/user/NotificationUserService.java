@@ -1,71 +1,91 @@
 package com.concierge.apiconcierge.services.notification.user;
 
 import com.concierge.apiconcierge.dtos.notification.NotificationUserDto;
+import com.concierge.apiconcierge.exceptions.notification.NotificationException;
 import com.concierge.apiconcierge.models.message.MessageResponse;
 import com.concierge.apiconcierge.models.notification.Notification;
 import com.concierge.apiconcierge.models.notification.NotificationUser;
 import com.concierge.apiconcierge.repositories.notification.INotificationUserRepository;
 import com.concierge.apiconcierge.util.ConstantsMessage;
+import com.concierge.apiconcierge.validation.notification.user.INotificationUserValidation;
+import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.UUID;
 
 @Service
 public class NotificationUserService implements INotificationUserService {
     @Autowired
     INotificationUserRepository repository;
 
+    @Autowired
+    INotificationUserValidation validation;
+
+    @SneakyThrows
     @Override
     public MessageResponse save(NotificationUser n) {
-        MessageResponse response = new MessageResponse();
         try {
-            NotificationUser result = this.repository.save(n);
-            response.setStatus(ConstantsMessage.SUCCESS);
-            response.setHeader("Notificação");
-            response.setMessage("Criada com sucesso.");
-            response.setData(result);
-            return response;
+            MessageResponse response = this.validation.save(n);
+            if (ConstantsMessage.SUCCESS.equals(response.getStatus())) {
+                n.setId(null);
+                this.repository.save(n);
+                return response;
+            } else {
+                return response;
+            }
         } catch (Exception e) {
-            response.setStatus(ConstantsMessage.ERROR);
-            response.setHeader(ConstantsMessage.ERROR);
-            response.setMessage(ConstantsMessage.ERROR);
-            return response;
+            throw new NotificationException(e.getMessage());
         }
     }
 
+    @SneakyThrows
     @Override
-    public MessageResponse delete(NotificationUserDto notification) {
-        try{
-            this.repository.delete(notification.companyId(), notification.resaleId(), notification.id());
-            MessageResponse response = new MessageResponse();
-            response.setStatus(ConstantsMessage.SUCCESS);
-            response.setHeader("Notificação");
-            response.setMessage("Removida com sucesso.");
-            return response;
+    public MessageResponse delete(NotificationUserDto notification, String userEmail) {
+        try {
+            MessageResponse response = this.validation.delete(notification, userEmail);
+            if (ConstantsMessage.SUCCESS.equals(response.getStatus())) {
+                this.repository.delete(notification.companyId(), notification.resaleId(), notification.id());
+                return response;
+            } else {
+                return response;
+            }
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new NotificationException(e.getMessage());
         }
     }
 
+    @SneakyThrows
+    @Override
+    public MessageResponse deleteAll(NotificationUserDto notification, String userEmail) {
+        try {
+            MessageResponse response = this.validation.deleteAll(notification, userEmail);
+            if (ConstantsMessage.SUCCESS.equals(response.getStatus())) {
+                this.repository.deleteAll(notification.companyId(), notification.resaleId(), notification.userId());
+                return response;
+            } else {
+                return response;
+            }
+        } catch (Exception e) {
+            throw new NotificationException(e.getMessage());
+        }
+    }
+
+    @SneakyThrows
     @Override
     public MessageResponse filterUser(Integer companyId, Integer resaleId, Integer userId) {
         try {
-            MessageResponse response = new MessageResponse();
-            List<Notification> list = this.repository.filterUser(companyId, resaleId, userId);
-            response.setStatus(ConstantsMessage.SUCCESS);
-            response.setHeader("Notificações");
-            response.setMessage("Encontrada com sucesso.");
-            response.setData(list);
-            return response;
+            MessageResponse response = this.validation.filterUser(companyId, resaleId, userId);
+            if (ConstantsMessage.SUCCESS.equals(response.getStatus())) {
+                List<Notification> list = this.repository.filterUser(companyId, resaleId, userId);
+                response.setData(list);
+                return response;
+            } else {
+                return response;
+            }
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new NotificationException(e.getMessage());
         }
     }
 
-    @Override
-    public MessageResponse filterNotification(Integer companyId, Integer resaleId, UUID notificationId) {
-        return null;
-    }
 }

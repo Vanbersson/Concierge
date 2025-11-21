@@ -5,6 +5,7 @@ import { Observable } from 'rxjs';
 import { MessageResponse } from '../../models/message/message-response';
 import { environment } from '../../../environments/environment';
 import { Notification } from '../../models/notification/notification';
+import { NotificationUser } from '../../models/notification/notification-user';
 
 @Injectable({
   providedIn: 'root'
@@ -19,6 +20,9 @@ export class NotificationService {
   }
   deleteNotification(no: Notification): Observable<HttpResponse<MessageResponse>> {
     return this.http.post<MessageResponse>(environment.apiuUrl + "/notification/user/delete", no, { headers: this.myHeaders(), observe: 'response' });
+  }
+  deleteAllNotification(no: NotificationUser): Observable<HttpResponse<MessageResponse>> {
+    return this.http.post<MessageResponse>(environment.apiuUrl + "/notification/user/delete/all", no, { headers: this.myHeaders(), observe: 'response' });
   }
 
   private myHeaders(): HttpHeaders {

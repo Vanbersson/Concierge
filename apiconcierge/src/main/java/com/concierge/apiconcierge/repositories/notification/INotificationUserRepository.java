@@ -31,4 +31,9 @@ public interface INotificationUserRepository extends JpaRepository<NotificationU
     @Modifying
     @Query(value = "DELETE FROM tb_notification_user WHERE company_id=?1 AND resale_id=?2 AND id=?3", nativeQuery = true)
     void delete(Integer companyId, Integer resaleId, UUID id);
+
+    @Transactional
+    @Modifying
+    @Query(value = "DELETE FROM tb_notification_user WHERE company_id=?1 AND resale_id=?2 AND user_id=?3", nativeQuery = true)
+    void deleteAll(Integer companyId, Integer resaleId, Integer userId);
 }

@@ -1,14 +1,50 @@
 <p-toast />
-<button pButton class="p-link layout-topbar-button" (click)="op.toggle($event)">
+<button *ngIf="listMessage.length > 0" pButton class="p-link layout-topbar-button" (click)="op.toggle($event)">
     <i class="pi pi-bell" pBadge [value]="listMessage.length"></i>
-    <!-- <span>Notificação</span> -->
-     <label>Notificação</label>
+    <label>Notificação</label>
+</button>
+<button *ngIf="listMessage.length == 0" pButton class="p-link layout-topbar-button" (click)="op.toggle($event)">
+    <i class="pi pi-bell"></i>
+    <label>Notificação</label>
 </button>
 <p-overlayPanel #op>
-    <div class="flex flex-column">
+    <p-toast />
+    <p-confirmDialog #cd>
+        <ng-template pTemplate="headless" let-message>
+            <div class="flex flex-column align-items-center p-5 surface-overlay border-round">
+                <div class="border-circle bg-primary inline-flex justify-content-center align-items-center h-6rem w-6rem">
+                    <i class="pi pi-question text-5xl"></i>
+                </div>
+                <span class="font-bold text-2xl block mb-2 mt-4">
+                    {{ message.header }}
+                </span>
+                <p class="mb-0">{{ message.message }}</p>
+                <div class="flex align-items-center gap-2 mt-4">
+                    <button 
+                        pButton 
+                        label="Confirmar" 
+                        (click)="cd.accept()" 
+                        class="w-8rem">
+                    </button>
+                    <button 
+                        pButton 
+                        label="Cancelar"
+                        (click)="cd.reject()" 
+                        class="p-button-outlined w-8rem ">
+                    </button>
+                </div>
+            </div>
+        </ng-template>
+    </p-confirmDialog>
+    <div *ngIf="listMessage.length > 0" class="flex flex-column" style="min-width: 20rem; min-height: 30rem;">
         <div class="flex justify-content-between align-items-center text-base text-900 font-normal mb-4 ">
             <span>Você tem <strong>{{listMessage.length}}</strong> notificações</span>
             <p-button icon="pi pi-times" size="small" [rounded]="true" severity="secondary-custom" (onClick)="op.toggle($event)"/> 
+        </div>
+        <div class="flex justify-content-end">
+            <p-button [rounded]="true" size="small" icon="pi pi-sync" label="Recarregar" [text]="true" (onClick)="init()"></p-button>
+        </div>
+        <div class="flex border-bottom-1 border-200 m-2">
         </div>
         <p-table [value]="listMessage" [paginator]="true" [rows]="8" styleClass="p-datatable-sm">
             <ng-template pTemplate="body" let-item>
@@ -36,4 +72,13 @@
             </ng-template>
         </p-table>
     </div>
+    <div *ngIf="listMessage.length > 0" class="flex justify-content-end">
+        <p-button [rounded]="true" size="small" icon="pi pi-trash" severity="danger" label="Apagar tudo" (onClick)="confirm()"></p-button>
+    </div>
+    <div *ngIf="listMessage.length == 0" class="flex flex-column justify-content-center align-items-center gap-2" style="min-width: 20rem; min-height: 30rem;">
+        <span>Você tem não notificações</span>
+        <p-button [rounded]="true" size="small" icon="pi pi-sync" label="Recarregar" [text]="true" (onClick)="init()"></p-button>
+    </div>
 </p-overlayPanel>
+
+
