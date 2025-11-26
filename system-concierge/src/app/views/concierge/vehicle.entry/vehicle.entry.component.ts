@@ -50,7 +50,6 @@ import { MESSAGE_RESPONSE_NOT_COLOR, MESSAGE_RESPONSE_NOT_MODEL, MESSAGE_RESPONS
 import { MessageResponse } from '../../../models/message/message-response';
 import { ExistsPlaca } from '../../../models/vehicle/exists-placa';
 //Enum
-import { ClientFisJurEnum } from '../../../models/clientcompany/client-fisjur-enum';
 import { Driver } from '../../../models/driver/driver';
 //Filters
 import { FilterClientComponent } from '../../../components/filter.client/filter.client.component';

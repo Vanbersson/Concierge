@@ -33,15 +33,15 @@ export class VehicleService {
   }
 
   allAuthorized$(): Observable<VehicleEntry[]> {
-    return this.http.get<VehicleEntry[]>(environment.apiuUrl + "/vehicle/entry/"+this.companyResale+"/allAuthorized"  , { headers: this.myHeaders() });
+    return this.http.get<VehicleEntry[]>(environment.apiuUrl + "/vehicle/entry/" + this.companyResale + "/allAuthorized", { headers: this.myHeaders() });
   }
 
   allPendingAuthorization$(): Observable<VehicleEntry[]> {
-    return this.http.get<VehicleEntry[]>(environment.apiuUrl + "/vehicle/entry/"+this.companyResale+"/allPendingAuthorization", { headers: this.myHeaders() });
+    return this.http.get<VehicleEntry[]>(environment.apiuUrl + "/vehicle/entry/" + this.companyResale + "/allPendingAuthorization", { headers: this.myHeaders() });
   }
 
   entryFilterId(id: number): Observable<HttpResponse<VehicleEntry>> {
-    return this.http.get<VehicleEntry>(environment.apiuUrl + "/vehicle/entry/"+this.companyResale+"/filter/id/" + id, { headers: this.myHeaders(), observe: 'response' });
+    return this.http.get<VehicleEntry>(environment.apiuUrl + "/vehicle/entry/" + this.companyResale + "/filter/id/" + id, { headers: this.myHeaders(), observe: 'response' });
   }
 
   entryFilterPlaca$(placa: string): Observable<HttpResponse<VehicleEntry>> {

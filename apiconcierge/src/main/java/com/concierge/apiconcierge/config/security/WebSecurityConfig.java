@@ -31,8 +31,8 @@ public class WebSecurityConfig {
         return new WebMvcConfigurer() {
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        //.allowedOrigins("https://www.atenatruck.com.br") // frontend
-                        .allowedOrigins("*")// frontend dev
+                        .allowedOrigins("https://www.atenatruck.com.br") // frontend
+                        //.allowedOrigins("*")// frontend dev
                         .allowedMethods(HttpMethod.POST.name(), HttpMethod.GET.name())
                         .allowedHeaders(HttpHeaders.CONTENT_TYPE, HttpHeaders.AUTHORIZATION);
             }

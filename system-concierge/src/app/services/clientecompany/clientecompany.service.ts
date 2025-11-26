@@ -46,8 +46,6 @@ export class ClientecompanyService {
     return this.http.get<MessageResponse>(environment.apiuUrl + "/clientcompany/" + this.companyResale + "/filter/cpf/" + cpf, { headers: this.myHeaders(), observe: 'response' });
   }
 
-
-
   //Externa
   FilterIdExternal(id: Number): Observable<ClientCompany[]> {
     return this.http.get<ClientCompany[]>(environment.apiApollo + "/fatclient/filter/code/" + id, { responseType: 'json' });
