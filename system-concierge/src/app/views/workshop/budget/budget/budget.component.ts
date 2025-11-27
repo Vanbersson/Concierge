@@ -84,6 +84,7 @@ export default class BudgetComponent implements OnInit, OnDestroy, DoCheck {
   visibleBudget: boolean = false;
   itemsStatus: MenuItem[] | undefined;
   activeIndexStatus: number = 0;
+  labelStatusBudget: string="";
   enabledSendMailButton = false;
 
   formBudget = new FormGroup({
@@ -166,7 +167,6 @@ export default class BudgetComponent implements OnInit, OnDestroy, DoCheck {
   }
 
   ngOnInit(): void {
-
     this.primeNGConfig.setTranslation({
       accept: 'Accept',
       reject: 'Cancel',
@@ -181,7 +181,6 @@ export default class BudgetComponent implements OnInit, OnDestroy, DoCheck {
       dateFormat: 'dd/mm/yy',
       weekHeader: 'Sm'
     });
-
     try {
 
       this.vehicleId.set(Number.parseInt(this.activatedRoute.snapshot.params['vehicleid']));
@@ -218,7 +217,6 @@ export default class BudgetComponent implements OnInit, OnDestroy, DoCheck {
 
   private async init() {
     this.busyService.busy();
-
     //Budget
     const bugetResult = await this.getBudget();
 
@@ -274,21 +272,26 @@ export default class BudgetComponent implements OnInit, OnDestroy, DoCheck {
         information: this.budget.information,
       });
 
+      //Status Budget
       if (this.budget.status == StatusBudgetEnum.OpenBudget) {
         this.enabledSendMailButton = false;
         this.activeIndexStatus = 0;
+        this.labelStatusBudget = this.itemsStatus[0].label;
       } else if (this.budget.status == StatusBudgetEnum.CompleteBudget) {
         this.enabledSendMailButton = true;
         this.enabledOpenBudget = true;
         this.activeIndexStatus = 1;
+        this.labelStatusBudget = this.itemsStatus[1].label;
       } else if (this.budget.status == StatusBudgetEnum.PendingApproval) {
         this.enabledSendMailButton = true;
         this.enabledOpenBudget = true;
         this.activeIndexStatus = 2;
+        this.labelStatusBudget = this.itemsStatus[2].label;
       } else if (this.budget.status == StatusBudgetEnum.Approved) {
         this.enabledSendMailButton = false;
         this.enabledOpenBudget = true;
         this.activeIndexStatus = 3;
+        this.labelStatusBudget = this.itemsStatus[3].label;
       }
 
       this.busyService.idle();

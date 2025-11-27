@@ -3,8 +3,14 @@
     <p-toast />
     <div class="layout-card-title">
         <span>Orçamento</span>
-        <div class="w-6">
+        <div class="w-6 mobile-visible-none">
             <p-steps [model]="itemsStatus" [readonly]="true" [activeIndex]="activeIndexStatus" />
+        </div>
+        <div class="mobile-visible layout-status-budget">
+            <div class="layout-number">
+                <span>{{activeIndexStatus + 1}}</span>
+            </div>
+            <span>{{labelStatusBudget}}</span>
         </div>
         <p-button icon="pi pi-arrow-right" [text]="true" label="Voltar" [routerLink]="'/portaria/mannutencao-entrada-veiculo/'+vehicleId()" />
     </div>
@@ -225,7 +231,7 @@
                                 <p-multiSelect [options]="listPayment" optionLabel="description" [showClear]="true" [selectionLimit]="1" placeholder="Selecione" formControlName="typePayment" />
                             </div>
                             <!-- show in mobile -->
-                            <div class="mobile-anabled col-12">
+                            <div class="mobile-visible col-12">
                                 <button pButton type="button" label="Fazer Orçamento" size="large" [raised]="true"  severity="warning" (click)="showDialogBudget()"></button>
                             </div>
                             <div class="col-12 md:col-6 lg:col-6 xl:col-6 flex flex-column">
@@ -235,7 +241,7 @@
                                 </span>
                             </div>
 
-                            <div class="mobile-disabled col-12 md:col-6 lg:col-6 xl:col-6 flex ">
+                            <div class="mobile-visible-none col-12 md:col-6 lg:col-6 xl:col-6 flex ">
                                 <button pButton type="button" label="Fazer Orçamento" size="large" [raised]="true" severity="warning" (click)="showDialogBudget()"></button>
                             </div>
 
@@ -252,12 +258,21 @@
             </div>
         </form>
     </div>
-    <!-- class="btn-action" -->
-    <div class="flex justify-content-between mt-2">
-        <div class="flex gap-2">
-            <button pButton type="button" label="Salvar" size="small" [raised]="true" severity="success-custom" icon="pi pi-check" (click)="saveBudget()"></button>
-            <button pButton type="button" label="Imprimir" size="small" [raised]="true" severity="secondary-custom" icon="pi pi-print" (click)="print()"></button>
-            <button pButton type="button" label="Enviar Cliente" size="small" [raised]="true" severity="secondary-custom" icon="pi pi-send" [disabled]="!enabledSendMailButton" (click)="confirmSendEmail()"></button>
+    <!-- DeskTop -->
+    <div class="mobile-visible-none">
+        <div class="flex justify-content-between mt-2">
+            <div class="flex gap-2">
+                <button pButton type="button" label="Salvar" size="small" [raised]="true" severity="success-custom" icon="pi pi-check" (click)="saveBudget()"></button>
+                <button pButton type="button" label="Imprimir" size="small" [raised]="true" severity="secondary-custom" icon="pi pi-print" (click)="print()"></button>
+                <button pButton type="button" label="Enviar Cliente" size="small" [raised]="true" severity="info" icon="pi pi-send" [disabled]="!enabledSendMailButton" (click)="confirmSendEmail()"></button>
+            </div>
+        </div>
+    </div>
+    <div class="mobile-visible mt-2">
+        <div class="flex align-items-center justify-content-center w-full gap-3">
+            <p-button icon="pi pi-check" [rounded]="true" severity="success-custom" label="Salvar" (onClick)="saveBudget()"/>
+            <p-button icon="pi pi-print" [rounded]="true" severity="secondary-custom" (onClick)="print()"/>
+            <p-button icon="pi pi-send" [rounded]="true" severity="info" [disabled]="!enabledSendMailButton" (onClick)="confirmSendEmail()" />
         </div>
     </div>
 </div>
@@ -265,6 +280,7 @@
 <p-dialog [(visible)]="visibleBudget" header="Fazer Orçamento" [modal]="true" [maximizable]="true"
     [style]="{ width: '80rem',height:'60rem' }" [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }">
     <p-tabView [style]="{'min-height': '46rem'}">
+        
         <p-tabPanel header="Solicitação">
             <div class="grid p-fluid p-formgrid">
                 <div class="col-12 md:col-5">
@@ -314,7 +330,7 @@
                     </form>
 
                 </div>
-                <div class="md:col-2 mobile-disabled">
+                <div class="md:col-2 mobile-visible-none">
                     <p-divider layout="vertical" />
                 </div>
                 <div class="col-12 md:col-5">
@@ -492,23 +508,21 @@
                             <p-inputIcon>
                                 <i class="pi pi-search"></i>
                             </p-inputIcon>
-                            <input pInputText type="text"
-                                (input)="dtPecas.filterGlobal($event.target.value, 'contains')" placeholder="Pesquisar" />
+                            <input pInputText type="text" (input)="dtPecas.filterGlobal($event.target.value, 'contains')" placeholder="Pesquisar" />
                         </p-iconField>
                         <app-filterparts (outputPart)="selectPart.set($event)" />
                     </div>
                 </ng-template>
                 <ng-template pTemplate="header">
                     <tr>
-                        <th class="font-normal" style="width: 5%;">Ordem</th>
-                        <th class="font-normal" style="width: 10%;">Código</th>
-                        <th class="font-normal" style="width: 40%;">Descrição</th>
-                        <th class="font-normal" style="width: 5%;">Quantidade</th>
-                        <th class="font-normal" style="width: 10%;">Valor</th>
-                        <th class="font-normal" style="width: 10%;">Desconto</th>
-                        <th class="font-normal" style="width: 10%;">Total</th>
-                        <th class="font-normal" style="width: 5%;"></th>
-
+                        <th style="width: 5%;">Ordem</th>
+                        <th style="width: 10%;">Código</th>
+                        <th style="width: 40%;">Descrição</th>
+                        <th style="width: 5%;">Quantidade</th>
+                        <th style="width: 10%;">Valor</th>
+                        <th style="width: 10%;">Desconto</th>
+                        <th style="width: 10%;">Total</th>
+                        <th style="width: 5%;"></th>
                     </tr>
                 </ng-template>
                 <ng-template pTemplate="body" let-parts let-editing="editing" let-index="rowIndex">
