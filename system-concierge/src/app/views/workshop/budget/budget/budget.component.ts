@@ -72,11 +72,9 @@ export enum StatusBudget {
   providers: [MessageService, ConfirmationService]
 })
 export default class BudgetComponent implements OnInit, OnDestroy, DoCheck {
-
   budget: Budget = new Budget();
   clientCompany: ClientCompany = new ClientCompany();
   vehicleEntry: VehicleEntry = new VehicleEntry();
-
   juridica: string = ClientFisJurEnum.juridica;
 
   vehicleId = signal<number>(0);
@@ -84,9 +82,8 @@ export default class BudgetComponent implements OnInit, OnDestroy, DoCheck {
   visibleBudget: boolean = false;
   itemsStatus: MenuItem[] | undefined;
   activeIndexStatus: number = 0;
-  labelStatusBudget: string="";
+  labelStatusBudget: string = "";
   enabledSendMailButton = false;
-
   formBudget = new FormGroup({
     dateValidation: new FormControl<Date | null>(null),
     nameResponsible: new FormControl<string>(""),
@@ -132,7 +129,6 @@ export default class BudgetComponent implements OnInit, OnDestroy, DoCheck {
   selectPart = signal<Part>(new Part());
   listBudgetItem: BudgetItem[] = [];
   clonedPartItem: { [s: string]: BudgetItem } = {};
-
   budgetItem: BudgetItem;
 
   //Toas info percent discount
@@ -162,9 +158,7 @@ export default class BudgetComponent implements OnInit, OnDestroy, DoCheck {
     private busyService: BusyService,
     private emailClientService: EmailClientService,
     private typePaymentService: TypePaymentService
-  ) {
-
-  }
+  ) { }
 
   ngOnInit(): void {
     this.primeNGConfig.setTranslation({
@@ -214,7 +208,6 @@ export default class BudgetComponent implements OnInit, OnDestroy, DoCheck {
       this.selectPart.set(new Part());
     }
   }
-
   private async init() {
     this.busyService.busy();
     //Budget
@@ -300,7 +293,6 @@ export default class BudgetComponent implements OnInit, OnDestroy, DoCheck {
       this.router.navigateByUrl("/portaria/lista-entrada-veiculo");
     }
   }
-
   private listPayments() {
     this.typePaymentService.listAllEnabled().subscribe(data => {
       this.listPayment = data;
@@ -1365,7 +1357,6 @@ export default class BudgetComponent implements OnInit, OnDestroy, DoCheck {
     this.clonedPartItem[item.id as string] = { ...item };
   }
   async onRowEditSave(item: BudgetItem, index: number) {
-
     if (this.verifyStatusBudget() == StatusBudget.close) {
       this.infoCloseBudget();
       this.onRowEditCancel(item, index);
@@ -1387,6 +1378,10 @@ export default class BudgetComponent implements OnInit, OnDestroy, DoCheck {
 
   }
   onRowEditCancel(item: BudgetItem, index: number) {
+    if (this.verifyStatusBudget() == StatusBudget.close) {
+      return;
+    }
+
     this.listBudgetItem[index] = this.clonedPartItem[item.id as string];
     delete this.clonedPartItem[item.id as string];
   }
@@ -1401,7 +1396,6 @@ export default class BudgetComponent implements OnInit, OnDestroy, DoCheck {
     }
     return true;
   }
-
   //Print Budget
   print() {
     try {
@@ -1410,7 +1404,6 @@ export default class BudgetComponent implements OnInit, OnDestroy, DoCheck {
       console.log(error)
     }
   }
-
   private validSendEmail(): boolean {
 
     //Date validation

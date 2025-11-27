@@ -80,13 +80,8 @@
                 </div>
                 <div class="flex flex-column w-3 gap-1 pl-1">
                     <span class="text-small">CNPJ/CPF</span>
-                    <span class="text-normal">
-                        @if(clientCompany.fisjur =="Juridica"){
-                        {{maskCNPJ(clientCompany.cnpj)}}
-                        }@else {
-                        {{maskCPF(clientCompany.cpf)}}
-                        }
-                    </span>
+                    <span *ngIf="clientCompany.fisjur == juridica" class="text-normal">{{maskCNPJ(clientCompany.cnpj)}}</span>
+                    <span *ngIf="clientCompany.fisjur != juridica" class="text-normal">{{maskCNPJ(clientCompany.cpf)}}</span>
                 </div>
             </div>
             <div class="flex border-left-1 border-bottom-1 border-right-1 ">
@@ -110,8 +105,7 @@
             <div class="flex border-left-1 border-bottom-1 border-right-1">
                 <div class="flex flex-column gap-1 pl-1">
                     <span class="text-small">ENDEREÇO</span>
-                    <span class="text-normal">{{clientCompany.address | uppercase}}
-                        {{clientCompany.addressNumber}}</span>
+                    <span class="text-normal">{{clientCompany.address | uppercase}} {{clientCompany.addressNumber}}</span>
                 </div>
             </div>
         </div>
@@ -247,7 +241,7 @@
         <div class="flex border-1 w-full h-4rem p-1 text-normal">
             {{budget.information | uppercase}}
         </div>
-        <div class="mt-2">
+        <div class="flex text-justify mt-2">
             <p>Orçamento esta sujeito a alteração após o prazo de validade; serviço será iniciado após aprovação; não
                 aprovação será cobrado
                 desmont/montagem e estacionamento; caso haja fornecim. peças será acrescido 20% ao valor total da mão de

@@ -86,6 +86,7 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
   RESPONSE_SUCCESS: string = "Success.";
  
   itemsStatus: MenuItem[] | undefined;
+  labelStatusVehicle: string="";
   activeIndexStatus: number = 0;
   vehicleEntry: VehicleEntry;
   private id: number = 0;
@@ -528,18 +529,23 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
     switch (status) {
       case 'Attendant':
         this.activeIndexStatus = 0;
+        this.labelStatusVehicle = this.itemsStatus[0].label;
         break;
       case 'Budget':
         this.activeIndexStatus = 1;
+        this.labelStatusVehicle = this.itemsStatus[1].label;
         break;
       case 'Running_Service':
         this.activeIndexStatus = 2;
+        this.labelStatusVehicle = this.itemsStatus[2].label;
         break;
       case 'Full_Service':
         this.activeIndexStatus = 3;
+        this.labelStatusVehicle = this.itemsStatus[3].label;
         break;
       case 'Exit':
         this.activeIndexStatus = 4;
+        this.labelStatusVehicle = this.itemsStatus[4].label;
         break;
     }
 

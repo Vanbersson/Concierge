@@ -577,20 +577,13 @@
                         <td>{{( ( parts.quantity * parts.price ) - parts.discount) | currency}}</td>
                         <td>
                             <div class="flex align-items-center justify-content-center gap-2">
-                                <button *ngIf="!editing" pButton type="button" pInitEditableRow icon="pi pi-pencil"
-                                    (click)="onRowEditInit(parts)" class="p-button-text" size="small">
+                                <button *ngIf="!editing" pButton type="button" pInitEditableRow icon="pi pi-pencil" (click)="onRowEditInit(parts)" class="p-button-text" size="small">
                                 </button>
-                                <button *ngIf="!editing" pButton type="button" icon="pi pi-trash"
-                                    (click)="deleteBudgetItem(parts)" class=" p-button-text" size="small"
-                                    severity="danger">
+                                <button *ngIf="!editing" pButton type="button" icon="pi pi-trash" (click)="deleteBudgetItem(parts)" class=" p-button-text" size="small" severity="danger">
                                 </button>
-                                <button *ngIf="editing" pButton pRipple type="button" pSaveEditableRow
-                                    icon="pi pi-check" (click)="onRowEditSave(parts,index)"
-                                    class="p-button-text p-button-success mr-2">
+                                <button *ngIf="editing" pButton pRipple type="button" pSaveEditableRow icon="pi pi-check" (click)="onRowEditSave(parts,index)" class="p-button-text p-button-success mr-2">
                                 </button>
-                                <button *ngIf="editing" pButton pRipple type="button" pCancelEditableRow
-                                    icon="pi pi-times" (click)="onRowEditCancel(parts, index)"
-                                    class="p-button-text p-button-danger">
+                                <button *ngIf="editing" pButton pRipple type="button" pCancelEditableRow icon="pi pi-times" (click)="onRowEditCancel(parts, index)" class="p-button-text p-button-danger">
                                 </button>
                             </div>
                         </td>

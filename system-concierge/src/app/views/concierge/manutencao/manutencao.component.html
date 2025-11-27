@@ -9,6 +9,12 @@
         <div class="w-8 mobile-visible-none">
             <p-steps [model]="itemsStatus" [readonly]="true" [activeIndex]="activeIndexStatus" />
         </div>
+        <div class="mobile-visible layout-status-vehicle">
+            <div class="layout-number">
+                <span>{{activeIndexStatus + 1}}</span>
+            </div>
+            <span>{{labelStatusVehicle}}</span>
+        </div>
         <div>
             <p-button *ngIf="!detailsVehicle" icon="pi pi-arrow-right" [text]="true" label="Voltar" routerLink="/portaria/lista-entrada-veiculo" />
         </div>

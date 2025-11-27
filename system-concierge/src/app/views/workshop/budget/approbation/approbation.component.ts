@@ -21,6 +21,7 @@ import { ClientCompany } from '../../../../models/clientcompany/client-company';
 import { VehicleEntry } from '../../../../models/vehicle/vehicle-entry';
 import { PrintBudgetComponent } from '../../../../components/print.budget/print.budget.component';
 import { BudgetService } from '../../../../services/budget/budget.service';
+import { ClientFisJurEnum } from '../../../../models/clientcompany/client-fisjur-enum';
 
 @Component({
   selector: 'app-approbation',
@@ -42,6 +43,7 @@ export default class ApprobationComponent implements OnInit {
   listBudgetServiceItem: BudgetServiceItem[] = [];
   listBudgetItem: BudgetItem[] = [];
   clientCompany: ClientCompany = new ClientCompany();
+  juridica = ClientFisJurEnum.juridica;
   vehicleEntry: VehicleEntry = new VehicleEntry();
 
   totalService: number;
@@ -59,46 +61,10 @@ export default class ApprobationComponent implements OnInit {
     private busyService: BusyService,
     private budgetService: BudgetService) { }
   ngOnInit(): void {
-    console.log()
 
-    this.valid();
+    this.init();
   }
-  formatNumberBudget(id: number): string {
-
-    var code = "";
-
-    if (id.toString().length == 1) {
-      code = "00000" + id;
-    } else if (id.toString().length == 2) {
-      code = "0000" + id;
-    } else if (id.toString().length == 3) {
-      code = "000" + id;
-    } else if (id.toString().length == 4) {
-      code = "00" + id;
-    } else if (id.toString().length == 5) {
-      code = "0" + id;
-    } else if (id.toString().length >= 6) {
-      code = id.toString();
-    }
-
-    return code;
-  }
-  maskPlaca(placa: string): string {
-    if (placa == "") return "";
-    return placa.substring(0, 3) + "-" + placa.substring(3, 7);
-  }
-  maskCNPJ(cnpj: string): string {
-    if (cnpj == "") return "";
-    const CNPJ = cnpj.substring(0, 2) + "." + cnpj.substring(2, 5) + "." + cnpj.substring(5, 8) + "/" + cnpj.substring(8, 12) + "-" + cnpj.substring(12, 14);
-    return CNPJ;
-  }
-  maskCPF(cpf: string): string {
-    if (cpf == "") return "";
-    const CPF = cpf.substring(0, 3) + "." + cpf.substring(3, 6) + "." + cpf.substring(6, 9) + "-" + cpf.substring(9, 11);
-    return CPF;
-  }
-
-  async valid() {
+  private async init() {
     this.busyService.busy();
     this.token = this.activatedRoute.snapshot.queryParamMap.get('token');
     const resultValid = await this.validToken(this.token);
@@ -146,6 +112,37 @@ export default class ApprobationComponent implements OnInit {
       this.busyService.idle();
       this.router.navigateByUrl("/not-found");
     }
+  }
+  formatNumberBudget(id: number): string {
+    var code = "";
+    if (id.toString().length == 1) {
+      code = "00000" + id;
+    } else if (id.toString().length == 2) {
+      code = "0000" + id;
+    } else if (id.toString().length == 3) {
+      code = "000" + id;
+    } else if (id.toString().length == 4) {
+      code = "00" + id;
+    } else if (id.toString().length == 5) {
+      code = "0" + id;
+    } else if (id.toString().length >= 6) {
+      code = id.toString();
+    }
+    return code;
+  }
+  maskPlaca(placa: string): string {
+    if (placa == "") return "";
+    return placa.substring(0, 3) + "-" + placa.substring(3, 7);
+  }
+  maskCNPJ(cnpj: string): string {
+    if (cnpj == "") return "";
+    const CNPJ = cnpj.substring(0, 2) + "." + cnpj.substring(2, 5) + "." + cnpj.substring(5, 8) + "/" + cnpj.substring(8, 12) + "-" + cnpj.substring(12, 14);
+    return CNPJ;
+  }
+  maskCPF(cpf: string): string {
+    if (cpf == "") return "";
+    const CPF = cpf.substring(0, 3) + "." + cpf.substring(3, 6) + "." + cpf.substring(6, 9) + "-" + cpf.substring(9, 11);
+    return CPF;
   }
 
   private async validToken(token: string): Promise<HttpResponse<MessageResponse>> {

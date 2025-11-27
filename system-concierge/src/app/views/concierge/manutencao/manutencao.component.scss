@@ -132,11 +132,40 @@
 
     @media (max-width: 991px) {
         .mobile-visible-none {
-            display: none;
+            display: none !important;
         }
 
         .mobile-visible {
+            display: block;
+        }
+
+        .layout-status-vehicle {
             display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+
+            .layout-number {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 30px;
+                height: 30px;
+                background-color: #3B82F6;
+                border: 1px solid #f3f4f6;
+                border-radius: 100%;
+
+                span {
+                    color: #fff;
+                    font-weight: 300;
+                }
+            }
+
+            span {
+                color: #4b5563;
+                font-weight: 700;
+                font-size: 1.25rem;
+            }
         }
 
         .layourt-button-action {
