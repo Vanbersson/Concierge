@@ -5,6 +5,8 @@ import { FormControl, FormGroup, Validators, FormsModule, ReactiveFormsModule } 
 //PrimeNg
 import { InputTextModule } from 'primeng/inputtext';
 import { InputNumberModule } from 'primeng/inputnumber';
+import { IconFieldModule } from 'primeng/iconfield';
+import { InputIconModule } from 'primeng/inputicon';
 import { ButtonModule } from 'primeng/button';
 import { InputMaskModule } from 'primeng/inputmask';
 import { ToastModule } from 'primeng/toast';
@@ -19,12 +21,14 @@ import { CompanyService } from '../../../services/company/company.service';
 import { Company } from '../../../models/company/Company';
 import { Resale } from '../../../models/resale/resale';
 import { ResaleService } from '../../../services/resale/resale.service';
+import { StatusEnabledDisabled } from '../../../models/enum/status-enabled-disabled';
 
 
 @Component({
   selector: 'app-company',
   standalone: true,
-  imports: [CommonModule, TabViewModule, TableModule, FormsModule, ReactiveFormsModule, InputTextModule, ButtonModule, InputMaskModule, ToastModule, InputNumberModule],
+  imports: [CommonModule, TabViewModule, TableModule, FormsModule, ReactiveFormsModule, IconFieldModule,InputIconModule,
+    InputTextModule, ButtonModule, InputMaskModule, ToastModule, InputNumberModule],
   templateUrl: './company.component.html',
   styleUrl: './company.component.scss',
   providers: [MessageService]
@@ -32,11 +36,12 @@ import { ResaleService } from '../../../services/resale/resale.service';
 export default class CompanyComponent {
 
   private company: Company;
+  enabled: string = StatusEnabledDisabled.enabled;
 
   resales: Resale[] = [];
 
   formCompany = new FormGroup({
-    id: new FormControl<number | null>(null),
+    id: new FormControl<number | null>({value:null,disabled:true}),
     status: new FormControl<string>('', Validators.required),
     name: new FormControl<string>('', Validators.required),
     cnpj: new FormControl<string>('', Validators.required),
@@ -55,6 +60,10 @@ export default class CompanyComponent {
   constructor(private companyService: CompanyService, private resaleService: ResaleService, private messageService: MessageService) {
     this.getCompanies();
     this.getResales();
+  }
+  maskCNPJ(cnpj: string): string {
+    const CNPJ = cnpj.substring(0, 2) + "." + cnpj.substring(2, 5) + "." + cnpj.substring(5, 8) + "/" + cnpj.substring(8, 12) + "-" + cnpj.substring(12, 14);
+    return CNPJ;
   }
 
   private getCompanies() {

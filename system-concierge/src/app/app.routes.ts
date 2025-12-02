@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { authGuardGuard } from './services/login/auth-guard.guard';
+import { AuthGuard } from './services/login/auth.guard';
 import { DriverMenuGuard } from './views/concierge/driver/driver.menu.guard';
 import { VehicleEntryMenuGuard } from './views/concierge/vehicle.entry/vehicle.entry.menu.guard';
 import { VehicleMenuGuard } from './views/concierge/vehicle/vehicle.menu';
@@ -20,19 +20,19 @@ export const routes: Routes = [
     {
         path: '',
         loadComponent: () => import('./layouts/layout/layout.component'),
-        canActivateChild: [authGuardGuard],
+        canActivateChild: [AuthGuard],
         children: [
             {
                 path: '',
                 title: 'Dashboard',
                 loadComponent: () => import('./views/dashboard/dashboard.component'),
-                canDeactivate: [CanDeactivateGuard]
+                 canDeactivate: [CanDeactivateGuard] 
             },
             {
                 path: 'dashboard',
                 title: 'Dashboard',
                 loadComponent: () => import('./views/dashboard/dashboard.component'),
-                canDeactivate: [CanDeactivateGuard]
+                canDeactivate: [CanDeactivateGuard] 
             },
             {
                 path: 'portaria',

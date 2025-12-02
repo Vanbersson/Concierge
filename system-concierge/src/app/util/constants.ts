@@ -1,5 +1,6 @@
 
-export const IMAGE_MAX_SIZE = 4243795;
+export const IMAGE_MAX_SIZE = 6 * 1024 * 1024; //Tamanho máximo permitido 5M
+export const IMAGE_MAX_SIZE_LABEL = "Tamanha máximo 5MB";
 
 export const MESSAGE_RESPONSE_SUCCESS = "Success.";
 export const MESSAGE_RESPONSE_ERROR = "Error.";

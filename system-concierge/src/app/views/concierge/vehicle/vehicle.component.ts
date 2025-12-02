@@ -36,7 +36,8 @@ import { PermissionService } from '../../../services/permission/permission.servi
 @Component({
   selector: 'app-veiculos',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, ToastModule, DropdownModule, TableModule, InputIconModule, IconFieldModule, TagModule, MultiSelectModule, ButtonModule, InputTextModule],
+  imports: [CommonModule, FormsModule, RouterModule, ToastModule, DropdownModule, TableModule, InputIconModule, IconFieldModule, 
+    TagModule, MultiSelectModule, ButtonModule, InputTextModule],
   templateUrl: './vehicle.component.html',
   styleUrl: './vehicle.component.scss',
   providers: [MessageService, DatePipe]

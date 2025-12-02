@@ -1,4 +1,4 @@
-import { Component, DoCheck, OnDestroy, OnInit, signal, ɵgenerateStandaloneInDeclarationsError } from '@angular/core';
+import { Component, DoCheck, OnInit, signal } from '@angular/core';
 import { CommonModule, DatePipe, UpperCasePipe } from '@angular/common';
 import { Validators, FormsModule, ReactiveFormsModule, FormGroup, FormControl } from '@angular/forms';
 import { lastValueFrom } from 'rxjs';
@@ -27,26 +27,22 @@ import { MessageService } from 'primeng/api';
 import { TagModule } from 'primeng/tag';
 import { ImageModule } from 'primeng/image';
 import { CheckboxModule } from 'primeng/checkbox';
-import { NgxImageCompressService } from 'ngx-image-compress';
 
 //Service
 import { VehicleModelService } from '../../../services/vehicle-model/vehicle-model.service';
-import { ClientecompanyService } from '../../../services/clientecompany/clientecompany.service';
 import { UserService } from '../../../services/user/user.service';
 import { VehicleService } from '../../../services/vehicle/vehicle.service';
-
+import { PhotoService } from '../../../services/photo/photo.service';
 //Interface
 import { StorageService } from '../../../services/storage/storage.service';
 import { IModelVehicle } from '../../../interfaces/vehicle-model/imodel-vehicle';
-
 //Class
 import { User } from '../../../models/user/user';
 import { ClientCompany } from '../../../models/clientcompany/client-company';
 import { VehicleEntry } from '../../../models/vehicle/vehicle-entry';
 import { IColor } from '../../../interfaces/icolor';
-import { MESSAGE_RESPONSE_NOT_COLOR, MESSAGE_RESPONSE_NOT_MODEL, MESSAGE_RESPONSE_NOT_PLACA, MESSAGE_RESPONSE_PLACAEXISTS } from '../../../util/constants';
+import { IMAGE_MAX_SIZE_LABEL, MESSAGE_RESPONSE_NOT_COLOR, MESSAGE_RESPONSE_NOT_MODEL, MESSAGE_RESPONSE_NOT_PLACA, MESSAGE_RESPONSE_PLACAEXISTS } from '../../../util/constants';
 //Components
-
 import { MessageResponse } from '../../../models/message/message-response';
 import { ExistsPlaca } from '../../../models/vehicle/exists-placa';
 //Enum
@@ -72,7 +68,7 @@ import { FilterDriverComponent } from '../../../components/filter.driver/filter.
   styleUrl: './vehicle.entry.component.scss'
 })
 export default class VehicleEntryComponent implements OnInit, DoCheck {
-  IMAGE_MAX_SIZE: number = 4243795;
+
   private vehicleEntry: VehicleEntry;
 
   activeStepper: number | undefined = 0;
@@ -131,10 +127,6 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
     UserAttendant: new FormControl<User[]>([]),
     vehicleNew: new FormControl<string>('not', Validators.required),
     serviceOrder: new FormControl<string>('yes', Validators.required),
-    photo1: new FormControl<string | null>(null),
-    photo2: new FormControl<string | null>(null),
-    photo3: new FormControl<string | null>(null),
-    photo4: new FormControl<string | null>(null),
     informationConcierge: new FormControl<string>(''),
   });
 
@@ -151,8 +143,7 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
     private vehicleService: VehicleService,
     private userService: UserService,
     private messageService: MessageService,
-    private serviceClienteCompany: ClientecompanyService,
-    private ngxImageCompressService: NgxImageCompressService) { }
+    private photoService: PhotoService) { }
 
   ngOnInit(): void {
     this.cores = [
@@ -273,79 +264,56 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
     }
   }
   public async photoFile1Vehicle() {
-    this.ngxImageCompressService.uploadFile().then(({ image, orientation }) => {
-      if (this.ngxImageCompressService.byteCount(image) > this.IMAGE_MAX_SIZE) {
-        this.messageService.add({ severity: 'error', summary: 'Imagem', detail: 'Tamanha máximo 3MB', icon: 'pi pi-times', life: 3000 });
-      } else {
-        this.ngxImageCompressService.compressFile(image, orientation, 50, 40).then((compressedImage) => {
-          // Remover o prefixo "data:image/jpeg;base64," se existir
-          const base64Data = compressedImage.split(',')[1];
-          this.photoVehicle1 = base64Data;
-          this.formVehicle.patchValue({ photo1: this.photoVehicle1 });
-        });
-      }
-    });
+    const photo = await this.photoService.selectPhoto();
+    if (photo == "Limit") {
+      this.messageService.add({ severity: 'error', summary: 'Imagem', detail: IMAGE_MAX_SIZE_LABEL, icon: 'pi pi-times', life: 3000 });
+    } else if (photo == "Error") {
+
+    } else {
+      this.photoVehicle1 = photo;
+    }
   }
   public async photoFile2Vehicle() {
-    this.ngxImageCompressService.uploadFile().then(({ image, orientation }) => {
-      if (this.ngxImageCompressService.byteCount(image) > this.IMAGE_MAX_SIZE) {
-        this.messageService.add({ severity: 'error', summary: 'Imagem', detail: 'Tamanha máximo 3MB', icon: 'pi pi-times', life: 3000 });
-      } else {
-        this.ngxImageCompressService.compressFile(image, orientation, 50, 40).then((compressedImage) => {
+    const photo = await this.photoService.selectPhoto();
+    if (photo == "Limit") {
+      this.messageService.add({ severity: 'error', summary: 'Imagem', detail: IMAGE_MAX_SIZE_LABEL, icon: 'pi pi-times', life: 3000 });
+    } else if (photo == "Error") {
 
-          // Remover o prefixo "data:image/jpeg;base64," se existir
-          const base64Data = compressedImage.split(',')[1];
-          this.photoVehicle2 = base64Data;
-          this.formVehicle.patchValue({ photo2: this.photoVehicle2 });
-        });
-      }
-    });
+    } else {
+      this.photoVehicle2 = photo;
+    }
   }
   public async photoFile3Vehicle() {
-    this.ngxImageCompressService.uploadFile().then(({ image, orientation }) => {
-      if (this.ngxImageCompressService.byteCount(image) > this.IMAGE_MAX_SIZE) {
-        this.messageService.add({ severity: 'error', summary: 'Imagem', detail: 'Tamanha máximo 3MB', icon: 'pi pi-times', life: 3000 });
-      } else {
-        this.ngxImageCompressService.compressFile(image, orientation, 50, 40).then((compressedImage) => {
+    const photo = await this.photoService.selectPhoto();
+    if (photo == "Limit") {
+      this.messageService.add({ severity: 'error', summary: 'Imagem', detail: IMAGE_MAX_SIZE_LABEL, icon: 'pi pi-times', life: 3000 });
+    } else if (photo == "Error") {
 
-          // Remover o prefixo "data:image/jpeg;base64," se existir
-          const base64Data = compressedImage.split(',')[1];
-          this.photoVehicle3 = base64Data;
-          this.formVehicle.patchValue({ photo3: this.photoVehicle3 });
-        });
-      }
-    })
+    } else {
+      this.photoVehicle3 = photo;
+    }
   }
   public async photoFile4Vehicle() {
-    this.ngxImageCompressService.uploadFile().then(({ image, orientation }) => {
-      if (this.ngxImageCompressService.byteCount(image) > this.IMAGE_MAX_SIZE) {
-        this.messageService.add({ severity: 'error', summary: 'Imagem', detail: 'Tamanha máximo 3MB', icon: 'pi pi-times', life: 3000 });
-      } else {
-        this.ngxImageCompressService.compressFile(image, orientation, 50, 40).then((compressedImage) => {
+    const photo = await this.photoService.selectPhoto();
+    if (photo == "Limit") {
+      this.messageService.add({ severity: 'error', summary: 'Imagem', detail: IMAGE_MAX_SIZE_LABEL, icon: 'pi pi-times', life: 3000 });
+    } else if (photo == "Error") {
 
-          // Remover o prefixo "data:image/jpeg;base64," se existir
-          const base64Data = compressedImage.split(',')[1];
-          this.photoVehicle4 = base64Data;
-          this.formVehicle.patchValue({ photo4: this.photoVehicle4 });
-        });
-      }
-    })
+    } else {
+      this.photoVehicle4 = photo;
+    }
   }
   public deleteFileVehicle1() {
     this.photoVehicle1 = "";
-    this.formVehicle.patchValue({ photo1: null });
   }
   public deleteFileVehicle2() {
     this.photoVehicle2 = "";
-    this.formVehicle.patchValue({ photo2: null });
   }
   public deleteFileVehicle3() {
     this.photoVehicle3 = "";
-    this.formVehicle.patchValue({ photo3: null });
   }
   public deleteFileVehicle4() {
     this.photoVehicle4 = "";
-    this.formVehicle.patchValue({ photo4: null });
   }
   public addRequirePlaca() {
     this.formVehicle.controls['placa'].addValidators(Validators.required);
@@ -371,10 +339,6 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
       color: [],
       vehicleNew: 'not',
       serviceOrder: 'yes',
-      photo1: null,
-      photo2: null,
-      photo3: null,
-      photo4: null,
       UserAttendant: []
     });
     this.photoVehicle1 = '';
@@ -541,10 +505,10 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
 
     this.vehicleEntry.idUserAttendant = vehicleValue.UserAttendant.at(0)?.id ?? 0;
     this.vehicleEntry.nameUserAttendant = vehicleValue.UserAttendant.at(0)?.name ?? "";
-    this.vehicleEntry.photo1 = vehicleValue?.photo1 ?? "";
-    this.vehicleEntry.photo2 = vehicleValue?.photo2 ?? "";
-    this.vehicleEntry.photo3 = vehicleValue?.photo3 ?? "";
-    this.vehicleEntry.photo4 = vehicleValue?.photo4 ?? "";
+    this.vehicleEntry.photo1 = this.photoVehicle1;
+    this.vehicleEntry.photo2 = this.photoVehicle2;
+    this.vehicleEntry.photo3 = this.photoVehicle3;
+    this.vehicleEntry.photo4 = this.photoVehicle4;
     this.vehicleEntry.vehicleNew = vehicleValue?.vehicleNew ?? "";
     this.vehicleEntry.serviceOrder = vehicleValue?.serviceOrder ?? "";
     this.vehicleEntry.informationConcierge = vehicleValue?.informationConcierge ?? "";
@@ -560,10 +524,10 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
       behavior: "smooth"
     });
   }
-  firstSecondaryName(name: string): string{
+  firstSecondaryName(name: string): string {
     var nameArr = name.split(' ');
-      name = nameArr[0] + " " + nameArr[1];
-      return name;
+    name = nameArr[0] + " " + nameArr[1];
+    return name;
   }
   public async saveVehicleEntry() {
     //Save vehicles

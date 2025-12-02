@@ -2,7 +2,6 @@ import { Component, DoCheck, OnInit, signal } from '@angular/core';
 import { CommonModule, DatePipe, UpperCasePipe } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { Validators, FormsModule, ReactiveFormsModule, FormGroup, FormControl } from '@angular/forms';
-import { NgxImageCompressService } from 'ngx-image-compress';
 //PrimeNg
 import { PrimeNGConfig } from 'primeng/api';
 import { TabViewModule } from 'primeng/tabview';
@@ -38,9 +37,8 @@ import { IColor } from '../../../interfaces/icolor';
 import {
   STATUS_VEHICLE_ENTRY_NOTAUTH, STATUS_VEHICLE_ENTRY_FIRSTAUTH,
   STATUS_VEHICLE_ENTRY_AUTHORIZED, MESSAGE_RESPONSE_NOT_CLIENT,
-  MESSAGE_RESPONSE_NOT_ATTENDANT, MESSAGE_RESPONSE_NOT_DRIVEREXIT, MESSAGE_RESPONSE_ERROR_AUTH_EXIT,
-  IMAGE_MAX_SIZE,
-  MESSAGE_RESPONSE_NOT_DRIVERENTRY
+  MESSAGE_RESPONSE_NOT_ATTENDANT,
+  IMAGE_MAX_SIZE_LABEL
 } from '../../../util/constants';
 //Class
 import { User } from '../../../models/user/user';
@@ -67,6 +65,7 @@ import { MessageResponse } from '../../../models/message/message-response';
 import { SuccessError } from '../../../models/enum/success-error';
 import { PermissionService } from '../../../services/permission/permission.service';
 import { ShareWhatsAppService } from '../../../services/share/share-whatsapp.service';
+import { PhotoService } from '../../../services/photo/photo.service';
 
 @Component({
   selector: 'app-manutencao',
@@ -84,9 +83,9 @@ import { ShareWhatsAppService } from '../../../services/share/share-whatsapp.ser
 })
 export default class ManutencaoComponent implements OnInit, DoCheck {
   RESPONSE_SUCCESS: string = "Success.";
- 
+
   itemsStatus: MenuItem[] | undefined;
-  labelStatusVehicle: string="";
+  labelStatusVehicle: string = "";
   activeIndexStatus: number = 0;
   vehicleEntry: VehicleEntry;
   private id: number = 0;
@@ -197,7 +196,7 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
     private confirmationService: ConfirmationService,
     private messageService: MessageService,
     private busyService: BusyService,
-    private ngxImageCompressService: NgxImageCompressService,
+    private photoService: PhotoService,
     private driverService: DriverService
   ) {
   }
@@ -454,7 +453,6 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
       }
     }
   }
-
   private loadDriver() {
     //Clear notifications
     this.messageService.clear("messageDriverEntry");
@@ -525,7 +523,6 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
     }
   }
   private stepStatus(status: string) {
-
     switch (status) {
       case 'Attendant':
         this.activeIndexStatus = 0;
@@ -615,56 +612,44 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
     this.formVehicle.controls['userAttendant'].updateValueAndValidity();
   }
   public async photoFile1Vehicle() {
-    this.ngxImageCompressService.uploadFile().then(({ image, orientation }) => {
-      if (this.ngxImageCompressService.byteCount(image) > IMAGE_MAX_SIZE) {
-        this.messageService.add({ severity: 'error', summary: 'Imagem', detail: 'Tamanha máximo 3MB', icon: 'pi pi-times', life: 3000 });
-      } else {
-        this.ngxImageCompressService.compressFile(image, orientation, 50, 40).then((compressedImage) => {
-          // Remover o prefixo "data:image/jpeg;base64," se existir
-          const base64Data = compressedImage.split(',')[1];
-          this.photoVehicle1 = base64Data;
-        });
-      }
-    });
+    const photo = await this.photoService.selectPhoto();
+    if (photo == "Limit") {
+      this.messageService.add({ severity: 'error', summary: 'Imagem', detail: IMAGE_MAX_SIZE_LABEL, icon: 'pi pi-times', life: 3000 });
+    } else if (photo == "Error") {
+
+    } else {
+      this.photoVehicle1 = photo;
+    }
   }
   public async photoFile2Vehicle() {
-    this.ngxImageCompressService.uploadFile().then(({ image, orientation }) => {
-      if (this.ngxImageCompressService.byteCount(image) > IMAGE_MAX_SIZE) {
-        this.messageService.add({ severity: 'error', summary: 'Imagem', detail: 'Tamanha máximo 3MB', icon: 'pi pi-times', life: 3000 });
-      } else {
-        this.ngxImageCompressService.compressFile(image, orientation, 50, 40).then((compressedImage) => {
-          // Remover o prefixo "data:image/jpeg;base64," se existir
-          const base64Data = compressedImage.split(',')[1];
-          this.photoVehicle2 = base64Data
-        });
-      }
-    });
+    const photo = await this.photoService.selectPhoto();
+    if (photo == "Limit") {
+      this.messageService.add({ severity: 'error', summary: 'Imagem', detail: IMAGE_MAX_SIZE_LABEL, icon: 'pi pi-times', life: 3000 });
+    } else if (photo == "Error") {
+
+    } else {
+      this.photoVehicle2 = photo;
+    }
   }
   public async photoFile3Vehicle() {
-    this.ngxImageCompressService.uploadFile().then(({ image, orientation }) => {
-      if (this.ngxImageCompressService.byteCount(image) > IMAGE_MAX_SIZE) {
-        this.messageService.add({ severity: 'error', summary: 'Imagem', detail: 'Tamanha máximo 3MB', icon: 'pi pi-times', life: 3000 });
-      } else {
-        this.ngxImageCompressService.compressFile(image, orientation, 50, 40).then((compressedImage) => {
-          // Remover o prefixo "data:image/jpeg;base64," se existir
-          const base64Data = compressedImage.split(',')[1];
-          this.photoVehicle3 = base64Data
-        });
-      }
-    });
+    const photo = await this.photoService.selectPhoto();
+    if (photo == "Limit") {
+      this.messageService.add({ severity: 'error', summary: 'Imagem', detail: IMAGE_MAX_SIZE_LABEL, icon: 'pi pi-times', life: 3000 });
+    } else if (photo == "Error") {
+
+    } else {
+      this.photoVehicle3 = photo;
+    }
   }
   public async photoFile4Vehicle() {
-    this.ngxImageCompressService.uploadFile().then(({ image, orientation }) => {
-      if (this.ngxImageCompressService.byteCount(image) > IMAGE_MAX_SIZE) {
-        this.messageService.add({ severity: 'error', summary: 'Imagem', detail: 'Tamanha máximo 3MB', icon: 'pi pi-times', life: 3000 });
-      } else {
-        this.ngxImageCompressService.compressFile(image, orientation, 50, 40).then((compressedImage) => {
-          // Remover o prefixo "data:image/jpeg;base64," se existir
-          const base64Data = compressedImage.split(',')[1];
-          this.photoVehicle4 = base64Data
-        });
-      }
-    });
+    const photo = await this.photoService.selectPhoto();
+    if (photo == "Limit") {
+      this.messageService.add({ severity: 'error', summary: 'Imagem', detail: IMAGE_MAX_SIZE_LABEL, icon: 'pi pi-times', life: 3000 });
+    } else if (photo == "Error") {
+
+    } else {
+      this.photoVehicle4 = photo;
+    }
   }
   public deleteFileVehicle1() {
     this.photoVehicle1 = "";

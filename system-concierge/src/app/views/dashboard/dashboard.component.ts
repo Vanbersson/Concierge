@@ -193,8 +193,7 @@ export default class DashboardComponent implements OnInit, CanComponentDeactivat
   canDeactivate(nextState?: RouterStateSnapshot): Promise<boolean> | boolean {
     // Apenas confirmar se for sair para o login
     const nextUrl = nextState?.url || '';
-    console.log(nextUrl)
-
+    
     if (nextUrl.includes('/login')) {
       return new Promise<boolean>((resolve) => {
         this.confirmationService.confirm({

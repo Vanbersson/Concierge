@@ -94,6 +94,16 @@ export class StorageService {
     return sessionStorage.getItem("permission");
   }
 
+  isLogged() {
+    return this.companyId &&
+      this.resaleId &&
+      this.id &&
+      this.name &&
+      this.email &&
+      this.token &&
+      this.roleDesc;
+  }
+
   public deleteStorage() {
     sessionStorage.clear();
   }
