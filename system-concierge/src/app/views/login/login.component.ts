@@ -63,7 +63,7 @@ export default class LoginComponent {
 
       const resultLogin = await this.login(login);
       if (resultLogin.status == 200) {
-        this.messageService.add({ severity: 'success', summary: 'Bem-vindo', detail: resultLogin.body.name, icon: 'pi pi-lock-open', life: 2000 });
+        this.messageService.add({ severity: 'success', summary: 'Bem-vindo', detail: resultLogin.body.name, icon: 'pi pi-lock-open', life: 3000 });
         this.storageService.companyId = resultLogin.body.companyId.toString();
         this.storageService.resaleId = resultLogin.body.resaleId.toString();
         this.storageService.photo = resultLogin.body.photo;
@@ -101,7 +101,7 @@ export default class LoginComponent {
     try {
       return await lastValueFrom(this.auth.login(login));
     } catch (error) {
-      this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Login ou senha inválido', icon: 'pi pi-lock', life: 2000 });
+      this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Login ou senha inválido', icon: 'pi pi-lock', life: 3000 });
       return error;
     }
   }

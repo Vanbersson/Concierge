@@ -32,7 +32,7 @@ export class VehicleService {
     return this.http.post<MessageResponse>(environment.apiuUrl + "/vehicle/entry/exit", vehicle, { headers: this.myHeaders(), observe: 'response' });
   }
 
-  allAuthorized$(): Observable<VehicleEntry[]> {
+  allAuthorized(): Observable<VehicleEntry[]> {
     return this.http.get<VehicleEntry[]>(environment.apiuUrl + "/vehicle/entry/" + this.companyResale + "/allAuthorized", { headers: this.myHeaders() });
   }
 

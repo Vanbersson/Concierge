@@ -132,13 +132,23 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
     information: new FormControl<string>('')
   });
   //Porteiro
+  entryPhoto1!: string;
+  entryPhoto2!: string;
+  entryPhoto3!: string;
+  entryPhoto4!: string;
+
+  exitPhoto1!: string;
+  exitPhoto2!: string;
+  exitPhoto3!: string;
+  exitPhoto4!: string;
+
   formConcierge = new FormGroup({
     entryId: new FormControl<number | null>({ value: null, disabled: true }),
     entryName: new FormControl<string>({ value: '', disabled: true }),
     entryInf: new FormControl<string>({ value: '', disabled: true }),
     exitId: new FormControl<number | null>({ value: null, disabled: true }),
     exitName: new FormControl<string>({ value: '', disabled: true }),
-    exitInf: new FormControl<string>({ value: '', disabled: true }),
+    exitInformation: new FormControl<string>({ value: '', disabled: true }),
   });
   //ClientCompany
   selectClientCompany = signal<ClientCompany>(new ClientCompany());
@@ -412,13 +422,25 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
     this.photoVehicle3 = this.vehicleEntry.photo3!;
     this.photoVehicle4 = this.vehicleEntry.photo4!;
     //Form Porteiro
+    this.entryPhoto1 = this.vehicleEntry.entryPhoto1;
+    this.entryPhoto2 = this.vehicleEntry.entryPhoto2;
+    this.entryPhoto3 = this.vehicleEntry.entryPhoto3;
+    this.entryPhoto4 = this.vehicleEntry.entryPhoto4;
+
+    this.exitPhoto1 = this.vehicleEntry.exitPhoto1;
+    this.exitPhoto2 = this.vehicleEntry.exitPhoto2;
+    this.exitPhoto3 = this.vehicleEntry.exitPhoto3;
+    this.exitPhoto4 = this.vehicleEntry.exitPhoto4;
     this.formConcierge.patchValue({
       entryId: this.vehicleEntry.idUserEntry,
       entryName: this.vehicleEntry.nameUserEntry,
       entryInf: this.vehicleEntry.informationConcierge,
       exitId: this.vehicleEntry.userIdExit == 0 ? null : this.vehicleEntry.userIdExit,
-      exitName: this.vehicleEntry.userNameExit
+      exitName: this.vehicleEntry.userNameExit,
+      exitInformation: this.vehicleEntry.exitInformation
     });
+
+
     //Form Proprietario
     if (this.vehicleEntry.clientCompanyId != 0) {
       this.formClientCompany.patchValue({

@@ -44,34 +44,69 @@ public class VehicleEntry implements Serializable {
     @Column(name = "budget_status")
     private StatusBudgetEnum budgetStatus;
 
+    //User Entry
     @JoinColumn(table = "tb_user", referencedColumnName = "id")
     @Column(name = "id_user_entry")
     private Integer idUserEntry;
-
     @Column(name = "name_user_entry")
     private String nameUserEntry;
-
     @Column(name = "date_entry")
     private Date dateEntry;
+    @Lob
+    @Column(name = "entry_photo1")
+    private byte[] entryPhoto1;
+    @Lob
+    @Column(name = "entry_photo2")
+    private byte[] entryPhoto2;
+    @Lob
+    @Column(name = "entry_photo3")
+    private byte[] entryPhoto3;
+    @Lob
+    @Column(name = "entry_photo4")
+    private byte[] entryPhoto4;
 
     @Column(name = "date_prevision_exit")
     private Date datePrevisionExit;
 
+    //User exit
     @Column(name = "user_id_exit")
     private Integer userIdExit;
-
     @Column(name = "user_name_exit")
     private String userNameExit;
-
     @Column(name = "date_exit")
     private Date dateExit;
+    @Lob
+    @Column(name = "exit_photo1")
+    private byte[] exitPhoto1;
+    @Lob
+    @Column(name = "exit_photo2")
+    private byte[] exitPhoto2;
+    @Lob
+    @Column(name = "exit_photo3")
+    private byte[] exitPhoto3;
+    @Lob
+    @Column(name = "exit_photo4")
+    private byte[] exitPhoto4;
+    @Column(name = "exit_information")
+    private String exitInformation;
 
+    //Attendant
     @JoinColumn(table = "tb_user", referencedColumnName = "id")
     @Column(name = "id_user_attendant")
     private Integer idUserAttendant;
-
     @Column(name = "name_user_attendant")
     private String nameUserAttendant;
+    @Lob
+    private byte[] photo1;
+    @Lob
+    private byte[] photo2;
+    @Lob
+    private byte[] photo3;
+    @Lob
+    private byte[] photo4;
+
+
+
 
 
     @JoinColumn(table = "tb_user", referencedColumnName = "id")
@@ -200,18 +235,6 @@ public class VehicleEntry implements Serializable {
 
     @Column(name = "km_exit")
     private String kmExit;
-
-    @Lob
-    private byte[] photo1;
-
-    @Lob
-    private byte[] photo2;
-
-    @Lob
-    private byte[] photo3;
-
-    @Lob
-    private byte[] photo4;
 
     @Column(name = "quantity_extinguisher")
     private Integer quantityExtinguisher;

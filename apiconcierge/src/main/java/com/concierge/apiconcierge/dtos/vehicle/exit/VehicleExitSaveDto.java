@@ -8,6 +8,11 @@ public record VehicleExitSaveDto(
         Integer vehicleId,
         Integer userId,
         String userName,
-        Date dateExit
+        Date dateExit,
+        byte[] exitPhoto1,
+        byte[] exitPhoto2,
+        byte[] exitPhoto3,
+        byte[] exitPhoto4,
+        String exitInformation
         ) {
 }

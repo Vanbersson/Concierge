@@ -9,15 +9,28 @@ export class VehicleEntry {
     idUserEntry: number = 0;
     nameUserEntry: string = '';
     dateEntry: Date | string = '';
+    entryPhoto1: string = '';
+    entryPhoto2: string = '';
+    entryPhoto3: string = '';
+    entryPhoto4: string = '';
     datePrevisionExit: Date | string = '';
     days: number = 0;
 
     userIdExit: number = 0;
     userNameExit: string = '';
     dateExit: Date | string = '';
+    exitPhoto1: string = '';
+    exitPhoto2: string = '';
+    exitPhoto3: string = '';
+    exitPhoto4: string = '';
+    exitInformation: string = '';
 
     idUserAttendant: number = 0;
     nameUserAttendant: string = '';
+    photo1: string = '';
+    photo2: string = '';
+    photo3: string = '';
+    photo4: string = '';
 
     idUserExitAuth1: number = 0;
     nameUserExitAuth1: string = '';
@@ -63,11 +76,6 @@ export class VehicleEntry {
     vehicleNew: string = '';
     kmEntry: string = '';
     kmExit: string = '';
-
-    photo1: string = '';
-    photo2: string = '';
-    photo3: string = '';
-    photo4: string = '';
 
     quantityExtinguisher: number = 0;
     quantityTrafficCone: number = 0;

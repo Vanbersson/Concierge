@@ -472,6 +472,10 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
     this.vehicleEntry.resaleId = this.storageService.resaleId;
     this.vehicleEntry.idUserEntry = this.storageService.id;
     this.vehicleEntry.nameUserEntry = this.storageService.name;
+    this.vehicleEntry.entryPhoto1 = this.photoVehicle1;
+    this.vehicleEntry.entryPhoto2 = this.photoVehicle2;
+    this.vehicleEntry.entryPhoto3 = this.photoVehicle3;
+    this.vehicleEntry.entryPhoto4 = this.photoVehicle4;
 
     if (this.formClientCompany.get('clientCompanyNot').value.length == 0) {
       this.vehicleEntry.clientCompanyId = this.clientCompany.id;
@@ -505,10 +509,7 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
 
     this.vehicleEntry.idUserAttendant = vehicleValue.UserAttendant.at(0)?.id ?? 0;
     this.vehicleEntry.nameUserAttendant = vehicleValue.UserAttendant.at(0)?.name ?? "";
-    this.vehicleEntry.photo1 = this.photoVehicle1;
-    this.vehicleEntry.photo2 = this.photoVehicle2;
-    this.vehicleEntry.photo3 = this.photoVehicle3;
-    this.vehicleEntry.photo4 = this.photoVehicle4;
+
     this.vehicleEntry.vehicleNew = vehicleValue?.vehicleNew ?? "";
     this.vehicleEntry.serviceOrder = vehicleValue?.serviceOrder ?? "";
     this.vehicleEntry.informationConcierge = vehicleValue?.informationConcierge ?? "";

@@ -70,6 +70,7 @@ interface IExportVehicle {
   Said_Usuario?: string,
   Said_Usuario_Nome?: string,
   Said_Usuario_Data?: string,
+  Said_Usuario_Inf?: string,
   Said_Previsao_Data?: string,
 
   Placa: string,
@@ -85,9 +86,9 @@ interface IExportVehicle {
   Km_entrada?: string,
   Km_saida?: string,
 
-  Nr_OS:string,
-  Nr_NFe:string,
-  Nr_NFEs:string,
+  Nr_OS: string,
+  Nr_NFe: string,
+  Nr_NFEs: string,
   inf: string
 }
 
@@ -345,6 +346,7 @@ export default class VehicleComponent implements OnInit, DoCheck {
         Said_Usuario: item.userIdExit == 0 ? "" : item.userIdExit.toString(),
         Said_Usuario_Nome: item.userNameExit,
         Said_Usuario_Data: item.dateExit.toString(),
+        Said_Usuario_Inf: item.exitInformation,
         Said_Previsao_Data: item.datePrevisionExit.toString(),
         Placa: item.placa,
         Frota: item.frota,
@@ -358,9 +360,9 @@ export default class VehicleComponent implements OnInit, DoCheck {
         Km_entrada: item.kmEntry,
         Km_saida: item.kmExit,
         Nr_OS: item.numServiceOrder,
-        Nr_NFe:item.numNfe,
+        Nr_NFe: item.numNfe,
         Nr_NFEs: item.numNfse,
-        inf:item.information
+        inf: item.information
       });
     }
 

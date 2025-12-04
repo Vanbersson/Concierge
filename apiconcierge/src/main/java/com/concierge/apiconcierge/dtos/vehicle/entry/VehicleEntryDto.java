@@ -3,6 +3,8 @@ package com.concierge.apiconcierge.dtos.vehicle.entry;
 import com.concierge.apiconcierge.models.budget.enums.StatusBudgetEnum;
 import com.concierge.apiconcierge.models.enums.YesNot;
 import com.concierge.apiconcierge.models.vehicle.enums.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Lob;
 
 import java.util.Date;
 
@@ -16,12 +18,28 @@ public record VehicleEntryDto(
         Integer idUserEntry,
         String nameUserEntry,
         Date dateEntry,
+        byte[] entryPhoto1,
+        byte[] entryPhoto2,
+        byte[] entryPhoto3,
+        byte[] entryPhoto4,
         Date datePrevisionExit,
+
         Integer userIdExit,
         String userNameExit,
         Date dateExit,
+        byte[] exitPhoto1,
+        byte[] exitPhoto2,
+        byte[] exitPhoto3,
+        byte[] exitPhoto4,
+        String exitInformation,
+
         Integer idUserAttendant,
         String nameUserAttendant,
+        byte[] photo1,
+        byte[] photo2,
+        byte[] photo3,
+        byte[] photo4,
+
         Integer idUserExitAuth1,
         String nameUserExitAuth1,
         Date dateExitAuth1,
@@ -59,10 +77,7 @@ public record VehicleEntryDto(
         YesNot vehicleNew,
         String kmEntry,
         String kmExit,
-        byte[] photo1,
-        byte[] photo2,
-        byte[] photo3,
-        byte[] photo4,
+
         Integer quantityExtinguisher,
         Integer quantityTrafficCone,
         Integer quantityTire,

@@ -1,5 +1,7 @@
 package com.concierge.apiconcierge.dtos.vehicle.entry;
 
+import jakarta.persistence.Lob;
+
 import java.util.Date;
 
 public record AuthExitDto(

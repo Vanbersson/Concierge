@@ -2,26 +2,21 @@
     <p-toast />
     <div class="layout-card-title">
         <span>Saída de veículos</span>
-        <div class="mobile-disabled">
-            <p-button icon="pi pi-sign-out" [text]="true" label="Saída" severity="danger" [disabled]="selectedVehicle.length == 0" (onClick)="confirm()" />
+        <div class="mobile-visible-none">
+            <p-button icon="pi pi-sign-out" label="Saída" severity="danger" [disabled]="selectedVehicle.length == 0" (onClick)="confirm()" />
             <p-divider layout="vertical" />
-            <p-button icon="pi pi-refresh" [text]="true" label="Recarregar" (onClick)="listVehicles()"/> 
+            <p-button  icon="pi pi-sync" label="Recarregar" [text]="true" (onClick)="init()"></p-button>
         </div>
-        <div class="mobile-enabled">
-            <p-button (onClick)="op.toggle($event)" icon="pi pi-ellipsis-v"  text="true" severity="secondary" [rounded]="true"/>
-            <p-overlayPanel #op>
-                <div class="flex flex-column">
-                    <p-button icon="pi pi-sign-out" [text]="true" label="Saída" severity="danger" [disabled]="selectedVehicle.length == 0" (onClick)="confirm()" />
-                    <p-button icon="pi pi-refresh" [text]="true" label="Recarregar" (onClick)="listVehicles()"/>
-                </div>
-            </p-overlayPanel>
+        <div class="mobile-visible">
+            <p-button icon="pi pi-sign-out" size="small" severity="danger" label="Saída" [disabled]="selectedVehicle.length == 0" (onClick)="confirm()" />
+            <p-button icon="pi pi-sync" size="small" [text]="true" (onClick)="init()"></p-button>
         </div>      
     </div>
     <p-table #tableFilter dataKey="id" [value]="listVehicleExit" [(selection)]="selectedVehicle" 
         currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords}" [showCurrentPageReport]="true"
         [globalFilterFields]="['id','placa','modelDescription', 'frota','dateEntry','clientCompanyName','nameUserAttendant']"
         [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 25, 50]"
-        [tableStyle]="{ 'min-width': '80rem' }" styleClass="p-datatable-sm">
+        styleClass="p-datatable-sm">
         <ng-template pTemplate="caption">
             <div class="flex align-items-center">
                 <p-iconField iconPosition="left">
@@ -37,21 +32,21 @@
                 <th>
                     Sel.
                 </th>
-                <th pSortableColumn="id">Código<p-sortIcon field="id"></p-sortIcon></th>
+                <th class="disabled-col" pSortableColumn="id">Código<p-sortIcon field="id"></p-sortIcon></th>
                 <th pSortableColumn="placa">Placa<p-sortIcon field="placa"></p-sortIcon></th>
                 <th pSortableColumn="modelDescription">Modelo<p-sortIcon field="modelDescription"></p-sortIcon></th>
-                <th pSortableColumn="frota">Frota<p-sortIcon field="frota"></p-sortIcon></th>
-                <th pSortableColumn="dateEntry">Entrada<p-sortIcon field="dateEntry"></p-sortIcon></th>
+                <th class="disabled-col" pSortableColumn="frota">Frota<p-sortIcon field="frota"></p-sortIcon></th>
+                <th class="disabled-col" pSortableColumn="dateEntry">Entrada<p-sortIcon field="dateEntry"></p-sortIcon></th>
                 <th pSortableColumn="clientCompanyName">Empresa<p-sortIcon field="clientCompanyName"></p-sortIcon></th>
-                <th pSortableColumn="nameUserAttendant">Consultor<p-sortIcon field="nameUserAttendant"></p-sortIcon></th>
-                <th pSortableColumn="nameUserExitAuth1">1ª Auto<p-sortIcon field="nameUserExitAuth1"></p-sortIcon></th>
-                <th pSortableColumn="nameUserExitAuth2">2ª Auto<p-sortIcon field="nameUserExitAuth2"></p-sortIcon></th>
+                <th class="disabled-col" pSortableColumn="nameUserAttendant">Consultor<p-sortIcon field="nameUserAttendant"></p-sortIcon></th>
+                <th class="disabled-col" pSortableColumn="nameUserExitAuth1">1ª Auto<p-sortIcon field="nameUserExitAuth1"></p-sortIcon></th>
+                <th class="disabled-col" pSortableColumn="nameUserExitAuth2">2ª Auto<p-sortIcon field="nameUserExitAuth2"></p-sortIcon></th>
             </tr>
         </ng-template>
-        <ng-template pTemplate="body" let-vehicle>
+        <ng-template pTemplate="body" let-vehicle let-rowIndex="rowIndex">
             <tr [pSelectableRow]="vehicle">
                 <td> <p-tableCheckbox [value]="vehicle" /></td>
-                <td><span class="text-500">{{ vehicle.id }}</span></td>
+                <td class="disabled-col"><span class="text-500">{{ vehicle.id }}</span></td>
                 <td>
                     @if(vehicle.placa == "NOVO"){
                     <div class="flex align-items-center justify-content-center bg-blue-100 border-round"
@@ -63,12 +58,12 @@
                     }
                 </td>
                 <td><span class="text-500">{{ vehicle.modelDescription | uppercase }}</span></td>
-                <td><span class="text-500">{{ vehicle.frota | uppercase }}</span></td>
-                <td><span class="text-500">{{ vehicle.dateEntry }}</span></td>
+                <td class="disabled-col"><span class="text-500">{{ vehicle.frota | uppercase }}</span></td>
+                <td class="disabled-col"><span class="text-500">{{ vehicle.dateEntry }}</span></td>
                 <td><span class="text-500">{{ vehicle.clientCompanyName | uppercase }}</span></td>
-                <td><span class="text-500">{{ vehicle.nameUserAttendant | uppercase }}</span></td>
-                <td><span class="text-500">{{ vehicle.nameUserExitAuth1 | uppercase }}</span></td>
-                <td><span class="text-500">{{ vehicle.nameUserExitAuth2 | uppercase }}</span></td>
+                <td class="disabled-col"><span class="text-500">{{ vehicle.nameUserAttendant | uppercase }}</span></td>
+                <td class="disabled-col"><span class="text-500">{{ vehicle.nameUserExitAuth1 | uppercase }}</span></td>
+                <td class="disabled-col"><span class="text-500">{{ vehicle.nameUserExitAuth2 | uppercase }}</span></td>
             </tr>
         </ng-template>
     </p-table>
@@ -77,11 +72,49 @@
 <p-confirmDialog #cd>
     <ng-template pTemplate="headless" let-message>
         <div class="flex flex-column align-items-center p-5 surface-overlay border-round">
-            <div
-                class="border-circle bg-primary inline-flex justify-content-center align-items-center h-6rem w-6rem">
-                <i class="pi pi-question text-5xl"></i>
+            <div class="border-circle bg-primary inline-flex justify-content-center align-items-center h-6rem w-6rem  mb-4">
+                <i class="pi pi-comment text-5xl"></i>
             </div>
-            <span class="font-bold text-2xl block mb-2 mt-4">
+            <p class="mb-0">Informações do veículo</p>
+            <span class="font-bold text-2xl block mb-2">
+             {{valueInfoPlaca | uppercase}}
+            </span>
+            <div style="min-width: 24rem;">
+                <div class="flex justify-content-between gap-2">
+                    <div class="layout-file">
+                        <div class="layout-file-img">
+                            <p-image *ngIf="photoVehicle1" [imageStyle]="{'object-fit':'cover'}" src="data:image/png;base64,{{photoVehicle1}}" alt="" [preview]="true" />
+                        </div>
+                        <button *ngIf="photoVehicle1"  pButton label="Remover" severity="danger" [disabled]="vehicleExit" (click)="deleteFileVehicle1()"></button>
+                        <button *ngIf="!photoVehicle1" pButton type="button" label="Selecionar" severity="secondary" [disabled]="vehicleExit" (click)="photoFile1Vehicle()"></button>   
+                    </div>
+                    <div class="layout-file">
+                        <div class="layout-file-img">
+                            <p-image *ngIf="photoVehicle2" [imageStyle]="{'object-fit':'cover'}" src="data:image/png;base64,{{photoVehicle2}}" alt="" [preview]="true" />
+                        </div>
+                        <button *ngIf="photoVehicle2" pButton label="Remover" severity="danger" [disabled]="vehicleExit" (click)="deleteFileVehicle2()"></button>        
+                        <button *ngIf="!photoVehicle2" pButton type="button" label="Selecionar" severity="secondary" [disabled]="vehicleExit" (click)="photoFile2Vehicle()"></button>       
+                    </div>
+                    <div class="layout-file">
+                        <div class="layout-file-img">
+                            <p-image *ngIf="photoVehicle3" [imageStyle]="{'object-fit':'cover'}" src="data:image/png;base64,{{photoVehicle3}}" alt="" [preview]="true" />
+                        </div>
+                        <button *ngIf="photoVehicle3" pButton label="Remover" severity="danger" [disabled]="vehicleExit" (click)="deleteFileVehicle3()"></button>        
+                        <button *ngIf="!photoVehicle3" pButton type="button" label="Selecionar" severity="secondary" [disabled]="vehicleExit" (click)="photoFile3Vehicle()"></button>
+                    </div>
+                    <div class="layout-file">
+                        <div class="layout-file-img">
+                            <p-image *ngIf="photoVehicle4" [imageStyle]="{'object-fit':'cover'}" src="data:image/png;base64,{{photoVehicle4}}" alt="" [preview]="true" />
+                        </div>
+                        <button *ngIf="photoVehicle4" pButton label="Remover" severity="danger" [disabled]="vehicleExit" (click)="deleteFileVehicle4()"></button>       
+                        <button *ngIf="!photoVehicle4" pButton type="button" label="Selecionar" severity="secondary" [disabled]="vehicleExit" (click)="photoFile4Vehicle()"></button>       
+                    </div>
+                </div>
+                <div class="inline-flex justify-content-center align-items-center w-full mt-2">
+                    <textarea rows="5" cols="30" pInputTextarea  [(ngModel)]="valueInfoVehicle"></textarea>
+                </div>
+            </div>
+             <span class="font-bold text-2xl block mb-2 mt-4">
                 {{ message.header }}
             </span>
             <p class="mb-0">{{ message.message }}</p>
@@ -94,3 +127,4 @@
         </div>
     </ng-template>
 </p-confirmDialog>
+

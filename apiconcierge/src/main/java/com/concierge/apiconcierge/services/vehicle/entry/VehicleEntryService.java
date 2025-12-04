@@ -129,6 +129,13 @@ public class VehicleEntryService implements IVehicleEntryService {
                 vehicleEntry.setUserIdExit(dataExit.userId());
                 vehicleEntry.setUserNameExit(dataExit.userName());
                 vehicleEntry.setDateExit(dataExit.dateExit());
+
+                vehicleEntry.setExitPhoto1(dataExit.exitPhoto1());
+                vehicleEntry.setExitPhoto2(dataExit.exitPhoto2());
+                vehicleEntry.setExitPhoto3(dataExit.exitPhoto3());
+                vehicleEntry.setExitPhoto4(dataExit.exitPhoto4());
+                vehicleEntry.setExitInformation(dataExit.exitInformation());
+
                 VehicleEntry result = this.repository.save(vehicleEntry);
                 //Notification
                 User userOrigem = this.userRepository.filterEmail(result.getCompanyId(), result.getResaleId(), userEmail);
@@ -450,17 +457,31 @@ public class VehicleEntryService implements IVehicleEntryService {
         map.put("status", vehicle.getStatus());
         map.put("stepEntry", vehicle.getStepEntry());
         map.put("budgetStatus", vehicle.getBudgetStatus());
+
         map.put("idUserEntry", vehicle.getIdUserEntry());
         map.put("nameUserEntry", vehicle.getNameUserEntry());
         map.put("dateEntry", vehicle.getDateEntry());
+        map.put("entryPhoto1", vehicle.getEntryPhoto1() == null ? "" : vehicle.getEntryPhoto1());
+        map.put("entryPhoto2", vehicle.getEntryPhoto2() == null ? "" : vehicle.getEntryPhoto2());
+        map.put("entryPhoto3", vehicle.getEntryPhoto3() == null ? "" : vehicle.getEntryPhoto3());
+        map.put("entryPhoto4", vehicle.getEntryPhoto4() == null ? "" : vehicle.getEntryPhoto4());
+        map.put("datePrevisionExit", vehicle.getDatePrevisionExit() == null ? "" : vehicle.getDatePrevisionExit());
 
         map.put("userIdExit", vehicle.getUserIdExit() == null ? 0 : vehicle.getUserIdExit());
         map.put("userNameExit", vehicle.getUserNameExit());
         map.put("dateExit", vehicle.getDateExit() == null ? "" : vehicle.getDateExit());
-        map.put("datePrevisionExit", vehicle.getDatePrevisionExit() == null ? "" : vehicle.getDatePrevisionExit());
+        map.put("exitPhoto1", vehicle.getExitPhoto1() == null ? "" : vehicle.getExitPhoto1());
+        map.put("exitPhoto2", vehicle.getExitPhoto2() == null ? "" : vehicle.getExitPhoto2());
+        map.put("exitPhoto3", vehicle.getExitPhoto3() == null ? "" : vehicle.getExitPhoto3());
+        map.put("exitPhoto4", vehicle.getExitPhoto4() == null ? "" : vehicle.getExitPhoto4());
+        map.put("exitInformation", vehicle.getExitInformation());
 
         map.put("idUserAttendant", vehicle.getIdUserAttendant() == null ? 0 : vehicle.getIdUserAttendant());
         map.put("nameUserAttendant", vehicle.getNameUserAttendant());
+        map.put("photo1", vehicle.getPhoto1() == null ? "" : vehicle.getPhoto1());
+        map.put("photo2", vehicle.getPhoto2() == null ? "" : vehicle.getPhoto2());
+        map.put("photo3", vehicle.getPhoto3() == null ? "" : vehicle.getPhoto3());
+        map.put("photo4", vehicle.getPhoto4() == null ? "" : vehicle.getPhoto4());
 
         map.put("idUserExitAuth1", vehicle.getIdUserExitAuth1() == null ? 0 : vehicle.getIdUserExitAuth1());
         map.put("nameUserExitAuth1", vehicle.getNameUserExitAuth1());
@@ -504,10 +525,6 @@ public class VehicleEntryService implements IVehicleEntryService {
         map.put("vehicleNew", vehicle.getVehicleNew());
         map.put("kmEntry", vehicle.getKmEntry());
         map.put("kmExit", vehicle.getKmExit());
-        map.put("photo1", vehicle.getPhoto1() == null ? "" : vehicle.getPhoto1());
-        map.put("photo2", vehicle.getPhoto2() == null ? "" : vehicle.getPhoto2());
-        map.put("photo3", vehicle.getPhoto3() == null ? "" : vehicle.getPhoto3());
-        map.put("photo4", vehicle.getPhoto4() == null ? "" : vehicle.getPhoto4());
         map.put("quantityExtinguisher", vehicle.getQuantityExtinguisher());
         map.put("quantityTrafficCone", vehicle.getQuantityTrafficCone());
         map.put("quantityTire", vehicle.getQuantityTire());

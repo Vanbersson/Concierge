@@ -38,10 +38,12 @@ import { NotificationUser } from '../../models/notification/notification-user';
 export class NotificationComponent implements OnInit, OnDestroy {
   @ViewChild('op') overlayPanel!: OverlayPanel;
   listMessage: Notification[] = [];
-  Yes = YesNot.yes;
-  Not = YesNot.not;
+  Yes:string = YesNot.yes;
+  Not:string = YesNot.not;
+  btnSync: boolean = false;
 
   constructor(
+     private busyService: BusyService,
     private confirmationService: ConfirmationService,
     private shareWhatsAppService: ShareWhatsAppService,
     private storageService: StorageService,
@@ -49,19 +51,20 @@ export class NotificationComponent implements OnInit, OnDestroy {
     private messageService: MessageService,
     private router: Router,
     private taskService: TaskService,
-    private busyService: BusyService,
     private notificationService: NotificationService,
     private vehicleService: VehicleService) { }
 
   ngOnInit(): void {
-    this.taskService.startTask(() => this.init(), 40000);
-    this.init();
+    this.taskService.startTask(() => this.init(false), 40000);
+    this.init(false);
   }
   ngOnDestroy(): void {
     this.taskService.stopTask();
   }
-  async init() {
+  async init(click: boolean) {
+    this.btnSync = click;
     const result = await this.listNotification();
+    this.btnSync = false;
     this.listMessage = result.body.data;
   }
   getTempoDecorrido(dataInicialStr: string): string {
@@ -151,7 +154,7 @@ export class NotificationComponent implements OnInit, OnDestroy {
     const result = await this.deleteNotitication(no);
     if (result.status == 200 && result.body.status == SuccessError.succes) {
       this.messageService.add({ severity: 'success', summary: result.body.header, detail: result.body.message, icon: 'pi pi-check' });
-      this.init();
+      this.init(false);
     } else if (result.status == 200 && result.body.status == SuccessError.error) {
       this.messageService.add({ severity: 'info', summary: result.body.header, detail: result.body.message, icon: 'pi pi-info-circle' });
     }
@@ -166,7 +169,7 @@ export class NotificationComponent implements OnInit, OnDestroy {
     const result = await this.deleteAllNotitication(no);
     if (result.status == 200 && result.body.status == SuccessError.succes) {
       this.messageService.add({ severity: 'success', summary: result.body.header, detail: result.body.message, icon: 'pi pi-check' });
-      this.init();
+      this.init(false);
     } else if (result.status == 200 && result.body.status == SuccessError.error) {
       this.messageService.add({ severity: 'info', summary: result.body.header, detail: result.body.message, icon: 'pi pi-info-circle' });
     }

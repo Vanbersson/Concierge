@@ -1,4 +1,13 @@
 :host {
+
+    .mobile-visible-none {
+        display: flex;
+    }
+
+    .mobile-visible {
+        display: none;
+    }
+
     .layout-card-title {
         display: flex;
         justify-content: space-between;
@@ -12,6 +21,26 @@
             color: var(--color-grey-800);
         }
 
+    }
+
+    .layout-file {
+        display: flex;
+        flex-direction: column;
+        background-color: var(--color-grey-300);
+        justify-content: center;
+        align-items: center;
+        border-radius: 8px;
+
+        .layout-file-img {
+            width: 80px;
+            height: 80px;
+        }
+
+        button {
+            width: 100px;
+            padding: 10px 0;
+            border-radius: 0 0 8px 8px;
+        }
     }
 
     .layout-badge-info {
@@ -32,21 +61,27 @@
         cursor: pointer;
     }
 
-    .mobile-enabled {
-        display: none;
-    }
+    ::ng-deep {
 
-    .mobile-disabled {
-        display: flex;
+        .p-image-preview-container>img {
+            width: 80px;
+            height: 80px;
+        }
+
     }
 
     @media (max-width: 991px) {
-
-        .mobile-enabled {
-            display: flex;
+        .mobile-visible-none {
+            display: none;
         }
 
-        .mobile-disabled {
+        .mobile-visible {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .disabled-col {
             display: none;
         }
 
@@ -54,10 +89,44 @@
             display: flex;
             flex-direction: row;
             align-items: center;
-            
+
             p-badge {
                 position: relative;
                 margin-left: auto;
+            }
+        }
+
+        ::ng-deep {
+            .p-image-preview-container>img {
+                width: 68px;
+                height: 68px;
+                object-fit: cover;
+            }
+        }
+
+        .layout-file {
+            .layout-file-img {
+                width: 68px;
+                height: 68px;
+
+            }
+
+            label {
+                padding: 5px 0px;
+                width: 68px;
+                background-color: #64748b;
+                color: #FFF;
+                text-align: center;
+                display: block;
+                border-radius: 0 0 8px 8px;
+                border: 1px solid var(--color-grey-300);
+                cursor: pointer;
+            }
+
+            button {
+                width: 76px;
+                padding: 10px 0;
+                border-radius: 0 0 8px 8px;
             }
         }
     }

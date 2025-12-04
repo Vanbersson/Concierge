@@ -208,6 +208,7 @@
             <p-tabPanel header="Porteiro">
                 <form [formGroup]="formConcierge">
                     <div class="p-fluid p-formgrid grid">
+                        <!-- Entry -->
                         <div class="col-12 flex align-items-center">
                             <span class="w-15rem font-semibold">Porteiro Entrada</span>
                             <div class="layout-card-divid"></div>
@@ -221,9 +222,31 @@
                              <input pInputText type="text"  formControlName="entryName">
                         </div>
                         <div class="md:col-4"></div>
-                        <div class="col-12">
+                        <div class="col-12 md:col-6">
                             <label for="entryInf" class="ml-2">Informações</label>
                             <textarea pInputTextarea maxlength="255" id="entryInf" rows="4" cols="30" formControlName="entryInf"></textarea>
+                        </div>
+                        <div class="col-12 md:col-6 flex align-items-end gap-2">
+                            <div class="layout-file">
+                                <div class="layout-file-img">
+                                    <p-image *ngIf="entryPhoto1" [imageStyle]="{'border-radius':'8px','object-fit':'cover'}" src="data:image/png;base64,{{entryPhoto1}}" alt="" [preview]="true" />
+                                </div>
+                            </div>
+                            <div class="layout-file">
+                                <div class="layout-file-img">
+                                    <p-image *ngIf="entryPhoto2" [imageStyle]="{'border-radius':'8px','object-fit':'cover'}" src="data:image/png;base64,{{entryPhoto2}}" alt="" [preview]="true" />
+                                </div>
+                            </div>
+                            <div class="layout-file">
+                                <div class="layout-file-img">
+                                    <p-image *ngIf="entryPhoto3" [imageStyle]="{'border-radius':'8px','object-fit':'cover'}" src="data:image/png;base64,{{entryPhoto3}}" alt="" [preview]="true" />
+                                </div>
+                            </div>
+                            <div class="layout-file">
+                                <div class="layout-file-img">
+                                    <p-image *ngIf="entryPhoto4" [imageStyle]="{'border-radius':'8px','object-fit':'cover'}" src="data:image/png;base64,{{entryPhoto4}}" alt="" [preview]="true" />
+                                </div>
+                            </div>
                         </div>
                         <!-- Exit -->
                         <div class="col-12 flex align-items-center">
@@ -239,9 +262,31 @@
                              <input pInputText type="text"  formControlName="exitName">
                         </div>
                         <div class="md:col-4"></div>
-                        <div class="col-12">
+                        <div class="col-12 md:col-6">
                             <label for="exitInf" class="ml-2">Informações</label>
-                            <textarea pInputTextarea maxlength="255" id="entryInf" rows="4" cols="30" formControlName="exitInf"></textarea>
+                            <textarea pInputTextarea maxlength="255" id="entryInf" rows="4" cols="30" formControlName="exitInformation"></textarea>
+                        </div>
+                        <div class="col-12 md:col-6 flex align-items-end gap-2">
+                            <div class="layout-file">
+                                <div class="layout-file-img">
+                                    <p-image *ngIf="exitPhoto1" [imageStyle]="{'border-radius':'8px','object-fit':'cover'}" src="data:image/png;base64,{{exitPhoto1}}" alt="" [preview]="true" />
+                                </div>
+                            </div>
+                            <div class="layout-file">
+                                <div class="layout-file-img">
+                                    <p-image *ngIf="exitPhoto2" [imageStyle]="{'border-radius':'8px','object-fit':'cover'}" src="data:image/png;base64,{{exitPhoto2}}" alt="" [preview]="true" />
+                                </div>
+                            </div>
+                            <div class="layout-file">
+                                <div class="layout-file-img">
+                                    <p-image *ngIf="exitPhoto3" [imageStyle]="{'border-radius':'8px','object-fit':'cover'}" src="data:image/png;base64,{{exitPhoto3}}" alt="" [preview]="true" />
+                                </div>
+                            </div>
+                            <div class="layout-file">
+                                <div class="layout-file-img">
+                                    <p-image *ngIf="exitPhoto4" [imageStyle]="{'border-radius':'8px','object-fit':'cover'}" src="data:image/png;base64,{{exitPhoto4}}" alt="" [preview]="true" />
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </form>
