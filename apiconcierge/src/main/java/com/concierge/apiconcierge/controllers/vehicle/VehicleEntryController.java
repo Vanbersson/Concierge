@@ -32,6 +32,7 @@ public class VehicleEntryController {
     public ResponseEntity<Object> save(@RequestBody VehicleEntrySaveDto data, HttpServletRequest request) {
         try {
             String userEmail = this.getEmail(request);
+            
             VehicleEntry vehicleEntry = new VehicleEntry();
             BeanUtils.copyProperties(data, vehicleEntry);
             Integer id = this.service.save(vehicleEntry,userEmail);

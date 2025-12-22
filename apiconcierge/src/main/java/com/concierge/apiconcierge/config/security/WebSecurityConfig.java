@@ -31,8 +31,8 @@ public class WebSecurityConfig {
         return new WebMvcConfigurer() {
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOrigins("https://www.atenatruck.com.br") // frontend
-                        //.allowedOrigins("*")// frontend dev
+                        //.allowedOrigins("https://www.atenatruck.com.br") // frontend
+                        .allowedOrigins("*")// frontend dev
                         .allowedMethods(HttpMethod.POST.name(), HttpMethod.GET.name())
                         .allowedHeaders(HttpHeaders.CONTENT_TYPE, HttpHeaders.AUTHORIZATION);
             }
@@ -46,9 +46,11 @@ public class WebSecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        .requestMatchers("/images/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/vehicle/entry/budget/token/valid/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/vehicle/entry/budget/token/approbation/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
+
                         .requestMatchers(HttpMethod.POST, "/user").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
@@ -70,4 +72,5 @@ public class WebSecurityConfig {
     public RestTemplate restTemplate() {
         return new RestTemplate();
     }
+
 }

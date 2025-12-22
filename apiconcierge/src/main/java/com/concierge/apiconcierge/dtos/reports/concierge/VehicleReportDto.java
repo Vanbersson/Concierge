@@ -11,6 +11,7 @@ public record VehicleReportDto(
         Date dateInit,
         Date dateFinal,
         Integer clientId,
+        Integer userAttendantId,
         Integer modelId,
         Integer vehicleId,
         String placa,
