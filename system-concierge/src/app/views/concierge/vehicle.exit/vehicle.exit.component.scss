@@ -29,17 +29,50 @@
         background-color: var(--color-grey-300);
         justify-content: center;
         align-items: center;
-        border-radius: 8px;
+        border-radius: 6px;
 
         .layout-file-img {
+            display: flex;
+            justify-content: center;
+            align-items: center;
             width: 80px;
             height: 80px;
         }
 
-        button {
+        input[type="file"] {
+            display: none;
+        }
+
+        label {
+            display: flex;
+            justify-content: center;
+            align-items: center;
             width: 100px;
             padding: 10px 0;
-            border-radius: 0 0 8px 8px;
+            border-radius: 0 0 6px 6px;
+            background: var(--color-primary);
+            color: #FFF;
+            cursor: pointer;
+
+            span {
+                display: flex;
+            }
+        }
+
+        button {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            width: 100px;
+            padding: 10px 0;
+            border-radius: 0 0 6px 6px;
+
+            span {
+                display: flex;
+                color: #FFF;
+                font-size: 14px;
+                font-weight: 400;
+            }
         }
     }
 
@@ -65,7 +98,7 @@
 
         .p-image-preview-container>img {
             width: 80px;
-            height: 80px;
+            height: 77px;
         }
 
     }
@@ -98,35 +131,40 @@
 
         ::ng-deep {
             .p-image-preview-container>img {
-                width: 68px;
-                height: 68px;
+                width: 62px;
+                height: 62px;
                 object-fit: cover;
+                border-radius: 6px 6px 0 0;
             }
         }
 
-        .layout-file {
+       .layout-file {
+
             .layout-file-img {
-                width: 68px;
-                height: 68px;
+                width: 62px;
+                height: 62px;
 
             }
 
             label {
                 padding: 5px 0px;
-                width: 68px;
-                background-color: #64748b;
-                color: #FFF;
-                text-align: center;
-                display: block;
-                border-radius: 0 0 8px 8px;
-                border: 1px solid var(--color-grey-300);
+                width: 62px;
+                height: 38px;
+                border-radius: 0 0 6px 6px;
                 cursor: pointer;
+
+                span {
+                    display: none;
+                }
             }
 
             button {
-                width: 76px;
-                padding: 10px 0;
-                border-radius: 0 0 8px 8px;
+                width: 62px;
+                border-radius: 0 0 6px 6px;
+
+                span {
+                    display: none;
+                }
             }
         }
     }

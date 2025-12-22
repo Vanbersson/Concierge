@@ -117,18 +117,18 @@
             </div>
             <div class="md:col-6"></div>
             <div class="col-12 md:col-6 ">
-                <label for="">Tipo</label>
+                <label for="">Situação do veículo</label>
                 <div class="flex align-items-center gap-2 border-1 border-round border-300 p-3">
                     <div class="flex align-items-center">
                         <p-radioButton value="E" inputId="type1" formControlName="type"></p-radioButton>
                         <label for="type1" class="ml-2">
-                            Entrada
+                            Na empresa
                         </label>
                     </div>
                     <div class="flex align-items-center">
                         <p-radioButton value="S" inputId="type2" formControlName="type"></p-radioButton>
                         <label for="type2" class="ml-2">
-                            Saída
+                           Já saiu
                         </label>
                     </div>
                     <div class="flex align-items-center">
@@ -165,7 +165,11 @@
                     </ng-template>
                 </p-multiSelect>
             </div>
-            <div class="md:col-8"></div>
+            <div class="col-12 md:col-4">
+                <label for="userAttendant">Consutor</label>
+                <p-multiSelect id="userAttendant" [options]="attendantsUser" optionLabel="name" [selectionLimit]="1" placeholder="Selecione" [style]="{'text-transform':'capitalize'}"  formControlName="userAttendant" />
+            </div>
+            <div class="md:col-4"></div>
             <div class="col-12 md:col-2">
                 <label for="clientCompanyCodeId">Código</label>
                 <p-inputNumber inputId="clientCompanyCodeId" mode="decimal" [useGrouping]="false" formControlName="clientCompanyId" />

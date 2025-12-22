@@ -1,6 +1,6 @@
 import { CommonModule, DatePipe, UpperCasePipe } from '@angular/common';
-import { Component, DoCheck, OnInit, Pipe, signal, ViewChild } from '@angular/core';
-import { FormGroup, FormControl, ReactiveFormsModule, FormsModule, Validators } from '@angular/forms'
+import { Component, DoCheck, OnInit, signal, ViewChild } from '@angular/core';
+import { FormGroup, FormControl, ReactiveFormsModule, FormsModule } from '@angular/forms'
 import { HttpResponse } from '@angular/common/http';
 import { lastValueFrom } from 'rxjs';
 
@@ -36,12 +36,13 @@ import { VehicleModelService } from '../../../../services/vehicle-model/vehicle-
 import { FilterClientComponent } from '../../../../components/filter.client/filter.client.component';
 import { BusyService } from '../../../../components/loading/busy.service';
 import { StorageService } from '../../../../services/storage/storage.service';
-import { Router } from '@angular/router';
 import ManutencaoComponent from '../../../concierge/manutencao/manutencao.component';
 
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 import { YesNot } from '../../../../models/enum/yes-not';
+import { User } from '../../../../models/user/user';
+import { UserService } from '../../../../services/user/user.service';
 
 interface IFilterVehicles {
   type: string;
@@ -51,6 +52,7 @@ interface IFilterVehicles {
   dateInit: Date | string;
   dateFinal: Date | string;
   clientId?: number;
+  userAttendantId?: number;
   modelId?: number;
   vehicleId?: number;
   placa?: string;
@@ -95,7 +97,7 @@ interface IExportVehicle {
 @Component({
   selector: 'app-vehicle',
   standalone: true,
-  imports: [CommonModule, FilterClientComponent, ToastModule, ButtonModule, TableModule,
+  imports: [CommonModule, FilterClientComponent, ToastModule, ButtonModule, TableModule, 
     InputTextModule, IconFieldModule, InputIconModule, TagModule,
     DialogModule, ReactiveFormsModule, FormsModule, InputNumberModule,
     CalendarModule, InputGroupModule, MultiSelectModule, ImageModule,
@@ -111,14 +113,16 @@ export default class VehicleComponent implements OnInit, DoCheck {
   listVehicleEntry: VehicleEntry[] = [];
   selectClientCompany = signal<ClientCompany>(new ClientCompany());
   vehicleModels$ = this.vehicleModelService.getAllEnabled();
+  attendantsUser: User[] = [];
   formFilter = new FormGroup({
-    type: new FormControl<string>('E'),
+    type: new FormControl<string>('A'),
     vehicleNew: new FormControl<string | null>(null),
     dateInit: new FormControl<Date | string>(''),
     dateFinal: new FormControl<Date | string>(''),
     clientCompanyId: new FormControl<number>(null),
     clientCompanyName: new FormControl<string>(''),
     modelVehicle: new FormControl<ModelVehicle[]>([]),
+    userAttendant: new FormControl<User[] | null>([]),
     vehicleId: new FormControl<number>(null),
     placa: new FormControl<string>(''),
     frota: new FormControl<number | null>(null)
@@ -129,6 +133,7 @@ export default class VehicleComponent implements OnInit, DoCheck {
   @ViewChild('detailsVehicle') detailsVehicle!: ManutencaoComponent;
 
   constructor(
+    private userService: UserService,
     private primeNGConfig: PrimeNGConfig,
     private reportService: VehicleReportService,
     private vehicleModelService: VehicleModelService,
@@ -136,7 +141,6 @@ export default class VehicleComponent implements OnInit, DoCheck {
     private storageService: StorageService) {
   }
   ngOnInit(): void {
-    this.clientdisable();
     this.primeNGConfig.setTranslation({
       accept: 'Accept',
       reject: 'Cancel',
@@ -151,6 +155,7 @@ export default class VehicleComponent implements OnInit, DoCheck {
       dateFormat: 'dd/mm/yy',
       weekHeader: 'Sm'
     });
+    this.init();
   }
   ngDoCheck(): void {
     if (this.selectClientCompany().id != 0) {
@@ -161,8 +166,11 @@ export default class VehicleComponent implements OnInit, DoCheck {
     }
 
   }
-
-
+  private async init() {
+    //Attendant
+    this.attendantsUser = await this.getUserRole();
+    this.clientdisable();
+  }
   private clientEnable() {
     this.formFilter.get('clientCompanyId').enable();
     this.formFilter.get('clientCompanyName').enable();
@@ -258,7 +266,7 @@ export default class VehicleComponent implements OnInit, DoCheck {
   }
   public cleanform() {
     this.formFilter.patchValue({
-      type: 'E',
+      type: 'A',
       vehicleNew: null,
       dateInit: '',
       dateFinal: '',
@@ -295,11 +303,12 @@ export default class VehicleComponent implements OnInit, DoCheck {
       type: value.type,
       companyId: this.storageService.companyId,
       resaleId: this.storageService.resaleId,
-      dateInit: value.dateInit,
+      dateInit: new Date(value.dateInit),
       dateFinal: value.dateFinal,
       clientId: value?.clientCompanyId ?? 0,
       modelId: value.modelVehicle.at(0)?.id ?? 0,
       vehicleId: value?.vehicleId ?? 0,
+      userAttendantId: value?.userAttendant.at(0)?.id ?? 0,
       placa: value.placa,
       frota: value.frota == null ? "" : value.frota.toString(),
       vehicleNew: value.vehicleNew?.at(0) ?? "not"
@@ -325,13 +334,19 @@ export default class VehicleComponent implements OnInit, DoCheck {
       return error;
     }
   }
+  private async getUserRole(): Promise<User[]> {
+    try {
+      return await lastValueFrom(this.userService.getUserFilterRoleId$(2));
+    } catch (error) {
+      return [];
+    }
+  }
   showVeiculo(id: number) {
     //Show dialog
     this.dialogVisibleVehicleDetails = true;
     //Details vehicle
     this.detailsVehicle.showDetailsVehicle(id);
   }
-
   exportExcel() {
     var listExp: IExportVehicle[] = [];
     for (let item of this.listVehicleEntry) {
@@ -383,6 +398,4 @@ export default class VehicleComponent implements OnInit, DoCheck {
 
     saveAs(blob, 'relatorio ' + this.datePipeBR.transform(new Date(), 'dd-MM-yyyy HH:mm') + ".xlsx");
   }
-
-
 }

@@ -12,6 +12,7 @@
     </div>
 
     <p-stepper #stepper [(activeStep)]="activeStepper">
+        <!-- client -->
         <p-stepperPanel>
             <ng-template pTemplate="header" let-onClick="onClick" let-index="index">
                 <button class="bg-transparent border-none inline-flex flex-column gap-2" (click)="stepperClientCompany()">
@@ -63,12 +64,13 @@
                         <div class="md:col-6"></div>
                     </div>
                 </form>
+                <p-divider type="solid" />
                 <div class="flex justify-content-end">
                     <p-button (onClick)="nextStepperClientCompany()" label="Avançar" icon="pi pi-arrow-right" iconPos="right" />
                 </div>
             </ng-template>
         </p-stepperPanel>
-
+        <!-- Driver -->
         <p-stepperPanel>
             <ng-template pTemplate="header" let-onClick="onClick" let-index="index">
                 <button class="bg-transparent border-none inline-flex flex-column gap-2" (click)="stepperDriver()">
@@ -130,13 +132,14 @@
                         </div>
                     </div>
                 </form>
+                <p-divider type="solid" />
                 <div class="flex justify-content-between">
                     <p-button (onClick)="prevCallback.emit()" label="Voltar" severity="secondary" icon="pi pi-arrow-left" />
                     <p-button (onClick)="nextSterpperDriver()" label="Avançar" icon="pi pi-arrow-right"  iconPos="right" />
                 </div>
             </ng-template>
         </p-stepperPanel>
-
+        <!-- Vehicle -->
         <p-stepperPanel>
             <ng-template pTemplate="header" let-onClick="onClick" let-index="index">
                 <button class="bg-transparent border-none inline-flex flex-column gap-2" (click)="stepperVehicle()">
@@ -229,72 +232,95 @@
                             <label for="consultorid">Consultor</label>
                             <p-multiSelect id="consultorid" [options]="consultores$ | async" [selectionLimit]="1"  optionLabel="name" placeholder="Selecione" [style]="{'text-transform':'capitalize'}" formControlName="UserAttendant" />
                         </div>
-                        <div class="col-12 lg:col-6 md:col-12 flex gap-2">
-                            <div class="layout-file">
-                                <div class="layout-file-img">
-                                    <p-image *ngIf="photoVehicle1" [imageStyle]="{'object-fit':'cover'}" src="data:image/png;base64,{{photoVehicle1}}" alt="" [preview]="true" />
-                                </div>
-                                <button pButton *ngIf="photoVehicle1" label="Remover" severity="danger" (click)="deleteFileVehicle1()"></button>
-                                <button pButton *ngIf="!photoVehicle1" type="button" label="Selecionar" severity="secondary" (click)="photoFile1Vehicle()"></button>
-                            </div> 
-                            <div class="layout-file">
-                                <div class="layout-file-img">
-                                    <p-image *ngIf="photoVehicle2" [imageStyle]="{'object-fit':'cover'}" src="data:image/png;base64,{{photoVehicle2}}" alt="" [preview]="true" />
-                                </div>
-                                <button *ngIf="photoVehicle2" pButton label="Remover" severity="danger" (click)="deleteFileVehicle2()"></button>
-                                <button *ngIf="!photoVehicle2" pButton type="button" label="Selecionar" severity="secondary" (click)="photoFile2Vehicle()"></button>
-                            </div>
-                            <div class="layout-file">
-                                <div class="layout-file-img">
-                                    <p-image *ngIf="photoVehicle3" [imageStyle]="{'object-fit':'cover'}" src="data:image/png;base64,{{photoVehicle3}}" alt="" [preview]="true" />
-                                </div>
-                                <button *ngIf="photoVehicle3" pButton label="Remover" severity="danger" (click)="deleteFileVehicle3()"></button>  
-                                <button *ngIf="!photoVehicle3" pButton type="button" label="Selecionar" severity="secondary" (click)="photoFile3Vehicle()"></button>  
-                            </div>
-                            <div class="layout-file">
-                                <div class="layout-file-img">
-                                    <p-image *ngIf="photoVehicle4" [imageStyle]="{'object-fit':'cover'}" src="data:image/png;base64,{{photoVehicle4}}" alt="" [preview]="true" />
-                                </div>
-                                <button *ngIf="photoVehicle4" pButton label="Remover" severity="danger" (click)="deleteFileVehicle4()"></button>
-                                <button *ngIf="!photoVehicle4" pButton type="button" label="Selecionar" severity="secondary" (click)="photoFile4Vehicle()"></button>
-                            </div>
-                        </div>
-                        <div class="col-12 lg:col-3 md:col-12">
-                            <div class="layout-card-option">
-                                <div class="layout-card-option-title">Veículo novo</div>
+
+                        <div class="col-12 md:col-3">
+                            <label for="">Veículo novo</label>
+                            <div class="flex align-items-center gap-2 border-1 border-round border-300 p-3">
                                 <div class="flex align-items-center">
                                     <p-radioButton inputId="newyes" value="yes" formControlName="vehicleNew" (onClick)="deleteRequirePlaca()"></p-radioButton>
-                                    <div class="checkboxDisable"> </div>
                                     <label for="newyes" class="ml-2">Sim</label>
                                 </div>
                                 <div class="flex align-items-center">
                                     <p-radioButton inputId="newnot" value="not" formControlName="vehicleNew" (onClick)="addRequirePlaca()"></p-radioButton>
-                                    <div class="checkboxDisable"> </div>
                                     <label for="newnot" class="ml-2">Não</label>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-12 lg:col-3 md:col-12">
-                            <div class="layout-card-option">
-                                <div class="layout-card-option-title">Ordem serviço</div>
+                         <div class="col-12 md:col-3">
+                            <label>Ordem serviço</label>
+                            <div class="flex align-items-center gap-2 border-1 border-round border-300 p-3">
                                 <div class="flex align-items-center">
                                     <p-radioButton inputId="serviceyes" value="yes" formControlName="serviceOrder"></p-radioButton>
-                                    <div class="checkboxDisable"> </div>
                                     <label for="serviceyes" class="ml-2">Sim</label>
                                 </div>
                                 <div class="flex align-items-center">
                                     <p-radioButton inputId="serviceno" value="not" formControlName="serviceOrder"></p-radioButton>
-                                    <div class="checkboxDisable"> </div>
                                     <label for="serviceno" class="ml-2">Não</label>
                                 </div>
                             </div>
                         </div>
+                        <div class="md:col-6"></div>
                         <div class="col-12">
                             <label for="informacao" class="ml-2">Informações</label>
-                            <textarea pInputTextarea maxlength="255" id="informacao" rows="5" cols="30" formControlName="informationConcierge"></textarea>
+                            <textarea pInputTextarea maxlength="255" id="informacao" rows="4" cols="30" formControlName="informationConcierge"></textarea>
+                        </div>
+                        <div class="col-12 md:col-4 flex justify-content-between gap-1">
+                            <div class="layout-file">
+                                <div class="layout-file-img">
+                                    <p-image *ngIf="photoVehicle1" [imageStyle]="{'object-fit':'cover'}" src="data:image/png;base64,{{photoVehicle1}}" alt="" [preview]="true"/>
+                                </div>
+                                <button pButton *ngIf="photoVehicle1" severity="danger" (click)="deleteFileVehicle1()">
+                                    <i class="pi pi-trash"></i>
+                                    <span>Remover</span>
+                                </button>
+                                <button pButton *ngIf="!photoVehicle1" type="button" (click)="photoFile1Vehicle()">
+                                    <i class="pi pi-plus"></i>
+                                    <span>Incluir</span>
+                                </button>
+                            </div> 
+                            <div class="layout-file">
+                                <div class="layout-file-img">
+                                    <p-image *ngIf="photoVehicle2" [imageStyle]="{'object-fit':'cover'}" src="data:image/png;base64,{{photoVehicle2}}" alt="" [preview]="true"/>
+                                </div>
+                                <button *ngIf="photoVehicle2" pButton severity="danger" (click)="deleteFileVehicle2()">
+                                    <i class="pi pi-trash"></i>
+                                    <span>Remover</span>
+                                </button>
+                                <button *ngIf="!photoVehicle2" pButton type="button" (click)="photoFile2Vehicle()">
+                                    <i class="pi pi-plus"></i>
+                                    <span>Incluir</span>
+                                </button>
+                            </div>
+                            <div class="layout-file">
+                                <div class="layout-file-img">
+                                    <p-image *ngIf="photoVehicle3" [imageStyle]="{'object-fit':'cover'}" src="data:image/png;base64,{{photoVehicle3}}" alt="" [preview]="true"/>
+                                </div>
+                                <button *ngIf="photoVehicle3" pButton severity="danger" (click)="deleteFileVehicle3()">
+                                    <i class="pi pi-trash"></i>
+                                    <span>Remover</span>
+                                </button>  
+                                <button *ngIf="!photoVehicle3" pButton type="button" (click)="photoFile3Vehicle()">
+                                    <i class="pi pi-plus"></i>
+                                    <span>Incluir</span>
+                                </button>  
+                            </div>
+                            <div class="layout-file">
+                                <div class="layout-file-img">
+                                    <p-image *ngIf="photoVehicle4" [imageStyle]="{'object-fit':'cover'}" src="data:image/png;base64,{{photoVehicle4}}" alt="" [preview]="true"/>
+                                </div>
+                                <button *ngIf="photoVehicle4" pButton severity="danger" (click)="deleteFileVehicle4()">
+                                    <i class="pi pi-trash"></i>
+                                    <span>Remover</span>
+                                </button>
+                                <button *ngIf="!photoVehicle4" pButton type="button" (click)="photoFile4Vehicle()">
+                                    <i class="pi pi-plus"></i>
+                                    <span>Incluir</span>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </form>
+                <p-divider type="solid" />
                 <div class="flex justify-content-start gap-2">
                     <button pButton (click)="prevCallback.emit()" label="Voltar" severity="secondary" icon="pi pi-arrow-left"></button>
                     <button pButton icon="pi pi-plus" label="Adicionar " [outlined]="true" (click)="addVehicleEntry()"></button>

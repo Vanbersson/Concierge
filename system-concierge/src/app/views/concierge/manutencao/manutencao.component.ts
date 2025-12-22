@@ -2,6 +2,7 @@ import { Component, DoCheck, OnInit, signal } from '@angular/core';
 import { CommonModule, DatePipe, UpperCasePipe } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { Validators, FormsModule, ReactiveFormsModule, FormGroup, FormControl } from '@angular/forms';
+import { environment } from '../../../../environments/environment';
 //PrimeNg
 import { PrimeNGConfig } from 'primeng/api';
 import { TabViewModule } from 'primeng/tabview';
@@ -38,7 +39,8 @@ import {
   STATUS_VEHICLE_ENTRY_NOTAUTH, STATUS_VEHICLE_ENTRY_FIRSTAUTH,
   STATUS_VEHICLE_ENTRY_AUTHORIZED, MESSAGE_RESPONSE_NOT_CLIENT,
   MESSAGE_RESPONSE_NOT_ATTENDANT,
-  IMAGE_MAX_SIZE_LABEL
+  IMAGE_MAX_SIZE_LABEL,
+  IMAGE_MAX_SIZE
 } from '../../../util/constants';
 //Class
 import { User } from '../../../models/user/user';
@@ -65,7 +67,8 @@ import { MessageResponse } from '../../../models/message/message-response';
 import { SuccessError } from '../../../models/enum/success-error';
 import { PermissionService } from '../../../services/permission/permission.service';
 import { ShareWhatsAppService } from '../../../services/share/share-whatsapp.service';
-import { PhotoService } from '../../../services/photo/photo.service';
+import { FileService } from '../../../services/file/file.service';
+import { NgxImageCompressService } from 'ngx-image-compress';
 
 @Component({
   selector: 'app-manutencao',
@@ -192,6 +195,8 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
   detailsVehicle: boolean = false;
 
   constructor(
+    private ngxImageCompressService: NgxImageCompressService,
+    private fileService: FileService,
     private shareWhatsAppService: ShareWhatsAppService,
     private permissionService: PermissionService,
     private primeNGConfig: PrimeNGConfig,
@@ -206,7 +211,6 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
     private confirmationService: ConfirmationService,
     private messageService: MessageService,
     private busyService: BusyService,
-    private photoService: PhotoService,
     private driverService: DriverService
   ) {
   }
@@ -360,8 +364,21 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
         }
       }
 
-
       this.loadForms();
+
+      //photos
+      const img1 = await this.findImage('/concierge/' + this.id + '/vehicle/image1.jpg');
+      if (img1.status == 200)
+        this.photoVehicle1 = img1.url;
+      const img2 = await this.findImage('/concierge/' + this.id + '/vehicle/image2.jpg');
+      if (img2.status == 200)
+        this.photoVehicle2 = img2.url;
+      const img3 = await this.findImage('/concierge/' + this.id + '/vehicle/image3.jpg');
+      if (img3.status == 200)
+        this.photoVehicle3 = img3.url;
+      const img4 = await this.findImage('/concierge/' + this.id + '/vehicle/image4.jpg');
+      if (img4.status == 200)
+        this.photoVehicle4 = img4.url;
     }
   }
   private loadForms() {
@@ -473,6 +490,16 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
       if (this.vehicleEntry.serviceOrder == "yes") {
         this.addRequireAttendant();
       }
+    }
+
+
+  }
+
+  private async findImage(url: string): Promise<HttpResponse<string>> {
+    try {
+      return await lastValueFrom(this.fileService.findImage(url));
+    } catch (error) {
+      return error;
     }
   }
   private loadDriver() {
@@ -633,58 +660,207 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
     this.formVehicle.controls['userAttendant'].removeValidators(Validators.required);
     this.formVehicle.controls['userAttendant'].updateValueAndValidity();
   }
-  public async photoFile1Vehicle() {
-    const photo = await this.photoService.selectPhoto();
-    if (photo == "Limit") {
+  /* Save imgage */
+  onFileSelected1(event: any) {
+    const file: File = event.target.files[0];
+    if (file.size > IMAGE_MAX_SIZE) {
       this.messageService.add({ severity: 'error', summary: 'Imagem', detail: IMAGE_MAX_SIZE_LABEL, icon: 'pi pi-times', life: 3000 });
-    } else if (photo == "Error") {
+      return;
+    }
+    this.uploadFile1(file);
+  }
+  private async uploadFile1(selectedFile: File) {
+    // Orientação padrão
+    // File -> Base64
+    const orientation = -1;
+    const base64 = await this.fileToBase64(selectedFile);
 
-    } else {
-      this.photoVehicle1 = photo;
+    const compressedImage = await this.ngxImageCompressService.compressFile(
+      base64,
+      orientation,
+      50,   // qualidade
+      40    // proporção
+    );
+
+    // Base64 -> File  
+    const imageFile = this.base64ToFile(compressedImage, selectedFile.name);
+
+    const formData = new FormData();
+    formData.append('file', imageFile, 'image1.jpg');
+    formData.append('local', this.storageService.companyId + '/' + this.storageService.resaleId + '/concierge/' + this.id + '/vehicle/');
+
+    const resultSave = await this.saveImage(formData);
+    if (resultSave.status == 200 && resultSave.body.status == SuccessError.succes) {
+      this.messageService.add({ severity: 'success', summary: resultSave.body.header, detail: resultSave.body.message, icon: 'pi pi-check' });
+      this.photoVehicle1 = environment.apiuUrl + resultSave.body.data["url"];
     }
   }
-  public async photoFile2Vehicle() {
-    const photo = await this.photoService.selectPhoto();
-    if (photo == "Limit") {
+  onFileSelected2(event: any) {
+    const file: File = event.target.files[0];
+    if (file.size > IMAGE_MAX_SIZE) {
       this.messageService.add({ severity: 'error', summary: 'Imagem', detail: IMAGE_MAX_SIZE_LABEL, icon: 'pi pi-times', life: 3000 });
-    } else if (photo == "Error") {
+      return;
+    }
+    this.uploadFile2(file);
+  }
+  private async uploadFile2(selectedFile: File) {
+    // Orientação padrão
+    // File -> Base64
+    const orientation = -1;
+    const base64 = await this.fileToBase64(selectedFile);
 
-    } else {
-      this.photoVehicle2 = photo;
+    const compressedImage = await this.ngxImageCompressService.compressFile(
+      base64,
+      orientation,
+      50,   // qualidade
+      40    // proporção
+    );
+
+    // Base64 -> File  
+    const imageFile = this.base64ToFile(compressedImage, selectedFile.name);
+    const formData = new FormData();
+    formData.append('file', imageFile, 'image2.jpg');
+    formData.append('local', this.storageService.companyId + '/' + this.storageService.resaleId + '/concierge/' + this.id + '/vehicle/');
+
+    const resultSave = await this.saveImage(formData);
+    if (resultSave.status == 200 && resultSave.body.status == SuccessError.succes) {
+      this.messageService.add({ severity: 'success', summary: resultSave.body.header, detail: resultSave.body.message, icon: 'pi pi-check' });
+      this.photoVehicle2 = environment.apiuUrl + resultSave.body.data["url"];
     }
   }
-  public async photoFile3Vehicle() {
-    const photo = await this.photoService.selectPhoto();
-    if (photo == "Limit") {
+  onFileSelected3(event: any) {
+    const file: File = event.target.files[0];
+    if (file.size > IMAGE_MAX_SIZE) {
       this.messageService.add({ severity: 'error', summary: 'Imagem', detail: IMAGE_MAX_SIZE_LABEL, icon: 'pi pi-times', life: 3000 });
-    } else if (photo == "Error") {
+      return;
+    }
+    this.uploadFile3(file);
+  }
+  private async uploadFile3(selectedFile: File) {
+    // Orientação padrão
+    // File -> Base64
+    const orientation = -1;
+    const base64 = await this.fileToBase64(selectedFile);
 
-    } else {
-      this.photoVehicle3 = photo;
+    const compressedImage = await this.ngxImageCompressService.compressFile(
+      base64,
+      orientation,
+      50,   // qualidade
+      40    // proporção
+    );
+
+    // Base64 -> File  
+    const imageFile = this.base64ToFile(compressedImage, selectedFile.name);
+    const formData = new FormData();
+    formData.append('file', imageFile, 'image3.jpg');
+    formData.append('local', this.storageService.companyId + '/' + this.storageService.resaleId + '/concierge/' + this.id + '/vehicle/');
+
+    const resultSave = await this.saveImage(formData);
+    if (resultSave.status == 200 && resultSave.body.status == SuccessError.succes) {
+      this.messageService.add({ severity: 'success', summary: resultSave.body.header, detail: resultSave.body.message, icon: 'pi pi-check' });
+      this.photoVehicle3 = environment.apiuUrl + resultSave.body.data["url"];
     }
   }
-  public async photoFile4Vehicle() {
-    const photo = await this.photoService.selectPhoto();
-    if (photo == "Limit") {
+  onFileSelected4(event: any) {
+    const file: File = event.target.files[0];
+    if (file.size > IMAGE_MAX_SIZE) {
       this.messageService.add({ severity: 'error', summary: 'Imagem', detail: IMAGE_MAX_SIZE_LABEL, icon: 'pi pi-times', life: 3000 });
-    } else if (photo == "Error") {
+      return;
+    }
+    this.uploadFile4(file);
+  }
+  private async uploadFile4(selectedFile: File) {
+    // Orientação padrão
+    // File -> Base64
+    const orientation = -1;
+    const base64 = await this.fileToBase64(selectedFile);
 
-    } else {
-      this.photoVehicle4 = photo;
+    const compressedImage = await this.ngxImageCompressService.compressFile(
+      base64,
+      orientation,
+      50,   // qualidade
+      40    // proporção
+    );
+
+    // Base64 -> File  
+    const imageFile = this.base64ToFile(compressedImage, selectedFile.name);
+    const formData = new FormData();
+    formData.append('file', imageFile, 'image4.jpg');
+    formData.append('local', this.storageService.companyId + '/' + this.storageService.resaleId + '/concierge/' + this.id + '/vehicle/');
+
+    const resultSave = await this.saveImage(formData);
+    if (resultSave.status == 200 && resultSave.body.status == SuccessError.succes) {
+      this.messageService.add({ severity: 'success', summary: resultSave.body.header, detail: resultSave.body.message, icon: 'pi pi-check' });
+      this.photoVehicle4 = environment.apiuUrl + resultSave.body.data["url"];
     }
   }
-  public deleteFileVehicle1() {
-    this.photoVehicle1 = "";
+  /* Delete image */
+  public async deleteFileVehicle1() {
+    const resultDel = await this.deleteImage(this.storageService.companyId + "/" + this.storageService.resaleId + '/concierge/' + this.id + '/vehicle/image1.jpg');
+    if (resultDel.status == 200 && resultDel.body.status == SuccessError.succes) {
+      this.messageService.add({ severity: 'success', summary: resultDel.body.header, detail: resultDel.body.message, icon: 'pi pi-check' });
+      this.photoVehicle1 = "";
+    }
   }
-  public deleteFileVehicle2() {
-    this.photoVehicle2 = "";
+  public async deleteFileVehicle2() {
+    const resultDel = await this.deleteImage(this.storageService.companyId + "/" + this.storageService.resaleId + '/concierge/' + this.id + '/vehicle/image2.jpg');
+    if (resultDel.status == 200 && resultDel.body.status == SuccessError.succes) {
+      this.messageService.add({ severity: 'success', summary: resultDel.body.header, detail: resultDel.body.message, icon: 'pi pi-check' });
+      this.photoVehicle2 = "";
+    }
   }
-  public deleteFileVehicle3() {
-    this.photoVehicle3 = "";
+  public async deleteFileVehicle3() {
+    const resultDel = await this.deleteImage(this.storageService.companyId + "/" + this.storageService.resaleId + '/concierge/' + this.id + '/vehicle/image3.jpg');
+    if (resultDel.status == 200 && resultDel.body.status == SuccessError.succes) {
+      this.messageService.add({ severity: 'success', summary: resultDel.body.header, detail: resultDel.body.message, icon: 'pi pi-check' });
+      this.photoVehicle3 = "";
+    }
   }
-  public deleteFileVehicle4() {
-    this.photoVehicle4 = "";
+  public async deleteFileVehicle4() {
+    const resultDel = await this.deleteImage(this.storageService.companyId + "/" + this.storageService.resaleId + '/concierge/' + this.id + '/vehicle/image4.jpg');
+    if (resultDel.status == 200 && resultDel.body.status == SuccessError.succes) {
+      this.messageService.add({ severity: 'success', summary: resultDel.body.header, detail: resultDel.body.message, icon: 'pi pi-check' });
+      this.photoVehicle4 = "";
+    }
   }
+  private async saveImage(data: FormData): Promise<HttpResponse<MessageResponse>> {
+    try {
+      return await lastValueFrom(this.fileService.uploadImage(data))
+    } catch (error) {
+      this.messageService.add({ severity: 'error', summary: 'Erro', detail: error.error.message, icon: 'pi pi-times' });
+      return error;
+    }
+  }
+  private async deleteImage(url: string): Promise<HttpResponse<MessageResponse>> {
+    try {
+      return await lastValueFrom(this.fileService.deleteImage(url))
+    } catch (error) {
+      this.messageService.add({ severity: 'error', summary: 'Erro', detail: error.error.message, icon: 'pi pi-times' });
+      return error;
+    }
+  }
+  private base64ToFile(base64: string, fileName: string): File {
+    const arr = base64.split(',');
+    const mime = arr[0].match(/:(.*?);/)![1];
+    const bstr = atob(arr[1]);
+    let n = bstr.length;
+    const u8arr = new Uint8Array(n);
+
+    while (n--) {
+      u8arr[n] = bstr.charCodeAt(n);
+    }
+
+    return new File([u8arr], fileName, { type: mime });
+  }
+  private fileToBase64(file: File): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = error => reject(error);
+    });
+  }
+
   private updateAuthExitStatus() {
     if (this.vehicleEntry.statusAuthExit == this.firstAuth) {
       this.vehicleEntry.statusAuthExit = this.notAuth;
@@ -1032,10 +1208,10 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
     this.vehicleEntry.numServiceOrder = vehicleValue?.numServiceOrder ?? "";
     this.vehicleEntry.numNfe = vehicleValue?.numNfe ?? "";
     this.vehicleEntry.numNfse = vehicleValue?.numNfse ?? "";
-    this.vehicleEntry.photo1 = this.photoVehicle1 ?? "";
+    /* this.vehicleEntry.photo1 = this.photoVehicle1 ?? "";
     this.vehicleEntry.photo2 = this.photoVehicle2 ?? "";
     this.vehicleEntry.photo3 = this.photoVehicle3 ?? "";
-    this.vehicleEntry.photo4 = this.photoVehicle4 ?? "";
+    this.vehicleEntry.photo4 = this.photoVehicle4 ?? ""; */
     this.vehicleEntry.vehicleNew = vehicleValue.vehicleNew;
     this.vehicleEntry.serviceOrder = vehicleValue.serviceOrder;
     this.vehicleEntry.information = vehicleValue.information;

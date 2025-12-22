@@ -27,6 +27,7 @@ import { MessageService } from 'primeng/api';
 import { TagModule } from 'primeng/tag';
 import { ImageModule } from 'primeng/image';
 import { CheckboxModule } from 'primeng/checkbox';
+import { DividerModule } from 'primeng/divider';
 
 //Service
 import { VehicleModelService } from '../../../services/vehicle-model/vehicle-model.service';
@@ -50,12 +51,17 @@ import { Driver } from '../../../models/driver/driver';
 //Filters
 import { FilterClientComponent } from '../../../components/filter.client/filter.client.component';
 import { FilterDriverComponent } from '../../../components/filter.driver/filter.driver.component';
+import { FileService } from '../../../services/file/file.service';
+import { PhotoResult } from '../../../interfaces/photo-result';
+import { PhotoResultStatus } from '../../../models/enum/photo-result-status';
+import { SuccessError } from '../../../models/enum/success-error';
+import { BusyService } from '../../../components/loading/busy.service';
 
 @Component({
   selector: 'app-vehicle.entry',
   standalone: true,
   imports: [
-    CommonModule, FilterClientComponent, FilterDriverComponent, FormsModule, ReactiveFormsModule,
+    CommonModule, FilterClientComponent, FilterDriverComponent, FormsModule, ReactiveFormsModule, DividerModule,
     StepperModule, ImageModule, ToastModule,
     CheckboxModule, TagModule, DialogModule,
     BadgeModule, TabViewModule, TableModule,
@@ -71,7 +77,7 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
 
   private vehicleEntry: VehicleEntry;
 
-  activeStepper: number | undefined = 0;
+  activeStepper: number | undefined = 2;
   private upperCasePipe = new UpperCasePipe();
 
   //ClientCompany
@@ -109,6 +115,11 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
   photoVehicle2!: string;
   photoVehicle3!: string;
   photoVehicle4!: string;
+
+  private photoVehicle1Temp!: string;
+  private photoVehicle2Temp!: string;
+  private photoVehicle3Temp!: string;
+  private photoVehicle4Temp!: string;
   vehicleModels$ = this.vehicleModelService.getAllEnabled();
 
   formVehicle = new FormGroup({
@@ -138,12 +149,14 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
   dialogVehicleVisible: boolean = false;
   listVehicleEntry: VehicleEntry[] = [];
   constructor(
+    private busyService: BusyService,
     private storageService: StorageService,
     private vehicleModelService: VehicleModelService,
     private vehicleService: VehicleService,
     private userService: UserService,
     private messageService: MessageService,
-    private photoService: PhotoService) { }
+    private photoService: PhotoService,
+    private fileService: FileService) { }
 
   ngOnInit(): void {
     this.cores = [
@@ -263,44 +276,53 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
       this.messageService.add({ severity: 'info', summary: 'Atenção', detail: 'Empresa não selecionada', icon: 'pi pi-info-circle' });
     }
   }
-  public async photoFile1Vehicle() {
-    const photo = await this.photoService.selectPhoto();
-    if (photo == "Limit") {
-      this.messageService.add({ severity: 'error', summary: 'Imagem', detail: IMAGE_MAX_SIZE_LABEL, icon: 'pi pi-times', life: 3000 });
-    } else if (photo == "Error") {
 
-    } else {
-      this.photoVehicle1 = photo;
+  public async photoFile1Vehicle() {
+    const photo: PhotoResult = await this.photoService.takePicture();
+    if (photo.status == PhotoResultStatus.SUCCESS) {
+      this.photoVehicle1 = photo.base64;
+    }
+    if (photo.status == PhotoResultStatus.LIMIT) {
+      this.messageService.add({ severity: 'info', summary: 'Imagem', detail: IMAGE_MAX_SIZE_LABEL, icon: 'pi pi-info-circle', life: 3000 });
+    }
+    if (photo.status == PhotoResultStatus.ERROR) {
+     // this.messageService.add({ severity: 'error', summary: 'Erro', detail: "Ocorreu um problema.", icon: 'pi pi-times', life: 3000 });
     }
   }
   public async photoFile2Vehicle() {
-    const photo = await this.photoService.selectPhoto();
-    if (photo == "Limit") {
-      this.messageService.add({ severity: 'error', summary: 'Imagem', detail: IMAGE_MAX_SIZE_LABEL, icon: 'pi pi-times', life: 3000 });
-    } else if (photo == "Error") {
-
-    } else {
-      this.photoVehicle2 = photo;
+    const photo = await this.photoService.takePicture();
+    if (photo.status == PhotoResultStatus.SUCCESS) {
+      this.photoVehicle2 = photo.base64;
+    }
+    if (photo.status == PhotoResultStatus.LIMIT) {
+      this.messageService.add({ severity: 'info', summary: 'Imagem', detail: IMAGE_MAX_SIZE_LABEL, icon: 'pi pi-info-circle', life: 3000 });
+    }
+    if (photo.status == PhotoResultStatus.ERROR) {
+      //this.messageService.add({ severity: 'error', summary: 'Erro', detail: "Ocorreu um problema.", icon: 'pi pi-times', life: 3000 });
     }
   }
   public async photoFile3Vehicle() {
-    const photo = await this.photoService.selectPhoto();
-    if (photo == "Limit") {
-      this.messageService.add({ severity: 'error', summary: 'Imagem', detail: IMAGE_MAX_SIZE_LABEL, icon: 'pi pi-times', life: 3000 });
-    } else if (photo == "Error") {
-
-    } else {
-      this.photoVehicle3 = photo;
+    const photo = await this.photoService.takePicture();
+    if (photo.status == PhotoResultStatus.SUCCESS) {
+      this.photoVehicle3 = photo.base64;
+    }
+    if (photo.status == PhotoResultStatus.LIMIT) {
+      this.messageService.add({ severity: 'info', summary: 'Imagem', detail: IMAGE_MAX_SIZE_LABEL, icon: 'pi pi-info-circle', life: 3000 });
+    }
+    if (photo.status == PhotoResultStatus.ERROR) {
+      //this.messageService.add({ severity: 'error', summary: 'Erro', detail: "Ocorreu um problema.", icon: 'pi pi-times', life: 3000 });
     }
   }
   public async photoFile4Vehicle() {
-    const photo = await this.photoService.selectPhoto();
-    if (photo == "Limit") {
-      this.messageService.add({ severity: 'error', summary: 'Imagem', detail: IMAGE_MAX_SIZE_LABEL, icon: 'pi pi-times', life: 3000 });
-    } else if (photo == "Error") {
-
-    } else {
-      this.photoVehicle4 = photo;
+    const photo = await this.photoService.takePicture();
+    if (photo.status == PhotoResultStatus.SUCCESS) {
+      this.photoVehicle4 = photo.base64;
+    }
+    if (photo.status == PhotoResultStatus.LIMIT) {
+      this.messageService.add({ severity: 'info', summary: 'Imagem', detail: IMAGE_MAX_SIZE_LABEL, icon: 'pi pi-info-circle', life: 3000 });
+    }
+    if (photo.status == PhotoResultStatus.ERROR) {
+     //this.messageService.add({ severity: 'error', summary: 'Erro', detail: "Ocorreu um problema.", icon: 'pi pi-times', life: 3000 });
     }
   }
   public deleteFileVehicle1() {
@@ -472,6 +494,7 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
     this.vehicleEntry.resaleId = this.storageService.resaleId;
     this.vehicleEntry.idUserEntry = this.storageService.id;
     this.vehicleEntry.nameUserEntry = this.storageService.name;
+
     this.vehicleEntry.entryPhoto1 = this.photoVehicle1;
     this.vehicleEntry.entryPhoto2 = this.photoVehicle2;
     this.vehicleEntry.entryPhoto3 = this.photoVehicle3;
@@ -531,13 +554,33 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
     return name;
   }
   public async saveVehicleEntry() {
+    this.busyService.busy();
     //Save vehicles
     for (let index = 0; index < this.listVehicleEntry.length; index++) {
       const vehicle = this.listVehicleEntry[index];
+      //Temp
+      this.photoVehicle1Temp = vehicle?.entryPhoto1 ?? null;
+      this.photoVehicle2Temp = vehicle?.entryPhoto2 ?? null;
+      this.photoVehicle3Temp = vehicle?.entryPhoto3 ?? null;
+      this.photoVehicle4Temp = vehicle?.entryPhoto4 ?? null;
 
-      var result = await this.saveVehicle(vehicle);
+      vehicle.entryPhoto1 = "";
+      vehicle.entryPhoto2 = "";
+      vehicle.entryPhoto3 = "";
+      vehicle.entryPhoto4 = "";
 
+      const result = await this.saveVehicle(vehicle);
       if (result.status == 201) {
+        //Image save
+        const img1 = await this.saveImg(result.body.id, this.photoVehicle1Temp, 1);
+        this.photoVehicle1Temp = null;
+        const img2 = await this.saveImg(result.body.id, this.photoVehicle2Temp, 2);
+        this.photoVehicle2Temp = null;
+        const img3 = await this.saveImg(result.body.id, this.photoVehicle3Temp, 3);
+        this.photoVehicle3Temp = null;
+        const img4 = await this.saveImg(result.body.id, this.photoVehicle4Temp, 4);
+        this.photoVehicle4Temp = null;
+
         if (vehicle.vehicleNew == 'not') {
           const uppercase = new UpperCasePipe();
           this.messageService.add({ severity: 'success', summary: 'Veículo Salvo', detail: "Placa " + uppercase.transform(vehicle.placa), icon: 'pi pi-check' });
@@ -558,6 +601,7 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
       }
 
     }
+    this.busyService.idle();
   }
   private async saveVehicle(vehicle: VehicleEntry): Promise<HttpResponse<VehicleEntry>> {
 
@@ -583,6 +627,39 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
       return error;
     }
 
+  }
+  private async saveImg(id: number, img: string, order: number): Promise<string> {
+    if (img != null) {
+      // Base64 -> File  
+      const imageFile = this.base64ToFile(img);
+      const formData = new FormData();
+      formData.append('file', imageFile, 'image' + order + '.jpg');
+      formData.append('local', this.storageService.companyId + '/' + this.storageService.resaleId + '/concierge/' + id + '/driver/entry/');
+      const resultSave = await this.saveImage(formData);
+      if (resultSave.status == 200 && resultSave.body.status == SuccessError.succes) {
+        // this.messageService.add({ severity: 'success', summary: resultSave.body.header, detail: resultSave.body.message, icon: 'pi pi-check' });
+      }
+    }
+    return SuccessError.succes;
+  }
+  private async saveImage(data: FormData): Promise<HttpResponse<MessageResponse>> {
+    try {
+      return await lastValueFrom(this.fileService.uploadImage(data))
+    } catch (error) {
+      this.messageService.add({ severity: 'error', summary: 'Erro', detail: error.error.message, icon: 'pi pi-times' });
+      return error;
+    }
+  }
+  private base64ToFile(base64: string): File {
+    const byteString = atob(base64);
+    const ab = new ArrayBuffer(byteString.length);
+    const ia = new Uint8Array(ab);
+
+    for (let i = 0; i < byteString.length; i++) {
+      ia[i] = byteString.charCodeAt(i);
+    }
+
+    return new File([ia], 'image', { type: 'image/jpeg' });
   }
 
 }

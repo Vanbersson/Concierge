@@ -147,9 +147,20 @@ export class FilterClientComponent {
         const result = await this.filterId(value.clientCompanyId);
         if (result.status == 200 && result.body.status == SuccessError.succes) {
           this.dialogListClientCompany.push(result.body.data);
+          //Api externa
+          this.serviceClienteCompany.FilterIdExternal(value.clientCompanyId).subscribe((data) => {
+            if (data.at(0).cnpj != this.dialogListClientCompany.at(0).cnpj) {
+              data.map(c => {
+                this.dialogListClientCompany.push(c);
+              });
+            }
+          });
         }
         if (result.status == 200 && result.body.status == SuccessError.error) {
-
+          //Api externa
+          this.serviceClienteCompany.FilterIdExternal(value.clientCompanyId).subscribe((data) => {
+            this.dialogListClientCompany = data;
+          });
         }
       } else if (value.clientCompanyFantasia) {
         const result = await this.filterFFantasia(value.clientCompanyFantasia);

@@ -27,6 +27,9 @@ import { SuccessError } from '../../../models/enum/success-error';
 import { BusyService } from '../../../components/loading/busy.service';
 import { PhotoService } from '../../../services/photo/photo.service';
 import { IMAGE_MAX_SIZE_LABEL } from '../../../util/constants';
+import { PhotoResult } from '../../../interfaces/photo-result';
+import { PhotoResultStatus } from '../../../models/enum/photo-result-status';
+import { FileService } from '../../../services/file/file.service';
 
 @Component({
   selector: 'app-vehicleexit',
@@ -40,19 +43,19 @@ import { IMAGE_MAX_SIZE_LABEL } from '../../../util/constants';
   styleUrl: './vehicle.exit.component.scss'
 })
 export default class VehicleExitComponent implements OnInit, OnDestroy {
-  //private vehicleExit: VehicleExit;
   listVehicleExit: VehicleEntry[] = [];
   selectedVehicle: VehicleEntry[] = [];
 
   valueInfoPlaca: string = '';
+  valueInfoModel: string = '';
   valueInfoVehicle: string = '';
-  photoVehicle1!: string;
-  photoVehicle2!: string;
-  photoVehicle3!: string;
-  photoVehicle4!: string;
-
+  photoVehicle1!: string | null;
+  photoVehicle2!: string | null;
+  photoVehicle3!: string | null;
+  photoVehicle4!: string | null;
 
   constructor(
+    private fileService: FileService,
     private busyService: BusyService,
     private vehicleService: VehicleService,
     private messageService: MessageService,
@@ -85,6 +88,8 @@ export default class VehicleExitComponent implements OnInit, OnDestroy {
         data[index].clientCompanyName = nome[0] + " " + nome[1];
       }
       this.listVehicleExit = data;
+    }else{
+      this.listVehicleExit = data;
     }
   }
   private async initTask() {
@@ -103,45 +108,52 @@ export default class VehicleExitComponent implements OnInit, OnDestroy {
     }
   }
 
-
   public async photoFile1Vehicle() {
-    const photo = await this.photoService.selectPhoto();
-    if (photo == "Limit") {
-      this.messageService.add({ severity: 'error', summary: 'Imagem', detail: IMAGE_MAX_SIZE_LABEL, icon: 'pi pi-times', life: 3000 });
-    } else if (photo == "Error") {
-
-    } else {
-      this.photoVehicle1 = photo;
+    const photo: PhotoResult = await this.photoService.takePicture();
+    if (photo.status == PhotoResultStatus.SUCCESS) {
+      this.photoVehicle1 = photo.base64;
+    }
+    if (photo.status == PhotoResultStatus.LIMIT) {
+      this.messageService.add({ severity: 'info', summary: 'Imagem', detail: IMAGE_MAX_SIZE_LABEL, icon: 'pi pi-info-circle', life: 3000 });
+    }
+    if (photo.status == PhotoResultStatus.ERROR) {
+      //this.messageService.add({ severity: 'error', summary: 'Erro', detail: "Ocorreu um problema.", icon: 'pi pi-times', life: 3000 });
     }
   }
   public async photoFile2Vehicle() {
-    const photo = await this.photoService.selectPhoto();
-    if (photo == "Limit") {
-      this.messageService.add({ severity: 'error', summary: 'Imagem', detail: IMAGE_MAX_SIZE_LABEL, icon: 'pi pi-times', life: 3000 });
-    } else if (photo == "Error") {
-
-    } else {
-      this.photoVehicle2 = photo;
+    const photo: PhotoResult = await this.photoService.takePicture();
+    if (photo.status == PhotoResultStatus.SUCCESS) {
+      this.photoVehicle2 = photo.base64;
+    }
+    if (photo.status == PhotoResultStatus.LIMIT) {
+      this.messageService.add({ severity: 'info', summary: 'Imagem', detail: IMAGE_MAX_SIZE_LABEL, icon: 'pi pi-info-circle', life: 3000 });
+    }
+    if (photo.status == PhotoResultStatus.ERROR) {
+      //this.messageService.add({ severity: 'error', summary: 'Erro', detail: "Ocorreu um problema.", icon: 'pi pi-times', life: 3000 });
     }
   }
   public async photoFile3Vehicle() {
-    const photo = await this.photoService.selectPhoto();
-    if (photo == "Limit") {
-      this.messageService.add({ severity: 'error', summary: 'Imagem', detail: IMAGE_MAX_SIZE_LABEL, icon: 'pi pi-times', life: 3000 });
-    } else if (photo == "Error") {
-
-    } else {
-      this.photoVehicle3 = photo;
+    const photo: PhotoResult = await this.photoService.takePicture();
+    if (photo.status == PhotoResultStatus.SUCCESS) {
+      this.photoVehicle3 = photo.base64;
+    }
+    if (photo.status == PhotoResultStatus.LIMIT) {
+      this.messageService.add({ severity: 'info', summary: 'Imagem', detail: IMAGE_MAX_SIZE_LABEL, icon: 'pi pi-info-circle', life: 3000 });
+    }
+    if (photo.status == PhotoResultStatus.ERROR) {
+      //this.messageService.add({ severity: 'error', summary: 'Erro', detail: "Ocorreu um problema.", icon: 'pi pi-times', life: 3000 });
     }
   }
   public async photoFile4Vehicle() {
-    const photo = await this.photoService.selectPhoto();
-    if (photo == "Limit") {
-      this.messageService.add({ severity: 'error', summary: 'Imagem', detail: IMAGE_MAX_SIZE_LABEL, icon: 'pi pi-times', life: 3000 });
-    } else if (photo == "Error") {
-
-    } else {
-      this.photoVehicle4 = photo;
+    const photo: PhotoResult = await this.photoService.takePicture();
+    if (photo.status == PhotoResultStatus.SUCCESS) {
+      this.photoVehicle4 = photo.base64;
+    }
+    if (photo.status == PhotoResultStatus.LIMIT) {
+      this.messageService.add({ severity: 'info', summary: 'Imagem', detail: IMAGE_MAX_SIZE_LABEL, icon: 'pi pi-info-circle', life: 3000 });
+    }
+    if (photo.status == PhotoResultStatus.ERROR) {
+      //this.messageService.add({ severity: 'error', summary: 'Erro', detail: "Ocorreu um problema.", icon: 'pi pi-times', life: 3000 });
     }
   }
   public deleteFileVehicle1() {
@@ -173,18 +185,18 @@ export default class VehicleExitComponent implements OnInit, OnDestroy {
     return datePipe.transform(date, "yyyy-MM-dd'T'HH:mm:ss.SSS") + timezone;
   }
   async confirm() {
-
     for (let index = 0; index < this.selectedVehicle.length; index++) {
       //clear
       this.valueInfoPlaca = "";
-      this.photoVehicle1 = "";
-      this.photoVehicle2 = "";
-      this.photoVehicle3 = "";
-      this.photoVehicle4 = "";
       this.valueInfoVehicle = "";
+      this.photoVehicle1 = null;
+      this.photoVehicle2 = null;
+      this.photoVehicle3 = null;
+      this.photoVehicle4 = null;
 
       var element = this.selectedVehicle[index];
       this.valueInfoPlaca = element.placa;
+      this.valueInfoModel = element.modelDescription;
 
       var vehicleExit: VehicleExit = new VehicleExit();
       vehicleExit.companyId = this.storageService.companyId;
@@ -193,8 +205,6 @@ export default class VehicleExitComponent implements OnInit, OnDestroy {
       vehicleExit.userId = this.storageService.id;
       vehicleExit.userName = this.storageService.name;
       vehicleExit.dateExit = this.formatDateTime(new Date());
-
-
       const resultSave = await this.confirmationExit(vehicleExit);
     }
     this.cleanSelectionVehicle();
@@ -206,12 +216,21 @@ export default class VehicleExitComponent implements OnInit, OnDestroy {
         header: 'Confirmar saída?',
         message: 'Por favor confirme para continuar.',
         accept: async () => {
-          exit.exitPhoto1 = this.photoVehicle1;
-          exit.exitPhoto2 = this.photoVehicle2;
-          exit.exitPhoto3 = this.photoVehicle3;
-          exit.exitPhoto4 = this.photoVehicle4;
           exit.exitInformation = this.valueInfoVehicle;
           const result = await this.exit(exit);
+          if (result) {
+            const resultImg1 = await this.saveImg(exit.vehicleId, this.photoVehicle1 ?? null, 1);
+            this.photoVehicle1 = null;
+
+            const resultImg2 = await this.saveImg(exit.vehicleId, this.photoVehicle2 ?? null, 2);
+            this.photoVehicle2 = null;
+
+            const resultImg3 = await this.saveImg(exit.vehicleId, this.photoVehicle3 ?? null, 3);
+            this.photoVehicle3 = null;
+
+            const resultImg4 = await this.saveImg(exit.vehicleId, this.photoVehicle4 ?? null, 4);
+            this.photoVehicle4 = null;
+          }
           setTimeout(() => resolve(result), 300);
         },
         reject: () => {
@@ -247,6 +266,39 @@ export default class VehicleExitComponent implements OnInit, OnDestroy {
     } catch (error) {
       return [];
     }
+  }
+  private async saveImg(id: number, img: string, order: number): Promise<string> {
+    if (img != null) {
+      // Base64 -> File  
+      const imageFile = this.base64ToFile(img);
+      const formData = new FormData();
+      formData.append('file', imageFile, 'image' + order + '.jpg');
+      formData.append('local', this.storageService.companyId + '/' + this.storageService.resaleId + '/concierge/' + id + '/driver/exit/');
+      const resultSave = await this.saveImage(formData);
+      if (resultSave.status == 200 && resultSave.body.status == SuccessError.succes) {
+        // this.messageService.add({ severity: 'success', summary: resultSave.body.header, detail: resultSave.body.message, icon: 'pi pi-check' });
+      }
+    }
+    return SuccessError.succes;
+  }
+  private async saveImage(data: FormData): Promise<HttpResponse<MessageResponse>> {
+    try {
+      return await lastValueFrom(this.fileService.uploadImage(data))
+    } catch (error) {
+      this.messageService.add({ severity: 'error', summary: 'Erro', detail: error.error.message, icon: 'pi pi-times' });
+      return error;
+    }
+  }
+  private base64ToFile(base64: string): File {
+    const byteString = atob(base64);
+    const ab = new ArrayBuffer(byteString.length);
+    const ia = new Uint8Array(ab);
+
+    for (let i = 0; i < byteString.length; i++) {
+      ia[i] = byteString.charCodeAt(i);
+    }
+
+    return new File([ia], 'image', { type: 'image/jpeg' });
   }
 
 }

@@ -1,6 +1,10 @@
 import { Injectable } from '@angular/core';
 import { NgxImageCompressService } from 'ngx-image-compress';
 import { IMAGE_MAX_SIZE } from '../../util/constants';
+import { Platform } from '@angular/cdk/platform';
+import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
+import { PhotoResult } from '../../interfaces/photo-result';
+import { PhotoResultStatus } from '../../models/enum/photo-result-status';
 
 
 @Injectable({
@@ -8,35 +12,84 @@ import { IMAGE_MAX_SIZE } from '../../util/constants';
 })
 export class PhotoService {
 
-    constructor(private ngxImageCompressService: NgxImageCompressService) { }
+    constructor(private platform: Platform, private ngxImageCompressService: NgxImageCompressService) { }
 
-    async selectPhoto(): Promise<string> {
+    async selectPhoto(): Promise<PhotoResult> {
         try {
             const { image, orientation } = await this.ngxImageCompressService.uploadFile();
 
             const imageSize = this.ngxImageCompressService.byteCount(image);
 
+            // Tamanho maximo
             if (imageSize > IMAGE_MAX_SIZE) {
-                return "Limit";
+                return { status: PhotoResultStatus.LIMIT };
             }
 
+            // Comprime a imagem
             const compressedImage = await this.ngxImageCompressService.compressFile(
                 image,
                 orientation,
-                40,   // qualidade
+                50,   // qualidade
                 40    // proporção
             );
 
-            // Remove prefixo data:image/jpeg;base64,
-            const base64Data = compressedImage.includes(',')
-                ? compressedImage.split(',')[1]
-                : compressedImage;
-
-            return base64Data;
+            return {
+                status: PhotoResultStatus.SUCCESS,
+                base64: this.cleanBase64(compressedImage || '')
+            };
         } catch (err) {
-
-            console.error(err);
-            return "Error";
+            return { status: PhotoResultStatus.ERROR };
         }
+    }
+
+    async takePicture(): Promise<PhotoResult> {
+        if (this.platform.ANDROID || this.platform.IOS) {
+            return await this.takeMobilePicture();
+        }
+        //Browser
+        return await this.selectPhoto();
+    }
+
+    // -----------------------------------------
+    // MOBILE (CAPACITOR)
+    // -----------------------------------------
+    private async takeMobilePicture(): Promise<PhotoResult> {
+        try {
+            const photo = await Camera.getPhoto({
+                quality: 50,
+                resultType: CameraResultType.Base64,
+                source: CameraSource.Camera,
+            });
+            // dataUrl que o compressor precisa
+            const imageDataUrl = `data:image/${photo.format};base64,${photo.base64String}`;
+
+            // Orientação padrão
+            const orientation = -1;
+
+            // Comprime a imagem
+            const compressedImage = await this.ngxImageCompressService.compressFile(
+                imageDataUrl,
+                orientation,
+                50,   // qualidade
+                40    // proporção
+            );
+
+            // retorna somente o base64 puro, sem o "data:image/jpeg;base64,"
+            return {
+                status: PhotoResultStatus.SUCCESS,
+                base64: this.cleanBase64(compressedImage || '')
+            };
+        } catch (error) {
+            return { status: PhotoResultStatus.ERROR };
+        }
+    }
+
+    // -----------------------------------------
+    // LIMPAR PREFIXO
+    // -----------------------------------------
+    private cleanBase64(base64: string): string {
+        return base64.includes(',')
+            ? base64.split(',')[1]
+            : base64;
     }
 }

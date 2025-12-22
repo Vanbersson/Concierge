@@ -171,34 +171,54 @@
                             <label for="informacao" class="ml-2">Informações</label>
                             <textarea pInputTextarea maxlength="255" id="informacao" rows="4" cols="30" formControlName="information"></textarea>
                         </div>
-                        <div class="col-12 lg:col-4 md:col-12 flex align-items-center gap-2">
+                        <div class="col-12 lg:col-4 md:col-12 flex align-items-center justify-content-between gap-1">
+                            <!-- image 1 -->
                             <div class="layout-file">
                                 <div class="layout-file-img">
-                                    <p-image *ngIf="photoVehicle1" [imageStyle]="{'object-fit':'cover'}" src="data:image/png;base64,{{photoVehicle1}}" alt="" [preview]="true" />
+                                    <p-image *ngIf="photoVehicle1" [imageStyle]="{'object-fit':'cover'}" [src]="photoVehicle1" alt="" [preview]="true" imageClass="lazy-img"/>
                                 </div>
-                                <button *ngIf="photoVehicle1"  pButton label="Remover" severity="danger" [disabled]="vehicleExit" (click)="deleteFileVehicle1()"></button>
-                                <button *ngIf="!photoVehicle1" pButton type="button" label="Selecionar" severity="secondary" [disabled]="vehicleExit" (click)="photoFile1Vehicle()"></button>   
+                                <button *ngIf="photoVehicle1"  pButton severity="danger" [disabled]="vehicleExit" (click)="deleteFileVehicle1()">
+                                    <i class="pi pi-trash"></i>
+                                    <span>Remover</span>
+                                </button> 
+                                <input type="file" id="uploadfileId1" (change)="onFileSelected1($event)" accept="image/png, image/jpeg" [disabled]="vehicleExit">
+                                <label *ngIf="!photoVehicle1" for="uploadfileId1" class="gap-2"><i class="pi pi-upload"></i><span>Incluir</span></label>                                                      
                             </div>
+                            <!-- image 2 -->
+                             <div class="layout-file">
+                                <div class="layout-file-img">
+                                    <p-image *ngIf="photoVehicle2" [imageStyle]="{'object-fit':'cover'}" [src]="photoVehicle2" alt="" [preview]="true" imageClass="lazy-img" />
+                                </div>
+                                <button *ngIf="photoVehicle2"  pButton severity="danger" [disabled]="vehicleExit" (click)="deleteFileVehicle2()">
+                                    <i class="pi pi-trash"></i>
+                                    <span>Remover</span>
+                                </button> 
+                                <input type="file" id="uploadfileId2" (change)="onFileSelected2($event)" accept="image/png, image/jpeg" [disabled]="vehicleExit">
+                                <label *ngIf="!photoVehicle2" for="uploadfileId2" class="gap-2"><i class="pi pi-upload"></i><span>Incluir</span></label>         
+                            </div> 
+                            <!-- image 3 -->
                             <div class="layout-file">
                                 <div class="layout-file-img">
-                                    <p-image *ngIf="photoVehicle2" [imageStyle]="{'object-fit':'cover'}" src="data:image/png;base64,{{photoVehicle2}}" alt="" [preview]="true" />
+                                    <p-image *ngIf="photoVehicle3" [imageStyle]="{'object-fit':'cover'}" [src]="photoVehicle3" alt="" [preview]="true" imageClass="lazy-img" />
                                 </div>
-                                <button *ngIf="photoVehicle2" pButton label="Remover" severity="danger" [disabled]="vehicleExit" (click)="deleteFileVehicle2()"></button>        
-                                <button *ngIf="!photoVehicle2" pButton type="button" label="Selecionar" severity="secondary" [disabled]="vehicleExit" (click)="photoFile2Vehicle()"></button>       
+                                <button *ngIf="photoVehicle3"  pButton severity="danger" [disabled]="vehicleExit" (click)="deleteFileVehicle3()">
+                                    <i class="pi pi-trash"></i>
+                                    <span>Remover</span>
+                                </button> 
+                                <input type="file" id="uploadfileId3" (change)="onFileSelected3($event)" accept="image/png, image/jpeg" [disabled]="vehicleExit">
+                                <label *ngIf="!photoVehicle3" for="uploadfileId3" class="gap-2"><i class="pi pi-upload"></i><span>Incluir</span></label>
                             </div>
+                            <!-- image 4 -->
                             <div class="layout-file">
                                 <div class="layout-file-img">
-                                    <p-image *ngIf="photoVehicle3" [imageStyle]="{'object-fit':'cover'}" src="data:image/png;base64,{{photoVehicle3}}" alt="" [preview]="true" />
+                                    <p-image *ngIf="photoVehicle4" [imageStyle]="{'object-fit':'cover'}" [src]="photoVehicle4" alt="" [preview]="true" imageClass="lazy-img"/>
                                 </div>
-                                <button *ngIf="photoVehicle3" pButton label="Remover" severity="danger" [disabled]="vehicleExit" (click)="deleteFileVehicle3()"></button>        
-                                <button *ngIf="!photoVehicle3" pButton type="button" label="Selecionar" severity="secondary" [disabled]="vehicleExit" (click)="photoFile3Vehicle()"></button>
-                            </div>
-                            <div class="layout-file">
-                                <div class="layout-file-img">
-                                    <p-image *ngIf="photoVehicle4" [imageStyle]="{'object-fit':'cover'}" src="data:image/png;base64,{{photoVehicle4}}" alt="" [preview]="true" />
-                                </div>
-                                <button *ngIf="photoVehicle4" pButton label="Remover" severity="danger" [disabled]="vehicleExit" (click)="deleteFileVehicle4()"></button>       
-                                <button *ngIf="!photoVehicle4" pButton type="button" label="Selecionar" severity="secondary" [disabled]="vehicleExit" (click)="photoFile4Vehicle()"></button>       
+                                <button *ngIf="photoVehicle4"  pButton severity="danger" [disabled]="vehicleExit" (click)="deleteFileVehicle4()">
+                                    <i class="pi pi-trash"></i>
+                                    <span>Remover</span>
+                                </button> 
+                                <input type="file" id="uploadfileId4" (change)="onFileSelected4($event)" accept="image/png, image/jpeg" [disabled]="vehicleExit">
+                                <label *ngIf="!photoVehicle4" for="uploadfileId4" class="gap-2"><i class="pi pi-upload"></i><span>Incluir</span></label>       
                             </div>
                         </div>
                     </div>
