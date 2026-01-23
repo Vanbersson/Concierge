@@ -9,9 +9,19 @@
      primary key(id)
  );
 
+ CREATE TABLE IF NOT EXISTS tb_payment_type(
+   company_id int not null,
+   resale_id int not null,
+   id int not null AUTO_INCREMENT,
+   status tinyint not null,
+   description varchar(100),
+   primary key(id)
+  );
+
  CREATE TABLE IF NOT EXISTS tb_permission(
      id int not null,
      description varchar(255) not null,
+     menu varchar(100) not null,
      PRIMARY KEY(id)
  );
 
@@ -25,7 +35,11 @@
     id int not null AUTO_INCREMENT,
     status tinyint not null,
     name varchar(255) not null,
+    fantasia varchar(255),
+    logo_url varchar(255),
     cnpj varchar(14) unique not null,
+    ie varchar(20),
+    im varchar(20),
     email varchar(100),
     cellphone varchar(11),
     phone varchar(10),
@@ -44,7 +58,11 @@
     id int not null AUTO_INCREMENT,
     status tinyint not null,
     name varchar(255) not null,
+    fantasia varchar(255),
+    logo_url varchar(255),
     cnpj varchar(14) unique not null,
+    ie varchar(20),
+    im varchar(20),
     email varchar(100),
     cellphone varchar(11),
     phone varchar(10),
@@ -83,8 +101,7 @@
      role_id int not null,
      role_desc varchar(100) not null,
      role_func tinyint not null,
-     photo longblob,
-     last_session datetime,
+     photo_url varchar(255),
      FOREIGN KEY(company_id) REFERENCES tb_company(id),
      FOREIGN KEY(resale_id) REFERENCES tb_resale(id),
      FOREIGN KEY(role_id) REFERENCES tb_user_role(id),
@@ -117,12 +134,12 @@
       PRIMARY KEY(id)
   );
 
- CREATE TABLE IF NOT EXISTS tb_client_company_type(
+ CREATE TABLE IF NOT EXISTS tb_client_company_category(
      company_id int not null,
      resale_id int not null,
      id int not null AUTO_INCREMENT,
      status tinyint not null,
-     description varchar(50) not null,
+     description varchar(100) not null,
      FOREIGN KEY(company_id) REFERENCES tb_company(id),
      FOREIGN KEY(resale_id) REFERENCES tb_resale(id),
      PRIMARY KEY(id)
@@ -133,11 +150,14 @@
      resale_id int not null,
      id int not null,
      status tinyint not null,
+     category_id int not null,
      name varchar(255) not null,
      fantasia varchar(255),
      clifor tinyint not null,
      fisjur tinyint not null,
      cnpj varchar(14),
+     ie varchar(20),
+     im varchar(20),
      cpf varchar(11),
      rg varchar(11),
      email_home varchar(100),
@@ -161,6 +181,7 @@
      contact_cellphone varchar(9),
      FOREIGN KEY(company_id) REFERENCES tb_company(id),
      FOREIGN KEY(resale_id) REFERENCES tb_resale(id),
+     FOREIGN KEY(category_id) REFERENCES tb_client_company_category(id),
      primary KEY(id)
  );
 
@@ -170,7 +191,7 @@
      id int not null AUTO_INCREMENT,
      status tinyint not null,
      description varchar(100) not null,
-     photo longblob,
+     photo_url varchar(255),
      PRIMARY KEY(id),
      FOREIGN KEY(company_id) REFERENCES tb_company(id),
      FOREIGN KEY(resale_id) REFERENCES tb_resale(id)
@@ -197,7 +218,6 @@
      FOREIGN KEY(owner_id) REFERENCES tb_client_company(id),
      FOREIGN KEY(attendant_id) REFERENCES tb_user(id),
      PRIMARY KEY(id)
-
  );
 
  CREATE TABLE IF NOT EXISTS tb_part(
@@ -215,8 +235,133 @@
     location_bookcase varchar(2),
     location_shelf varchar(2),
     date_last_entry datetime,
+    photo_url varchar(255),
     primary key(id)
  );
+
+ CREATE TABLE IF NOT EXISTS tb_budget(
+       company_id int not null,
+       resale_id int not null,
+       id int not null AUTO_INCREMENT,
+       status tinyint not null,
+       date_generation datetime not null,
+       date_validation datetime,
+       date_authorization datetime,
+       name_responsible varchar(100),
+       payment_type_id int,
+       payment_type_desc varchar(100),
+       attendant_user_id int not null,
+       attendant_user_name varchar(100),
+       client_company_id int not null,
+       client_company_name varchar(100),
+       client_send_date datetime,
+       client_approved_date datetime,
+       information varchar(255),
+       FOREIGN KEY(company_id) REFERENCES tb_company(id),
+       FOREIGN KEY(resale_id) REFERENCES tb_resale(id),
+       FOREIGN KEY(payment_type_id) REFERENCES tb_payment_type(id),
+       FOREIGN KEY(attendant_user_id) REFERENCES tb_user(id),
+       FOREIGN KEY(client_company_id) REFERENCES tb_client_company(id),
+       primary key(id)
+   );
+
+ CREATE TABLE IF NOT EXISTS tb_budget_requisition(
+     company_id int not null,
+     resale_id int not null,
+     id binary(16) unique,
+     budget_id int not null,
+     ordem int not null,
+     description varchar(100) not null,
+     FOREIGN KEY(company_id) REFERENCES tb_company(id),
+     FOREIGN KEY(resale_id) REFERENCES tb_resale(id),
+     FOREIGN KEY(budget_id) REFERENCES tb_budget(id),
+     primary key(id)
+   );
+
+ CREATE TABLE IF NOT EXISTS tb_budget_item(
+       company_id int not null,
+       resale_id int not null,
+       id binary(16) unique,
+       status tinyint not null,
+       budget_id int not null,
+       ordem int not null,
+       part_id int not null,
+       code varchar(20) not null,
+       description varchar(100) not null,
+       quantity float not null,
+       discount float not null,
+       price float not null,
+       FOREIGN KEY(company_id) REFERENCES tb_company(id),
+       FOREIGN KEY(resale_id) REFERENCES tb_resale(id),
+       FOREIGN KEY(part_id) REFERENCES tb_part(id),
+       FOREIGN KEY(budget_id) REFERENCES tb_budget(id),
+       primary key(id)
+   );
+
+ CREATE TABLE IF NOT EXISTS tb_budget_service(
+         company_id int not null,
+         resale_id int not null,
+         id binary(16) unique,
+         budget_id int not null,
+         status tinyint not null,
+         ordem int not null,
+         description varchar(100) not null,
+         hour_service float not null,
+         price float not null,
+         discount float not null,
+         FOREIGN KEY(company_id) REFERENCES tb_company(id),
+         FOREIGN KEY(resale_id) REFERENCES tb_resale(id),
+         FOREIGN KEY(budget_id) REFERENCES tb_budget(id),
+         primary key(id)
+     );
+
+ CREATE TABLE IF NOT EXISTS tb_budget_token(
+         company_id int not null,
+         resale_id int not null,
+         id binary(16) unique,
+         budget_id int not null,
+         date_valid datetime not null,
+         FOREIGN KEY(company_id) REFERENCES tb_company(id),
+         FOREIGN KEY(resale_id) REFERENCES tb_resale(id),
+         PRIMARY KEY(id)
+     );
+
+ CREATE TABLE IF NOT EXISTS tb_driver(
+       company_id int not null,
+       resale_id int not null,
+       id int not null AUTO_INCREMENT,
+       status tinyint not null,
+       name varchar(100) not null,
+       cpf varchar(11) not null,
+       rg varchar(11) not null,
+       date_birth datetime not null,
+       male_female tinyint not null,
+       cnh_register varchar(11) not null,
+       cnh_category varchar(10) not null,
+       cnh_validation datetime not null,
+       email varchar(100),
+       ddd_cellphone varchar(2),
+       cellphone varchar(9),
+       ddd_phone varchar(2),
+       phone varchar(8),
+       zip_code varchar(8) not null,
+       state varchar(2) not null,
+       city varchar(100) not null,
+       neighborhood varchar(100) not null,
+       address varchar(100) not null,
+       address_number varchar(10) not null,
+       address_complement varchar(100),
+       photo_driver_url varchar(255),
+       photo_doc1_url varchar(255),
+       photo_doc2_url varchar(255),
+       user_id int not null,
+       user_name varchar(100) not null,
+       date_register datetime not null,
+       FOREIGN KEY(company_id) REFERENCES tb_company(id),
+       FOREIGN KEY(resale_id) REFERENCES tb_resale(id),
+       FOREIGN KEY(user_id) REFERENCES tb_user(id),
+       PRIMARY KEY(id)
+   );
 
  CREATE TABLE IF NOT EXISTS tb_vehicle_entry(
      company_id int not null,
@@ -225,184 +370,90 @@
      status tinyint not null,
      step_entry tinyint not null,
 
-     budget_status tinyint not null,
+     budget_id int,
 
-     id_user_entry int not null,
-     name_user_entry varchar(100) not null,
-     date_entry datetime not null,
-     date_prevision_exit datetime,
+     entry_user_id int not null,
+     entry_user_name varchar(100) not null,
+     entry_date datetime not null,
+     entry_photo1_url varchar(255),
+     entry_photo2_url varchar(255),
+     entry_photo3_url varchar(255),
+     entry_photo4_url varchar(255),
+     entry_information varchar(255),
 
-     user_id_exit int,
-     user_name_exit varchar(100),
-     date_exit datetime,
+     exit_date_prevision datetime,
 
-     id_user_attendant int,
-     name_user_attendant varchar(100),
+     exit_user_id int not null,
+     exit_user_name varchar(100) not null,
+     exit_date datetime,
+     exit_photo1_url varchar(255),
+     exit_photo2_url varchar(255),
+     exit_photo3_url varchar(255),
+     exit_photo4_url varchar(255),
+     exit_information varchar(255),
 
-     id_user_exit_auth1 int,
-     name_user_exit_auth1 varchar(100),
-     date_exit_auth1 datetime,
+     attendant_user_id int,
+     attendant_user_name varchar(100),
+     attendant_photo1_url varchar(255),
+     attendant_photo2_url varchar(255),
+     attendant_photo3_url varchar(255),
+     attendant_photo4_url varchar(255),
+     attendant_information varchar(255),
 
-     id_user_exit_auth2 int,
-     name_user_exit_auth2 varchar(100),
-     date_exit_auth2 datetime,
-     status_auth_exit tinyint not null,
+     auth_exit_status tinyint not null,
+
+     auth1_exit_user_id int,
+     auth1_exit_user_name varchar(100),
+     auth1_exit_date datetime,
+
+     auth2_exit_user_id int,
+     auth2_exit_user_name varchar(100),
+     auth2_exit_date datetime,
 
      model_id int,
      model_description varchar(100),
 
      client_company_id int,
      client_company_name varchar(255),
-     client_company_cnpj varchar(14),
-     client_company_cpf varchar(11),
-     client_company_rg varchar(11),
 
+     driver_entry_id int,
      driver_entry_name varchar(255) not null,
-     driver_entry_cpf varchar(11),
-     driver_entry_rg varchar(11),
-     driver_entry_photo longblob,
-     driver_entry_signature longblob,
-     driver_entry_photo_doc1 longblob,
-     driver_entry_photo_doc2 longblob,
 
+     driver_exit_id int,
      driver_exit_name varchar(255),
-     driver_exit_cpf varchar(11),
-     driver_exit_rg varchar(11),
-     driver_exit_photo longblob,
-     driver_exit_signature longblob,
-     driver_exit_photo_doc1 longblob,
-     driver_exit_photo_doc2 longblob,
 
-     color tinyint,
-     placa varchar(7),
-     placas_junto varchar(255),
-     frota varchar(10),
+     vehicle_plate varchar(7),
+     vehicle_plate_together varchar(255),
+     vehicle_fleet varchar(10),
+     vehicle_color tinyint,
+     vehicle_km_entry varchar(10),
+     vehicle_km_exit varchar(10),
      vehicle_new tinyint not null,
-     km_entry varchar(10),
-     km_exit varchar(10),
-     photo1 longblob,
-     photo2 longblob,
-     photo3 longblob,
-     photo4 longblob,
+     vehicle_service_order tinyint not null,
 
      quantity_extinguisher int,
      quantity_traffic_cone int,
      quantity_tire int,
      quantity_tire_complete int,
      quantity_tool_box int,
-     service_order tinyint not null,
+
      num_service_order varchar(20),
      num_nfe varchar(20),
      num_nfse varchar(20),
-     information varchar(255),
-     information_concierge varchar(255),
      FOREIGN KEY(company_id) REFERENCES tb_company(id),
      FOREIGN KEY(resale_id) REFERENCES tb_resale(id),
-     FOREIGN KEY(id_user_entry) REFERENCES tb_user(id),
-     FOREIGN KEY(id_user_attendant) REFERENCES tb_user(id),
-     FOREIGN KEY(id_user_exit_auth1) REFERENCES tb_user(id),
-     FOREIGN KEY(id_user_exit_auth2) REFERENCES tb_user(id),
+     FOREIGN KEY(budget_id) REFERENCES tb_budget(id),
+     FOREIGN KEY(entry_user_id) REFERENCES tb_user(id),
+     FOREIGN KEY(exit_user_id) REFERENCES tb_user(id),
+     FOREIGN KEY(attendant_user_id) REFERENCES tb_user(id),
+     FOREIGN KEY(auth1_exit_user_id) REFERENCES tb_user(id),
+     FOREIGN KEY(auth2_exit_user_id) REFERENCES tb_user(id),
      FOREIGN KEY(model_id) REFERENCES tb_vehicle_model(id),
      FOREIGN KEY(client_company_id) REFERENCES tb_client_company(id),
+     FOREIGN KEY(driver_entry_id) REFERENCES tb_driver(id),
+     FOREIGN KEY(driver_exit_id) REFERENCES tb_driver(id),
      PRIMARY KEY(id)
-
  );
-
- CREATE TABLE IF NOT EXISTS tb_type_payment(
-      company_id int not null,
-      resale_id int not null,
-      id int not null AUTO_INCREMENT,
-      status tinyint not null,
-      description varchar(100),
-      primary key(id)
- );
-
-
- CREATE TABLE IF NOT EXISTS tb_budget(
-      company_id int not null,
-      resale_id int not null,
-      id int not null AUTO_INCREMENT,
-      vehicle_entry_id int not null,
-      status tinyint not null,
-      date_generation datetime not null,
-      date_validation datetime,
-      date_authorization datetime,
-      name_responsible varchar(100),
-      type_payment varchar(100),
-      id_user_attendant int not null,
-      client_company_id int not null,
-      client_send_date datetime,
-      client_approved_date datetime,
-      information varchar(255),
-      FOREIGN KEY(company_id) REFERENCES tb_company(id),
-      FOREIGN KEY(resale_id) REFERENCES tb_resale(id),
-      FOREIGN KEY(vehicle_entry_id) REFERENCES tb_vehicle_entry(id),
-      FOREIGN KEY(id_user_attendant) REFERENCES tb_user(id),
-      FOREIGN KEY(client_company_id) REFERENCES tb_client_company(id),
-      primary key(id)
-  );
-
- CREATE TABLE IF NOT EXISTS tb_budget_requisition(
-    company_id int not null,
-    resale_id int not null,
-    id binary(16) unique,
-    budget_id int not null,
-    ordem int not null,
-    description varchar(100) not null,
-    FOREIGN KEY(company_id) REFERENCES tb_company(id),
-    FOREIGN KEY(resale_id) REFERENCES tb_resale(id),
-    FOREIGN KEY(budget_id) REFERENCES tb_budget(id),
-    primary key(id)
-  );
-
- CREATE TABLE IF NOT EXISTS tb_budget_item(
-      company_id int not null,
-      resale_id int not null,
-      id binary(16) unique,
-      status tinyint not null,
-      budget_id int not null,
-      ordem int not null,
-      part_id int not null,
-      code varchar(20) not null,
-      description varchar(100) not null,
-      quantity float not null,
-      discount float not null,
-      price float not null,
-      FOREIGN KEY(company_id) REFERENCES tb_company(id),
-      FOREIGN KEY(resale_id) REFERENCES tb_resale(id),
-      FOREIGN KEY(part_id) REFERENCES tb_part(id),
-      FOREIGN KEY(budget_id) REFERENCES tb_budget(id),
-      primary key(id)
-  );
-
- CREATE TABLE IF NOT EXISTS tb_budget_service(
-        company_id int not null,
-        resale_id int not null,
-        id binary(16) unique,
-        budget_id int not null,
-        status tinyint not null,
-        ordem int not null,
-        description varchar(100) not null,
-        hour_service float not null,
-        price float not null,
-        discount float not null,
-        FOREIGN KEY(company_id) REFERENCES tb_company(id),
-        FOREIGN KEY(resale_id) REFERENCES tb_resale(id),
-        FOREIGN KEY(budget_id) REFERENCES tb_budget(id),
-        primary key(id)
-    );
-
- CREATE TABLE IF NOT EXISTS tb_budget_token(
-        company_id int not null,
-        resale_id int not null,
-        id binary(16) unique,
-        budget_id int not null,
-        date_valid datetime not null,
-        FOREIGN KEY(company_id) REFERENCES tb_company(id),
-        FOREIGN KEY(resale_id) REFERENCES tb_resale(id),
-        PRIMARY KEY(id)
-    );
-
 
  CREATE TABLE IF NOT EXISTS tb_purchase_order(
         company_id int not null,
@@ -453,6 +504,16 @@
         PRIMARY KEY(id)
     );
 
+ CREATE TABLE IF NOT EXISTS tb_mechanic_role(
+     company_id int not null,
+     resale_id int not null,
+     id int not null AUTO_INCREMENT,
+     status tinyint not null,
+     description varchar(100) not null,
+     PRIMARY KEY(id),
+     FOREIGN KEY(company_id) REFERENCES tb_company(id),
+     FOREIGN KEY(resale_id) REFERENCES tb_resale(id)
+ );
 
  CREATE TABLE IF NOT EXISTS tb_mechanic(
     company_id int not null,
@@ -461,12 +522,13 @@
     status tinyint not null,
     name varchar(100) not null,
     code_password int not null,
-    photo longblob,
+    role_id int not null,
+    photo_url varchar(255),
     FOREIGN KEY(company_id) REFERENCES tb_company(id),
     FOREIGN KEY(resale_id) REFERENCES tb_resale(id),
+    FOREIGN KEY(role_id) REFERENCES tb_mechanic_role(id),
     PRIMARY KEY(id)
 );
-
 
  CREATE TABLE IF NOT EXISTS tb_tool_control_category(
     company_id int not null,
@@ -495,7 +557,7 @@
     quantity_accounting_kit float not null,
     quantity_available_kit float not null,
     validity_day int,
-    photo longblob,
+    photo_url varchar(255),
     FOREIGN KEY(company_id) REFERENCES tb_company(id),
     FOREIGN KEY(resale_id) REFERENCES tb_resale(id),
     FOREIGN KEY(category_id) REFERENCES tb_tool_control_category(id),
@@ -562,6 +624,55 @@
     FOREIGN KEY(user_id_ret) REFERENCES tb_user(id),
     FOREIGN KEY(request_id) REFERENCES tb_tool_control_request(id),
     FOREIGN KEY(material_id) REFERENCES tb_tool_control_material(id),
+    PRIMARY KEY(id)
+);
+
+CREATE TABLE IF NOT EXISTS tb_notification(
+    company_id int not null,
+    resale_id int not null,
+    id binary(16) unique,
+    orig_user_id int not null,
+    orig_user_name varchar(100) not null,
+    orig_date datetime not null,
+    orig_role_id int not null,
+    orig_role_desc varchar(100) not null,
+    orig_notification_menu tinyint not null,
+    dest_user_id int,
+    dest_user_role_id int,
+    dest_user_all tinyint not null,
+    vehicle_id int,
+    budget_id int,
+    purchase_order_id int,
+    tool_control_request_id int,
+    header varchar(100) not null,
+    message1 varchar(100) not null,
+    message2 varchar(100),
+    message3 varchar(100),
+    share_message tinyint not null,
+    delete_message tinyint not null,
+    FOREIGN KEY(company_id) REFERENCES tb_company(id),
+    FOREIGN KEY(resale_id) REFERENCES tb_resale(id),
+    FOREIGN KEY(orig_user_id) REFERENCES tb_user(id),
+    FOREIGN KEY(orig_role_id) REFERENCES tb_user_role(id),
+    FOREIGN KEY(dest_user_id) REFERENCES tb_user(id),
+    FOREIGN KEY(dest_user_role_id) REFERENCES tb_user_role(id),
+    FOREIGN KEY(vehicle_id) REFERENCES tb_vehicle_entry(id),
+    FOREIGN KEY(budget_id) REFERENCES tb_budget(id),
+    FOREIGN KEY(purchase_order_id) REFERENCES tb_purchase_order(id),
+    FOREIGN KEY(tool_control_request_id) REFERENCES tb_tool_control_request(id),
+    PRIMARY KEY(id)
+);
+
+ CREATE TABLE IF NOT EXISTS tb_notification_user(
+    company_id int not null,
+    resale_id int not null,
+    id binary(16) unique,
+    notification_id binary(16),
+    user_id int,
+    FOREIGN KEY(company_id) REFERENCES tb_company(id),
+    FOREIGN KEY(resale_id) REFERENCES tb_resale(id),
+    FOREIGN KEY(notification_id) REFERENCES tb_notification(id),
+    FOREIGN KEY(user_id) REFERENCES tb_user(id),
     PRIMARY KEY(id)
 );
 

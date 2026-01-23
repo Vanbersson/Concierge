@@ -10,7 +10,7 @@ public interface IVehicleModelService {
 
     String update(VehicleModel mod);
 
-    List<Map<String, Object>> listAll(Integer companyId, Integer resaleId);
+    List<VehicleModel> listAll(Integer companyId, Integer resaleId);
 
-    List<Map<String, Object>> listAllEnabled(Integer companyId, Integer resaleId);
+    List<VehicleModel> listAllEnabled(Integer companyId, Integer resaleId);
 }

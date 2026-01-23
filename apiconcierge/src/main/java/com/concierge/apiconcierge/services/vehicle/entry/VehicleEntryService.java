@@ -595,7 +595,7 @@ public class VehicleEntryService implements IVehicleEntryService {
         MessageResponse resultNotification = this.notificationService.save(n);
         Notification dataNotifi = (Notification) resultNotification.getData();
         for (PermissionUser p : permissions) {
-            User u = this.userRepository.findById(vehicle.getCompanyId(), vehicle.getResaleId(), p.getUserId());
+            User u = this.userRepository.filterId(vehicle.getCompanyId(), vehicle.getResaleId(), p.getUserId());
             NotificationUser nuDest = new NotificationUser();
             nuDest.setCompanyId(userOrig.getCompanyId());
             nuDest.setResaleId(userOrig.getResaleId());

@@ -26,7 +26,7 @@ public class FileUploadController {
     @Value("${local.image.upload}")
     private String UPLOAD_DIR;
 
-    @PostMapping("/upload/image")
+   // @PostMapping("/upload/image")
     public ResponseEntity<Object> uploadImage(@RequestParam("file") MultipartFile file,
                                               @RequestParam("local") String local) {
         try {
@@ -66,25 +66,20 @@ public class FileUploadController {
 
             Path filePath = basePath.resolve(fileLocal.local()).normalize();
 
-            MessageResponse response = new MessageResponse();
-            response.setHeader("Imagem");
-
             // Proteção contra path traversal
             if (!filePath.startsWith(basePath)) {
-                response.setStatus(ConstantsMessage.ERROR);
-                response.setMessage("Caminho invalido.");
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto("Caminho invalido."));
             }
 
             if (!Files.exists(filePath) || !Files.isRegularFile(filePath)) {
-                response.setStatus(ConstantsMessage.ERROR);
-                response.setMessage("Imagem não encontrada.");
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new MessageResponseDto("Imagem não encontrada."));
             }
 
             Files.delete(filePath);
 
+            MessageResponse response = new MessageResponse();
             response.setStatus(ConstantsMessage.SUCCESS);
+            response.setHeader("Imagem");
             response.setMessage("Excluída com socesso.");
 
             return ResponseEntity.status(HttpStatus.OK).body(response);

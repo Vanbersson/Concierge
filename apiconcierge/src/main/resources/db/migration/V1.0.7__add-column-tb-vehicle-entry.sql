@@ -1,9 +1,0 @@
-ALTER TABLE tb_vehicle_entry ADD COLUMN exit_photo1 longblob;
-ALTER TABLE tb_vehicle_entry ADD COLUMN exit_photo2 longblob;
-ALTER TABLE tb_vehicle_entry ADD COLUMN exit_photo3 longblob;
-ALTER TABLE tb_vehicle_entry ADD COLUMN exit_photo4 longblob;
-ALTER TABLE tb_vehicle_entry ADD COLUMN exit_information varchar(255);
-ALTER TABLE tb_vehicle_entry ADD COLUMN entry_photo1 longblob;
-ALTER TABLE tb_vehicle_entry ADD COLUMN entry_photo2 longblob;
-ALTER TABLE tb_vehicle_entry ADD COLUMN entry_photo3 longblob;
-ALTER TABLE tb_vehicle_entry ADD COLUMN entry_photo4 longblob;

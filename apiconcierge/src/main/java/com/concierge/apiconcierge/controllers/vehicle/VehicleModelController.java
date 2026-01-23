@@ -50,7 +50,7 @@ public class VehicleModelController {
     public ResponseEntity<Object> listAll(@PathVariable(name = "companyId") Integer companyId,
                                           @PathVariable(name = "resaleId") Integer resaleId) {
         try {
-            List<Map<String, Object>> list = this.service.listAll(companyId, resaleId);
+            List<VehicleModel> list = this.service.listAll(companyId, resaleId);
             return ResponseEntity.status(HttpStatus.OK).body(list);
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
@@ -61,7 +61,7 @@ public class VehicleModelController {
     public ResponseEntity<Object> listAllEnabled(@PathVariable(name = "companyId") Integer companyId,
                                                  @PathVariable(name = "resaleId") Integer resaleId) {
         try {
-            List<Map<String, Object>> list = this.service.listAllEnabled(companyId, resaleId);
+            List<VehicleModel> list = this.service.listAllEnabled(companyId, resaleId);
             return ResponseEntity.status(HttpStatus.OK).body(list);
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));

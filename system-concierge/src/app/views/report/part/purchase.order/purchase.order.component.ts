@@ -71,7 +71,7 @@ export interface IFilterPurchaseOrder {
 })
 export default class PurchaseOrderComponent implements OnInit, DoCheck {
   purchaseOrders: PurchaseOrder[] = [];
-  responsable$ = this.userService.getUserFilterRoleId$(3);
+  responsable$ = this.userService.filterRoleId(3);
 
   selectClientCompany = signal<ClientCompany>(new ClientCompany());
   dialogVisible: boolean = false;

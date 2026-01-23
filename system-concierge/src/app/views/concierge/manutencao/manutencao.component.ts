@@ -551,7 +551,7 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
   }
   private async getUserRole(): Promise<User[]> {
     try {
-      return await lastValueFrom(this.userService.getUserFilterRoleId$(2));
+      return await lastValueFrom(this.userService.filterRoleId(2));
     } catch (error) {
       return [];
     }

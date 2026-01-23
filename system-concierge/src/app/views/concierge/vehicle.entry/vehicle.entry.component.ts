@@ -77,7 +77,7 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
 
   private vehicleEntry: VehicleEntry;
 
-  activeStepper: number | undefined = 2;
+  activeStepper: number | undefined = 0;
   private upperCasePipe = new UpperCasePipe();
 
   //ClientCompany
@@ -141,7 +141,7 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
     informationConcierge: new FormControl<string>(''),
   });
 
-  consultores$ = this.userService.getUserFilterRoleId$(2);
+  consultores$ = this.userService.filterRoleId(2);
 
   formCompanyIsEditable = false;
 
@@ -642,6 +642,16 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
     }
     return SuccessError.succes;
   }
+   private base64ToFile(base64: string): File {
+    const byteString = atob(base64);
+    const ab = new ArrayBuffer(byteString.length);
+    const ia = new Uint8Array(ab);
+
+    for (let i = 0; i < byteString.length; i++) {
+      ia[i] = byteString.charCodeAt(i);
+    }
+    return new File([ia], 'image', { type: 'image/jpeg' });
+  }
   private async saveImage(data: FormData): Promise<HttpResponse<MessageResponse>> {
     try {
       return await lastValueFrom(this.fileService.uploadImage(data))
@@ -650,16 +660,6 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
       return error;
     }
   }
-  private base64ToFile(base64: string): File {
-    const byteString = atob(base64);
-    const ab = new ArrayBuffer(byteString.length);
-    const ia = new Uint8Array(ab);
-
-    for (let i = 0; i < byteString.length; i++) {
-      ia[i] = byteString.charCodeAt(i);
-    }
-
-    return new File([ia], 'image', { type: 'image/jpeg' });
-  }
+ 
 
 }

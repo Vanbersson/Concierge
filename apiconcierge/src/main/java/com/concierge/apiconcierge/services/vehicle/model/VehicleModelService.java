@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 @Service
 public class VehicleModelService implements IVehicleModelService {
 
@@ -49,7 +50,6 @@ public class VehicleModelService implements IVehicleModelService {
             String message = this.validation.update(mod);
             if (ConstantsMessage.SUCCESS.equals(message)) {
                 VehicleModel resultMod = this.repository.save(mod);
-
                 return ConstantsMessage.SUCCESS;
             } else {
                 throw new VehicleModelException(message);
@@ -61,16 +61,11 @@ public class VehicleModelService implements IVehicleModelService {
 
     @SneakyThrows
     @Override
-    public List<Map<String, Object>> listAll(Integer companyId, Integer resaleId) {
+    public List<VehicleModel> listAll(Integer companyId, Integer resaleId) {
         try {
             String message = this.validation.listAll(companyId, resaleId);
             if (ConstantsMessage.SUCCESS.equals(message)) {
-                List<VehicleModel> resultList = this.repository.listAll(companyId, resaleId);
-                List<Map<String, Object>> list = new ArrayList<>();
-                for (VehicleModel m : resultList) {
-                    list.add(this.loadModel(m));
-                }
-                return list;
+                return this.repository.listAll(companyId, resaleId);
             } else {
                 throw new VehicleModelException(message);
             }
@@ -81,16 +76,11 @@ public class VehicleModelService implements IVehicleModelService {
 
     @SneakyThrows
     @Override
-    public List<Map<String, Object>> listAllEnabled(Integer companyId, Integer resaleId) {
+    public List<VehicleModel> listAllEnabled(Integer companyId, Integer resaleId) {
         try {
             String message = this.validation.listAllEnabled(companyId, resaleId);
             if (ConstantsMessage.SUCCESS.equals(message)) {
-                List<VehicleModel> resultList = this.repository.listAllEnabled(companyId, resaleId);
-                List<Map<String, Object>> list = new ArrayList<>();
-                for (VehicleModel m : resultList) {
-                    list.add(this.loadModel(m));
-                }
-                return list;
+                return this.repository.listAllEnabled(companyId, resaleId);
             } else {
                 throw new VehicleModelException(message);
             }
@@ -99,19 +89,4 @@ public class VehicleModelService implements IVehicleModelService {
         }
     }
 
-    private Map<String, Object> loadModel(VehicleModel mod) {
-        Map<String, Object> map = new HashMap<>();
-
-        map.put("companyId", mod.getCompanyId());
-        map.put("resaleId", mod.getResaleId());
-        map.put("id", mod.getId());
-        map.put("status", mod.getStatus());
-        map.put("description", mod.getDescription());
-        if (mod.getPhoto() == null) {
-            map.put("photo", "");
-        } else {
-            map.put("photo", mod.getPhoto());
-        }
-        return map;
-    }
 }

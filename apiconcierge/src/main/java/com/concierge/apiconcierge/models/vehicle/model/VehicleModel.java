@@ -31,6 +31,6 @@ public class VehicleModel {
 
     private String description;
 
-    @Lob
-    private byte[] photo;
+    @Column(name = "photo_url")
+    private String photoUrl;
 }

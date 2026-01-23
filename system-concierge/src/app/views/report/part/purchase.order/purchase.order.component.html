@@ -163,8 +163,7 @@
             </div>
             <div class=" field col-12 md:col-2">
                 <label for="purchaseId">Nº Pedido</label>
-                <p-inputNumber inputId="purchaseId" mode="decimal" [useGrouping]="false"
-                    formControlName="purchaseOrderId" />
+                <p-inputNumber inputId="purchaseId" mode="decimal" [useGrouping]="false" formControlName="purchaseOrderId" />
             </div>
             <div class=" field col-12 md:col-2">
                 <label for="nfNumId">Nº Nota</label>
@@ -197,10 +196,8 @@
         </div>
 
         <div class="flex justify-content-end gap-2 mt-5">
-            <button pButton type="button" pRipple label="Fechar" icon="pi pi-times" class="p-button-text"
-                (click)="hideDialog()"></button>
-            <button pButton type="button" pRipple label="Pesquisar" icon="pi pi-search" class="p-button-text"
-                (click)="searchPurchaseOrder()"></button>
+            <button pButton type="button" pRipple label="Fechar" icon="pi pi-times" class="p-button-text" (click)="hideDialog()"></button>
+            <button pButton type="button" pRipple label="Pesquisar" icon="pi pi-search" class="p-button-text" (click)="searchPurchaseOrder()"></button>
         </div>
     </form>
 </p-dialog>

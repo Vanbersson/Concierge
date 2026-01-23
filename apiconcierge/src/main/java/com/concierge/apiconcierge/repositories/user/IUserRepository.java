@@ -17,13 +17,15 @@ public interface IUserRepository extends JpaRepository<User, Integer> {
     @Query(value = "SELECT * FROM tb_user WHERE company_id=?1 AND resale_id=?2 AND role_id=?3", nativeQuery = true)
     List<User> findByRoleId(Integer companyId, Integer resaleId, Integer roleId);
 
+    @Query(value = "SELECT * FROM tb_user WHERE company_id=?1 AND resale_id=?2 AND id=?3", nativeQuery = true)
+    User filterId(Integer companyId, Integer resaleId, Integer id);
+
     @Query(value = "SELECT * FROM tb_user WHERE company_id=?1 AND resale_id=?2 AND email=?3", nativeQuery = true)
     User filterEmail(Integer companyId, Integer resaleId, String email);
 
     @Query(value = "SELECT * FROM tb_user WHERE email=?1", nativeQuery = true)
     User loginEmail(String email);
 
-    @Query(value = "SELECT * FROM tb_user WHERE company_id=?1 AND resale_id=?2 AND id=?3", nativeQuery = true)
-    User findById(Integer companyId, Integer resaleId, Integer id);
+
 
 }

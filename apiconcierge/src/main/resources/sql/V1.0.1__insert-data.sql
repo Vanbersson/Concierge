@@ -31,12 +31,12 @@ VALUES
 (1,1,0,'Recursos Humanos');
 
 INSERT INTO `tb_user`
-(`company_id`, `resale_id`,`status`, `name`, `email`, `password`, `cellphone`, `limit_discount`, `role_id`, `role_desc`, `role_func`, `photo`)
+(`company_id`, `resale_id`,`status`, `name`, `email`, `password`, `cellphone`, `limit_discount`, `role_id`, `role_desc`, `role_func`, `photo_url`)
 VALUES
 (1,1,0,'Administrador','vambersson@gmail.com','$2a$10$9EKoKdyZdu.iFS8QnBykoOCW1Gix0PB/k6PN5L5t7URoddZ.wsu9i','81982158862',10,1,'TI',0,'');
 
 INSERT INTO tb_vehicle_model
-(company_id, resale_id, status, description,photo)
+(company_id, resale_id, status, description,photo_url)
 VALUES
 (1,1,0,'Cavalo Mecânico',''),
 (1,1,0,'Graneleiro',''),
@@ -54,15 +54,15 @@ VALUES
 (1,1,0,'Coleta Material',''),
 (1,1,0,'Outro','');
 
-INSERT INTO `tb_client_company_type`
+INSERT INTO `tb_client_company_category`
 (`company_id`, `resale_id`, `status`,`description`)
 VALUES
-(1,1,0,'P.J. C/Insc. Est.'),
-(1,1,0,'P.J. S/Insc. Est.'),
 (1,1,0,'P.F. Consumidor'),
-(1,1,0,'O.C. Outro Consumidor');
+(1,1,0,'P.J. C/Insc. Est.'),
+(1,1,0,'P.J. S/Insc. Est.');
 
-INSERT INTO tb_type_payment
+
+INSERT INTO tb_payment_type
 (`company_id`, `resale_id`, `status`, `description`)
 VALUE
 (1,1,0,'À vista (dinheiro)'),
@@ -94,54 +94,64 @@ INSERT INTO `tb_menu`
 VALUES
 ('0_0','Dashboard'),
 ('1_0','Portaria'),
-('1_1','Atendimento'),
+('1_1','Entrada de Veículo'),
 ('1_2','Veículos'),
-('1_3','Manutenção'),
-('1_4','Cadastros'),
-('1_4_0','Modelo'),
-('1_4_1','Veículo'),
+('1_5','Saída de Veiculo'),
+('1_3','Motorista'),
+('1_99','Cadastros'),
+('1_99_0','Modelo'),
+('1_99_1','Veículo'),
+
 ('2_0','Peças'),
-('2_1','Consulta peças'),
+('2_1','Atendimento Peças'),
 ('2_2','Pedidos de compras'),
-('2_2_0','Pedidos'),
-('2_2_1','Consulta'),
-('2_99','Cadastro'),
+('2_99','Cadastros'),
+('2_99_0','Peças'),
+
 ('3_0','Oficina'),
-('3_1','Orçamentos'),
-('3_1_0','Atendimento'),
-('3_1_1','Consulta'),
+('3_1','Atendimento Oficina'),
+
 ('3_2','Controle de equipamentos'),
 ('3_2_0','Requisições'),
-('3_2_1','Cadastro'),
+('3_2_1','Cadastros'),
 ('3_2_1_0','Categoria'),
 ('3_2_1_1','Material'),
-('3_99','Cadastro'),
+('3_3','Orçamentos'),
+('3_99','Cadastros'),
 ('3_99_0','Mecânico'),
+
 ('4_0','Faturamento'),
 ('4_1','Manutenção Clientes'),
+
 ('100_0','Relatório'),
 ('100_1','Portaria'),
 ('100_1_0','Veículos'),
 ('100_2','Peças'),
 ('100_2_0','Pedidos de compras'),
+
 ('999_0','Configurações'),
 ('999_1','Empresa'),
 ('999_2','Cadastro Usuários');
 
+
 INSERT INTO tb_permission
-(id,description)
+(id,description,menu)
 VALUES
-(100,'Autorizar entrada de veículo'),
-(101,'Autorizar saída de veículo'),
-(102,'Autorizar saída de veículo - 1ª'),
-(103,'Autorizar saída de veículo - 2ª'),
-(104,'Remover autorização de saída de veículo - 1ª'),
-(105,'Remover autorização de saída de veículo - 2ª'),
-(106,'Autorizar saída de veículo sem O.S.'),
-(107,'Remover autorização de saída de veículo sem O.S.'),
-(150,'Gerar orçamento'),
-(151,'Manutenção orçamento'),
-(152,'Visualizar orçamento');
+(100,'Editar entrada de veículo','Portaria'),
+(101,'Autorizar saída de veículo','Portaria'),
+(102,'Autorizar saída de veículo - 1ª','Portaria'),
+(103,'Autorizar saída de veículo - 2ª','Portaria'),
+(104,'Remover autorização de saída de veículo - 1ª','Portaria'),
+(105,'Remover autorização de saída de veículo - 2ª','Portaria'),
+(106,'Autorizar saída de veículo sem O.S.','Portaria'),
+(107,'Remover autorização de saída de veículo sem O.S.','Portaria'),
+(150,'Gerar orçamento','Portaria'),
+(151,'Manutenção orçamento','Portaria'),
+(152,'Visualizar orçamento','Portaria'),
+(153,'Receber notificações de entrada veículo','Portaria'),
+(154,'Receber notificações de saída veículo','Portaria'),
+(300,'Alterar quantidade material','Oficina');
+
 
 
 

@@ -23,15 +23,15 @@
         </ng-template>
         <ng-template pTemplate="header">
             <tr>
-                <th class="font-normal" pSortableColumn="id" style="width:10%">Código <p-sortIcon
+                <th pSortableColumn="id" style="width:10%">Código <p-sortIcon
                         field="id"></p-sortIcon></th>
-                <th class="font-normal" pSortableColumn="status" style="width:10%">Ativo<p-sortIcon
+                <th pSortableColumn="status" style="width:10%">Ativo<p-sortIcon
                         field="status"></p-sortIcon></th>
-                <th class="font-normal" pSortableColumn="image" style="width:10%">Foto<p-sortIcon
+                <th pSortableColumn="image" style="width:10%">Foto<p-sortIcon
                         field="image"></p-sortIcon></th>
-                <th class="font-normal" pSortableColumn="description" style="width:40%">Descrição <p-sortIcon
+                <th pSortableColumn="description" style="width:40%">Descrição <p-sortIcon
                         field="description"></p-sortIcon></th>
-                <th class="font-normal" style="width:10%">Editar</th>
+                <th style="width:10%">Editar</th>
             </tr>
         </ng-template>
         <ng-template pTemplate="body" let-modelo>
@@ -48,7 +48,7 @@
                     <img class="layout-img-small" src="data:image/png;base64,{{modelo.photo}}" alt="Vehicle Model" width="32" height="32" loading="lazy">
                     }
                 </td>
-                <td>{{modelo.description}}</td>
+                <td>{{modelo.description | uppercase}}</td>
                 <td>
                     <p-button icon="pi pi-pencil" label="Editar" zise="small" [text]="true" severity="primary" (click)="editModel(modelo)"></p-button>
                 </td>
