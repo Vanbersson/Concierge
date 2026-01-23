@@ -14,45 +14,18 @@ export class PhotoService {
 
     constructor(private platform: Platform, private ngxImageCompressService: NgxImageCompressService) { }
 
-    async selectPhoto(): Promise<PhotoResult> {
-        try {
-            const { image, orientation } = await this.ngxImageCompressService.uploadFile();
-
-            const imageSize = this.ngxImageCompressService.byteCount(image);
-
-            // Tamanho maximo
-            if (imageSize > IMAGE_MAX_SIZE) {
-                return { status: PhotoResultStatus.LIMIT };
-            }
-
-            // Comprime a imagem
-            const compressedImage = await this.ngxImageCompressService.compressFile(
-                image,
-                orientation,
-                50,   // qualidade
-                40    // proporção
-            );
-
-            return {
-                status: PhotoResultStatus.SUCCESS,
-                base64: this.cleanBase64(compressedImage || '')
-            };
-        } catch (err) {
-            return { status: PhotoResultStatus.ERROR };
-        }
-    }
-
     async takePicture(): Promise<PhotoResult> {
         if (this.platform.ANDROID || this.platform.IOS) {
             return await this.takeMobilePicture();
         }
         //Browser
-        return await this.selectPhoto();
+        return await this.takeMobilePicture();
     }
 
     // -----------------------------------------
     // MOBILE (CAPACITOR)
     // -----------------------------------------
+
     private async takeMobilePicture(): Promise<PhotoResult> {
         try {
             const photo = await Camera.getPhoto({
@@ -77,19 +50,11 @@ export class PhotoService {
             // retorna somente o base64 puro, sem o "data:image/jpeg;base64,"
             return {
                 status: PhotoResultStatus.SUCCESS,
-                base64: this.cleanBase64(compressedImage || '')
+                base64: compressedImage
             };
         } catch (error) {
             return { status: PhotoResultStatus.ERROR };
         }
     }
 
-    // -----------------------------------------
-    // LIMPAR PREFIXO
-    // -----------------------------------------
-    private cleanBase64(base64: string): string {
-        return base64.includes(',')
-            ? base64.split(',')[1]
-            : base64;
-    }
 }

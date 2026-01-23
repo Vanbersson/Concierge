@@ -6,7 +6,6 @@ import { SidebarComponent } from '../sidebar/sidebar/sidebar.component';
 import { TopbarComponent } from '../menu/topbar/topbar.component';
 import { LayoutService } from './service/layout.service';
 import { filter, Subscription } from 'rxjs';
-import { IUser } from '../../interfaces/user/iuser';
 
 @Component({
   selector: 'app-layout',
@@ -17,9 +16,6 @@ import { IUser } from '../../interfaces/user/iuser';
   providers: []
 })
 export default class LayoutComponent implements OnDestroy {
-
-  user: IUser = null;
-
   overlayMenuOpenSubscription: Subscription;
 
   menuOutsideClickListener: any;

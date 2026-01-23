@@ -1,5 +1,6 @@
 package com.concierge.apiconcierge.validation.user;
 
+import com.concierge.apiconcierge.models.message.MessageResponse;
 import com.concierge.apiconcierge.models.user.User;
 import com.concierge.apiconcierge.repositories.user.IUserRepository;
 import com.concierge.apiconcierge.util.ConstantsMessage;
@@ -15,86 +16,243 @@ public class UserValidation implements IUserValidation {
     IUserRepository repository;
 
     @Override
-    public String save(User user) {
-        if (user.getCompanyId() == null || user.getCompanyId() == 0)
-            return ConstantsMessage.ERROR_COMPANY;
-        if (user.getResaleId() == null || user.getResaleId() == 0)
-            return ConstantsMessage.ERROR_RESALE;
-        if (user.getStatus() == null)
-            return ConstantsMessage.ERROR_STATUS;
-        if (user.getName().isBlank())
-            return ConstantsMessage.ERROR_NAME;
-        if (user.getPassword().isBlank())
-            return ConstantsMessage.ERROR_PASSWORD;
-        if (user.getRoleId() == null || user.getRoleId() == 0)
-            return ConstantsMessage.ERROR_ROLE;
-        if (user.getRoleDesc().isBlank())
-            return ConstantsMessage.ERROR_ROLE;
-        if (user.getRoleFunc() == null)
-            return ConstantsMessage.ERROR_ROLE;
-        if (user.getEmail().isBlank())
-            return ConstantsMessage.ERROR_EMAIL;
-        if (this.repository.filterEmail(user.getCompanyId(), user.getResaleId(), user.getEmail()) != null)
-            return ConstantsMessage.ERROR_USER_EXISTS;
-
-        return ConstantsMessage.SUCCESS;
+    public MessageResponse save(User user) {
+        MessageResponse response = new MessageResponse();
+        if (user.getCompanyId() == null || user.getCompanyId() == 0) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Empresa");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (user.getResaleId() == null || user.getResaleId() == 0) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Revenda");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (user.getStatus() == null) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Status");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (user.getName().isBlank()) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Nome");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (user.getPassword().isBlank()) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Senha");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (user.getRoleId() == null || user.getRoleId() == 0) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Cargo");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (user.getRoleDesc().isBlank()) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Cargo");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (user.getRoleFunc() == null) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Função");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (user.getEmail().isBlank()) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("E-Mail");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (this.repository.filterEmail(user.getCompanyId(), user.getResaleId(), user.getEmail()) != null) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Usuário");
+            response.setMessage("E-Mail já cadastrado.");
+            return response;
+        }
+        response.setStatus(ConstantsMessage.SUCCESS);
+        response.setHeader("Usuário");
+        response.setMessage("Cadastrado com sucesso.");
+        return response;
     }
 
     @Override
-    public String update(User user) {
-        if (user.getCompanyId() == null || user.getCompanyId() == 0)
-            return ConstantsMessage.ERROR_COMPANY;
-        if (user.getResaleId() == null || user.getResaleId() == 0)
-            return ConstantsMessage.ERROR_RESALE;
-        if (user.getStatus() == null)
-            return ConstantsMessage.ERROR_STATUS;
-        if (user.getId() == null || user.getId() == 0)
-            return ConstantsMessage.ERROR_ID;
-        if (user.getName().isBlank())
-            return ConstantsMessage.ERROR_NAME;
-        if (user.getRoleId() == null || user.getRoleId() == 0)
-            return ConstantsMessage.ERROR_ROLE;
-        if (user.getRoleDesc().isBlank())
-            return ConstantsMessage.ERROR_ROLE;
-        if (user.getRoleFunc() == null)
-            return ConstantsMessage.ERROR_ROLE;
-        if (user.getEmail().isBlank())
-            return ConstantsMessage.ERROR_EMAIL;
-
-        return ConstantsMessage.SUCCESS;
+    public MessageResponse update(User user) {
+        MessageResponse response = new MessageResponse();
+        if (user.getCompanyId() == null || user.getCompanyId() == 0) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Empresa");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (user.getResaleId() == null || user.getResaleId() == 0) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Revenda");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (user.getStatus() == null) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Status");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (user.getId() == null || user.getId() == 0) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Código");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (user.getName().isBlank()) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Nome");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+//        if (user.getPassword().isBlank()) {
+//            response.setStatus(ConstantsMessage.ERROR);
+//            response.setHeader("Senha");
+//            response.setMessage(ConstantsMessage.NOT_INFORMED);
+//            return response;
+//        }
+        if (user.getRoleId() == null || user.getRoleId() == 0) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Cargo");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (user.getRoleDesc().isBlank()) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Cargo");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (user.getRoleFunc() == null) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Função");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (user.getEmail().isBlank()) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("E-Mail");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        response.setStatus(ConstantsMessage.SUCCESS);
+        response.setHeader("Usuário");
+        response.setMessage("Atualizado com sucesso.");
+        return response;
     }
 
     @Override
-    public String filterId(Integer companyId, Integer resaleId, Integer id) {
-        if (companyId == null || companyId == 0)
-            return ConstantsMessage.ERROR_COMPANY;
-        if (resaleId == null || resaleId == 0)
-            return ConstantsMessage.ERROR_RESALE;
-        if (id == null || id == 0)
-            return ConstantsMessage.ERROR_ID;
-        return ConstantsMessage.SUCCESS;
+    public MessageResponse listAll(Integer companyId, Integer resaleId) {
+        MessageResponse response = new MessageResponse();
+        if (companyId == null || companyId == 0) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Empresa");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (resaleId == null || resaleId == 0) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Revenda");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        response.setStatus(ConstantsMessage.SUCCESS);
+        response.setHeader("Usuário");
+        response.setMessage("Encontrado com sucesso.");
+        return response;
+    }
+
+    @Override
+    public MessageResponse filterId(Integer companyId, Integer resaleId, Integer id) {
+        MessageResponse response = new MessageResponse();
+        if (companyId == null || companyId == 0) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Empresa");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (resaleId == null || resaleId == 0) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Revenda");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (id == null || id == 0) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Código");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        response.setStatus(ConstantsMessage.SUCCESS);
+        response.setHeader("Usuário");
+        response.setMessage("Encontrado com sucesso.");
+        return response;
     }
 
 
     @Override
-    public String filterRoleId(Integer companyId, Integer resaleId, Integer roleId) {
-        if (companyId == null || companyId == 0)
-            return ConstantsMessage.ERROR_COMPANY;
-        if (resaleId == null || resaleId == 0)
-            return ConstantsMessage.ERROR_RESALE;
-        if (roleId == null || roleId == 0)
-            return ConstantsMessage.ERROR_ROLE;
-        return ConstantsMessage.SUCCESS;
+    public MessageResponse filterRoleId(Integer companyId, Integer resaleId, Integer roleId) {
+        MessageResponse response = new MessageResponse();
+        if (companyId == null || companyId == 0) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Empresa");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (resaleId == null || resaleId == 0) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Revenda");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (roleId == null || roleId == 0) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Cargo");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        response.setStatus(ConstantsMessage.SUCCESS);
+        response.setHeader("Usuário");
+        response.setMessage("Encontrado com sucesso.");
+        return response;
     }
 
     @Override
-    public String filterEmail(Integer companyId, Integer resaleId, String email) {
-        if (companyId == null || companyId == 0)
-            return ConstantsMessage.ERROR_COMPANY;
-        if (resaleId == null || resaleId == 0)
-            return ConstantsMessage.ERROR_RESALE;
-        if (email.isBlank())
-            return ConstantsMessage.ERROR_EMAIL;
-        return ConstantsMessage.SUCCESS;
+    public MessageResponse filterEmail(Integer companyId, Integer resaleId, String email) {
+        MessageResponse response = new MessageResponse();
+        if (companyId == null || companyId == 0) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Empresa");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (resaleId == null || resaleId == 0) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Revenda");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (email.isBlank()) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("E-Mail");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        response.setStatus(ConstantsMessage.SUCCESS);
+        response.setHeader("Usuário");
+        response.setMessage("Encontrado com sucesso.");
+        return response;
     }
 }

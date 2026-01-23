@@ -4,7 +4,6 @@ import { ReactiveFormsModule, Validators, FormControl, FormGroup } from '@angula
 import { Router } from '@angular/router';
 import { HttpResponse } from '@angular/common/http';
 import { lastValueFrom } from 'rxjs';
-
 //PrimeNG
 import { ToastModule } from 'primeng/toast';
 import { InputTextModule } from 'primeng/inputtext';
@@ -12,18 +11,16 @@ import { PasswordModule } from 'primeng/password';
 import { ButtonModule } from 'primeng/button';
 import { MessageService, ConfirmationService, TreeNode } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
-
 //Services
 import { AuthService } from '../../services/login/auth.service';
 import { LayoutService } from '../../layouts/layout/service/layout.service';
 import { StorageService } from '../../services/storage/storage.service';
 import { BusyService } from '../../components/loading/busy.service';
 import { MenuUserService } from '../../services/menu/menu-user.service';
-import { PermissionService } from '../../services/permission/permission.service';
-
 //Interface
 import { IAuth } from '../../interfaces/auth/iauth';
-import { IAuthResponse } from '../../interfaces/auth/iauthresponse';
+//Class
+import { User } from '../../models/user/user';
 
 @Component({
   selector: 'app-login',
@@ -66,7 +63,7 @@ export default class LoginComponent {
         this.messageService.add({ severity: 'success', summary: 'Bem-vindo', detail: resultLogin.body.name, icon: 'pi pi-lock-open', life: 3000 });
         this.storageService.companyId = resultLogin.body.companyId.toString();
         this.storageService.resaleId = resultLogin.body.resaleId.toString();
-        this.storageService.photo = resultLogin.body.photo;
+        this.storageService.photo = resultLogin.body.photoUrl;
         this.storageService.id = resultLogin.body.id.toString();
         this.storageService.name = resultLogin.body.name;
         this.storageService.email = login.email;
@@ -97,7 +94,7 @@ export default class LoginComponent {
       }
     });
   }
-  private async login(login: IAuth): Promise<HttpResponse<IAuthResponse>> {
+  private async login(login: IAuth): Promise<HttpResponse<User>> {
     try {
       return await lastValueFrom(this.auth.login(login));
     } catch (error) {

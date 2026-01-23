@@ -1,4 +1,4 @@
-import { Component, signal, ViewChild, ElementRef, OnInit, OnDestroy, DoCheck } from '@angular/core';
+import { Component, signal, ViewChild, ElementRef, OnInit, OnDestroy, DoCheck, Input } from '@angular/core';
 import { CommonModule, UpperCasePipe } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 
@@ -6,6 +6,7 @@ import { Router, RouterLink } from '@angular/router';
 import { Sidebar, SidebarModule } from 'primeng/sidebar';
 import { AvatarModule } from 'primeng/avatar';
 import { ImageModule } from 'primeng/image';
+import { DialogModule } from 'primeng/dialog';
 //Service
 import { LayoutService } from '../../layout/service/layout.service';
 import { StorageService } from '../../../services/storage/storage.service';
@@ -14,11 +15,15 @@ import { UserProfileComponent } from '../../../components/user.profile/user.prof
 import { NotificationComponent } from '../../../components/notification/notification.component';
 //Class
 import { User } from '../../../models/user/user';
+import { UserService } from '../../../services/user/user.service';
+import { lastValueFrom } from 'rxjs';
+import { MessageResponse } from '../../../models/message/message-response';
+import { HttpResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-topbar',
   standalone: true,
-  imports: [CommonModule, UserProfileComponent,NotificationComponent,
+  imports: [CommonModule, UserProfileComponent, NotificationComponent, DialogModule,
     RouterLink, SidebarModule, AvatarModule,
     ImageModule],
   templateUrl: './topbar.component.html',
@@ -38,7 +43,6 @@ export class TopbarComponent implements OnInit, OnDestroy, DoCheck {
   @ViewChild('topbarmenu') menu!: ElementRef;
 
   /* Sider Bar */
-  updateUser = signal<User>(new User());
   showUserPhoto: string = "";
   showUserName: string = "";
   userRoleDescription: string = "";
@@ -47,8 +51,13 @@ export class TopbarComponent implements OnInit, OnDestroy, DoCheck {
 
   @ViewChild('sidebarRef') sidebarRef!: Sidebar;
 
+  updateUser = signal<User>(new User());
+  dialogVisibleProfileUser: boolean = false;
+  @ViewChild('profileUser') profileUser!: UserProfileComponent;
+
   constructor(
     public layoutService: LayoutService,
+    private userService: UserService,
     private storageService: StorageService,
     private router: Router
   ) { }
@@ -64,19 +73,35 @@ export class TopbarComponent implements OnInit, OnDestroy, DoCheck {
   ngDoCheck(): void {
 
     if (this.updateUser().id != 0) {
-      this.showUserPhoto = this.updateUser().photo;
+      this.showUserPhoto = this.updateUser().photoUrl;
       this.showUserName = this.updateUser().name.split(' ')[0];
 
-      this.storageService.photo = this.updateUser().photo;
+      this.storageService.photo = this.updateUser().photoUrl;
       this.storageService.name = this.updateUser().name;
       this.storageService.cellphone = this.updateUser().cellphone;
       //Limpa o usuário
       this.updateUser.set(new User());
     }
+ 
+  }
 
+  async openProfileUser() {
+    const result = await this.userFilterEmail(this.storageService.email);
+    if (result.status == 200) {
+      this.visibleSideBarRight = false;
+      this.dialogVisibleProfileUser = true;
+      this.profileUser.showUser(result.body.data);
+    }
+  }
+
+  private async userFilterEmail(email: string): Promise<HttpResponse<MessageResponse>> {
+    try {
+      return await lastValueFrom(this.userService.filterEmail(email));
+    } catch (error) {
+      return error;
+    }
   }
   closeSession() {
-    //this.storageService.deleteStorage();
     this.navigatorLogin();
   }
 

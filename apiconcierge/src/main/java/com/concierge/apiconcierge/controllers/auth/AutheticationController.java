@@ -35,10 +35,6 @@ public class AutheticationController {
             var token = tokenService.generateToken((User) auth.getPrincipal());
             User user = this.repository.loginEmail(data.email());
 
-            //Last Session
-            user.setLastSession(new Date());
-
-            this.repository.save(user);
             Map<String, Object> map = new HashMap<>();
             map.put("companyId", user.getCompanyId());
             map.put("resaleId", user.getResaleId());
@@ -48,8 +44,7 @@ public class AutheticationController {
             map.put("cellphone", user.getCellphone());
             map.put("limitDiscount", user.getLimitDiscount());
             map.put("token", token);
-            map.put("photo", user.getPhoto() == null ? "" : user.getPhoto());
-
+            map.put("photoUrl", user.getPhotoUrl());
             return ResponseEntity.status(HttpStatus.OK).body(map);
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));

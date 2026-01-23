@@ -1,19 +1,22 @@
 package com.concierge.apiconcierge.validation.user;
 
+import com.concierge.apiconcierge.models.message.MessageResponse;
 import com.concierge.apiconcierge.models.user.User;
 
 import java.util.List;
 import java.util.Map;
 
 public interface IUserValidation {
-    String save(User user);
+    MessageResponse save(User user);
 
-    String update(User user);
+    MessageResponse update(User user);
 
-    String filterId(Integer companyId, Integer resaleId, Integer id);
+    MessageResponse listAll(Integer companyId, Integer resaleId);
 
-    String filterRoleId(Integer companyId, Integer resaleId, Integer roleId);
+    MessageResponse filterId(Integer companyId, Integer resaleId, Integer id);
 
-    String filterEmail(Integer companyId, Integer resaleId, String email);
+    MessageResponse filterRoleId(Integer companyId, Integer resaleId, Integer roleId);
+
+    MessageResponse filterEmail(Integer companyId, Integer resaleId, String email);
 
 }

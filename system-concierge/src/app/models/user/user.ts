@@ -1,19 +1,18 @@
-import { IUser } from "../../interfaces/user/iuser";
+import { StatusEnabledDisabled } from "../enum/status-enabled-disabled";
 
-
-export class User implements IUser {
+export class User {
     companyId: number = 0;
     resaleId: number = 0;
     id: number = 0;
-    status: string = '';
+    status: StatusEnabledDisabled = StatusEnabledDisabled.disabled;
     name: string = '';
     password: string = '';
     email: string = '';
     cellphone: string = '';
     limitDiscount: number = 0;
-    photo: string = '';
+    photoUrl: string = '';
     roleId: number = 0;
     roleDesc: string = '';
     roleFunc: string = '';
-
+    token: string = '';
 }

@@ -70,7 +70,7 @@ export default class UserComponent implements OnInit {
 
   formUser = new FormGroup({
     id: new FormControl<number | null>(null),
-    status: new FormControl<string>({ value: this.enabled, disabled: false }),
+    status: new FormControl<StatusEnabledDisabled>({ value: StatusEnabledDisabled.enabled, disabled: false }),
     name: new FormControl<string>('', Validators.required),
     email: new FormControl<string>('', Validators.required),
     password: new FormControl<string>(''),
@@ -107,47 +107,46 @@ export default class UserComponent implements OnInit {
       { key: '0_0', label: 'Dashboard', icon: 'pi pi-home' },
       {
         key: '1_0', label: 'Portaria', children: [
-          { key: '1_1', label: 'Entrada Veículo', },
+          { key: '1_1', label: 'Entrada de Veículo', },
           { key: '1_2', label: 'Veículos' },
-          { key: '1_5', label: 'Saída Veiculo' },
+          { key: '1_5', label: 'Saída de Veiculo' },
           { key: '1_3', label: 'Motorista' },
           {
-            key: '1_4', label: 'Cadastros', children: [
-              { key: '1_4_0', label: 'Modelo' },
-              { key: '1_4_1', label: 'Veículo' },
+            key: '1_99', label: 'Cadastros', children: [
+              { key: '1_99_0', label: 'Modelo' },
+              { key: '1_99_1', label: 'Veículo' },
             ]
           },
         ]
       },
       {
         key: '2_0', label: 'Peças', children: [
-          { key: '2_1', label: 'Consulta peças' },
+          { key: '2_1', label: 'Atendimento peças' },
+          { key: '2_2', label: 'Pedidos de compras'},
           {
-            key: '2_2', label: 'Pedidos de compras', children: [
-              { key: '2_2_0', label: 'Pedidos' },
+            key: '2_99', label: 'Cadastros', children: [
+              { key: '2_99_0', label: 'Peças' },
             ]
-          },
-          {
-            key: '2_99', label: 'Cadastro', children: []
           }
         ]
       },
       {
         key: '3_0', label: 'Oficina', children: [
-          { key: '3_1', label: 'Orçamentos' },
+          { key: '3_1', label: 'Atendimento Oficina' },
           {
             key: '3_2', label: 'Controle de equipamentos', children: [
               { key: '3_2_0', label: 'Requisições' },
               {
-                key: '3_2_1', label: 'Cadastro', children: [
+                key: '3_2_1', label: 'Cadastros', children: [
                   { key: '3_2_1_0', label: 'Categoria' },
                   { key: '3_2_1_1', label: 'Material' },
                 ]
               }
             ]
           },
+           { key: '3_3', label: 'Orçamentos' },
           {
-            key: '3_99', label: 'Cadastro', children: [
+            key: '3_99', label: 'Cadastros', children: [
               { key: '3_99_0', label: 'Mecânico' },
             ]
           }
@@ -204,7 +203,7 @@ export default class UserComponent implements OnInit {
     this.formUser.controls['passwordValid'].updateValueAndValidity();
   }
   getUsers() {
-    this.userService.getAll$().subscribe(data => {
+    this.userService.listAll().subscribe(data => {
       this.users = data;
     });
   }
@@ -260,7 +259,7 @@ export default class UserComponent implements OnInit {
     this.userSelect = user;
 
     var roleSelect: UserRole;
-    this.userPhoto = user.photo;
+    this.userPhoto = user.photoUrl;
 
     for (var role of this.roles) {
       if (role.id == user.roleId) {
@@ -347,7 +346,7 @@ export default class UserComponent implements OnInit {
       passwordValid: '',
       roleDesc: null,
       roleFunc: 'USER',
-      status: this.enabled
+      status: StatusEnabledDisabled.enabled
     });
   }
   public async selectPhoto() {
@@ -422,7 +421,7 @@ export default class UserComponent implements OnInit {
     const { value } = this.formUser;
     var userNew = new User();
 
-    userNew.photo = this.userPhoto;
+    userNew.photoUrl = this.userPhoto;
     userNew.companyId = this.storageService.companyId;
     userNew.resaleId = this.storageService.resaleId;
     userNew.name = value.name;
@@ -438,9 +437,9 @@ export default class UserComponent implements OnInit {
     this.userService.saveUser(userNew).subscribe(data => {
 
       if (data.status == 201) {
-        this.formUser.get('id').setValue(data.body.id);
+        this.formUser.get('id').setValue(data.body.data.id);
         this.userSelect = userNew;
-        this.userSelect.id = data.body.id;
+        this.userSelect.id = data.body.data.id;
         this.isEditUser = true;
         this.getUsers();
         this.alertUserSave();
@@ -453,7 +452,7 @@ export default class UserComponent implements OnInit {
 
       const { value } = this.formUser;
 
-      this.userSelect.photo = this.userPhoto;
+      this.userSelect.photoUrl = this.userPhoto;
       this.userSelect.name = value.name;
       this.userSelect.email = value.email;
       this.userSelect.cellphone = value.cellphone;

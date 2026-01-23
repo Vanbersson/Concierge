@@ -1,15 +1,27 @@
 package com.concierge.apiconcierge.services.user;
 
 import com.concierge.apiconcierge.config.security.WebSecurityConfig;
+import com.concierge.apiconcierge.dtos.file.FileLocalDto;
+import com.concierge.apiconcierge.dtos.message.MessageResponseDto;
 import com.concierge.apiconcierge.exceptions.user.UserException;
+import com.concierge.apiconcierge.models.message.MessageResponse;
 import com.concierge.apiconcierge.models.user.User;
 import com.concierge.apiconcierge.repositories.user.IUserRepository;
 import com.concierge.apiconcierge.util.ConstantsMessage;
 import com.concierge.apiconcierge.validation.user.UserValidation;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -17,31 +29,33 @@ import java.util.Map;
 
 @Service
 public class UserService implements IUserService {
+    @Value("${local.image.upload}")
+    private String UPLOAD_DIR;
 
     @Autowired
-    IUserRepository repository;
+    private IUserRepository repository;
 
     @Autowired
-    UserValidation validation;
+    private UserValidation validation;
 
     @Autowired
-    WebSecurityConfig security;
+    private WebSecurityConfig security;
 
     @SneakyThrows
     @Override
-    public Integer save(User user) {
+    public MessageResponse save(User user) {
         try {
-            String message = this.validation.save(user);
-            if (ConstantsMessage.SUCCESS.equals(message)) {
+            MessageResponse response = this.validation.save(user);
+            if (ConstantsMessage.SUCCESS.equals(response.getStatus())) {
                 String encryptedPass = this.security.passwordEncoder().encode(user.getPassword());
-
                 user.setId(null);
                 user.setPassword(encryptedPass);
 
-                User userResult = this.repository.save(user);
-                return userResult.getId();
+                User result = this.repository.save(user);
+                response.setData(result);
+                return response;
             } else {
-                throw new UserException(message);
+                return response;
             }
         } catch (Exception ex) {
             throw new UserException(ex.getMessage());
@@ -50,19 +64,20 @@ public class UserService implements IUserService {
 
     @SneakyThrows
     @Override
-    public String update(User user) {
-
+    public MessageResponse update(User user) {
         try {
-            String message = this.validation.update(user);
-            if (ConstantsMessage.SUCCESS.equals(message)) {
+            MessageResponse response = this.validation.update(user);
+            if (ConstantsMessage.SUCCESS.equals(response.getStatus())) {
+                User userResult = this.repository.filterId(user.getCompanyId(), user.getResaleId(), user.getId());
 
-                User userResult = this.repository.filterEmail(user.getCompanyId(), user.getResaleId(), user.getEmail());
+                user.setEmail(userResult.getEmail());
                 user.setPassword(userResult.getPassword());
 
-                this.repository.save(user);
-                return ConstantsMessage.SUCCESS;
+                User result = this.repository.save(user);
+                response.setData(result);
+                return response;
             } else {
-                throw new UserException(message);
+                return response;
             }
         } catch (Exception ex) {
             throw new UserException(ex.getMessage());
@@ -71,57 +86,18 @@ public class UserService implements IUserService {
 
     @SneakyThrows
     @Override
-    public List<Map<String, Object>> listAll(Integer companyId, Integer resaleId) {
+    public MessageResponse listAll(Integer companyId, Integer resaleId) {
         try {
-            List<User> usersResult = this.repository.listAll(companyId, resaleId);
-
-            List<Map<String, Object>> list = new ArrayList<>();
-            for (User user : usersResult) {
-                list.add(this.loadUser(user));
-            }
-            return list;
-        } catch (Exception ex) {
-            throw new UserException(ex.getMessage());
-        }
-
-    }
-
-    @SneakyThrows
-    @Override
-    public Map<String, Object> filterId(Integer companyId, Integer resaleId, Integer id) {
-        try {
-            String message = this.validation.filterId(companyId, resaleId, id);
-
-            if (ConstantsMessage.SUCCESS.equals(message)) {
-                User user = this.repository.findById(companyId, resaleId, id);
-                return this.loadUser(user);
-            } else {
-                throw new UserException(message);
-            }
-        } catch (Exception ex) {
-            throw new UserException(ex.getMessage());
-        }
-
-    }
-
-    @SneakyThrows
-    @Override
-    public List<Map<String, Object>> filterRoleId(Integer companyId, Integer resaleId, Integer roleId) {
-
-        try {
-            String message = this.validation.filterRoleId(companyId, resaleId, roleId);
-            if (ConstantsMessage.SUCCESS.equals(message)) {
-
-                List<User> usersResult = this.repository.findByRoleId(companyId, resaleId, roleId);
-
+            MessageResponse response = this.validation.listAll(companyId, resaleId);
+            if (ConstantsMessage.SUCCESS.equals(response.getStatus())) {
+                List<User> usersResult = this.repository.listAll(companyId, resaleId);
                 List<Map<String, Object>> list = new ArrayList<>();
                 for (User user : usersResult) {
                     list.add(this.loadUser(user));
                 }
-                return list;
-            } else {
-                throw new UserException(message);
+                response.setData(list);
             }
+            return response;
         } catch (Exception ex) {
             throw new UserException(ex.getMessage());
         }
@@ -129,26 +105,146 @@ public class UserService implements IUserService {
 
     @SneakyThrows
     @Override
-    public Map<String, Object> filterEmail(Integer companyId, Integer resaleId, String email) {
-
+    public MessageResponse filterId(Integer companyId, Integer resaleId, Integer id) {
         try {
-            String message = this.validation.filterEmail(companyId, resaleId, email);
-            if (ConstantsMessage.SUCCESS.equals(message)) {
-                User userResult = this.repository.filterEmail(companyId, resaleId, email);
-                if (userResult == null) return new HashMap<>();
-
-                return this.loadUser(userResult);
-            } else {
-                throw new UserException(message);
+            MessageResponse response = this.validation.filterId(companyId, resaleId, id);
+            if (ConstantsMessage.SUCCESS.equals(response.getStatus())) {
+                User user = this.repository.filterId(companyId, resaleId, id);
+                if (user == null) {
+                    response.setStatus(ConstantsMessage.INFO);
+                    response.setHeader("Usuário");
+                    response.setMessage("Usuário não encontrado.");
+                    return response;
+                }
+                response.setData(this.loadUser(user));
             }
+            return response;
         } catch (Exception ex) {
             throw new UserException(ex.getMessage());
+        }
+    }
+
+    @SneakyThrows
+    @Override
+    public MessageResponse filterRoleId(Integer companyId, Integer resaleId, Integer roleId) {
+        try {
+            MessageResponse response = this.validation.filterRoleId(companyId, resaleId, roleId);
+            if (ConstantsMessage.SUCCESS.equals(response.getStatus())) {
+                List<User> usersResult = this.repository.findByRoleId(companyId, resaleId, roleId);
+                List<Map<String, Object>> list = new ArrayList<>();
+                for (User user : usersResult) {
+                    list.add(this.loadUser(user));
+                }
+                response.setData(list);
+            }
+            return response;
+        } catch (Exception ex) {
+            throw new UserException(ex.getMessage());
+        }
+    }
+
+    @SneakyThrows
+    @Override
+    public MessageResponse filterEmail(Integer companyId, Integer resaleId, String email) {
+        try {
+            MessageResponse response = this.validation.filterEmail(companyId, resaleId, email);
+            if (ConstantsMessage.SUCCESS.equals(response.getStatus())) {
+                User user = this.repository.filterEmail(companyId, resaleId, email);
+                if (user == null) {
+                    response.setStatus(ConstantsMessage.INFO);
+                    response.setHeader("Usuário");
+                    response.setMessage("Usuário não encontrado.");
+                    return response;
+                }
+                response.setData(this.loadUser(user));
+            }
+            return response;
+        } catch (Exception ex) {
+            throw new UserException(ex.getMessage());
+        }
+    }
+
+    @SneakyThrows
+    @Override
+    public MessageResponse saveImage(MultipartFile file, String local) {
+        try {
+            MessageResponse response = new MessageResponse();
+            response.setStatus(ConstantsMessage.SUCCESS);
+            response.setHeader("Imagem");
+            response.setMessage("Salva com socesso.");
+
+            // Segurança básica
+            if (local.contains("..")) {
+                response.setStatus(ConstantsMessage.ERROR);
+                response.setMessage("Caminho inválido.");
+                return response;
+            }
+
+            // Nome do arquivo
+            Path filePath = Paths.get(UPLOAD_DIR + local + file.getOriginalFilename());
+
+            // Cria diretórios se necessário
+            Files.createDirectories(filePath.getParent());
+
+            // Salva ou substitui se existir)
+            Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+            // URL pública
+            String url = "/images/" + local + file.getOriginalFilename();
+
+            // Retornar o caminho do arquivo salvo
+            Map<String, String> map = new HashMap<>();
+            map.put("url", url);
+
+            response.setData(map);
+
+            return response;
+        } catch (Exception e) {
+            throw new Exception(e.getMessage());
+        }
+    }
+
+    @SneakyThrows
+    @Override
+    public MessageResponse deleteImage(String userEmail) {
+        try {
+            MessageResponse response = new MessageResponse();
+            response.setStatus(ConstantsMessage.SUCCESS);
+            response.setHeader("Imagem");
+            response.setMessage("Excluída com socesso.");
+
+            Path basePath = Paths.get(UPLOAD_DIR).toAbsolutePath().normalize();
+
+            User responseUser = this.repository.loginEmail(userEmail);
+            Path filePath = basePath.resolve(responseUser.getCompanyId() + "/" + responseUser.getResaleId() + "/users/" + responseUser.getId() + "/profile/image.jpg").normalize();
+
+            // Proteção contra path traversal
+            if (!filePath.startsWith(basePath)) {
+                response.setStatus(ConstantsMessage.ERROR);
+                response.setMessage("Caminho inválido.");
+                return response;
+            }
+
+            if (!Files.exists(filePath) || !Files.isRegularFile(filePath)) {
+                response.setStatus(ConstantsMessage.ERROR);
+                response.setMessage("Imagem não encontrada.");
+                return response;
+            }
+
+            Files.delete(filePath);
+
+
+            responseUser.setPhotoUrl("");
+            this.repository.save(responseUser);
+
+            return response;
+        } catch (Exception e) {
+            throw new Exception(e.getMessage());
         }
     }
 
     private Map<String, Object> loadUser(User user) {
         Map<String, Object> map = new HashMap<>();
-
         map.put("companyId", user.getCompanyId());
         map.put("resaleId", user.getResaleId());
         map.put("id", user.getId());
@@ -160,11 +256,7 @@ public class UserService implements IUserService {
         map.put("roleId", user.getRoleId());
         map.put("roleDesc", user.getRoleDesc());
         map.put("roleFunc", user.getRoleFunc());
-        if (user.getPhoto() == null) {
-            map.put("photo", "");
-        } else {
-            map.put("photo", user.getPhoto());
-        }
+        map.put("photoUrl", user.getPhotoUrl());
         return map;
     }
 }

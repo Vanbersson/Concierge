@@ -1,6 +1,9 @@
 package com.concierge.apiconcierge.services.user;
 
+import com.concierge.apiconcierge.dtos.file.FileLocalDto;
+import com.concierge.apiconcierge.models.message.MessageResponse;
 import com.concierge.apiconcierge.models.user.User;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Map;
@@ -8,15 +11,19 @@ import java.util.Map;
 
 public interface IUserService {
 
-    Integer save(User user);
+    public MessageResponse save(User user);
 
-    String update(User user);
+    public MessageResponse update(User user);
 
-    List<Map<String, Object>> listAll(Integer companyId, Integer resaleId);
+    public MessageResponse listAll(Integer companyId, Integer resaleId);
 
-    Map<String, Object> filterId(Integer companyId, Integer resaleId,Integer id);
+    public MessageResponse filterId(Integer companyId, Integer resaleId, Integer id);
 
-    List<Map<String, Object>> filterRoleId(Integer companyId, Integer resaleId,Integer roleId);
+    public MessageResponse filterRoleId(Integer companyId, Integer resaleId, Integer roleId);
 
-    Map<String, Object> filterEmail(Integer companyId, Integer resaleId,String email);
+    public MessageResponse filterEmail(Integer companyId, Integer resaleId, String email);
+
+    public MessageResponse saveImage(MultipartFile file, String local);
+
+    public MessageResponse deleteImage(String userEmail);
 }

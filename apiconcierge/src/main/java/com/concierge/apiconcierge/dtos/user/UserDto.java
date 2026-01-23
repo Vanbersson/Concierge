@@ -19,9 +19,8 @@ public record UserDto(
         String password,
         String cellphone,
         Integer limitDiscount,
-        byte[] photo,
+        String photoUrl,
         Integer roleId,
         String roleDesc,
-        UserRoleEnum roleFunc,
-        Date lastSession) {
+        UserRoleEnum roleFunc) {
 }

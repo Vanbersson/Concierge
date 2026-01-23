@@ -1,63 +1,43 @@
-
-<div class="layout-sidebar-button">
-    <a class="layout-sidebar-content-card" (click)="showDialogUser()">
-        <i class="pi pi-user"></i>
-        <div class="layout-sidebar-content-card-item">
-            <span class="sidebar-content-card-item-title">Perfil</span>
-            <span>Dados do usuário</span>
-        </div>
-    </a>
-</div>
-
-<p-toast/>
-<p-dialog [(visible)]="visibleDialogUser" [modal]="true" [style]="{ width: '50rem' }"
-    [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }">
-    <form [formGroup]="userFormView" (ngSubmit)="updateUser()">
+<p-toast />
+<div class="flex">
+    <form [formGroup]="userForm" (ngSubmit)="save()">
         <div class="p-fluid p-formgrid grid">
-            <div class="field col-12 flex align-items-center justify-content-center">
-                <div class="layout-photo-person mb-5 mt-1">
-                    @if(userPhoto){
-                    <p-image [imageStyle]="{'border-radius':'100%','object-fit':'cover'}" src="data:image/png;base64,{{userPhoto}}" alt="imagem motorista" height="80" width="80" [preview]="true" />
-                    <p-button severity="danger" [text]="true" label="Remover" (click)="deletePhoto()"></p-button>
-                    }@else{
-                    <div class="layout-photo-person-label">
+           <div class="col-12 flex align-items-center justify-content-center mb-2 mt-2">
+                <div class="layout-photo-person mb-5">
+                    <p-image *ngIf="userPhotoUrl" [imageStyle]="{'border-radius':'100%','object-fit':'cover'}" [src]="userPhotoUrl" alt="" height="80" width="80" [preview]="true" />
+                    <p-button *ngIf="userPhotoUrl" severity="danger" [text]="true" label="Remover" size="small" (click)="deletePhoto()"></p-button>
+                    <div *ngIf="!userPhotoUrl" class="layout-photo-person-label">
                         <button pButton type="button" label="Foto" [text]="true" size="small" (click)="selectPhoto()"></button>
                     </div>
-                    }
                 </div>
-            </div>
-            <div class="field col-12 md:col-12">
+            </div> 
+            <div class="col-12 md:col-12">
                 <label for="nameid">Nome</label>
                 <input pInputText id="nameid" type="text" formControlName="name" />
-                <small class="p-error block" *ngIf="userFormView.get('name')?.invalid && userFormView.get('name')?.dirty">Campo obrigatório</small>
+                <small class="p-error block" *ngIf="userForm.get('name')?.invalid && userForm.get('name')?.dirty">Campo obrigatório</small>
             </div>
-            <div class="field col-12 md:col-6">
-                <label for="">Email</label>
-                <div class="layout-input-disabled">
-                    <span class="text-500 font-medium"><strong>{{userEmail}}</strong></span>
-                </div>
+            <div class="col-12 md:col-6">
+                <label for="emailId">Email</label>
+                <input pInputText id="emailId" type="text" formControlName="email" >
             </div>
-            <div class="field col-12 md:col-4">
+            <div class="col-12 md:col-4">
                 <label for="cellphoneid">Celular</label>
-                <p-inputMask id="cellphoneid" mask="(99) 9 9999-9999" formControlName="cellphone" unmask="true" />
+                <p-inputMask id="cellphoneid" mask="(99) 9 9999-9999" unmask="true" formControlName="cellphone" />
             </div>
-            <div class="field col-12 md:col-2">
+            <div class=" col-12 md:col-2">
                 <label for="">Desconto</label>
-                <div class="layout-input-disabled">
-                    <span class="text-500 font-medium"><strong>{{limitDiscount()}}%</strong></span>
-                </div>
+                <p-inputNumber suffix="%" formControlName="limitDiscount"/>
             </div>
-            
-            <div class="field col-12 md:col-6">
+            <div class="col-12 md:col-6">
                 <label for="">Cargo</label>
-                <div class="layout-input-disabled">
-                    <span class="text-500 font-medium"><strong>{{userRoleDescription | uppercase}}</strong></span>
-                </div>
+                <input pInputText formControlName="roleDesc"/>
             </div>
-            <div class="field col-12 md:col-6">
+           <div class="col-12 md:col-6">
+            </div>
+            <div class="col-12 md:col-6">
                 <div class="flex flex-column gap-2">
                     <div class="">Situação</div>
-                    <div class="flex gap-2 mt-2 " >
+                    <div class="flex align-items-center gap-2 border-1 border-round border-300 p-3">
                         <div class="flex align-items-center mb-1">
                             <p-radioButton inputId="ativo" [value]="enabled" formControlName="status"></p-radioButton>
                             <label for="ativo" class="ml-2">Ativado</label>
@@ -68,11 +48,11 @@
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
-        <div class="flex justify-content-end gap-2 mt-3">
-            <button pButton type="button" pRipple label="Fechar" icon="pi pi-times" class="p-button-text" (click)="hideDialogUser()"></button>
+            </div> 
+        </div> 
+        <p-divider type="solid" />
+        <div class="flex justify-content-end">
             <button pButton type="submit" pRipple label="Salvar" icon="pi pi-check" class="p-button-text"></button>
         </div>
     </form>
-</p-dialog>
+</div>

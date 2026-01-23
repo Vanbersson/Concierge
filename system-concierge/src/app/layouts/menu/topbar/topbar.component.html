@@ -8,15 +8,17 @@
         <i class="pi pi-bars"></i>
     </button>
 
-    <button #topbarmenubutton class="p-link layout-topbar-menu-button layout-topbar-button" (click)="layoutService.showProfileSidebar()">
+    <button #topbarmenubutton class="p-link layout-topbar-menu-button layout-topbar-button"
+        (click)="layoutService.showProfileSidebar()">
         <i class="pi pi-ellipsis-v"></i>
     </button>
 
-    <div #topbarmenu class="layout-topbar-menu" [ngClass]="{'layout-topbar-menu-mobile-active':layoutService.state.profileSidebarVisible}">
-        <app-notification/>
+    <div #topbarmenu class="layout-topbar-menu"
+        [ngClass]="{'layout-topbar-menu-mobile-active':layoutService.state.profileSidebarVisible}">
+        <app-notification />
         <button class="p-link layout-topbar-button" (click)="showSideBarRight()">
             <i class="pi pi-align-right"></i>
-             <label>Configuração</label>
+            <label>Configuração</label>
         </button>
     </div>
 
@@ -30,11 +32,8 @@
             </div>
             <div class="flex flex-row gap-2 mt-5">
                 <div class="layout-side-header-photo">
-                    @if(showUserPhoto){
-                    <p-image [imageStyle]="{'border-radius':'100%','object-fit':'cover'}" src="data:image/png;base64,{{showUserPhoto}}" alt="imagem usuário" height="56" width="56" />
-                    }@else {
-                    <p-avatar [label]="firstLetter" size="xlarge" shape="circle" [style]="{ 'background-color': '#dee9fc' }"></p-avatar>
-                    }
+                    <img *ngIf="showUserPhoto != ''" style="border-radius: 100%; object-fit: cover;" [src]="showUserPhoto" alt="imagem usuário" height="56" width="56" />
+                    <p-avatar *ngIf="!showUserPhoto" [label]="firstLetter" size="xlarge" shape="circle" [style]="{ 'background-color': '#dee9fc' }"></p-avatar>
                 </div>
                 <div class="flex flex-column gap-2">
                     <span class="font-semibold text-xl text-black-alpha-60">Olá, {{showUserName | titlecase}}</span>
@@ -43,9 +42,14 @@
             </div>
         </div>
         <div class="layout-sidebar-content">
-
-            <app-userprofile (outputUser)="updateUser.set($event)"/>
-
+            <a class="layout-sidebar-content-card" (click)="openProfileUser()">
+                <i class="pi pi-user"></i>
+                <div class="layout-sidebar-content-card-item">
+                    <span class="sidebar-content-card-item-title">Perfil</span>
+                    <span>Dados do usuário</span>
+                </div>
+            </a>
+            
             <a class="layout-sidebar-content-card">
                 <i class="pi pi-cog"></i>
                 <div class="layout-sidebar-content-card-item">
@@ -53,9 +57,9 @@
                     <span>Informações do sistema</span>
                 </div>
             </a>
-            
+
             <div class="border-top-1 border-200 m-4"></div>
-            
+
             <a class="layout-sidebar-content-card" (click)="closeSession()">
                 <i class="pi pi-sign-out"></i>
                 <div class="layout-sidebar-content-card-item">
@@ -66,3 +70,8 @@
         </div>
     </ng-template>
 </p-sidebar>
+
+<p-dialog header="Perfil do usuário" [(visible)]="dialogVisibleProfileUser" [modal]="true" [style]="{ width: '54rem' }"
+    [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }">
+    <app-userprofile #profileUser (outUser)="updateUser.set($event)"/>
+</p-dialog>

@@ -51,8 +51,8 @@ public class User implements Serializable, UserDetails {
     @Column(name = "limit_discount")
     private Integer limitDiscount;
 
-    @Lob
-    private byte[] photo;
+    @Column(name = "photo_url")
+    private String photoUrl;
 
     @JoinColumn(table = "tb_user_role", referencedColumnName = "id")
     @Column(name = "role_id")
@@ -63,9 +63,6 @@ public class User implements Serializable, UserDetails {
 
     @Column(name = "role_func")
     private UserRoleEnum roleFunc;
-
-    @Column(name = "last_session")
-    private Date lastSession;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

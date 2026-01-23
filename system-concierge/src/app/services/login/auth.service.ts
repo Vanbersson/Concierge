@@ -5,7 +5,7 @@ import { environment } from '../../../environments/environment';
 
 //Interfaces
 import { IAuth } from '../../interfaces/auth/iauth';
-import { IAuthResponse } from '../../interfaces/auth/iauthresponse';
+import { User } from '../../models/user/user';
 
 @Injectable({
   providedIn: 'root'
@@ -14,8 +14,8 @@ export class AuthService {
 
   constructor(private http: HttpClient) { }
 
-  login(login: IAuth): Observable<HttpResponse<IAuthResponse>> {
-    return this.http.post<IAuthResponse>(environment.apiuUrl + "/auth/login", login, { observe: "response" });
+  login(login: IAuth): Observable<HttpResponse<User>> {
+    return this.http.post<User>(environment.apiuUrl + "/auth/login", login, { observe: "response" });
   }
 
 }

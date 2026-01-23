@@ -1,164 +1,199 @@
-import { Component, EventEmitter, OnDestroy, OnInit, Output, signal } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControl, FormsModule, ReactiveFormsModule, FormGroup, Validators } from '@angular/forms';
-import { NgxImageCompressService } from 'ngx-image-compress';
+import { environment } from '../../../environments/environment';
 
 import { ToastModule } from 'primeng/toast';
 import { ButtonModule } from 'primeng/button';
-import { DialogModule } from 'primeng/dialog';
 import { InputMaskModule } from 'primeng/inputmask';
 import { InputTextModule } from 'primeng/inputtext';
+import { InputNumberModule } from 'primeng/inputnumber';
 import { RadioButtonModule } from 'primeng/radiobutton';
 import { PasswordModule } from 'primeng/password';
 import { ImageModule } from 'primeng/image';
 import { MessageService } from 'primeng/api';
+import { DividerModule } from 'primeng/divider';
 
 import { StorageService } from '../../services/storage/storage.service';
 import { UserService } from '../../services/user/user.service';
-import { BusyService } from '../loading/busy.service';
 import { User } from '../../models/user/user';
 import { lastValueFrom } from 'rxjs';
 import { HttpResponse } from '@angular/common/http';
-import { IMAGE_MAX_SIZE } from '../../util/constants';
+import { IMAGE_MAX_SIZE_LABEL } from '../../util/constants';
 import { StatusEnabledDisabled } from '../../models/enum/status-enabled-disabled';
+import { MessageResponse } from '../../models/message/message-response';
+import { PhotoService } from '../../services/photo/photo.service';
+import { PhotoResultStatus } from '../../models/enum/photo-result-status';
+import { PhotoResult } from '../../interfaces/photo-result';
+import { SuccessError } from '../../models/enum/success-error';
 
 @Component({
   selector: 'app-userprofile',
   standalone: true,
   imports: [
     CommonModule, FormsModule, ReactiveFormsModule,
-    ToastModule, ButtonModule, DialogModule,
-    InputMaskModule, InputTextModule, RadioButtonModule,
+    ToastModule, ButtonModule, DividerModule,
+    InputMaskModule, InputTextModule, RadioButtonModule, InputNumberModule,
     PasswordModule, ImageModule],
   templateUrl: './user.profile.component.html',
   styleUrl: './user.profile.component.scss',
   providers: [MessageService],
 })
 export class UserProfileComponent {
-  private user: User;
-  @Output() public outputUser = new EventEmitter<User>();
+  private user!: User;
+  @Output() public outUser = new EventEmitter<User>();
   enabled = StatusEnabledDisabled.enabled;
   disabled = StatusEnabledDisabled.disabled;
-  visibleDialogUser: boolean = false;
-
-  userPhoto!: string;
-  userEmail!: string;
-  userRoleDescription!: string;
-  limitDiscount = signal<number>(0);
-  userFormView = new FormGroup({
-    status: new FormControl<string>({ value: '', disabled: true }),
-    name: new FormControl<string>('', Validators.required),
-    password: new FormControl<string>(''),
-    passwordValid: new FormControl<string>(''),
-    cellphone: new FormControl<string>(''),
-  });
+  userPhotoUrl!: string;
 
   userForm = new FormGroup({
-    status: new FormControl<string>('', Validators.required),
     name: new FormControl<string>('', Validators.required),
-    email: new FormControl<string>('', Validators.required),
-    password: new FormControl<string>(''),
-    passwordValid: new FormControl<string>(''),
+    email: new FormControl<string>({ value: '', disabled: true }, Validators.required),
     cellphone: new FormControl<string>(''),
-    photo: new FormControl<string | null>(null),
-    roleDesc: new FormControl<string>('', Validators.required),
+    limitDiscount: new FormControl<number>({ value: 0, disabled: true }, Validators.required),
+    roleDesc: new FormControl<string>({ value: '', disabled: true }, Validators.required),
+    status: new FormControl<string>({ value: StatusEnabledDisabled.enabled, disabled: true }, Validators.required),
   });
 
   constructor(
+    private photoService: PhotoService,
     private storageService: StorageService,
     private messageService: MessageService,
-    private userService: UserService,
-    private busyService: BusyService,
-    private ngxImageCompressService: NgxImageCompressService) { }
+    private userService: UserService) { }
 
-  showDialogUser() {
-    this.busyService.busy();
-    this.searchUser();
+  showUser(user: User) {
+    this.user = user;
+    this.dataViewUser();
   }
-  private searchUser() {
-    this.userService.getUserFilterEmail$(this.storageService.email).subscribe((data) => {
-      this.user = data.body;
-      this.busyService.idle();
-      this.dataViewUser();
-      this.visibleDialogUser = true;
-    }, (error) => {
-      this.busyService.idle();
-    });
 
-  }
-  hideDialogUser() {
-    this.visibleDialogUser = false;
-  }
-  dataViewUser() {
-    this.userFormView.patchValue({
-      status: this.user.status,
+  private dataViewUser() {
+    this.userForm.patchValue({
       name: this.user.name,
-      password: '',
-      passwordValid: '',
+      email: this.user.email,
       cellphone: this.user.cellphone,
+      limitDiscount: this.user.limitDiscount,
+      roleDesc: this.user.roleDesc,
+      status: this.user.status,
     });
-    this.userPhoto = this.user.photo;
-    this.userEmail = this.user.email;
-    this.limitDiscount.set(this.user.limitDiscount);
-    this.userRoleDescription = this.user.roleDesc;
-
+    this.userPhotoUrl = this.user.photoUrl;
   }
-  deletePhoto() {
-    this.userPhoto = "";
-    this.userForm.patchValue({ photo: "" });
+  async deletePhoto() {
+    this.userPhotoUrl = "";
+    this.user.photoUrl = "";
   }
-  selectPhoto() {
-    this.ngxImageCompressService.uploadFile().then(({ image, orientation }) => {
-      if (this.ngxImageCompressService.byteCount(image) > IMAGE_MAX_SIZE) {
-        this.messageService.add({ severity: 'error', summary: 'Imagem', detail: 'Tamanha máximo 3MB', icon: 'pi pi-times', life: 3000 });
-      } else {
-        this.ngxImageCompressService.compressFile(image, orientation, 50, 40).then((compressedImage) => {
-
-          // Remover o prefixo "data:image/jpeg;base64," se existir
-          const base64Data = compressedImage.split(',')[1];
-          this.userPhoto = base64Data;
-          this.userForm.patchValue({ photo: this.userPhoto });
-        });
-      }
-    });
-
+  async selectPhoto() {
+    const photo: PhotoResult = await this.photoService.takePicture();
+    if (photo.status == PhotoResultStatus.SUCCESS) {
+      this.userPhotoUrl = photo.base64;
+    }
+    if (photo.status == PhotoResultStatus.LIMIT) {
+      this.messageService.add({ severity: 'info', summary: 'Imagem', detail: IMAGE_MAX_SIZE_LABEL, icon: 'pi pi-info-circle', life: 3000 });
+    }
+    if (photo.status == PhotoResultStatus.ERROR) {
+      // this.messageService.add({ severity: 'error', summary: 'Erro', detail: "Ocorreu um problema.", icon: 'pi pi-times', life: 3000 });
+    }
   }
-  dataUpdateUser() {
-    const { value } = this.userFormView;
+
+  async save() {
+    const resultPhoto = await this.photo();
+    const { valid, value } = this.userForm;
+
+    if (!valid) return;
+
     this.user.name = value.name;
     this.user.cellphone = value.cellphone;
-    this.user.photo = this.userPhoto != "" ? this.userPhoto : "";
-    this.user.password = value.password;
-  }
-  private validUser(): boolean {
-    const { value } = this.userFormView;
-    if (value.name == "") {
-      this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Nome não informado', icon: 'pi pi-times' });
-      return false;
+    const resultUpdate = await this.updateUser(this.user);
+    if (resultUpdate.status == 200 && resultUpdate.body.status == SuccessError.succes) {
+      this.messageService.add({ severity: 'success', summary: resultUpdate.body.header, detail: resultUpdate.body.message, icon: 'pi pi-check' });
+      this.outUser.emit(resultUpdate.body.data);
     }
-    return true;
   }
-  async updateUser() {
-    this.dataUpdateUser();
-    if (this.validUser()) {
-      const resultUser = await this.saveUser(this.user);
-      if (resultUser.status == 200) {
-        this.messageService.add({ severity: 'success', summary: 'Usuário', detail: 'Atualizado com sucesso', icon: 'pi pi-check' });
-        this.outputUser.emit(this.user);
-        this.hideDialogUser();
+
+  private async photo() {
+
+    //Remove a foto
+    if (!this.userPhotoUrl && !this.user.photoUrl) {
+      const resultDel = await this.deleteImage();
+      if (resultDel.status == 200 && resultDel.body.status == SuccessError.succes) {
+        // this.messageService.add({ severity: 'success', summary: resultDel.body.header, detail: resultDel.body.message, icon: 'pi pi-check' });
+      }
+      return;
+    }
+
+    //Tentar salvar a foto
+    if (this.userPhotoUrl && !this.user.photoUrl) {
+      try {
+        const { base64, mime } = this.cleanBase64(this.userPhotoUrl);
+        const imageFile = this.base64ToFile(base64, mime);
+
+        const path =
+          `${this.storageService.companyId}/` +
+          `${this.storageService.resaleId}/users/` +
+          `${this.storageService.id}/profile/`;
+
+        const formData = new FormData();
+        formData.append('file', imageFile);
+        formData.append('local', path);
+
+        const resultSave = await this.saveImage(formData);
+        if (resultSave.status === 200 && resultSave.body.status === SuccessError.succes) {
+          // this.messageService.add({ severity: 'success', summary: resultSave.body.header, detail: resultSave.body.message, icon: 'pi pi-check' });
+          this.user.photoUrl = `${environment.apiuUrl}${resultSave.body.data["url"]}`;
+        }
+      } catch (error) {
+        this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Erro ao salvar imagem de perfil' });
       }
     }
 
   }
-  private async saveUser(user: User): Promise<HttpResponse<User>> {
+
+  private cleanBase64(base64: string): { base64: string; mime: string } {
+    if (!base64.includes(',')) {
+      return { base64, mime: 'image/jpeg' };
+    }
+
+    const [header, data] = base64.split(',');
+    const mime = header.match(/data:(.*);base64/)?.[1] || 'image/jpeg';
+
+    return { base64: data, mime };
+  }
+
+  private base64ToFile(base64: string, mime: string): File {
+    const byteString = atob(base64);
+    const ab = new ArrayBuffer(byteString.length);
+    const ia = new Uint8Array(ab);
+
+    for (let i = 0; i < byteString.length; i++) {
+      ia[i] = byteString.charCodeAt(i);
+    }
+
+    return new File([ia], 'image.jpg', { type: mime });
+  }
+
+  private async deleteImage(): Promise<HttpResponse<MessageResponse>> {
     try {
-      return await lastValueFrom(this.userService.updateUser(user));
+      return await lastValueFrom(this.userService.deleteImage())
     } catch (error) {
-      this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Não autorizado', icon: 'pi pi-times' });
+      this.messageService.add({ severity: 'error', summary: 'Erro', detail: error.error.message, icon: 'pi pi-times' });
       return error;
     }
   }
-  alertErroPassword() {
-    this.messageService.add({ severity: 'error', summary: 'Senha', detail: 'Senha não conferir', icon: 'pi pi-times' });
+
+  private async saveImage(data: FormData): Promise<HttpResponse<MessageResponse>> {
+    try {
+      return await lastValueFrom(this.userService.uploadImage(data))
+    } catch (error) {
+      this.messageService.add({ severity: 'error', summary: 'Erro', detail: error.error.message, icon: 'pi pi-times' });
+      return error;
+    }
+  }
+
+  private async updateUser(user: User): Promise<HttpResponse<MessageResponse>> {
+    try {
+      return await lastValueFrom(this.userService.updateUser(user));
+    } catch (error) {
+      this.messageService.add({ severity: 'error', summary: 'Erro', detail: error.error.message, icon: 'pi pi-times' });
+      return error;
+    }
   }
 }
