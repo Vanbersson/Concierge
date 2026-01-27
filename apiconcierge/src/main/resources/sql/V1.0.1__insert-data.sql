@@ -54,7 +54,7 @@ VALUES
 (1,1,0,'Coleta Material',''),
 (1,1,0,'Outro','');
 
-INSERT INTO `tb_client_company_category`
+INSERT INTO `tb_client_category`
 (`company_id`, `resale_id`, `status`,`description`)
 VALUES
 (1,1,0,'P.F. Consumidor'),

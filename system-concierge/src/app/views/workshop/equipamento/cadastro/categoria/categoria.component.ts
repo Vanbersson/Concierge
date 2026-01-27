@@ -17,9 +17,6 @@ import { RadioButtonModule } from 'primeng/radiobutton';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 
-//Enum
-import { StatusEnabledDisabled } from '../../../../../models/enum/status-enabled-disabled';
-
 //Service
 import { ToolControlCategory } from '../../../../../models/workshop/toolcontrol/tool-control-category';
 import { StorageService } from '../../../../../services/storage/storage.service';
@@ -27,6 +24,7 @@ import { ToolControlCategoryService } from '../../../../../services/workshop/too
 import { HttpResponse } from '@angular/common/http';
 import { lastValueFrom } from 'rxjs';
 import { BusyService } from '../../../../../components/loading/busy.service';
+import { StatusEnum } from '../../../../../models/enum/status-enum';
 
 enum TypeCategory {
   FERRAMENTA = "Ferramenta", EPI = "EPI", UNIFORME = "Uniforme", OUTRO = "Outro"
@@ -45,8 +43,8 @@ enum TypeCategory {
 export default class CategoriaComponent implements OnInit {
 
   category: ToolControlCategory;
-  enabled = StatusEnabledDisabled.enabled;
-  disabled = StatusEnabledDisabled.disabled;
+  enabled = StatusEnum.ENABLED;
+  disabled = StatusEnum.DISABLED;
   typeOutro = TypeCategory.OUTRO;
   typeFerr = TypeCategory.FERRAMENTA;
   typeEPI = TypeCategory.EPI;

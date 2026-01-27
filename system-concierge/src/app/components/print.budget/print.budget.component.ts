@@ -8,7 +8,7 @@ import { VehicleEntry } from '../../models/vehicle/vehicle-entry';
 import { BudgetRequisition } from '../../models/budget/budget-requisition';
 import { BudgetServiceItem } from '../../models/budget/budget-item-service';
 import { BudgetItem } from '../../models/budget/budget-item';
-import { ClientFisJurEnum } from '../../models/clientcompany/client-fisjur-enum';
+import { FisJurEnum } from '../../models/clientcompany/fisjur-enum';
 
 @Component({
   selector: 'app-printbudget',
@@ -26,7 +26,7 @@ export class PrintBudgetComponent {
   clientCompany: ClientCompany = new ClientCompany();
   vehicleEntry: VehicleEntry = new VehicleEntry();
 
-  juridica: string = ClientFisJurEnum.juridica;
+  juridica: string = FisJurEnum.JURIDICA;
 
   totalService: number;
   totalServiceDiscount: number;

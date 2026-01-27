@@ -21,7 +21,7 @@ import { ClientCompany } from '../../../../models/clientcompany/client-company';
 import { VehicleEntry } from '../../../../models/vehicle/vehicle-entry';
 import { PrintBudgetComponent } from '../../../../components/print.budget/print.budget.component';
 import { BudgetService } from '../../../../services/budget/budget.service';
-import { ClientFisJurEnum } from '../../../../models/clientcompany/client-fisjur-enum';
+import { FisJurEnum } from '../../../../models/clientcompany/fisjur-enum';
 
 @Component({
   selector: 'app-approbation',
@@ -43,7 +43,7 @@ export default class ApprobationComponent implements OnInit {
   listBudgetServiceItem: BudgetServiceItem[] = [];
   listBudgetItem: BudgetItem[] = [];
   clientCompany: ClientCompany = new ClientCompany();
-  juridica = ClientFisJurEnum.juridica;
+  juridica = FisJurEnum.JURIDICA;
   vehicleEntry: VehicleEntry = new VehicleEntry();
 
   totalService: number;

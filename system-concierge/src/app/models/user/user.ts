@@ -1,10 +1,10 @@
-import { StatusEnabledDisabled } from "../enum/status-enabled-disabled";
+import { StatusEnum } from "../enum/status-enum";
 
 export class User {
     companyId: number = 0;
     resaleId: number = 0;
     id: number = 0;
-    status: StatusEnabledDisabled = StatusEnabledDisabled.disabled;
+    status: StatusEnum = StatusEnum.DISABLED;
     name: string = '';
     password: string = '';
     email: string = '';

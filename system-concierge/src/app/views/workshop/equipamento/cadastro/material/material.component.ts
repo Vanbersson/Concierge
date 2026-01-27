@@ -22,7 +22,6 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { StorageService } from '../../../../../services/storage/storage.service';
 import { NgxImageCompressService } from 'ngx-image-compress';
 //Enum
-import { StatusEnabledDisabled } from '../../../../../models/enum/status-enabled-disabled';
 import { ToolControlMaterial } from '../../../../../models/workshop/toolcontrol/tool-control-material';
 import { IMAGE_MAX_SIZE } from '../../../../../util/constants';
 import { ToolControlCategory } from '../../../../../models/workshop/toolcontrol/tool-control-category';
@@ -36,6 +35,7 @@ import { SuccessError } from '../../../../../models/enum/success-error';
 import { TypeCategory } from '../../../../../models/enum/type-category';
 import { PermissionService } from '../../../../../services/permission/permission.service';
 import { PermissionUser } from '../../../../../models/permission/permission-user';
+import { StatusEnum } from '../../../../../models/enum/status-enum';
 
 
 enum typeMaterial {
@@ -56,8 +56,8 @@ enum typeMaterial {
 })
 export default class MaterialComponent implements OnInit {
   visibleDialog = false;
-  enabled = StatusEnabledDisabled.enabled;
-  disabled = StatusEnabledDisabled.disabled;
+  enabled = StatusEnum.ENABLED;
+  disabled = StatusEnum.DISABLED;
   material!: ToolControlMaterial;
   category!: ToolControlCategory;
   listMat: ToolControlMaterial[] = [];

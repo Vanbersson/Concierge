@@ -21,13 +21,12 @@ import { CompanyService } from '../../../services/company/company.service';
 import { Company } from '../../../models/company/Company';
 import { Resale } from '../../../models/resale/resale';
 import { ResaleService } from '../../../services/resale/resale.service';
-import { StatusEnabledDisabled } from '../../../models/enum/status-enabled-disabled';
-
+import { StatusEnum } from '../../../models/enum/status-enum';
 
 @Component({
   selector: 'app-company',
   standalone: true,
-  imports: [CommonModule, TabViewModule, TableModule, FormsModule, ReactiveFormsModule, IconFieldModule,InputIconModule,
+  imports: [CommonModule, TabViewModule, TableModule, FormsModule, ReactiveFormsModule, IconFieldModule, InputIconModule,
     InputTextModule, ButtonModule, InputMaskModule, ToastModule, InputNumberModule],
   templateUrl: './company.component.html',
   styleUrl: './company.component.scss',
@@ -36,12 +35,12 @@ import { StatusEnabledDisabled } from '../../../models/enum/status-enabled-disab
 export default class CompanyComponent {
 
   private company: Company;
-  enabled: string = StatusEnabledDisabled.enabled;
+  enabled: string = StatusEnum.ENABLED;
 
   resales: Resale[] = [];
 
   formCompany = new FormGroup({
-    id: new FormControl<number | null>({value:null,disabled:true}),
+    id: new FormControl<number | null>({ value: null, disabled: true }),
     status: new FormControl<string>('', Validators.required),
     name: new FormControl<string>('', Validators.required),
     cnpj: new FormControl<string>('', Validators.required),

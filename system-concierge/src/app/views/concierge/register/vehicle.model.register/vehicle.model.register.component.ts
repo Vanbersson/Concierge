@@ -21,10 +21,9 @@ import { NgxImageCompressService } from 'ngx-image-compress';
 import { BusyService } from '../../../../components/loading/busy.service';
 //Class
 import { ModelVehicle } from '../../../../models/vehicle-model/model-vehicle';
-//Enum
-import { StatusEnabledDisabled } from '../../../../models/enum/status-enabled-disabled';
 //Const
 import { IMAGE_MAX_SIZE } from '../../../../util/constants';
+import { StatusEnum } from '../../../../models/enum/status-enum';
 
 @Component({
   selector: 'app-vehicle.model.register',
@@ -39,8 +38,8 @@ import { IMAGE_MAX_SIZE } from '../../../../util/constants';
 })
 export default class VehicleModelRegisterComponent implements OnInit {
 
-  enabled = StatusEnabledDisabled.enabled;
-  disabled = StatusEnabledDisabled.disabled;
+  enabled = StatusEnum.ENABLED;
+  disabled = StatusEnum.DISABLED;
   modelVehicles: ModelVehicle[] = [];
   modelVehicle: ModelVehicle;
   dialogVisible: boolean = false;

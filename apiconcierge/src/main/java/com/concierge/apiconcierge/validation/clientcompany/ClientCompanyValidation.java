@@ -1,14 +1,12 @@
 package com.concierge.apiconcierge.validation.clientcompany;
 
 import com.concierge.apiconcierge.models.clientcompany.ClientCompany;
-import com.concierge.apiconcierge.models.clientcompany.FisJurEnum;
+import com.concierge.apiconcierge.models.clientcompany.FisJur;
 import com.concierge.apiconcierge.models.message.MessageResponse;
 import com.concierge.apiconcierge.repositories.clientcompany.IClientCompanyRepository;
 import com.concierge.apiconcierge.util.ConstantsMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Service
 public class ClientCompanyValidation implements IClientCompanyValidation {
@@ -31,12 +29,6 @@ public class ClientCompanyValidation implements IClientCompanyValidation {
             response.setMessage(ConstantsMessage.NOT_INFORMED);
             return response;
         }
-        if (client.getId() == null || client.getId() == 0) {
-            response.setStatus(ConstantsMessage.ERROR);
-            response.setHeader("Código");
-            response.setMessage(ConstantsMessage.NOT_INFORMED);
-            return response;
-        }
         if (client.getStatus() == null) {
             response.setStatus(ConstantsMessage.ERROR);
             response.setHeader("Status");
@@ -55,11 +47,18 @@ public class ClientCompanyValidation implements IClientCompanyValidation {
             response.setMessage(ConstantsMessage.NOT_INFORMED);
             return response;
         }
-        if (client.getFisjur() == FisJurEnum.Física) {
+
+        if (client.getFisjur() == FisJur.Física) {
             if (client.getCpf().isBlank()) {
                 response.setStatus(ConstantsMessage.ERROR);
                 response.setHeader("CPF");
                 response.setMessage(ConstantsMessage.NOT_INFORMED);
+                return response;
+            }
+            if(!this.isValidCpf(client.getCpf())){
+                response.setStatus(ConstantsMessage.ERROR);
+                response.setHeader("CPF");
+                response.setMessage("Inválido.");
                 return response;
             }
             ClientCompany clientResult = this.repository.filterCNPJ(client.getCompanyId(), client.getResaleId(), client.getCpf());
@@ -69,7 +68,7 @@ public class ClientCompanyValidation implements IClientCompanyValidation {
                 response.setMessage("Já cadastrado.");
                 return response;
             }
-        } else if (client.getFisjur() == FisJurEnum.Jurídica) {
+        } else if (client.getFisjur() == FisJur.Jurídica) {
             if (client.getCnpj().isBlank()) {
                 response.setStatus(ConstantsMessage.ERROR);
                 response.setHeader("CNPJ");
@@ -135,14 +134,30 @@ public class ClientCompanyValidation implements IClientCompanyValidation {
             response.setMessage(ConstantsMessage.NOT_INFORMED);
             return response;
         }
-        if (client.getFisjur() == FisJurEnum.Física) {
+        if (client.getFisjur() == FisJur.Física) {
             if (client.getCpf().isBlank()) {
                 response.setStatus(ConstantsMessage.ERROR);
                 response.setHeader("CPF");
                 response.setMessage(ConstantsMessage.NOT_INFORMED);
                 return response;
             }
-        } else {
+            if(!this.isValidCpf(client.getCpf())){
+                response.setStatus(ConstantsMessage.ERROR);
+                response.setHeader("CPF");
+                response.setMessage("Inválido.");
+                return response;
+            }
+
+            ClientCompany clientFilterCPF = this.repository.filterCPF(client.getCompanyId(), client.getResaleId(), client.getCpf());
+            if (clientFilterCPF != null) {
+                if(clientFilterCPF.getId() != client.getId()){
+                    response.setStatus(ConstantsMessage.ERROR);
+                    response.setHeader("Cliente");
+                    response.setMessage("Já cadastrado ok.");
+                    return response;
+                }
+            }
+        } else if (client.getFisjur() == FisJur.Jurídica) {
             if (client.getCnpj().isBlank()) {
                 response.setStatus(ConstantsMessage.ERROR);
                 response.setHeader("CNPJ");
@@ -315,5 +330,52 @@ public class ClientCompanyValidation implements IClientCompanyValidation {
         response.setHeader(ConstantsMessage.SUCCESS);
         response.setMessage(ConstantsMessage.SUCCESS);
         return response;
+    }
+
+    private boolean isValidCpf(String cpf) {
+        if (cpf == null || cpf.length() != 11) {
+            return false;
+        }
+
+        // Rejeita CPFs com todos os dígitos iguais (ex: 00000000000)
+        boolean allSame = true;
+        for (int i = 1; i < 11; i++) {
+            if (cpf.charAt(i) != cpf.charAt(0)) {
+                allSame = false;
+                break;
+            }
+        }
+        if (allSame) return false;
+
+        try {
+            int soma = 0;
+            int peso = 10;
+
+            // Calcula o 1º dígito verificador
+            for (int i = 0; i < 9; i++) {
+                soma += (cpf.charAt(i) - '0') * peso--;
+            }
+            int resto = soma % 11;
+            int digito1 = (resto < 2) ? 0 : 11 - resto;
+
+            // Valida o 1º dígito
+            if (digito1 != (cpf.charAt(9) - '0')) {
+                return false;
+            }
+
+            soma = 0;
+            peso = 11;
+
+            // Calcula o 2º dígito verificador
+            for (int i = 0; i < 10; i++) {
+                soma += (cpf.charAt(i) - '0') * peso--;
+            }
+            resto = soma % 11;
+            int digito2 = (resto < 2) ? 0 : 11 - resto;
+
+            return digito2 == (cpf.charAt(10) - '0');
+        } catch (Exception e) {
+            return false;
+        }
     }
 }

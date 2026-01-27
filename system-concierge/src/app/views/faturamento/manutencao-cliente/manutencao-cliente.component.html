@@ -43,8 +43,8 @@
         <ng-template pTemplate="body" let-client>
             <tr>
                 <td>{{client.id}}</td>
-                <td>{{client.fantasia}}</td>
-                <td>{{client.name}}</td>
+                <td>{{client.fantasia | uppercase}}</td>
+                <td>{{client.name | uppercase}}</td>
                 <td>{{maskCNPJ(client.cnpj)}}</td>
                 <td>{{maskCPF(client.cpf)}}</td>
                 <td><p-button icon="pi pi-pencil" label="Editar" severity="secondary-custom" size="small" (onClick)="editClient(client)" /></td>
@@ -54,8 +54,31 @@
 </div>
 
 <!-- Dialog Add or Alter cliente -->
-<p-dialog header="Cadastro" [(visible)]="visibleDialog" [modal]="true" [maximizable]="true" [style]="{ width: '60rem', height:'52rem' }"
+<p-dialog header="Cadastro de clientes" [(visible)]="visibleDialog" [modal]="true" [maximizable]="true" [style]="{ width: '80rem', height:'58rem' }"
     [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }">
+    <form [formGroup]="formClient">
+        <div class="p-fluid p-formgrid grid">
+            <div class="md:col-8">
+            </div>
+            <div class="col-12 md:col-4">
+                <label for="">Tipo</label>
+                <div class="flex align-items-center gap-2 border-1 border-round border-300 p-3">
+                    <div class="flex align-items-center">
+                        <p-radioButton inputId="pfi" [value]="fisica" formControlName="fisjur" (onClick)="changeType()"></p-radioButton>
+                        <label for="pfi" class="ml-2">{{fisica}}</label>
+                    </div>
+                    <div class="flex align-items-center">
+                        <p-radioButton inputId="pju" [value]="juridica" formControlName="fisjur" (onClick)="changeType()"></p-radioButton>
+                        <label for="pju" class="ml-2">{{juridica}}</label>
+                    </div>
+                    <div class="flex align-items-center">
+                        <p-radioButton inputId="pou" [value]="outras" formControlName="fisjur" (onClick)="changeType()"></p-radioButton>
+                        <label for="pou" class="ml-2">{{outras}}</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
     <p-tabView >
         <p-tabPanel header="Dados">
             <form [formGroup]="formClient" class="layout-card-aba">
@@ -65,23 +88,25 @@
                         <p-inputNumber mode="decimal" [useGrouping]="false" formControlName="id" />
                     </div>
                     <div class="col-12 md:col-10">
-                        <label for="ClientNameId">Razão Social</label>
+                        <label for="ClientNameId">Nome</label>
                         <input id="ClientNameId" type="text" [style]="{'text-transform':'uppercase'}" pInputText formControlName="name" />
                         <small class="p-error block" *ngIf="formClient.get('name')?.invalid">Campo obrigatório</small>
                     </div>
-                    <div class="col-12 md:col-6">
-                        <label for="ClientFantasiaId">Fantasia</label>
+                    <div class="col-12 md:col-3">
+                        <label for="ClientFantasiaId">Apelido/Fantasia</label>
                         <input id="ClientFantasiaId" type="text" [style]="{'text-transform':'uppercase'}" pInputText formControlName="fantasia" />
+                    </div>
+                    <div class="col-12 md:col-3">
+                        <label for="CliForId">Categoria</label>
+                        <p-multiSelect [options]="categories" optionLabel="description" [selectionLimit]="1" placeholder="Selecione" formControlName="category"  />
+                         <small class="p-error block" *ngIf="formClient.get('category')?.invalid">Campo obrigatório</small> 
                     </div>
                     <div class="col-12 md:col-3">
                         <label for="CliForId">Cliente/Fornecedor</label>
                         <p-multiSelect [options]="clifor" optionLabel="type" [selectionLimit]="1" placeholder="Selecione" formControlName="clifor" />
                         <small class="p-error block" *ngIf="formClient.get('clifor')?.invalid">Campo obrigatório</small>
                     </div>
-                    <div class="col-12 md:col-3">
-                        <label for="FisJurId">Jurídica/Física</label>
-                        <p-multiSelect [options]="fisjur" optionLabel="type" [selectionLimit]="1" placeholder="Selecione" formControlName="fisjur" />
-                        <small class="p-error block" *ngIf="formClient.get('fisjur')?.invalid">Campo obrigatório</small>
+                    <div class="md:col-3">
                     </div>
                     <div class="col-12 md:col-1">
                         <label for="DddPhoneId">DDD</label>
@@ -102,17 +127,12 @@
                     </div>
                     <div class="md:col-4">
                     </div>
-                    <div class="col-12 md:col-6">
-                        <label for="emailHomeId">E-mail Casa</label>
-                        <input id="emailHomeId" type="email" [style]="{'text-transform':'lowercase'}" pInputText formControlName="emailHome" />
-                    </div>
-                    <div class="col-12 md:col-6">
-                        <label for="emailWorkId">E-mail Trabalho</label>
-                        <input id="emailWorkId" type="email" [style]="{'text-transform':'lowercase'}" pInputText formControlName="emailWork" />
-                    </div>
                     <div class="col-12 md:col-2">
                         <label for="ClientzipCode">CEP</label>
-                        <p-inputMask id="ClientzipCode" mask="99999-999" [unmask]="true" formControlName="zipCode" />
+                        <p-inputGroup>
+                            <p-inputMask id="ClientzipCode" mask="99999-999" [unmask]="true" formControlName="zipCode" />
+                            <button type="button" pButton icon="pi pi-search" class="p-button-warning" (click)="searchCEP()"></button>
+                        </p-inputGroup>
                         <small class="p-error block" *ngIf="formClient.get('zipCode')?.invalid">Campo obrigatório</small>
                     </div>
                     <div class="col-12 md:col-8">
@@ -122,7 +142,7 @@
                     </div>
                     <div class="col-12 md:col-2">
                         <label for="ClientAddressNumber">Nº</label>
-                        <p-inputNumber id="ClientAddressNumber" formControlName="addressNumber" [useGrouping]="false" />
+                        <p-inputNumber id="ClientAddressNumber" maxlength="10" [useGrouping]="false" formControlName="addressNumber" />
                     </div>
                     <div class="col-12 md:col-1">
                         <label for="ClientState">UF</label>
@@ -149,33 +169,44 @@
         <p-tabPanel header="Contato">
             <form [formGroup]="formClient" class="layout-card-aba">
                 <div class="p-fluid p-formgrid grid">
+                     <div class="col-12 md:col-6">
+                        <label for="emailHomeId">E-mail casa</label>
+                        <input id="emailHomeId" type="email" [style]="{'text-transform':'lowercase'}" pInputText formControlName="emailHome" />
+                    </div>
                     <div class="col-12 md:col-6">
-                        <label for="contactNameId">Nome</label>
-                        <input id="contactNameId" type="text" [style]="{'text-transform':'uppercase'}" pInputText formControlName="contactName" />
+                        <label for="emailWorkId">E-mail trabalho</label>
+                        <input id="emailWorkId" type="email" [style]="{'text-transform':'lowercase'}" pInputText formControlName="emailWork" />
                     </div>
-                    <div class="md:col-6"></div>
-                    <div class="col-12 md:col-6">
-                        <label for="contactEmailId">E-Mail</label>
-                        <input id="contactEmailId" type="email" [style]="{'text-transform':'lowercase'}" pInputText formControlName="contactEmail" />
+                    <div class="col-12">
+                        <label for="">Pessoa de contato</label>
+                        <div class="card grid mt-1">
+                            <div class="col-12 md:col-4">
+                                <label for="contactNameId">Nome</label>
+                                <input id="contactNameId" type="text" [style]="{'text-transform':'uppercase'}" pInputText formControlName="contactName" />
+                            </div>
+                            <div class="col-12 md:col-8">
+                                <label for="contactEmailId">E-Mail</label>
+                                <input id="contactEmailId" type="email" [style]="{'text-transform':'lowercase'}" pInputText formControlName="contactEmail" />
+                            </div>
+                            <div class="col-12 md:col-1">
+                                <label for="contactDDDPhoneId">DDD</label>
+                                <p-inputMask id="contactDDDPhoneId" mask="99" [unmask]="true" formControlName="contactDDDPhone" />
+                            </div>
+                            <div class="col-12 md:col-3">
+                                <label for="contactPhoneId">Telefone</label>
+                                <p-inputMask id="contactPhoneId" mask="9999-9999" [unmask]="true" formControlName="contactPhone" />
+                            </div>
+                            <div class="col-12 md:col-1">
+                                <label for="contactDDDCellphoneId">DDD</label>
+                                <p-inputMask id="contactDDDCellphoneId" mask="99" [unmask]="true" formControlName="contactDDDCellphone" />
+                            </div>
+                            <div class="col-12 md:col-3">
+                                <label for="contactCellphoneId">Celular</label>
+                                <p-inputMask id="contactCellphoneId" mask="9999-9999" [unmask]="true" formControlName="contactCellphone" />
+                            </div>
+                        </div>
                     </div>
-                    <div class="md:col-6"></div>
-                    <div class="col-12 md:col-1">
-                        <label for="contactDDDPhoneId">DDD</label>
-                        <p-inputMask id="contactDDDPhoneId" mask="99" [unmask]="true" formControlName="contactDDDPhone" />
-                    </div>
-                    <div class="col-12 md:col-3">
-                        <label for="contactPhoneId">Telefone</label>
-                        <p-inputMask id="contactPhoneId" mask="9999-9999" [unmask]="true" formControlName="contactPhone" />
-                    </div>
-
-                    <div class="col-12 md:col-1">
-                        <label for="contactDDDCellphoneId">DDD</label>
-                        <p-inputMask id="contactDDDCellphoneId" mask="99" [unmask]="true" formControlName="contactDDDCellphone" />
-                    </div>
-                    <div class="col-12 md:col-3">
-                        <label for="contactCellphoneId">Celular</label>
-                        <p-inputMask id="contactCellphoneId" mask="9999-9999" [unmask]="true" formControlName="contactCellphone" />
-                    </div>
+                   
                 </div>
             </form>
         </p-tabPanel>
@@ -190,6 +221,14 @@
                             <button type="button" pButton icon="pi pi-lock" class="p-button-secondary" (click)="confirm('CNPJ')"></button>
                         </p-inputGroup>
                         <small class="p-error block" *ngIf="formClient.get('cnpj')?.invalid">Campo obrigatório</small>
+                    </div>
+                    <div class="col-12 md:col-3">
+                        <label for="">Inscrição estadual</label>
+                        <input pInputText type="text" formControlName="ie"/>
+                    </div>
+                    <div class="col-12 md:col-3">
+                        <label for="">Inscrição municipal</label>
+                        <input pInputText type="text" formControlName="im"/>
                     </div>
                 </div>
             </form>
@@ -208,7 +247,7 @@
                     </div>
                     <div class="col-12 md:col-3">
                         <label for="ClientRg">RG</label>
-                        <p-inputNumber inputId="ClientRg" mode="decimal" [useGrouping]="false" formControlName="rg" />
+                        <p-inputNumber id="ClientRg" [useGrouping]="false" maxlength="11" formControlName="rg"/>
                     </div>
                     <div class="md:col-3">
                     </div>
@@ -219,7 +258,7 @@
     <p-divider type="solid" />
     <div class="col-12 flex justify-content-end gap-2">
         <button pButton type="button" pRipple label="Fechar" icon="pi pi-times" class="p-button-text" (click)="hideDialog()"></button>
-        <button pButton type="button" pRipple label="Salvar" icon="pi pi-check" class="p-button-text" (click)="saveClient()"></button>
+        <button pButton type="button" pRipple label="Salvar" icon="pi pi-check" class="p-button-text" (click)="save()"></button>
     </div>
 </p-dialog>
 

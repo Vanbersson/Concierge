@@ -1,7 +1,7 @@
 package com.concierge.apiconcierge.repositories.clientcompany;
 
 import com.concierge.apiconcierge.models.clientcompany.ClientCompany;
-import com.concierge.apiconcierge.models.clientcompany.FisJurEnum;
+import com.concierge.apiconcierge.models.clientcompany.FisJur;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -18,10 +18,10 @@ public interface IClientCompanyRepository extends JpaRepository<ClientCompany, I
     ClientCompany filterId(Integer companyId, Integer resaleId, Integer clientId);
 
     @Query(value = "SELECT * FROM `tb_client_company` WHERE company_id=?1 AND resale_id=?2 AND fisjur=?3 AND fantasia like %?4%", nativeQuery = true)
-    List<ClientCompany> filterFantasia(Integer companyId, Integer resaleId, FisJurEnum fisjur, String fantasia);
+    List<ClientCompany> filterFantasia(Integer companyId, Integer resaleId, FisJur fisjur, String fantasia);
 
     @Query(value = "SELECT * FROM `tb_client_company` WHERE company_id=?1 AND resale_id=?2 AND fisjur=?3 AND name like %?4%", nativeQuery = true)
-    List<ClientCompany> filterName(Integer companyId, Integer resaleId, FisJurEnum fisjur, String name);
+    List<ClientCompany> filterName(Integer companyId, Integer resaleId, FisJur fisjur, String name);
 
     @Query(value = "SELECT * FROM `tb_client_company` WHERE company_id=?1 AND resale_id=?2 AND cnpj=?3", nativeQuery = true)
     ClientCompany filterCNPJ(Integer companyId, Integer resaleId, String cnpj);

@@ -4,7 +4,7 @@ import com.concierge.apiconcierge.models.status.StatusEnableDisable;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.io.Serializable;
+import java.util.Date;
 
 @Getter
 @Setter
@@ -13,12 +13,10 @@ import java.io.Serializable;
 @EqualsAndHashCode(of = "id")
 @SecondaryTable(name = "tb_company", pkJoinColumns = @PrimaryKeyJoinColumn(name = "id"))
 @SecondaryTable(name = "tb_resale", pkJoinColumns = @PrimaryKeyJoinColumn(name = "id"))
-@SecondaryTable(name = "tb_client_company_type", pkJoinColumns = @PrimaryKeyJoinColumn(name = "id"))
+@SecondaryTable(name = "tb_client_category", pkJoinColumns = @PrimaryKeyJoinColumn(name = "id"))
 @Entity
 @Table(name = "tb_client_company")
-public class ClientCompany implements Serializable {
-
-    private static final long serialVersionUID = 9L;
+public class ClientCompany {
 
     @JoinColumn(table = "tb_company", referencedColumnName = "id")
     @Column(name = "company_id")
@@ -28,7 +26,11 @@ public class ClientCompany implements Serializable {
     @Column(name = "resale_id")
     private Integer resaleId;
 
+    @Column(name="date_register")
+    private Date dateRegister;
+
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     private StatusEnableDisable status;
@@ -37,15 +39,29 @@ public class ClientCompany implements Serializable {
 
     private String fantasia;
 
-    private CliForEnum clifor;
+    @JoinColumn(table = "tb_client_category", referencedColumnName = "id")
+    @Column(name = "category_id")
+    private Integer categoryId;
 
-    private FisJurEnum fisjur;
+    private CliFor clifor;
+
+    private FisJur fisjur;
 
     private String cnpj;
+
+    private String ie;
+
+    private String im;
 
     private String cpf;
 
     private String rg;
+
+    @Column(name = "rg_expedidor")
+    private String rgExpedidor;
+
+    @Column(name = "date_birth")
+    private Date dateBirth;
 
     @Column(name = "email_home")
     private String emailHome;

@@ -1,5 +1,5 @@
 package com.concierge.apiconcierge.models.clientcompany;
 
-public enum FisJurEnum {
-    Física, Jurídica;
+public enum CliFor {
+    Cliente, Fornecedor, Ambos;
 }

@@ -29,13 +29,13 @@ import { NgxImageCompressService } from 'ngx-image-compress';
 import { StorageService } from '../../../services/storage/storage.service';
 import { HttpResponse } from '@angular/common/http';
 import { lastValueFrom } from 'rxjs';
-import { StatusEnabledDisabled } from '../../../models/enum/status-enabled-disabled';
 import { BusyService } from '../../../components/loading/busy.service';
 import { CEPService } from '../../../services/cep/cep.service';
 //enum
 import { MaleFemale } from '../../../models/enum/male-female';
 import { MessageResponse } from '../../../models/message/message-response';
 import { SuccessError } from '../../../models/enum/success-error';
+import { StatusEnum } from '../../../models/enum/status-enum';
 
 interface sexo {
   type: string;
@@ -56,8 +56,8 @@ export default class DriverComponent implements OnInit {
   listDriver: Driver[] = [];
   driver!: Driver;
 
-  enabled = StatusEnabledDisabled.enabled;
-  disabled = StatusEnabledDisabled.disabled;
+  enabled = StatusEnum.ENABLED;
+  disabled = StatusEnum.DISABLED;
 
   //Dialog novo
   visibleDialogNew: boolean = false;

@@ -18,14 +18,13 @@ import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 //Class
 import { Mechanic } from '../../../../models/workshop/mechanic/Mechanic';
-//Enum
-import { StatusEnabledDisabled } from '../../../../models/enum/status-enabled-disabled';
 //Services
 import { MechanicService } from '../../../../services/workshop/mechanic/mechanic.service';
 import { NgxImageCompressService } from 'ngx-image-compress';
 import { StorageService } from '../../../../services/storage/storage.service';
 import { IMAGE_MAX_SIZE } from '../../../../util/constants';
 import { BusyService } from '../../../../components/loading/busy.service';
+import { StatusEnum } from '../../../../models/enum/status-enum';
 
 @Component({
   selector: 'app-mechanic',
@@ -42,8 +41,8 @@ export default class MecanicoComponent implements OnInit {
   mechanics: Mechanic[] = [];
   mechanic: Mechanic;
 
-  enabled = StatusEnabledDisabled.enabled;
-  disabled = StatusEnabledDisabled.disabled;
+  enabled = StatusEnum.ENABLED;
+  disabled = StatusEnum.DISABLED;
 
   //Dialog
   visibleDialog: boolean = false;

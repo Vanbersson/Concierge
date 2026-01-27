@@ -2,22 +2,16 @@ package com.concierge.apiconcierge.services.clientcompany;
 
 import com.concierge.apiconcierge.exceptions.clientcompany.ClientCompanyException;
 import com.concierge.apiconcierge.models.clientcompany.ClientCompany;
-import com.concierge.apiconcierge.models.clientcompany.FisJurEnum;
+import com.concierge.apiconcierge.models.clientcompany.FisJur;
 import com.concierge.apiconcierge.models.message.MessageResponse;
 import com.concierge.apiconcierge.repositories.clientcompany.IClientCompanyRepository;
 import com.concierge.apiconcierge.util.ConstantsMessage;
-import com.concierge.apiconcierge.util.ConstantsUrls;
-import com.concierge.apiconcierge.validation.clientcompany.ClientCompanyValidation;
 import com.concierge.apiconcierge.validation.clientcompany.IClientCompanyValidation;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class ClientCompanyService implements IClientCompanyService {
@@ -33,8 +27,12 @@ public class ClientCompanyService implements IClientCompanyService {
         try {
             MessageResponse response = this.validation.save(client);
             if (ConstantsMessage.SUCCESS.equals(response.getStatus())) {
-                if (client.getFisjur() == FisJurEnum.Física) {
+                client.setId(null);
+                client.setDateRegister(new Date());
+                if (client.getFisjur() == FisJur.Física) {
                     client.setCnpj("");
+                    client.setIe("");
+                    client.setIm("");
                 } else {
                     client.setCpf("");
                     client.setRg("");
@@ -79,7 +77,17 @@ public class ClientCompanyService implements IClientCompanyService {
                     response.setMessage("Não encontrado.");
                     return response;
                 }
-                response.setData(list);
+                List<Map<String,Object>> result = new ArrayList<>();
+                for(ClientCompany c: list){
+                    Map<String,Object> map = new HashMap<>();
+                    map.put("id",c.getId());
+                    map.put("fantasia",c.getFantasia());
+                    map.put("name",c.getName());
+                    map.put("cnpj",c.getCnpj());
+                    map.put("cpf",c.getCpf());
+                    result.add(map);
+                }
+                response.setData(result);
                 return response;
             } else {
                 return response;
@@ -118,7 +126,7 @@ public class ClientCompanyService implements IClientCompanyService {
         try {
             MessageResponse response = this.validation.filterFantasia(companyId, resaleId, fantasia);
             if (ConstantsMessage.SUCCESS.equals(response.getStatus())) {
-                List<ClientCompany> list = this.repository.filterFantasia(companyId, resaleId, FisJurEnum.Jurídica, fantasia);
+                List<ClientCompany> list = this.repository.filterFantasia(companyId, resaleId, FisJur.Jurídica, fantasia);
                 if (list.isEmpty()) {
                     response.setStatus(ConstantsMessage.ERROR);
                     response.setHeader("Informações");
@@ -141,7 +149,7 @@ public class ClientCompanyService implements IClientCompanyService {
         try {
             MessageResponse response = this.validation.filterFantasia(companyId, resaleId, fantasia);
             if (ConstantsMessage.SUCCESS.equals(response.getStatus())) {
-                List<ClientCompany> list = this.repository.filterFantasia(companyId, resaleId, FisJurEnum.Física, fantasia);
+                List<ClientCompany> list = this.repository.filterFantasia(companyId, resaleId, FisJur.Física, fantasia);
                 if (list.isEmpty()) {
                     response.setStatus(ConstantsMessage.ERROR);
                     response.setHeader("Informações");
@@ -164,7 +172,7 @@ public class ClientCompanyService implements IClientCompanyService {
         try {
             MessageResponse response = this.validation.filterName(companyId, resaleId, name);
             if (ConstantsMessage.SUCCESS.equals(response.getStatus())) {
-                List<ClientCompany> list = this.repository.filterName(companyId, resaleId, FisJurEnum.Jurídica, name);
+                List<ClientCompany> list = this.repository.filterName(companyId, resaleId, FisJur.Jurídica, name);
                 if (list.isEmpty()) {
                     response.setStatus(ConstantsMessage.ERROR);
                     response.setHeader("Informações");
@@ -187,7 +195,7 @@ public class ClientCompanyService implements IClientCompanyService {
         try {
             MessageResponse response = this.validation.filterName(companyId, resaleId, name);
             if (ConstantsMessage.SUCCESS.equals(response.getStatus())) {
-                List<ClientCompany> list = this.repository.filterName(companyId, resaleId, FisJurEnum.Física, name);
+                List<ClientCompany> list = this.repository.filterName(companyId, resaleId, FisJur.Física, name);
                 if (list.isEmpty()) {
                     response.setStatus(ConstantsMessage.ERROR);
                     response.setHeader("Informações");

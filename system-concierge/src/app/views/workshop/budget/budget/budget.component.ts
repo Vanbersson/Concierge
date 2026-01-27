@@ -30,7 +30,7 @@ import { StorageService } from '../../../../services/storage/storage.service';
 import { BudgetService } from '../../../../services/budget/budget.service';
 import { TypePaymentService } from '../../../../services/payment/type-payment.service';
 import { BusyService } from '../../../../components/loading/busy.service';
-import { ClientecompanyService } from '../../../../services/clientecompany/clientecompany.service';
+
 import { VehicleService } from '../../../../services/vehicle/vehicle.service';
 import { EmailClientService } from '../../../../services/email/email-client.service';
 //class
@@ -51,9 +51,10 @@ import { PrintBudgetComponent } from '../../../../components/print.budget/print.
 //Enum
 import { StatusBudgetEnum } from '../../../../models/budget/status-budget-enum';
 import { EmailClient } from '../../../../models/email/email-client';
-import { ClientFisJurEnum } from '../../../../models/clientcompany/client-fisjur-enum';
 import { BudgetToken } from '../../../../models/budget/budget-token';
 import { TypePayment } from '../../../../models/payment/type-payment';
+import { FisJurEnum } from '../../../../models/clientcompany/fisjur-enum';
+import { ClientCompanyService } from '../../../../services/clientecompany/client-company.service';
 
 export enum StatusBudget {
   open = "Open",
@@ -75,7 +76,7 @@ export default class BudgetComponent implements OnInit, OnDestroy, DoCheck {
   budget: Budget = new Budget();
   clientCompany: ClientCompany = new ClientCompany();
   vehicleEntry: VehicleEntry = new VehicleEntry();
-  juridica: string = ClientFisJurEnum.juridica;
+  juridica: string =FisJurEnum.JURIDICA;
 
   vehicleId = signal<number>(0);
   listPayment: TypePayment[] = [];
@@ -149,7 +150,7 @@ export default class BudgetComponent implements OnInit, OnDestroy, DoCheck {
     private vehicleService: VehicleService,
     private storageService: StorageService,
     private budgetService: BudgetService,
-    private serviceClienteCompany: ClientecompanyService,
+    private clientService: ClientCompanyService,
     private router: Router,
     private messageService: MessageService,
     private confirmationService: ConfirmationService,
@@ -352,7 +353,7 @@ export default class BudgetComponent implements OnInit, OnDestroy, DoCheck {
   }
   private async getClient(id: number): Promise<HttpResponse<MessageResponse>> {
     try {
-      return await lastValueFrom(this.serviceClienteCompany.filterId(id));
+      return await lastValueFrom(this.clientService.filterId(id));
     } catch (error) {
       return error;
     }

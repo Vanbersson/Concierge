@@ -20,12 +20,12 @@ import { User } from '../../models/user/user';
 import { lastValueFrom } from 'rxjs';
 import { HttpResponse } from '@angular/common/http';
 import { IMAGE_MAX_SIZE_LABEL } from '../../util/constants';
-import { StatusEnabledDisabled } from '../../models/enum/status-enabled-disabled';
 import { MessageResponse } from '../../models/message/message-response';
 import { PhotoService } from '../../services/photo/photo.service';
 import { PhotoResultStatus } from '../../models/enum/photo-result-status';
 import { PhotoResult } from '../../interfaces/photo-result';
 import { SuccessError } from '../../models/enum/success-error';
+import { StatusEnum } from '../../models/enum/status-enum';
 
 @Component({
   selector: 'app-userprofile',
@@ -42,8 +42,8 @@ import { SuccessError } from '../../models/enum/success-error';
 export class UserProfileComponent {
   private user!: User;
   @Output() public outUser = new EventEmitter<User>();
-  enabled = StatusEnabledDisabled.enabled;
-  disabled = StatusEnabledDisabled.disabled;
+  enabled = StatusEnum.ENABLED;
+  disabled = StatusEnum.DISABLED;
   userPhotoUrl!: string;
 
   userForm = new FormGroup({
@@ -52,7 +52,7 @@ export class UserProfileComponent {
     cellphone: new FormControl<string>(''),
     limitDiscount: new FormControl<number>({ value: 0, disabled: true }, Validators.required),
     roleDesc: new FormControl<string>({ value: '', disabled: true }, Validators.required),
-    status: new FormControl<string>({ value: StatusEnabledDisabled.enabled, disabled: true }, Validators.required),
+    status: new FormControl<string>({ value: StatusEnum.DISABLED, disabled: true }, Validators.required),
   });
 
   constructor(

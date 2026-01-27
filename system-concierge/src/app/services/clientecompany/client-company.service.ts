@@ -9,14 +9,14 @@ import { MessageResponse } from '../../models/message/message-response';
 @Injectable({
   providedIn: 'root'
 })
-export class ClientecompanyService {
+export class ClientCompanyService {
 
   companyResale: string = this.storage.companyId + "/" + this.storage.resaleId;
 
   constructor(private http: HttpClient, private storage: StorageService) { }
 
-  save(client: ClientCompany): Observable<HttpResponse<ClientCompany>> {
-    return this.http.post<ClientCompany>(environment.apiuUrl + "/clientcompany/save", client, { headers: this.myHeaders(), observe: 'response' });
+  save(client: ClientCompany): Observable<HttpResponse<MessageResponse>> {
+    return this.http.post<MessageResponse>(environment.apiuUrl + "/clientcompany/save", client, { headers: this.myHeaders(), observe: 'response' });
   }
   update(client: ClientCompany): Observable<HttpResponse<MessageResponse>> {
     return this.http.post<MessageResponse>(environment.apiuUrl + "/clientcompany/update", client, { headers: this.myHeaders(), observe: 'response' });

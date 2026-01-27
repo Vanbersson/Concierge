@@ -1,24 +1,29 @@
 package com.concierge.apiconcierge.dtos.clientcompany;
 
-import com.concierge.apiconcierge.models.clientcompany.CliForEnum;
-import com.concierge.apiconcierge.models.clientcompany.FisJurEnum;
+import com.concierge.apiconcierge.models.clientcompany.CliFor;
+import com.concierge.apiconcierge.models.clientcompany.FisJur;
 import com.concierge.apiconcierge.models.status.StatusEnableDisable;
-import jakarta.persistence.Column;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+
+import java.util.Date;
 
 public record ClientCompanyDto(
         Integer companyId,
         Integer resaleId,
+        Date dateRegister,
         Integer id,
         StatusEnableDisable status,
         String name,
         String fantasia,
-        CliForEnum clifor,
-        FisJurEnum fisjur,
+        Integer categoryId,
+        CliFor clifor,
+        FisJur fisjur,
         String cnpj,
+        String ie,
+        String im,
         String cpf,
         String rg,
+        String rgExpedidor,
+        Date dateBirth,
         String emailHome,
         String emailWork,
         String dddCellphone,

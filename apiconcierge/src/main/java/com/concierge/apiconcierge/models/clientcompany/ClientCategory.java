@@ -4,8 +4,6 @@ import com.concierge.apiconcierge.models.status.StatusEnableDisable;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.io.Serializable;
-
 @Getter
 @Setter
 @NoArgsConstructor
@@ -14,10 +12,8 @@ import java.io.Serializable;
 @SecondaryTable(name = "tb_company", pkJoinColumns = @PrimaryKeyJoinColumn(name = "id"))
 @SecondaryTable(name = "tb_resale", pkJoinColumns = @PrimaryKeyJoinColumn(name = "id"))
 @Entity
-@Table(name = "tb_client_company_type")
-public class ClientCompanyType implements Serializable {
-
-    private static final long serialVersionUID = 8L;
+@Table(name = "tb_client_category")
+public class ClientCategory {
 
     @JoinColumn(table = "tb_company", referencedColumnName = "id")
     @Column(name = "company_id")

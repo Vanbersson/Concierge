@@ -134,7 +134,7 @@
       PRIMARY KEY(id)
   );
 
- CREATE TABLE IF NOT EXISTS tb_client_company_category(
+ CREATE TABLE IF NOT EXISTS tb_client_category(
      company_id int not null,
      resale_id int not null,
      id int not null AUTO_INCREMENT,
@@ -148,11 +148,12 @@
  CREATE TABLE IF NOT EXISTS tb_client_company (
      company_id int not null,
      resale_id int not null,
-     id int not null,
+     date_register datetime not null,
+     id int not null AUTO_INCREMENT,
      status tinyint not null,
-     category_id int not null,
      name varchar(255) not null,
      fantasia varchar(255),
+     category_id int not null,
      clifor tinyint not null,
      fisjur tinyint not null,
      cnpj varchar(14),
@@ -160,6 +161,8 @@
      im varchar(20),
      cpf varchar(11),
      rg varchar(11),
+     rg_expedidor varchar(11),
+     date_birth datetime,
      email_home varchar(100),
      email_work varchar(100),
      ddd_cellphone varchar(2),
@@ -181,7 +184,7 @@
      contact_cellphone varchar(9),
      FOREIGN KEY(company_id) REFERENCES tb_company(id),
      FOREIGN KEY(resale_id) REFERENCES tb_resale(id),
-     FOREIGN KEY(category_id) REFERENCES tb_client_company_category(id),
+     FOREIGN KEY(category_id) REFERENCES tb_client_category(id),
      primary KEY(id)
  );
 

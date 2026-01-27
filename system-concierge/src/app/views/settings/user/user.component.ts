@@ -39,8 +39,8 @@ import { MessageResponse } from '../../../models/message/message-response';
 import { IMAGE_MAX_SIZE, MESSAGE_RESPONSE_SUCCESS } from '../../../util/constants';
 import { NgxImageCompressService } from 'ngx-image-compress';
 import { StorageService } from '../../../services/storage/storage.service';
-import { StatusEnabledDisabled } from '../../../models/enum/status-enabled-disabled';
 import { SuccessError } from '../../../models/enum/success-error';
+import { StatusEnum } from '../../../models/enum/status-enum';
 
 @Component({
   selector: 'app-user',
@@ -65,12 +65,12 @@ export default class UserComponent implements OnInit {
   userRoleDescription!: string;
   isEditUser: boolean = false;
 
-  enabled: string = StatusEnabledDisabled.enabled;
-  disabled: string = StatusEnabledDisabled.disabled;
+  enabled = StatusEnum.ENABLED;
+  disabled = StatusEnum.DISABLED;
 
   formUser = new FormGroup({
     id: new FormControl<number | null>(null),
-    status: new FormControl<StatusEnabledDisabled>({ value: StatusEnabledDisabled.enabled, disabled: false }),
+    status: new FormControl<StatusEnum>({ value: StatusEnum.DISABLED, disabled: false }),
     name: new FormControl<string>('', Validators.required),
     email: new FormControl<string>('', Validators.required),
     password: new FormControl<string>(''),
@@ -122,7 +122,7 @@ export default class UserComponent implements OnInit {
       {
         key: '2_0', label: 'Peças', children: [
           { key: '2_1', label: 'Atendimento peças' },
-          { key: '2_2', label: 'Pedidos de compras'},
+          { key: '2_2', label: 'Pedidos de compras' },
           {
             key: '2_99', label: 'Cadastros', children: [
               { key: '2_99_0', label: 'Peças' },
@@ -144,7 +144,7 @@ export default class UserComponent implements OnInit {
               }
             ]
           },
-           { key: '3_3', label: 'Orçamentos' },
+          { key: '3_3', label: 'Orçamentos' },
           {
             key: '3_99', label: 'Cadastros', children: [
               { key: '3_99_0', label: 'Mecânico' },
@@ -346,7 +346,7 @@ export default class UserComponent implements OnInit {
       passwordValid: '',
       roleDesc: null,
       roleFunc: 'USER',
-      status: StatusEnabledDisabled.enabled
+      status: StatusEnum.ENABLED
     });
   }
   public async selectPhoto() {

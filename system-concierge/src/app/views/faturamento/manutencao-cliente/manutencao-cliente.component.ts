@@ -20,17 +20,24 @@ import { DividerModule } from 'primeng/divider';
 
 
 import { ClientCompany } from '../../../models/clientcompany/client-company';
-import { ClientecompanyService } from '../../../services/clientecompany/clientecompany.service';
 
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ITypeClient } from '../../../interfaces/clientcompany/itype-client';
 import { HttpResponse } from '@angular/common/http';
 import { lastValueFrom } from 'rxjs';
-import { ClientFisJurEnum } from '../../../models/clientcompany/client-fisjur-enum';
+
 import { MessageResponse } from '../../../models/message/message-response';
 import { SuccessError } from '../../../models/enum/success-error';
 import { BudgetService } from '../../../services/budget/budget.service';
 import { BusyService } from '../../../components/loading/busy.service';
+import { FisJurEnum } from '../../../models/clientcompany/fisjur-enum';
+import { CliForEnum } from '../../../models/clientcompany/clifor-enum';
+import { CEPService } from '../../../services/cep/cep.service';
+import { ClientCategoryService } from '../../../services/clientecompany/client-category.service';
+import { ClientCategory } from '../../../models/clientcompany/client-category';
+import { ClientCompanyService } from '../../../services/clientecompany/client-company.service';
+import { StorageService } from '../../../services/storage/storage.service';
+import { StatusEnum } from '../../../models/enum/status-enum';
 
 @Component({
   selector: 'app-manutencao-cliente',
@@ -43,41 +50,47 @@ import { BusyService } from '../../../components/loading/busy.service';
   styleUrl: './manutencao-cliente.component.scss',
   providers: [ConfirmationService, MessageService]
 })
-export default class ManutencaoClienteComponent implements OnInit, OnDestroy, DoCheck {
+export default class ManutencaoClienteComponent implements OnInit {
 
+  categories: ClientCategory[] = [];
   clifor: ITypeClient[] = [];
-  fisjur: ITypeClient[] = [];
   clients: ClientCompany[] = [];
   client: ClientCompany;
+  fisica = FisJurEnum.FISICA;
+  juridica = FisJurEnum.JURIDICA;
+  outras = FisJurEnum.OUTRAS;
   isClientNew = true;
   formClient = new FormGroup({
-    id: new FormControl<number | null>(null),
+    id: new FormControl<number | null>({ value: null, disabled: true }),
     fantasia: new FormControl<string>(""),
     name: new FormControl<string>("", Validators.required),
+    category: new FormControl<ClientCategory[]>([], Validators.required),
     clifor: new FormControl<ITypeClient[]>([], Validators.required),
-    fisjur: new FormControl<ITypeClient[]>([], Validators.required),
+    fisjur: new FormControl<string>(FisJurEnum.FISICA),
     cnpj: new FormControl<string>(""),
     cpf: new FormControl<string>(""),
-    rg: new FormControl<string>(""),
-    dddPhone: new FormControl<number | null>(null),
-    phone: new FormControl<number | null>(null),
-    dddCellphone: new FormControl<number | null>(null),
-    cellphone: new FormControl<number | null>(null),
+    rg: new FormControl<string | null>(null),
+    ie: new FormControl<string>(""),
+    im: new FormControl<string>(""),
+    dddPhone: new FormControl<string | null>(null),
+    phone: new FormControl<string | null>(null),
+    dddCellphone: new FormControl<string | null>(null),
+    cellphone: new FormControl<string | null>(null),
     emailHome: new FormControl<string>(""),
     emailWork: new FormControl<string>(""),
     zipCode: new FormControl<string>("", Validators.required),
     address: new FormControl<string>("", Validators.required),
-    addressNumber: new FormControl<number | null>(null),
+    addressNumber: new FormControl<string | null>(null),
     state: new FormControl<string>("", Validators.required),
     city: new FormControl<string>("", Validators.required),
     neighborhood: new FormControl<string>("", Validators.required),
     addressComplement: new FormControl<string>(""),
     contactName: new FormControl<string>(""),
     contactEmail: new FormControl<string>(""),
-    contactDDDPhone: new FormControl<number | null>(null),
-    contactPhone: new FormControl<number | null>(null),
-    contactDDDCellphone: new FormControl<number | null>(null),
-    contactCellphone: new FormControl<number | null>(null),
+    contactDDDPhone: new FormControl<string | null>(null),
+    contactPhone: new FormControl<string | null>(null),
+    contactDDDCellphone: new FormControl<string | null>(null),
+    contactCellphone: new FormControl<string | null>(null),
   });
   formClientFilter = new FormGroup({
     id: new FormControl<number | null>(null),
@@ -97,32 +110,23 @@ export default class ManutencaoClienteComponent implements OnInit, OnDestroy, Do
   visibleDialogFilter: boolean = false;
 
   constructor(
+    private storageService: StorageService,
+    private categoryService: ClientCategoryService,
+    private cepService: CEPService,
     private busyService: BusyService,
     private confirmationService: ConfirmationService,
     private messageService: MessageService,
-    private clienteService: ClientecompanyService) {
+    private clientService: ClientCompanyService) {
   }
-  ngDoCheck(): void {
-    if (this.formClient.value.fisjur.at(0)) {
-      if (this.formClient.value.fisjur.at(0)?.type == "Jurídica") {
-        this.showJuridica = true;
-        this.showFisica = false;
-      } else if (this.formClient.value.fisjur.at(0)?.type == "Física") {
-        this.showFisica = true;
-        this.showJuridica = false;
-      }
-    } else {
-      this.showJuridica = false;
-      this.showFisica = false;
-    }
-  }
+
   ngOnInit(): void {
-    this.clifor = [{ type: 'Cliente', value: 'Cliente' }, { type: 'Fornecedor', value: 'Fornecedor' }, { type: 'Ambos', value: 'Ambos' }];
-    this.fisjur = [{ type: 'Jurídica', value: 'Jurídica' }, { type: 'Física', value: 'Física' }];
+    this.clifor = [
+      { type: CliForEnum.CLIENTE, value: CliForEnum.CLIENTE },
+      { type: CliForEnum.FORNECEDOR, value: CliForEnum.FORNECEDOR },
+      { type: CliForEnum.AMBOS, value: CliForEnum.AMBOS }];
     this.init();
   }
-  ngOnDestroy(): void {
-  }
+
   async init() {
     //Show load
     this.busyService.busy();
@@ -130,13 +134,39 @@ export default class ManutencaoClienteComponent implements OnInit, OnDestroy, Do
     if (result.status == 200 && result.body.status == SuccessError.succes) {
       this.clients = result.body.data;
     }
+
+    const resultCate = await this.listAllCategories();
+    this.categories = resultCate;
     //Close load
     this.busyService.idle();
   }
+
+  changeType() {
+    if (this.formClient.value.fisjur == FisJurEnum.JURIDICA) {
+      this.showJuridica = true;
+      this.showFisica = false;
+      this.addValidCNPJ();
+      this.removeValidCPF();
+      this.formClient.patchValue({ cnpj: "" });
+    } else if (this.formClient.value.fisjur == FisJurEnum.FISICA) {
+      this.showFisica = true;
+      this.showJuridica = false;
+      this.addValidCPF();
+      this.removeValidCNPJ();
+      this.formClient.patchValue({ cpf: "" });
+    } else if (this.formClient.value.fisjur == FisJurEnum.OUTRAS) {
+      this.showFisica = true;
+      this.showJuridica = false;
+      this.removeValidCNPJ();
+      this.removeValidCPF();
+      this.formClient.patchValue({ cpf: "00000000000" });
+    }
+  }
   private async listAll(): Promise<HttpResponse<MessageResponse>> {
     try {
-      return await lastValueFrom(this.clienteService.listAll());
+      return await lastValueFrom(this.clientService.listAll());
     } catch (error) {
+      this.messageService.add({ severity: 'error', summary: 'Erro', detail: error.error.message, icon: 'pi pi-times' });
       return error;
     }
   }
@@ -184,22 +214,84 @@ export default class ManutencaoClienteComponent implements OnInit, OnDestroy, Do
     this.enableClientCnpj();
     this.enableClientCpf();
     this.isClientNew = true;
-   // this.editCNPJCPF = true;
+    this.client = new ClientCompany();
+    this.editCNPJCPF = true;
+    //habilita o tipo de cliente
+    this.formClient.get("fisjur").enable();
+
+    //Começa na aba PF
+    this.showFisica = true;
+    this.showJuridica = false;
+    this.addValidCPF();
+    this.removeValidCNPJ();
   }
-  saveClient() {
+  save() {
     if (this.isClientNew) {
       this.saveNewClient();
     } else {
-      this.update();
+      this.saveUpdateClient();
     }
   }
 
   private async saveNewClient() {
+    const { value, valid } = this.formClient;
+    if (!valid) {
+      return;
+    }
 
+    this.client.companyId = this.storageService.companyId;
+    this.client.resaleId = this.storageService.resaleId;
+    this.client.state = StatusEnum.ENABLED;
+    this.client.name = value.name;
+    this.client.fantasia = value.fantasia;
+    this.client.categoryId = value.category.at(0).id;
+    this.client.clifor = this.getCliFor(value.clifor.at(0).value);
+    this.client.fisjur = this.getFisJur(value.fisjur);
+    this.client.dddPhone = value.dddPhone != null ? value.dddPhone : "";
+    this.client.phone = value.phone != null ? value.phone : "";
+    this.client.dddCellphone = value.dddCellphone != null ? value.dddCellphone : "";
+    this.client.cellphone = value.cellphone != null ? value.cellphone : "";
+    this.client.emailHome = value.emailHome;
+    this.client.emailWork = value.emailWork;
+    this.client.zipCode = value.zipCode;
+    this.client.address = value.address;
+    this.client.addressNumber = value.addressNumber != null ? value.addressNumber : "";
+    this.client.city = value.city;
+    this.client.state = value.state;
+    this.client.neighborhood = value.neighborhood;
+    this.client.addressComplement = value.addressComplement;
+    this.client.cnpj = value.cnpj;
+    this.client.cpf = value.cpf;
+    this.client.rg = value.rg;
+    this.client.contactName = value.contactName;
+    this.client.contactEmail = value.contactEmail;
+    this.client.contactDDDPhone = value.contactDDDPhone != null ? value.contactDDDPhone : "";
+    this.client.contactPhone = value.contactPhone != null ? value.contactPhone : "";
+    this.client.contactDDDCellphone = value.contactDDDCellphone != null ? value.contactDDDCellphone : "";
+    this.client.contactCellphone = value.contactCellphone != null ? value.contactCellphone : "";
+
+    const result = await this.saveClient(this.client);
+    if (result.status == 201 && result.body.status == SuccessError.succes) {
+      this.client.id = result.body.data.id;
+      this.formClient.patchValue({ id: result.body.data.id });
+      this.messageService.add({ severity: 'success', summary: result.body.header, detail: result.body.message, icon: 'pi pi-check' });
+    }
+    if (result.status == 201 && result.body.status == SuccessError.error) {
+      this.messageService.add({ severity: 'info', summary: result.body.header, detail: result.body.message, icon: 'pi pi-info-circle' });
+
+    }
   }
 
-  editClient(cli: ClientCompany) {
-
+  async editClient(cli: ClientCompany) {
+    const resultFilter = await this.filterIdClient(cli.id);
+    if (resultFilter.status == 200 && resultFilter.body.status == SuccessError.succes) {
+      cli = resultFilter.body.data;
+      //this.messageService.add({ severity: 'success', summary: resultFilter.body.header, detail: resultFilter.body.message, icon: 'pi pi-check' });
+    }
+    if (resultFilter.status == 200 && resultFilter.body.status == SuccessError.error) {
+      this.messageService.add({ severity: 'info', summary: resultFilter.body.header, detail: resultFilter.body.message, icon: 'pi pi-info-circle' });
+      return;
+    }
     this.disableClientId();
     this.disableClientCnpj();
     this.disableClientCpf();
@@ -209,46 +301,61 @@ export default class ManutencaoClienteComponent implements OnInit, OnDestroy, Do
     this.editCNPJCPF = false;
 
     this.client = cli;
+    //desabilita o tipo de cliente
+    this.formClient.get("fisjur").disable();
+
+    if (this.client.fisjur == FisJurEnum.JURIDICA) {
+      this.showJuridica = true;
+      this.showFisica = false;
+      this.addValidCNPJ();
+      this.removeValidCPF();
+    } else if (this.client.fisjur == FisJurEnum.FISICA) {
+      this.showFisica = true;
+      this.showJuridica = false;
+      this.addValidCPF();
+      this.removeValidCNPJ();
+    } else if (this.client.fisjur == FisJurEnum.OUTRAS) {
+      this.showFisica = true;
+      this.showJuridica = false;
+      this.removeValidCNPJ();
+      this.removeValidCPF();
+    }
 
     this.formClient.patchValue({
       id: cli.id,
       fantasia: cli.fantasia,
       name: cli.name,
+      category: [this.filterIdCategory(this.client.categoryId)],
       clifor: [{ type: cli.clifor, value: cli.clifor }],
-      fisjur: [{ type: cli.fisjur, value: cli.fisjur }],
+      fisjur: cli.fisjur,
       cnpj: cli.cnpj,
+      ie: cli.ie,
+      im: cli.im,
       cpf: cli.cpf,
-      rg: cli.rg,
-      dddPhone: cli.dddPhone != "" ? Number.parseInt(cli.dddPhone) : null,
-      phone: cli.phone != "" ? Number.parseInt(cli.phone) : null,
-      dddCellphone: cli.dddCellphone != "" ? Number.parseInt(cli.dddCellphone) : null,
-      cellphone: cli.cellphone != "" ? Number.parseInt(cli.cellphone) : null,
+      rg: cli.rg != "" ? cli.rg : null,
+      dddPhone: cli.dddPhone != "" ? cli.dddPhone : null,
+      phone: cli.phone != "" ? cli.phone : null,
+      dddCellphone: cli.dddCellphone != "" ? cli.dddCellphone : null,
+      cellphone: cli.cellphone != "" ? cli.cellphone : null,
       emailHome: cli.emailHome,
       emailWork: cli.emailWork,
       zipCode: cli.zipCode,
       address: cli.address,
-      addressNumber: cli.addressNumber != "" ? Number.parseInt(cli.addressNumber) : null,
+      addressNumber: cli.addressNumber != "" ? cli.addressNumber : null,
       state: cli.state,
       city: cli.city,
       neighborhood: cli.neighborhood,
       addressComplement: cli.addressComplement,
       contactName: cli.contactName,
       contactEmail: cli.contactEmail,
-      contactDDDPhone: cli.contactDDDPhone != "" ? Number.parseInt(cli.contactDDDPhone) : null,
-      contactPhone: cli.contactPhone != "" ? Number.parseInt(cli.contactPhone) : null,
-      contactDDDCellphone: cli.contactDDDCellphone != "" ? Number.parseInt(cli.contactDDDCellphone) : null,
-      contactCellphone: cli.contactCellphone != "" ? Number.parseInt(cli.contactCellphone) : null,
+      contactDDDPhone: cli.contactDDDPhone != "" ? cli.contactDDDPhone : null,
+      contactPhone: cli.contactPhone != "" ? cli.contactPhone : null,
+      contactDDDCellphone: cli.contactDDDCellphone != "" ? cli.contactDDDCellphone : null,
+      contactCellphone: cli.contactCellphone != "" ? cli.contactCellphone : null,
     });
 
-    if (this.client.fisjur == ClientFisJurEnum.fisica) {
-      this.addValidCPF();
-      this.removeValidCNPJ();
-    } else {
-      this.addValidCNPJ();
-      this.removeValidCPF();
-    }
   }
-  async update() {
+  async saveUpdateClient() {
     this.enableClientCnpj();
     this.enableClientCpf();
 
@@ -260,22 +367,20 @@ export default class ManutencaoClienteComponent implements OnInit, OnDestroy, Do
       return;
     }
 
-    //Show load
-    this.busyService.busy();
-
     this.client.name = value.name;
     this.client.fantasia = value.fantasia;
-    this.client.clifor = value.clifor.at(0).value;
-    this.client.fisjur = value.fisjur.at(0).value;
-    this.client.dddPhone = value.dddPhone != null ? value.dddPhone.toString() : "";
-    this.client.phone = value.phone != null ? value.phone.toString() : "";
-    this.client.dddCellphone = value.dddCellphone != null ? value.dddCellphone.toString() : "";
-    this.client.cellphone = value.cellphone != null ? value.cellphone.toString() : "";
+    this.client.categoryId = value.category.at(0).id;
+    this.client.clifor = this.getCliFor(value.clifor.at(0).value);
+    this.client.fisjur = this.getFisJur(value.fisjur);
+    this.client.dddPhone = value.dddPhone != null ? value.dddPhone : "";
+    this.client.phone = value.phone != null ? value.phone : "";
+    this.client.dddCellphone = value.dddCellphone != null ? value.dddCellphone : "";
+    this.client.cellphone = value.cellphone != null ? value.cellphone : "";
     this.client.emailHome = value.emailHome;
     this.client.emailWork = value.emailWork;
     this.client.zipCode = value.zipCode;
     this.client.address = value.address;
-    this.client.addressNumber = value.addressNumber.toString();
+    this.client.addressNumber = value.addressNumber != null ? value.addressNumber : "";;
     this.client.city = value.city;
     this.client.state = value.state;
     this.client.neighborhood = value.neighborhood;
@@ -285,28 +390,44 @@ export default class ManutencaoClienteComponent implements OnInit, OnDestroy, Do
     this.client.rg = value.rg;
     this.client.contactName = value.contactName;
     this.client.contactEmail = value.contactEmail;
-    this.client.contactDDDPhone = value.contactDDDPhone != null ? value.contactDDDPhone.toString() : "";
-    this.client.contactPhone = value.contactPhone != null ? value.contactPhone.toString() : "";
-    this.client.contactDDDCellphone = value.contactDDDCellphone != null ? value.contactDDDCellphone.toString() : "";
-    this.client.contactCellphone = value.contactCellphone != null ? value.contactCellphone.toString() : "";
-
-    const resultClient = await this.updateClient();
+    this.client.contactDDDPhone = value.contactDDDPhone != null ? value.contactDDDPhone : "";
+    this.client.contactPhone = value.contactPhone != null ? value.contactPhone : "";
+    this.client.contactDDDCellphone = value.contactDDDCellphone != null ? value.contactDDDCellphone : "";
+    this.client.contactCellphone = value.contactCellphone != null ? value.contactCellphone : "";
+    //Show load
+    this.busyService.busy();
+    const resultClient = await this.updateClient(this.client);
     if (resultClient.status == 200 && resultClient.body.status == SuccessError.succes) {
       this.messageService.add({ severity: 'success', summary: resultClient.body.header, detail: resultClient.body.message, icon: 'pi pi-check' });
     } else if (resultClient.status == 200 && resultClient.body.status == SuccessError.error) {
       this.messageService.add({ severity: 'info', summary: resultClient.body.header, detail: resultClient.body.message, icon: 'pi pi-info-circle' });
     }
+    //close load
+    this.busyService.idle();
 
     this.disableClientCnpj();
     this.disableClientCpf();
     this.editCNPJCPF = false;
-
-    //close load
-    this.busyService.idle();
   }
-  private async updateClient(): Promise<HttpResponse<MessageResponse>> {
+  private async saveClient(client: ClientCompany): Promise<HttpResponse<MessageResponse>> {
     try {
-      return await lastValueFrom(this.clienteService.update(this.client));
+      return await lastValueFrom(this.clientService.save(client));
+    } catch (error) {
+      this.messageService.add({ severity: 'error', summary: 'Erro', detail: error.error.message, icon: 'pi pi-times' });
+      return error;
+    }
+  }
+  private async filterIdClient(id: number): Promise<HttpResponse<MessageResponse>> {
+    try {
+      return await lastValueFrom(this.clientService.filterId(id));
+    } catch (error) {
+      this.messageService.add({ severity: 'error', summary: 'Erro', detail: error.error.message, icon: 'pi pi-times' });
+      return error;
+    }
+  }
+  private async updateClient(client: ClientCompany): Promise<HttpResponse<MessageResponse>> {
+    try {
+      return await lastValueFrom(this.clientService.update(client));
     } catch (error) {
       this.messageService.add({ severity: 'error', summary: 'Erro', detail: error.error.message, icon: 'pi pi-times' });
       return error;
@@ -317,11 +438,12 @@ export default class ManutencaoClienteComponent implements OnInit, OnDestroy, Do
       id: null,
       name: "",
       fantasia: "",
+      category: [],
       clifor: [],
-      fisjur: [],
+      fisjur: FisJurEnum.FISICA,
       cnpj: "",
       cpf: "",
-      rg: "",
+      rg: null,
       dddPhone: null,
       phone: null,
       dddCellphone: null,
@@ -389,6 +511,61 @@ export default class ManutencaoClienteComponent implements OnInit, OnDestroy, Do
   }
   disableClientCpf() {
     this.formClient.get("cpf").disable();
+  }
+
+  public async searchCEP() {
+    if (!this.formClient.get('zipCode').value) {
+      return;
+    }
+    const result = await this.cep(this.formClient.get('zipCode').value);
+
+    if (result.status == 200) {
+      this.formClient.patchValue({
+        address: result.body.logradouro,
+        addressComplement: result.body.complemento,
+        state: result.body.uf,
+        city: result.body.localidade,
+        neighborhood: result.body.bairro
+      });
+    }
+
+  }
+  private async cep(cep: string): Promise<HttpResponse<any>> {
+    try {
+      return await lastValueFrom(this.cepService.search(cep));
+    } catch (error) {
+      return error;
+    }
+  }
+
+  private async listAllCategories(): Promise<ClientCategory[]> {
+    try {
+      return await lastValueFrom(this.categoryService.listAll());
+    } catch (error) {
+      return []
+    }
+  }
+
+  private filterIdCategory(id: number): ClientCategory {
+    return this.categories.find(c => c.id === id);
+  }
+
+  getCliFor(value: string): CliForEnum {
+    if (value == CliForEnum.CLIENTE)
+      return CliForEnum.CLIENTE;
+    if (value == CliForEnum.FORNECEDOR)
+      return CliForEnum.FORNECEDOR;
+
+    return CliForEnum.AMBOS;
+  }
+
+  getFisJur(value: string): FisJurEnum {
+    if (value == FisJurEnum.FISICA)
+      return FisJurEnum.FISICA;
+    if (value == FisJurEnum.JURIDICA)
+      return FisJurEnum.JURIDICA;
+
+    return FisJurEnum.OUTRAS;
   }
 
 

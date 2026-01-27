@@ -16,7 +16,7 @@ import { lastValueFrom } from 'rxjs';
 import { BusyService } from '../loading/busy.service';
 import { PartsService } from '../../services/parts/parts.service';
 import { StorageService } from '../../services/storage/storage.service';
-import { StatusEnabledDisabled } from '../../models/enum/status-enabled-disabled';
+import { StatusEnum } from '../../models/enum/status-enum';
 
 @Component({
   selector: 'app-filterparts',
@@ -69,7 +69,7 @@ export class FilterPartsComponent {
 
       this.selectedParts.companyId = this.storageService.companyId;
       this.selectedParts.resaleId = this.storageService.resaleId;
-      this.selectedParts.status = StatusEnabledDisabled.enabled;
+      this.selectedParts.status = StatusEnum.ENABLED;
       this.selectedParts.description = value.selecDesc;
       this.selectedParts.qtdAvailable = value.selecQtdAvailable;
       this.selectedParts.discount = value.selecDiscount;

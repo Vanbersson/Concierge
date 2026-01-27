@@ -1,17 +1,25 @@
-import { IClientCompany } from "../../interfaces/clientcompany/iclient-company";
+import { StatusEnum } from "../enum/status-enum";
+import { CliForEnum } from "./clifor-enum";
+import { FisJurEnum } from "./fisjur-enum";
 
-export class ClientCompany implements IClientCompany {
+export class ClientCompany {
     companyId: number = 0;
     resaleId: number = 0;
+    dateRegister: Date | string = '';
     id: number = 0;
-    status: string = '';
+    status: StatusEnum = StatusEnum.DISABLED;
     name: string = '';
     fantasia: string = '';
-    clifor: string = '';
-    fisjur: string = '';
+    categoryId: number = 0;
+    clifor: CliForEnum = CliForEnum.AMBOS;
+    fisjur: FisJurEnum = FisJurEnum.OUTRAS;
     cnpj: string = '';
+    ie: string = '';
+    im: string = '';
     cpf: string = '';
     rg: string = '';
+    rgExpedidor: string = '';
+    dateBirth: Date | string = '';
     emailHome: string = '';
     emailWork: string = '';
     dddCellphone: string = '';
