@@ -19,7 +19,7 @@ export class ClientCompany {
     cpf: string = '';
     rg: string = '';
     rgExpedidor: string = '';
-    dateBirth: Date | string = '';
+    dateBirth: string = '';
     emailHome: string = '';
     emailWork: string = '';
     dddCellphone: string = '';

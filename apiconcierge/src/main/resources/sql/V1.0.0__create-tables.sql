@@ -162,7 +162,7 @@
      cpf varchar(11),
      rg varchar(11),
      rg_expedidor varchar(11),
-     date_birth datetime,
+     date_birth varchar(8),
      email_home varchar(100),
      email_work varchar(100),
      ddd_cellphone varchar(2),

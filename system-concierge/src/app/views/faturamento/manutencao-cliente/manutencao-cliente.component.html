@@ -17,7 +17,6 @@
                     </p-inputIcon>
                     <input pInputText type="text" (input)="dt1.filterGlobal($event.target.value, 'contains')" placeholder="Pesquisar" />
                 </p-iconField>
-                <!-- <p-button icon="pi pi-filter" severity="warning" [text]="true" label="Filtros" (onClick)="showDialogFilter()" /> -->
             </div>
         </ng-template>
         <ng-template pTemplate="header">
@@ -47,14 +46,16 @@
                 <td>{{client.name | uppercase}}</td>
                 <td>{{maskCNPJ(client.cnpj)}}</td>
                 <td>{{maskCPF(client.cpf)}}</td>
-                <td><p-button icon="pi pi-pencil" label="Editar" severity="secondary-custom" size="small" (onClick)="editClient(client)" /></td>
+                <td>
+                    <p-button icon="pi pi-pencil" label="Editar" severity="secondary-custom" size="small" (onClick)="editClient(client)" />
+                </td>
             </tr>
         </ng-template>
     </p-table>
 </div>
 
 <!-- Dialog Add or Alter cliente -->
-<p-dialog header="Cadastro de clientes" [(visible)]="visibleDialog" [modal]="true" [maximizable]="true" [style]="{ width: '80rem', height:'58rem' }"
+<p-dialog header="Cadastro de Clientes" [(visible)]="visibleDialog" [modal]="true" [maximizable]="true" [style]="{ width: '80rem', height:'58rem' }"
     [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }">
     <form [formGroup]="formClient">
         <div class="p-fluid p-formgrid grid">
@@ -249,7 +250,13 @@
                         <label for="ClientRg">RG</label>
                         <p-inputNumber id="ClientRg" [useGrouping]="false" maxlength="11" formControlName="rg"/>
                     </div>
-                    <div class="md:col-3">
+                    <div class="col-12 md:col-2">
+                        <label for="">Orgão expedidor</label>
+                        <input pInputText formControlName="rgExpedidor"/>
+                    </div>
+                    <div class="col-12 md:col-2">
+                        <label for="">Data de nascimento</label>
+                         <p-inputMask mask="99/99/9999" [unmask]="true" formControlName="dateBirth" />
                     </div>
                 </div>
             </form>
@@ -262,86 +269,6 @@
     </div>
 </p-dialog>
 
-<!-- <p-dialog header="Filtros" [(visible)]="visibleDialogFilter" [modal]="true" [style]="{ width: '50rem', height:'56rem' }"
-    [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }">
-    <div class="card">
-        <form [formGroup]="formClientFilter">
-            <div class="p-formgrid p-fluid grid">
-                <div class="col-12 flex justify-content-end">
-                    <p-button icon="pi pi-refresh" [text]="true" label="Limpar" size="small" (onClick)="cleanFormFilter()"/>
-                </div>
-                <div class="col-12 md:col-3">
-                    <label for="filterClientId">Código</label>
-                    <p-inputNumber mode="decimal" [useGrouping]="false" formControlName="id" />
-                </div>
-                <div class="col-12 md:col-5">
-                    <label for="filterClientFantasiaId">Fantasia</label>
-                    <input id="filterClientFantasiaId" type="text" [style]="{'text-transform':'uppercase'}" pInputText  formControlName="fantasia"/>
-                </div>
-                <div class="md:col-4">
-                </div>
-                <div class="col-12">
-                    <label for="filterClientNameId">Razão Social</label>
-                    <input id="filterClientNameId" type="text" [style]="{'text-transform':'uppercase'}" pInputText  formControlName="name"/>
-                </div>
-                <div class="col-12 md:col-4">
-                    <label for="ClientCnpj">CNPJ</label>
-                    <p-inputMask mask="99.999.999/9999-99" [unmask]="true" formControlName="cnpj"/>
-                </div>
-                <div class="col-12 md:col-4">
-                    <label for="ClientCpf">CPF</label>
-                    <p-inputMask mask="999.999.999-99" [unmask]="true" formControlName="cpf"/>
-                </div>
-                <div class="md:col-4">
-                </div>
-                <div class="col-12 md:col-5 mb-0">
-                    <label for="">Jurídica/Física</label>
-                    <div class="flex align-items-center gap-2 border-1 border-round border-300 p-3">
-                        <div class="flex align-items-center">
-                            <p-radioButton value="Física" inputId="fisjur1" formControlName="fisjur"></p-radioButton>
-                            <label for="fisjur1" class="ml-2">
-                                Física
-                            </label>
-                        </div>
-                        <div class="flex align-items-center">
-                            <p-radioButton value="Jurídica" inputId="fisjur2" formControlName="fisjur"></p-radioButton>
-                            <label for="fisjur2" class="ml-2">
-                                Jurídica
-                            </label>
-                        </div>
-                    </div>
-                </div>
-                   <div class="md:col-8">
-                </div>
-                <div class="col-12 md:col-5">
-                    <label for="">Cliente/Fornecedor</label>
-                    <div class="flex align-items-center gap-2 border-1 border-round border-300 p-3">
-                        <div class="flex align-items-center">
-                            <p-radioButton value="Física" inputId="clifor1" formControlName="clifor"></p-radioButton>
-                            <label for="clifor1" class="ml-2">
-                                Cliente
-                            </label>
-                        </div>
-                        <div class="flex align-items-center">
-                            <p-radioButton value="Jurídica" inputId="clifor2" formControlName="clifor"></p-radioButton>
-                            <label for="clifor2" class="ml-2">
-                                Fornecedor
-                            </label>
-                        </div>
-                    </div>
-                </div>                
-            </div>
-        </form>
-    </div>
-
-    <div class="col-12 flex justify-content-end gap-2">
-        <button pButton type="button" pRipple label="Fechar" icon="pi pi-times" class="p-button-text"
-            (click)="hideDialogFilter()"></button>
-        <button pButton type="button" pRipple label="Salvar" icon="pi pi-check" class="p-button-text"></button>
-    </div>
-</p-dialog> -->
-
-<!-- Comfirm -->
 <p-confirmDialog #cd>
     <ng-template pTemplate="headless" let-message>
         <div class="flex flex-column align-items-center p-5 surface-overlay border-round">
@@ -361,3 +288,4 @@
         </div>
     </ng-template>
 </p-confirmDialog>
+

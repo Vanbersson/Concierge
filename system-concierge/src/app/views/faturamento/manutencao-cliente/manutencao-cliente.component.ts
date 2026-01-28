@@ -68,10 +68,12 @@ export default class ManutencaoClienteComponent implements OnInit {
     clifor: new FormControl<ITypeClient[]>([], Validators.required),
     fisjur: new FormControl<string>(FisJurEnum.FISICA),
     cnpj: new FormControl<string>(""),
-    cpf: new FormControl<string>(""),
-    rg: new FormControl<string | null>(null),
     ie: new FormControl<string>(""),
     im: new FormControl<string>(""),
+    cpf: new FormControl<string>(""),
+    rg: new FormControl<string | null>(null),
+    rgExpedidor: new FormControl<string>(""),
+    dateBirth: new FormControl<string>(""),
     dddPhone: new FormControl<string | null>(null),
     phone: new FormControl<string | null>(null),
     dddCellphone: new FormControl<string | null>(null),
@@ -92,15 +94,7 @@ export default class ManutencaoClienteComponent implements OnInit {
     contactDDDCellphone: new FormControl<string | null>(null),
     contactCellphone: new FormControl<string | null>(null),
   });
-  formClientFilter = new FormGroup({
-    id: new FormControl<number | null>(null),
-    fantasia: new FormControl<string>(""),
-    name: new FormControl<string>(""),
-    cnpj: new FormControl<string>(""),
-    cpf: new FormControl<string>(""),
-    fisjur: new FormControl<string>(""),
-    clifor: new FormControl<string>(""),
-  });
+
   //Dialog edit
   visibleDialog: boolean = false;
   showJuridica = false;
@@ -127,7 +121,7 @@ export default class ManutencaoClienteComponent implements OnInit {
     this.init();
   }
 
-  async init() {
+  private async init() {
     //Show load
     this.busyService.busy();
     const result = await this.listAll();
@@ -162,6 +156,7 @@ export default class ManutencaoClienteComponent implements OnInit {
       this.formClient.patchValue({ cpf: "00000000000" });
     }
   }
+
   private async listAll(): Promise<HttpResponse<MessageResponse>> {
     try {
       return await lastValueFrom(this.clientService.listAll());
@@ -170,45 +165,56 @@ export default class ManutencaoClienteComponent implements OnInit {
       return error;
     }
   }
+
   private addValidCNPJ() {
     this.formClient.controls['cnpj'].addValidators(Validators.required);
     this.formClient.controls['cnpj'].updateValueAndValidity();
   }
+
   private removeValidCNPJ() {
     this.formClient.controls['cnpj'].removeValidators(Validators.required);
     this.formClient.controls['cnpj'].updateValueAndValidity();
   }
+
   private addValidCPF() {
     this.formClient.controls['cpf'].addValidators(Validators.required);
     this.formClient.controls['cpf'].updateValueAndValidity();
   }
+
   private removeValidCPF() {
     this.formClient.controls['cpf'].removeValidators(Validators.required);
     this.formClient.controls['cpf'].updateValueAndValidity();
   }
+
   maskCNPJ(cnpj: string): string {
     if (cnpj == "") return "";
     const CNPJ = cnpj.substring(0, 2) + "." + cnpj.substring(2, 5) + "." + cnpj.substring(5, 8) + "/" + cnpj.substring(8, 12) + "-" + cnpj.substring(12, 14);
     return CNPJ;
   }
+
   maskCPF(cpf: string): string {
     if (cpf == "") return "";
     const CPF = cpf.substring(0, 3) + "." + cpf.substring(3, 6) + "." + cpf.substring(6, 9) + "-" + cpf.substring(9, 11);
     return CPF;
   }
+
   showDialog() {
     this.cleanFormClient();
     this.visibleDialog = true;
   }
+
   hideDialog() {
     this.visibleDialog = false;
   }
+
   showDialogFilter() {
     this.visibleDialogFilter = true;
   }
+
   hideDialogFilter() {
     this.visibleDialogFilter = false;
   }
+
   newClient() {
     this.showDialog();
     this.enableClientCnpj();
@@ -225,6 +231,7 @@ export default class ManutencaoClienteComponent implements OnInit {
     this.addValidCPF();
     this.removeValidCNPJ();
   }
+
   save() {
     if (this.isClientNew) {
       this.saveNewClient();
@@ -261,8 +268,12 @@ export default class ManutencaoClienteComponent implements OnInit {
     this.client.neighborhood = value.neighborhood;
     this.client.addressComplement = value.addressComplement;
     this.client.cnpj = value.cnpj;
+    this.client.ie = value.ie;
+    this.client.im = value.im;
     this.client.cpf = value.cpf;
     this.client.rg = value.rg;
+    this.client.rgExpedidor = value.rgExpedidor;
+    this.client.dateBirth = value.dateBirth;
     this.client.contactName = value.contactName;
     this.client.contactEmail = value.contactEmail;
     this.client.contactDDDPhone = value.contactDDDPhone != null ? value.contactDDDPhone : "";
@@ -272,8 +283,12 @@ export default class ManutencaoClienteComponent implements OnInit {
 
     const result = await this.saveClient(this.client);
     if (result.status == 201 && result.body.status == SuccessError.succes) {
-      this.client.id = result.body.data.id;
+      this.client = result.body.data;
       this.formClient.patchValue({ id: result.body.data.id });
+      //desabilita o tipo de cliente
+      this.formClient.get("fisjur").disable();
+      //alterar para cliente existente
+      this.isClientNew = false;
       this.messageService.add({ severity: 'success', summary: result.body.header, detail: result.body.message, icon: 'pi pi-check' });
     }
     if (result.status == 201 && result.body.status == SuccessError.error) {
@@ -333,6 +348,8 @@ export default class ManutencaoClienteComponent implements OnInit {
       im: cli.im,
       cpf: cli.cpf,
       rg: cli.rg != "" ? cli.rg : null,
+      rgExpedidor: cli.rgExpedidor,
+      dateBirth: cli.dateBirth,
       dddPhone: cli.dddPhone != "" ? cli.dddPhone : null,
       phone: cli.phone != "" ? cli.phone : null,
       dddCellphone: cli.dddCellphone != "" ? cli.dddCellphone : null,
@@ -355,6 +372,7 @@ export default class ManutencaoClienteComponent implements OnInit {
     });
 
   }
+
   async saveUpdateClient() {
     this.enableClientCnpj();
     this.enableClientCpf();
@@ -363,7 +381,6 @@ export default class ManutencaoClienteComponent implements OnInit {
     if (!valid) {
       this.disableClientCnpj();
       this.disableClientCpf();
-      this.messageService.add({ severity: 'error', summary: 'Erro', detail: "Cadastro inválido", icon: 'pi pi-times' });
       return;
     }
 
@@ -371,7 +388,6 @@ export default class ManutencaoClienteComponent implements OnInit {
     this.client.fantasia = value.fantasia;
     this.client.categoryId = value.category.at(0).id;
     this.client.clifor = this.getCliFor(value.clifor.at(0).value);
-    this.client.fisjur = this.getFisJur(value.fisjur);
     this.client.dddPhone = value.dddPhone != null ? value.dddPhone : "";
     this.client.phone = value.phone != null ? value.phone : "";
     this.client.dddCellphone = value.dddCellphone != null ? value.dddCellphone : "";
@@ -386,8 +402,12 @@ export default class ManutencaoClienteComponent implements OnInit {
     this.client.neighborhood = value.neighborhood;
     this.client.addressComplement = value.addressComplement;
     this.client.cnpj = value.cnpj;
+    this.client.ie = value.ie;
+    this.client.im = value.im;
     this.client.cpf = value.cpf;
     this.client.rg = value.rg;
+    this.client.rgExpedidor = value.rgExpedidor;
+    this.client.dateBirth = value.dateBirth;
     this.client.contactName = value.contactName;
     this.client.contactEmail = value.contactEmail;
     this.client.contactDDDPhone = value.contactDDDPhone != null ? value.contactDDDPhone : "";
@@ -409,6 +429,7 @@ export default class ManutencaoClienteComponent implements OnInit {
     this.disableClientCpf();
     this.editCNPJCPF = false;
   }
+
   private async saveClient(client: ClientCompany): Promise<HttpResponse<MessageResponse>> {
     try {
       return await lastValueFrom(this.clientService.save(client));
@@ -417,6 +438,7 @@ export default class ManutencaoClienteComponent implements OnInit {
       return error;
     }
   }
+
   private async filterIdClient(id: number): Promise<HttpResponse<MessageResponse>> {
     try {
       return await lastValueFrom(this.clientService.filterId(id));
@@ -425,6 +447,7 @@ export default class ManutencaoClienteComponent implements OnInit {
       return error;
     }
   }
+
   private async updateClient(client: ClientCompany): Promise<HttpResponse<MessageResponse>> {
     try {
       return await lastValueFrom(this.clientService.update(client));
@@ -433,7 +456,8 @@ export default class ManutencaoClienteComponent implements OnInit {
       return error;
     }
   }
-  cleanFormClient() {
+
+  private cleanFormClient() {
     this.formClient.patchValue({
       id: null,
       name: "",
@@ -443,7 +467,11 @@ export default class ManutencaoClienteComponent implements OnInit {
       fisjur: FisJurEnum.FISICA,
       cnpj: "",
       cpf: "",
+      ie: "",
+      im: "",
       rg: null,
+      rgExpedidor: "",
+      dateBirth: "",
       dddPhone: null,
       phone: null,
       dddCellphone: null,
@@ -465,18 +493,12 @@ export default class ManutencaoClienteComponent implements OnInit {
       contactCellphone: null,
     });
   }
-  cleanFormFilter() {
-    this.formClientFilter.patchValue({
-      id: null,
-      fantasia: "",
-      name: "",
-      cnpj: "",
-      cpf: "",
-      fisjur: "",
-      clifor: ""
-    });
-  }
+
   confirm(value: string) {
+    //Só pode alterar se for PF ou PJ
+    if (this.formClient.get('fisjur').value == FisJurEnum.OUTRAS) {
+      return;
+    }
     this.confirmationService.confirm({
       header: 'Alterar ' + value + '?',
       message: 'Por favor comfirme para alterar.',
@@ -530,6 +552,7 @@ export default class ManutencaoClienteComponent implements OnInit {
     }
 
   }
+
   private async cep(cep: string): Promise<HttpResponse<any>> {
     try {
       return await lastValueFrom(this.cepService.search(cep));
@@ -567,6 +590,5 @@ export default class ManutencaoClienteComponent implements OnInit {
 
     return FisJurEnum.OUTRAS;
   }
-
 
 }

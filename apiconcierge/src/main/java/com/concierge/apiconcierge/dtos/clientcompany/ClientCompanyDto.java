@@ -23,7 +23,7 @@ public record ClientCompanyDto(
         String cpf,
         String rg,
         String rgExpedidor,
-        Date dateBirth,
+        String dateBirth,
         String emailHome,
         String emailWork,
         String dddCellphone,

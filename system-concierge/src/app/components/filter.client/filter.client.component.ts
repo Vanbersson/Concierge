@@ -36,7 +36,6 @@ export class FilterClientComponent {
   @Output() public outputClient = new EventEmitter<ClientCompany>();
   @Input() isDisabled: boolean = false;
 
-  public clientName = signal<string>('')
   //Filter Client
   dialogListClientCompany: ClientCompany[] = [];
   dialogSelectClientCompany: ClientCompany = null;
@@ -63,19 +62,7 @@ export class FilterClientComponent {
   }
   public async selectClientCompany() {
     if (this.dialogSelectClientCompany) {
-      //Emit 
-      this.dialogSelectClientCompany.companyId = this.storageService.companyId;
-      this.dialogSelectClientCompany.resaleId = this.storageService.resaleId;
-      this.dialogSelectClientCompany.status = StatusEnum.ENABLED;
-      this.dialogSelectClientCompany.contactName = "";
-      this.dialogSelectClientCompany.contactEmail = "";
-      this.dialogSelectClientCompany.contactDDDPhone = "";
-      this.dialogSelectClientCompany.contactPhone = "";
-      this.dialogSelectClientCompany.contactDDDCellphone = "";
-      this.dialogSelectClientCompany.contactCellphone = "";
-      const resultClient = await this.saveClient(this.dialogSelectClientCompany);
       this.outputClient.emit(this.dialogSelectClientCompany);
-      this.clientName.set(this.dialogSelectClientCompany.name);
       this.dialogVisibleClientCompany = false;
     }
   }
@@ -90,20 +77,9 @@ export class FilterClientComponent {
         const result = await this.filterId(value.clientCompanyId);
         if (result.status == 200 && result.body.status == SuccessError.succes) {
           this.dialogListClientCompany.push(result.body.data);
-          //Api externa
-          this.clientService.FilterIdExternal(value.clientCompanyId).subscribe((data) => {
-            if (data.at(0).cnpj != this.dialogListClientCompany.at(0).cnpj) {
-              data.map(c => {
-                this.dialogListClientCompany.push(c);
-              });
-            }
-          });
         }
         if (result.status == 200 && result.body.status == SuccessError.error) {
-          //Api externa
-          this.clientService.FilterIdExternal(value.clientCompanyId).subscribe((data) => {
-            this.dialogListClientCompany = data;
-          });
+          
         }
       } else if (value.clientCompanyFantasia) {
         const result = await this.filterJFantasia(value.clientCompanyFantasia);
@@ -125,20 +101,9 @@ export class FilterClientComponent {
         const result = await this.filterCNPJ(value.clientCompanyCnpj);
         if (result.status == 200 && result.body.status == SuccessError.succes) {
           this.dialogListClientCompany.push(result.body.data);
-          //Api externa
-          this.clientService.filterCnpjExternal(value.clientCompanyCnpj).subscribe((data) => {
-            if (data.at(0).cnpj != this.dialogListClientCompany.at(0).cnpj) {
-              data.map(c => {
-                this.dialogListClientCompany.push(c);
-              });
-            }
-          });
         }
         if (result.status == 200 && result.body.status == SuccessError.error) {
-          //Api externa
-          this.clientService.filterCnpjExternal(value.clientCompanyCnpj).subscribe((data) => {
-            this.dialogListClientCompany = data;
-          });
+          
         }
       }
     } else {
@@ -147,20 +112,9 @@ export class FilterClientComponent {
         const result = await this.filterId(value.clientCompanyId);
         if (result.status == 200 && result.body.status == SuccessError.succes) {
           this.dialogListClientCompany.push(result.body.data);
-          //Api externa
-          this.clientService.FilterIdExternal(value.clientCompanyId).subscribe((data) => {
-            if (data.at(0).cnpj != this.dialogListClientCompany.at(0).cnpj) {
-              data.map(c => {
-                this.dialogListClientCompany.push(c);
-              });
-            }
-          });
         }
         if (result.status == 200 && result.body.status == SuccessError.error) {
-          //Api externa
-          this.clientService.FilterIdExternal(value.clientCompanyId).subscribe((data) => {
-            this.dialogListClientCompany = data;
-          });
+  
         }
       } else if (value.clientCompanyFantasia) {
         const result = await this.filterFFantasia(value.clientCompanyFantasia);
@@ -182,32 +136,15 @@ export class FilterClientComponent {
         const result = await this.filterCPF(value.clientCompanyCpf);
         if (result.status == 200 && result.body.status == SuccessError.succes) {
           this.dialogListClientCompany.push(result.body.data);
-          //Api externa
-          this.clientService.filterCpfExternal(value.clientCompanyCpf).subscribe((data) => {
-            if (data.at(0).cpf != this.dialogListClientCompany.at(0).cpf) {
-              data.map(c => {
-                this.dialogListClientCompany.push(c);
-              });
-            }
-          });
         }
         if (result.status == 200 && result.body.status == SuccessError.error) {
-          //Api externa
-          this.clientService.filterCpfExternal(value.clientCompanyCpf).subscribe((data) => {
-            this.dialogListClientCompany = data;
-          });
+                 
         }
       }
     }
     this.dialogloadingClientCompany = false;
   }
-  private async saveClient(client: ClientCompany): Promise<HttpResponse<MessageResponse>> {
-    try {
-      return await lastValueFrom(this.clientService.save(client));
-    } catch (error) {
-      return error;
-    }
-  }
+
   private async filterId(id: number): Promise<HttpResponse<MessageResponse>> {
     try {
       return await lastValueFrom(this.clientService.filterId(id));

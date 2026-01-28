@@ -47,7 +47,7 @@ export class ClientCompanyService {
   }
 
   //Externa
-  FilterIdExternal(id: Number): Observable<ClientCompany[]> {
+  /* FilterIdExternal(id: Number): Observable<ClientCompany[]> {
     return this.http.get<ClientCompany[]>(environment.apiApollo + "/fatclient/filter/code/" + id, { responseType: 'json' });
   }
   FilterFantasiaJExternal(name: string): Observable<ClientCompany[]> {
@@ -70,7 +70,7 @@ export class ClientCompanyService {
   }
   getTipo$(tipo: string): Observable<ClientCompany[]> {
     return this.http.get<ClientCompany[]>(environment.apiApollo + "/fatclient/filter/tipo/" + tipo, { responseType: 'json' });
-  }
+  } */
 
   private myHeaders(): HttpHeaders {
     const httpOptions = new HttpHeaders({

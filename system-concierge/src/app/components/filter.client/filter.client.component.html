@@ -71,11 +71,11 @@
         </ng-template>
         <ng-template pTemplate="header">
             <tr>
-                <th pSortableColumn="id" class="font-normal">Código<p-sortIcon field="id" /></th>
-                <th pSortableColumn="name" class="font-normal">Nome<p-sortIcon field="name" /></th>
-                <th pSortableColumn="cnpj" class="font-normal">CNPJ<p-sortIcon field="cnpj" /></th>
-                <th pSortableColumn="cpf" class="font-normal">CPF<p-sortIcon field="cpf" /></th>
-                <th pSortableColumn="rg" class="font-normal">RG<p-sortIcon field="rg" /></th>
+                <th pSortableColumn="id" >Código<p-sortIcon field="id" /></th>
+                <th pSortableColumn="name" >Nome<p-sortIcon field="name" /></th>
+                <th pSortableColumn="cnpj" >CNPJ<p-sortIcon field="cnpj" /></th>
+                <th pSortableColumn="cpf" >CPF<p-sortIcon field="cpf" /></th>
+                <th pSortableColumn="rg" >RG<p-sortIcon field="rg" /></th>
             </tr>
         </ng-template>
         <ng-template pTemplate="body" let-clientcompany>
@@ -90,13 +90,10 @@
     </p-table>
     <div class="flex justify-content-end gap-2 mt-2">
         <div>
-            <button pButton type="button" pRipple label="Fechar" icon="pi pi-times" class="p-button-text"
-                (click)="hideDialogFilterClientCompany()"></button>
+            <button pButton type="button" pRipple label="Fechar" icon="pi pi-times" class="p-button-text" (click)="hideDialogFilterClientCompany()"></button>
         </div>
-
         <div>
-            <button pButton type="submit" pRipple label="Confirmar" icon="pi pi-check" class="p-button-text"
-                (click)="selectClientCompany()"></button>
+            <button pButton type="submit" pRipple label="Confirmar" icon="pi pi-check" class="p-button-text" (click)="selectClientCompany()"></button>
         </div>
     </div>
 </p-dialog>
