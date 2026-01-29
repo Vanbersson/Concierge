@@ -1,4 +1,4 @@
-import { Component, DoCheck, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { InputTextModule } from 'primeng/inputtext';
@@ -18,7 +18,6 @@ import { ConfirmationService, MessageService } from 'primeng/api';
 import { RadioButtonModule } from 'primeng/radiobutton';
 import { DividerModule } from 'primeng/divider';
 
-
 import { ClientCompany } from '../../../models/clientcompany/client-company';
 
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -28,7 +27,6 @@ import { lastValueFrom } from 'rxjs';
 
 import { MessageResponse } from '../../../models/message/message-response';
 import { SuccessError } from '../../../models/enum/success-error';
-import { BudgetService } from '../../../services/budget/budget.service';
 import { BusyService } from '../../../components/loading/busy.service';
 import { FisJurEnum } from '../../../models/clientcompany/fisjur-enum';
 import { CliForEnum } from '../../../models/clientcompany/clifor-enum';
@@ -39,29 +37,35 @@ import { ClientCompanyService } from '../../../services/clientecompany/client-co
 import { StorageService } from '../../../services/storage/storage.service';
 import { StatusEnum } from '../../../models/enum/status-enum';
 
+
 @Component({
-  selector: 'app-manutencao-cliente',
+  selector: 'app-client-company',
   standalone: true,
   imports: [CommonModule, TabViewModule, ButtonModule, InputTextModule, TableModule,
     MultiSelectModule, InputNumberModule, IconFieldModule, InputIconModule, DialogModule, DividerModule,
     InputMaskModule, InputGroupModule, ConfirmDialogModule, ToastModule, RadioButtonModule,
     ReactiveFormsModule],
-  templateUrl: './manutencao-cliente.component.html',
-  styleUrl: './manutencao-cliente.component.scss',
+  templateUrl: './client-company.component.html',
+  styleUrl: './client-company.component.scss',
   providers: [ConfirmationService, MessageService]
 })
-export default class ManutencaoClienteComponent implements OnInit {
-
+export default class ClientCompanyComponent implements OnInit {
   categories: ClientCategory[] = [];
-  clifor: ITypeClient[] = [];
   clients: ClientCompany[] = [];
   client: ClientCompany;
+  isClientNew = true;
+
+  enabled = StatusEnum.ENABLED;
+  disabled = StatusEnum.DISABLED;
+  clifor: ITypeClient[] = [];
+
   fisica = FisJurEnum.FISICA;
   juridica = FisJurEnum.JURIDICA;
   outras = FisJurEnum.OUTRAS;
-  isClientNew = true;
+
   formClient = new FormGroup({
     id: new FormControl<number | null>({ value: null, disabled: true }),
+    status: new FormControl<StatusEnum>(this.enabled, Validators.required),
     fantasia: new FormControl<string>(""),
     name: new FormControl<string>("", Validators.required),
     category: new FormControl<ClientCategory[]>([], Validators.required),
@@ -130,7 +134,8 @@ export default class ManutencaoClienteComponent implements OnInit {
     }
 
     const resultCate = await this.listAllCategories();
-    this.categories = resultCate;
+    this.categories = resultCate.body.data
+
     //Close load
     this.busyService.idle();
   }
@@ -248,7 +253,7 @@ export default class ManutencaoClienteComponent implements OnInit {
 
     this.client.companyId = this.storageService.companyId;
     this.client.resaleId = this.storageService.resaleId;
-    this.client.state = StatusEnum.ENABLED;
+    this.client.status = value.status;
     this.client.name = value.name;
     this.client.fantasia = value.fantasia;
     this.client.categoryId = value.category.at(0).id;
@@ -271,7 +276,7 @@ export default class ManutencaoClienteComponent implements OnInit {
     this.client.ie = value.ie;
     this.client.im = value.im;
     this.client.cpf = value.cpf;
-    this.client.rg = value.rg;
+    this.client.rg = value.rg != null ? value.rg : "";
     this.client.rgExpedidor = value.rgExpedidor;
     this.client.dateBirth = value.dateBirth;
     this.client.contactName = value.contactName;
@@ -290,6 +295,11 @@ export default class ManutencaoClienteComponent implements OnInit {
       //alterar para cliente existente
       this.isClientNew = false;
       this.messageService.add({ severity: 'success', summary: result.body.header, detail: result.body.message, icon: 'pi pi-check' });
+      //lista os clientes novamente
+      const resultCli = await this.listAll();
+      if (resultCli.status == 200 && resultCli.body.status == SuccessError.succes) {
+        this.clients = resultCli.body.data;
+      }
     }
     if (result.status == 201 && result.body.status == SuccessError.error) {
       this.messageService.add({ severity: 'info', summary: result.body.header, detail: result.body.message, icon: 'pi pi-info-circle' });
@@ -337,6 +347,7 @@ export default class ManutencaoClienteComponent implements OnInit {
     }
 
     this.formClient.patchValue({
+      status: cli.status,
       id: cli.id,
       fantasia: cli.fantasia,
       name: cli.name,
@@ -384,6 +395,7 @@ export default class ManutencaoClienteComponent implements OnInit {
       return;
     }
 
+    this.client.status = value.status;
     this.client.name = value.name;
     this.client.fantasia = value.fantasia;
     this.client.categoryId = value.category.at(0).id;
@@ -405,7 +417,7 @@ export default class ManutencaoClienteComponent implements OnInit {
     this.client.ie = value.ie;
     this.client.im = value.im;
     this.client.cpf = value.cpf;
-    this.client.rg = value.rg;
+    this.client.rg = value.rg != null ? value.rg : "";
     this.client.rgExpedidor = value.rgExpedidor;
     this.client.dateBirth = value.dateBirth;
     this.client.contactName = value.contactName;
@@ -419,6 +431,11 @@ export default class ManutencaoClienteComponent implements OnInit {
     const resultClient = await this.updateClient(this.client);
     if (resultClient.status == 200 && resultClient.body.status == SuccessError.succes) {
       this.messageService.add({ severity: 'success', summary: resultClient.body.header, detail: resultClient.body.message, icon: 'pi pi-check' });
+      //lista os clientes novamente
+      const result = await this.listAll();
+      if (result.status == 200 && result.body.status == SuccessError.succes) {
+        this.clients = result.body.data;
+      }
     } else if (resultClient.status == 200 && resultClient.body.status == SuccessError.error) {
       this.messageService.add({ severity: 'info', summary: resultClient.body.header, detail: resultClient.body.message, icon: 'pi pi-info-circle' });
     }
@@ -459,6 +476,7 @@ export default class ManutencaoClienteComponent implements OnInit {
 
   private cleanFormClient() {
     this.formClient.patchValue({
+      status: this.enabled,
       id: null,
       name: "",
       fantasia: "",
@@ -561,11 +579,12 @@ export default class ManutencaoClienteComponent implements OnInit {
     }
   }
 
-  private async listAllCategories(): Promise<ClientCategory[]> {
+  private async listAllCategories(): Promise<HttpResponse<MessageResponse>> {
     try {
-      return await lastValueFrom(this.categoryService.listAll());
+      return await lastValueFrom(this.categoryService.listAllEnabled());
     } catch (error) {
-      return []
+      this.messageService.add({ severity: 'error', summary: 'Erro', detail: error.error.message, icon: 'pi pi-times' });
+      return error;
     }
   }
 
@@ -573,7 +592,7 @@ export default class ManutencaoClienteComponent implements OnInit {
     return this.categories.find(c => c.id === id);
   }
 
-  getCliFor(value: string): CliForEnum {
+  private getCliFor(value: string): CliForEnum {
     if (value == CliForEnum.CLIENTE)
       return CliForEnum.CLIENTE;
     if (value == CliForEnum.FORNECEDOR)
@@ -582,7 +601,7 @@ export default class ManutencaoClienteComponent implements OnInit {
     return CliForEnum.AMBOS;
   }
 
-  getFisJur(value: string): FisJurEnum {
+  private getFisJur(value: string): FisJurEnum {
     if (value == FisJurEnum.FISICA)
       return FisJurEnum.FISICA;
     if (value == FisJurEnum.JURIDICA)
@@ -590,5 +609,6 @@ export default class ManutencaoClienteComponent implements OnInit {
 
     return FisJurEnum.OUTRAS;
   }
+
 
 }

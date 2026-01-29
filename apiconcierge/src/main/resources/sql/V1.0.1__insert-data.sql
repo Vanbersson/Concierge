@@ -122,6 +122,8 @@ VALUES
 
 ('4_0','Faturamento'),
 ('4_1','Manutenção Clientes'),
+('4_99','Cadastros'),
+('4_99_0','Categoria de Clientes'),
 
 ('100_0','Relatório'),
 ('100_1','Portaria'),

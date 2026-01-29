@@ -178,12 +178,24 @@ export class SidebarComponent implements OnInit {
         label: 'Faturamento',
         visible: false,
         items: [
-          ,
           {
             key: '4_1',
             label: 'Manutenção Clientes',
             visible: false,
             routerLink: 'faturamento/manutencao-cliente'
+          },
+          {
+            key: '4_99',
+            label: 'Cadastros',
+            visible: false,
+            items: [
+              {
+                key: '4_99_0',
+                label: 'Categoria de Clientes',
+                visible: false,
+                routerLink:'faturamento/register-client-category'
+              }
+            ]
           }
         ]
       },

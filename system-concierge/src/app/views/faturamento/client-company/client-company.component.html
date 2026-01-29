@@ -2,11 +2,11 @@
     <p-toast />
     <div class="layout-card-title">
         <span>Manutenção de clientes</span>
-        <p-button icon="pi pi-plus" [text]="true" label="Novo" (onClick)="newClient()" />
+        <p-button icon="pi pi-plus" [text]="true" label="Cliente" (onClick)="newClient()" />
     </div>
     <p-table #dt1 dataKey="id" [value]="clients" [rowHover]="true" 
         currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords}" [showCurrentPageReport]="true"
-        [globalFilterFields]="['id', 'fantasia', 'name', 'cnpj', 'cpf']" 
+        [globalFilterFields]="['id','status','fantasia', 'name', 'cnpj', 'cpf']" 
         [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 25, 50]" 
         styleClass="p-datatable-sm">
         <ng-template pTemplate="caption">
@@ -24,10 +24,13 @@
                 <th pSortableColumn="id" style="width:10%">
                     Código <p-sortIcon field="id" />
                 </th>
+                <th pSortableColumn="status" style="width:10%">
+                    {{enabled}} <p-sortIcon field="status" />
+                </th>
                 <th pSortableColumn="fantasia" style="width:15%">
                     Fantasia <p-sortIcon field="fantasia" />
                 </th>
-                <th pSortableColumn="name" style="width:50%">
+                <th pSortableColumn="name" style="width:40%">
                     Nome <p-sortIcon field="name" />
                 </th>
                 <th pSortableColumn="cnpj" style="width:15%">
@@ -42,6 +45,13 @@
         <ng-template pTemplate="body" let-client>
             <tr>
                 <td>{{client.id}}</td>
+                <td class="gap-2">
+                    <i class="pi " [ngClass]="{
+                        'pi-times-circle text-red-500':client.status == disabled,
+                        'pi-check-circle text-green-500':client.status == enabled}">
+                    </i>
+                    {{client.status | uppercase}}
+                </td>
                 <td>{{client.fantasia | uppercase}}</td>
                 <td>{{client.name | uppercase}}</td>
                 <td>{{maskCNPJ(client.cnpj)}}</td>
@@ -59,7 +69,20 @@
     [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }">
     <form [formGroup]="formClient">
         <div class="p-fluid p-formgrid grid">
-            <div class="md:col-8">
+            <div class="md:col-5">
+            </div>
+            <div class="col-12 md:col-3">
+                <label for="">Status</label>
+                <div class="flex align-items-center gap-2 border-1 border-round border-300 p-3">
+                    <div class="flex align-items-center">
+                        <p-radioButton inputId="st1" [value]="enabled" formControlName="status"></p-radioButton>
+                        <label for="st1" class="ml-2">{{enabled}}</label>
+                    </div>
+                    <div class="flex align-items-center">
+                        <p-radioButton inputId="st2" [value]="disabled" formControlName="status"></p-radioButton>
+                        <label for="st2" class="ml-2">{{disabled}}</label>
+                    </div>
+                </div>
             </div>
             <div class="col-12 md:col-4">
                 <label for="">Tipo</label>

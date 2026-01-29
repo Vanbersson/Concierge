@@ -45,33 +45,7 @@ export class ClientCompanyService {
   filterCPF(cpf: string): Observable<HttpResponse<MessageResponse>> {
     return this.http.get<MessageResponse>(environment.apiuUrl + "/clientcompany/" + this.companyResale + "/filter/cpf/" + cpf, { headers: this.myHeaders(), observe: 'response' });
   }
-
-  //Externa
-  /* FilterIdExternal(id: Number): Observable<ClientCompany[]> {
-    return this.http.get<ClientCompany[]>(environment.apiApollo + "/fatclient/filter/code/" + id, { responseType: 'json' });
-  }
-  FilterFantasiaJExternal(name: string): Observable<ClientCompany[]> {
-    return this.http.get<ClientCompany[]>(environment.apiApollo + "/fatclient/filter/j/fantasia/" + name, { responseType: 'json' });
-  }
-  getFantasiaF$(name: string): Observable<ClientCompany[]> {
-    return this.http.get<ClientCompany[]>(environment.apiApollo + "/fatclient/filter/f/fantasia/" + name, { responseType: 'json' });
-  }
-  FilterNameJExternal(name: string): Observable<ClientCompany[]> {
-    return this.http.get<ClientCompany[]>(environment.apiApollo + "/fatclient/filter/j/name/" + name, { responseType: 'json' });
-  }
-  getNameF$(name: string): Observable<ClientCompany[]> {
-    return this.http.get<ClientCompany[]>(environment.apiApollo + "/fatclient/filter/f/name/" + name, { responseType: 'json' });
-  }
-  filterCnpjExternal(cnpj: string): Observable<ClientCompany[]> {
-    return this.http.get<ClientCompany[]>(environment.apiApollo + "/fatclient/filter/cnpj/" + cnpj, { responseType: 'json' });
-  }
-  filterCpfExternal(cpf: string): Observable<ClientCompany[]> {
-    return this.http.get<ClientCompany[]>(environment.apiApollo + "/fatclient/filter/cpf/" + cpf, { responseType: 'json' });
-  }
-  getTipo$(tipo: string): Observable<ClientCompany[]> {
-    return this.http.get<ClientCompany[]>(environment.apiApollo + "/fatclient/filter/tipo/" + tipo, { responseType: 'json' });
-  } */
-
+  
   private myHeaders(): HttpHeaders {
     const httpOptions = new HttpHeaders({
       'Content-Type': 'application/json',

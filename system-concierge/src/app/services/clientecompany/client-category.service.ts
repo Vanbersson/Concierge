@@ -15,8 +15,20 @@ export class ClientCategoryService {
 
     constructor(private http: HttpClient, private storage: StorageService) { }
 
-    listAll(): Observable<ClientCategory[]> {
-        return this.http.get<ClientCategory[]>(environment.apiuUrl + "/clientcompany/category/" + this.companyResale + "/filter/all", { headers: this.myHeaders() });
+    save(cat: ClientCategory): Observable<HttpResponse<MessageResponse>> {
+        return this.http.post<MessageResponse>(environment.apiuUrl + "/clientcompany/category/save", cat, { headers: this.myHeaders(), observe: 'response' });
+    }
+
+    update(cat: ClientCategory): Observable<HttpResponse<MessageResponse>> {
+        return this.http.post<MessageResponse>(environment.apiuUrl + "/clientcompany/category/update", cat, { headers: this.myHeaders(), observe: 'response' });
+    }
+
+    listAll(): Observable<HttpResponse<MessageResponse>> {
+        return this.http.get<MessageResponse>(environment.apiuUrl + "/clientcompany/category/" + this.companyResale + "/filter/all", { headers: this.myHeaders(), observe: 'response' });
+    }
+
+    listAllEnabled(): Observable<HttpResponse<MessageResponse>> {
+        return this.http.get<MessageResponse>(environment.apiuUrl + "/clientcompany/category/" + this.companyResale + "/filter/all/enabled", { headers: this.myHeaders(), observe: 'response' });
     }
 
     filterId(id: number): Observable<HttpResponse<MessageResponse>> {

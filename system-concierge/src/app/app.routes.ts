@@ -131,8 +131,13 @@ export const routes: Routes = [
                     {
                         path: 'manutencao-cliente',
                         title: 'Cliente',
-                        loadComponent: () => import('./views/faturamento/manutencao-cliente/manutencao-cliente.component')
+                        loadComponent: () => import('./views/faturamento/client-company/client-company.component')
                     },
+                    {
+                        path:'register-client-category',
+                        title:'Categoria',
+                        loadComponent:() => import('./views/faturamento/register/client-category/client-category.component'),
+                    }
                 ]
             },
             {

@@ -1,8 +1,13 @@
 package com.concierge.apiconcierge.controllers.clientcompany;
 
 import com.concierge.apiconcierge.dtos.clientcompany.ClientCategoryDto;
+import com.concierge.apiconcierge.dtos.message.MessageResponseDto;
 import com.concierge.apiconcierge.models.clientcompany.ClientCategory;
+import com.concierge.apiconcierge.models.clientcompany.ClientCompany;
+import com.concierge.apiconcierge.models.message.MessageResponse;
+import com.concierge.apiconcierge.models.status.StatusEnableDisable;
 import com.concierge.apiconcierge.repositories.clientcompany.IClientCategoryRepository;
+import com.concierge.apiconcierge.services.clientcompany.category.IClientCategoryService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,51 +22,66 @@ import java.util.Optional;
 public class ClientCategoryController {
 
     @Autowired
-    IClientCategoryRepository typeRepository;
+    private IClientCategoryService service;
 
-    @PostMapping("/add")
+    @PostMapping("/save")
     public ResponseEntity<Object> save(@RequestBody ClientCategoryDto data) {
-
-        ClientCategory type = new ClientCategory();
-        BeanUtils.copyProperties(data, type);
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(typeRepository.save(type));
+        try {
+            ClientCategory category = new ClientCategory();
+            BeanUtils.copyProperties(data, category);
+            MessageResponse response = this.service.save(category);
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
+        }
     }
 
     @PostMapping("/update")
     public ResponseEntity<Object> update(@RequestBody ClientCategoryDto data) {
-
-        Optional<ClientCategory> type0 = typeRepository.findById(data.id());
-
-        if (type0.isEmpty()) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-
-        ClientCategory type = new ClientCategory();
-        BeanUtils.copyProperties(data, type);
-
-        return ResponseEntity.ok(typeRepository.save(type));
-
-
+        try {
+            ClientCategory category = new ClientCategory();
+            BeanUtils.copyProperties(data, category);
+            MessageResponse response = this.service.update(category);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
+        }
     }
 
     @GetMapping("/{companyId}/{resaleId}/filter/all")
-    public ResponseEntity<List<ClientCategory>> listAll(
+    public ResponseEntity<Object> listAll(
             @PathVariable(name = "companyId") Integer companyId,
             @PathVariable(name = "resaleId") Integer resaleId) {
+        try {
+            MessageResponse response = this.service.listAll(companyId, resaleId);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
+        }
+    }
 
-        List<ClientCategory> types = typeRepository.listAll(companyId, resaleId);
-
-        return ResponseEntity.ok(types);
+    @GetMapping("/{companyId}/{resaleId}/filter/all/enabled")
+    public ResponseEntity<Object> listAllEnabled(
+            @PathVariable(name = "companyId") Integer companyId,
+            @PathVariable(name = "resaleId") Integer resaleId) {
+        try {
+            MessageResponse response = this.service.listAllStatus(companyId, resaleId, StatusEnableDisable.Habilitado);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
+        }
     }
 
     @GetMapping("/{companyId}/{resaleId}/filter/id/{id}")
     public ResponseEntity<Object> filterId(@PathVariable(name = "companyId") Integer companyId,
                                            @PathVariable(name = "resaleId") Integer resaleId,
                                            @PathVariable(name = "id") Integer id) {
-        ClientCategory type0 = typeRepository.filterId(companyId, resaleId, id);
-
-        if (type0 == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-
-        return ResponseEntity.ok(type0);
+        try {
+            MessageResponse response = this.service.filterId(companyId, resaleId,id);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
+        }
     }
 
 }

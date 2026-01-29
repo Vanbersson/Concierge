@@ -75,16 +75,16 @@
                 <th pSortableColumn="name" >Nome<p-sortIcon field="name" /></th>
                 <th pSortableColumn="cnpj" >CNPJ<p-sortIcon field="cnpj" /></th>
                 <th pSortableColumn="cpf" >CPF<p-sortIcon field="cpf" /></th>
-                <th pSortableColumn="rg" >RG<p-sortIcon field="rg" /></th>
             </tr>
         </ng-template>
         <ng-template pTemplate="body" let-clientcompany>
-            <tr [pSelectableRow]="clientcompany">
+            
+            <tr [pSelectableRow]="clientcompany"  
+            [ngClass]="{'text-red-300':clientcompany.status == disabled}">
                 <td>{{clientcompany.id}}</td>
                 <td>{{clientcompany.name | uppercase}}</td>
-                <td>{{clientcompany.cnpj}}</td>
-                <td>{{clientcompany.cpf}}</td>
-                <td>{{clientcompany.rg}}</td>
+                <td>{{maskCNPJ(clientcompany.cnpj)}}</td>
+                <td>{{maskCPF(clientcompany.cpf)}}</td>
             </tr>
         </ng-template>
     </p-table>

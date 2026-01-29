@@ -81,6 +81,7 @@ public class ClientCompanyService implements IClientCompanyService {
                 for(ClientCompany c: list){
                     Map<String,Object> map = new HashMap<>();
                     map.put("id",c.getId());
+                    map.put("status",c.getStatus());
                     map.put("fantasia",c.getFantasia());
                     map.put("name",c.getName());
                     map.put("cnpj",c.getCnpj());

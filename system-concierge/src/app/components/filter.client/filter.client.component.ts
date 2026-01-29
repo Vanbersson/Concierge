@@ -36,6 +36,9 @@ export class FilterClientComponent {
   @Output() public outputClient = new EventEmitter<ClientCompany>();
   @Input() isDisabled: boolean = false;
 
+  enabled = StatusEnum.ENABLED;
+  disabled = StatusEnum.DISABLED;
+
   //Filter Client
   dialogListClientCompany: ClientCompany[] = [];
   dialogSelectClientCompany: ClientCompany = null;
@@ -57,14 +60,30 @@ export class FilterClientComponent {
   public showDialogFilterClientCompany() {
     this.dialogVisibleClientCompany = true;
   }
+  
   public hideDialogFilterClientCompany() {
     this.dialogVisibleClientCompany = false;
   }
+
   public async selectClientCompany() {
     if (this.dialogSelectClientCompany) {
-      this.outputClient.emit(this.dialogSelectClientCompany);
-      this.dialogVisibleClientCompany = false;
+      if (this.dialogSelectClientCompany.status == this.enabled) {
+        this.outputClient.emit(this.dialogSelectClientCompany);
+        this.dialogVisibleClientCompany = false;
+      }
     }
+  }
+
+  maskCNPJ(cnpj: string): string {
+    if (cnpj == "") return "";
+    const CNPJ = cnpj.substring(0, 2) + "." + cnpj.substring(2, 5) + "." + cnpj.substring(5, 8) + "/" + cnpj.substring(8, 12) + "-" + cnpj.substring(12, 14);
+    return CNPJ;
+  }
+
+  maskCPF(cpf: string): string {
+    if (cpf == "") return "";
+    const CPF = cpf.substring(0, 3) + "." + cpf.substring(3, 6) + "." + cpf.substring(6, 9) + "-" + cpf.substring(9, 11);
+    return CPF;
   }
 
   public async filterClientCompany() {
@@ -79,7 +98,7 @@ export class FilterClientComponent {
           this.dialogListClientCompany.push(result.body.data);
         }
         if (result.status == 200 && result.body.status == SuccessError.error) {
-          
+
         }
       } else if (value.clientCompanyFantasia) {
         const result = await this.filterJFantasia(value.clientCompanyFantasia);
@@ -103,7 +122,7 @@ export class FilterClientComponent {
           this.dialogListClientCompany.push(result.body.data);
         }
         if (result.status == 200 && result.body.status == SuccessError.error) {
-          
+
         }
       }
     } else {
@@ -114,7 +133,7 @@ export class FilterClientComponent {
           this.dialogListClientCompany.push(result.body.data);
         }
         if (result.status == 200 && result.body.status == SuccessError.error) {
-  
+
         }
       } else if (value.clientCompanyFantasia) {
         const result = await this.filterFFantasia(value.clientCompanyFantasia);
@@ -138,7 +157,7 @@ export class FilterClientComponent {
           this.dialogListClientCompany.push(result.body.data);
         }
         if (result.status == 200 && result.body.status == SuccessError.error) {
-                 
+
         }
       }
     }

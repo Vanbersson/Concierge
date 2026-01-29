@@ -8,7 +8,6 @@ public record ClientCategoryDto(
         Integer resaleId,
         Integer id,
         StatusEnableDisable status,
-        String description,
-        CliFor type
+        String description
 ) {
 }
