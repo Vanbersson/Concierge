@@ -26,10 +26,11 @@
                 <label for="drivercnhRegisterId">Nº Registro CNH</label>
                 <p-inputNumber id="drivercnhRegisterId" mode="decimal" [useGrouping]="false" formControlName="cnhRegister" />
             </div>
-            <div class="col-12 flex">
-                 <div class="block">
+            <div class="col-12 md:col-4">
+                <div class="flex gap-2">
                     <button pButton type="submit" label="Pesquisar" class="p-button-warning w-full" icon="pi pi-search"></button>
-                 </div>
+                    <button pButton type="button" label="Limpar" class="p-button-danger w-full" icon="pi pi-times" (click)="cleanForm()"></button>
+                </div>
             </div>
         </div>
     </form>
@@ -57,7 +58,7 @@
             </tr>
         </ng-template>
         <ng-template pTemplate="body" let-driver>
-            <tr [pSelectableRow]="driver">
+            <tr [pSelectableRow]="driver" [ngClass]="{'text-red-300':driver.status == disabled}">
                 <td>{{driver.id}}</td>
                 <td>{{driver.name | uppercase}}</td>
                 <td>{{ maskCPF(driver.cpf)}}</td>

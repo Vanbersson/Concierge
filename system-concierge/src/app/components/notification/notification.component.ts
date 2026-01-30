@@ -55,8 +55,8 @@ export class NotificationComponent implements OnInit, OnDestroy {
     private vehicleService: VehicleService) { }
 
   ngOnInit(): void {
-    this.taskService.startTask(() => this.init(false), 40000);
-    this.init(false);
+   // this.taskService.startTask(() => this.init(false), 40000);
+    //this.init(false);
   }
   ngOnDestroy(): void {
     this.taskService.stopTask();

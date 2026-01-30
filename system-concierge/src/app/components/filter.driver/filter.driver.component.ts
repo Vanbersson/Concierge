@@ -13,25 +13,33 @@ import { InputNumberModule } from 'primeng/inputnumber';
 import { RadioButtonModule } from 'primeng/radiobutton';
 import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
+import { MessageService } from 'primeng/api';
+import { ToastModule } from 'primeng/toast';
 //Class
 import { Driver } from '../../models/driver/driver';
 import { DriverService } from '../../services/driver/driver.service';
 import { HttpResponse } from '@angular/common/http';
 import { lastValueFrom } from 'rxjs';
+import { MessageResponse } from '../../models/message/message-response';
+import { SuccessError } from '../../models/enum/success-error';
+import { StatusEnum } from '../../models/enum/status-enum';
 
 @Component({
   selector: 'app-filterdriver',
   standalone: true,
-  imports: [CommonModule, DialogModule, ButtonModule, TableModule, InputTextModule,
+  imports: [CommonModule, DialogModule, ButtonModule, TableModule, InputTextModule, ToastModule,
     InputGroupModule, ReactiveFormsModule, FormsModule, InputMaskModule, InputNumberModule,
     RadioButtonModule, InputIconModule, IconFieldModule],
   templateUrl: './filter.driver.component.html',
-  styleUrl: './filter.driver.component.scss'
+  styleUrl: './filter.driver.component.scss',
+  providers: [MessageService]
 })
 export class FilterDriverComponent {
-
   @Output() public outputDriver = new EventEmitter<Driver>();
   @Input() isDisabled: boolean = false;
+
+  enabled = StatusEnum.ENABLED;
+  disabled = StatusEnum.DISABLED;
 
   //Filter Client
   listDrivers: Driver[] = [];
@@ -47,7 +55,7 @@ export class FilterDriverComponent {
     cnhRegister: new FormControl<string | null>(null),
   });
 
-  constructor(private driverService: DriverService) { }
+  constructor(private driverService: DriverService, private messageService: MessageService) { }
 
   maskCPF(cpf: string): string {
     if (cpf == "") return "";
@@ -71,11 +79,14 @@ export class FilterDriverComponent {
       cnhRegister: null
     });
     this.listDrivers = [];
+    this.dialogSelectDriver = null;
   }
   public async selectDriver() {
     if (this.dialogSelectDriver) {
-      this.outputDriver.emit(this.dialogSelectDriver);
-      this.hideDialog();
+      if (this.dialogSelectDriver.status == this.enabled) {
+        this.outputDriver.emit(this.dialogSelectDriver);
+        this.hideDialog();
+      }
     }
   }
   async filterDriver() {
@@ -84,60 +95,88 @@ export class FilterDriverComponent {
 
     if (value.id) {
       const result = await this.filterDriverId(value.id);
-      if (result.status == 200) {
-        this.listDrivers.push(result.body);
+      if (result.status == 200 && result.body.status == SuccessError.succes) {
+        this.messageService.add({ severity: 'success', summary: result.body.header, detail: result.body.message, icon: 'pi pi-check' });
+        this.listDrivers.push(result.body.data);
+      }
+      if (result.status == 200 && result.body.status == SuccessError.error) {
+        this.messageService.add({ severity: 'info', summary: result.body.header, detail: result.body.message, icon: 'pi pi-info-circle' });
       }
     } else if (value.name) {
-      this.listDrivers = await this.filterDriverName(value.name);
+      const result = await this.filterDriverName(value.name);
+      if (result.status == 200 && result.body.status == SuccessError.succes) {
+        this.messageService.add({ severity: 'success', summary: result.body.header, detail: result.body.message, icon: 'pi pi-check' });
+        this.listDrivers = result.body.data;
+      }
+      if (result.status == 200 && result.body.status == SuccessError.error) {
+        this.messageService.add({ severity: 'info', summary: result.body.header, detail: result.body.message, icon: 'pi pi-info-circle' });
+      }
     } else if (value.cpf) {
       const result = await this.filterDriverCPF(value.cpf);
-      if (result.status == 200) {
-        this.listDrivers.push(result.body);
+      if (result.status == 200 && result.body.status == SuccessError.succes) {
+        this.messageService.add({ severity: 'success', summary: result.body.header, detail: result.body.message, icon: 'pi pi-check' });
+        this.listDrivers.push(result.body.data);
+      }
+      if (result.status == 200 && result.body.status == SuccessError.error) {
+        this.messageService.add({ severity: 'info', summary: result.body.header, detail: result.body.message, icon: 'pi pi-info-circle' });
       }
     } else if (value.rg) {
       const result = await this.filterDriverRG(value.rg);
-      if (result.status == 200) {
-        this.listDrivers.push(result.body);
+      if (result.status == 200 && result.body.status == SuccessError.succes) {
+        this.messageService.add({ severity: 'success', summary: result.body.header, detail: result.body.message, icon: 'pi pi-check' });
+        this.listDrivers.push(result.body.data);
+      }
+      if (result.status == 200 && result.body.status == SuccessError.error) {
+        this.messageService.add({ severity: 'info', summary: result.body.header, detail: result.body.message, icon: 'pi pi-info-circle' });
       }
     } else if (value.cnhRegister) {
       const result = await this.filterDriverCNHRegister(value.cnhRegister);
-      if (result.status == 200) {
-        this.listDrivers.push(result.body);
+      if (result.status == 200 && result.body.status == SuccessError.succes) {
+        this.messageService.add({ severity: 'success', summary: result.body.header, detail: result.body.message, icon: 'pi pi-check' });
+        this.listDrivers.push(result.body.data);
+      }
+      if (result.status == 200 && result.body.status == SuccessError.error) {
+        this.messageService.add({ severity: 'info', summary: result.body.header, detail: result.body.message, icon: 'pi pi-info-circle' });
       }
     }
   }
-  private async filterDriverId(id: number): Promise<HttpResponse<Driver>> {
+  private async filterDriverId(id: number): Promise<HttpResponse<MessageResponse>> {
     try {
-      return lastValueFrom(this.driverService.filterId(id));
+      return await lastValueFrom(this.driverService.filterId(id));
     } catch (error) {
+      this.messageService.add({ severity: 'error', summary: 'Erro', detail: error.error.message, icon: 'pi pi-times' });
       return error;
     }
   }
-  private async filterDriverName(name: string): Promise<Driver[]> {
+  private async filterDriverName(name: string): Promise<HttpResponse<MessageResponse>> {
     try {
-      return lastValueFrom(this.driverService.filterName(name));
+      return await lastValueFrom(this.driverService.filterName(name));
     } catch (error) {
-      return [];
-    }
-  }
-  private async filterDriverCPF(cpf: string): Promise<HttpResponse<Driver>> {
-    try {
-      return lastValueFrom(this.driverService.filterCPF(cpf));
-    } catch (error) {
+      this.messageService.add({ severity: 'error', summary: 'Erro', detail: error.error.message, icon: 'pi pi-times' });
       return error;
     }
   }
-  private async filterDriverRG(rg: string): Promise<HttpResponse<Driver>> {
+  private async filterDriverCPF(cpf: string): Promise<HttpResponse<MessageResponse>> {
     try {
-      return lastValueFrom(this.driverService.filterRG(rg));
+      return await lastValueFrom(this.driverService.filterCPF(cpf));
     } catch (error) {
+      this.messageService.add({ severity: 'error', summary: 'Erro', detail: error.error.message, icon: 'pi pi-times' });
       return error;
     }
   }
-  private async filterDriverCNHRegister(cnh: string): Promise<HttpResponse<Driver>> {
+  private async filterDriverRG(rg: string): Promise<HttpResponse<MessageResponse>> {
     try {
-      return lastValueFrom(this.driverService.filterCNHRegister(cnh));
+      return await lastValueFrom(this.driverService.filterRG(rg));
     } catch (error) {
+      this.messageService.add({ severity: 'error', summary: 'Erro', detail: error.error.message, icon: 'pi pi-times' });
+      return error;
+    }
+  }
+  private async filterDriverCNHRegister(cnh: string): Promise<HttpResponse<MessageResponse>> {
+    try {
+      return await lastValueFrom(this.driverService.filterCNHRegister(cnh));
+    } catch (error) {
+      this.messageService.add({ severity: 'error', summary: 'Erro', detail: error.error.message, icon: 'pi pi-times' });
       return error;
     }
   }

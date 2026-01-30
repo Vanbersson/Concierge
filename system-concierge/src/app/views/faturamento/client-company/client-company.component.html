@@ -279,7 +279,7 @@
                     </div>
                     <div class="col-12 md:col-2">
                         <label for="">Data de nascimento</label>
-                         <p-inputMask mask="99/99/9999" [unmask]="true" formControlName="dateBirth" />
+                        <p-calendar [showOnFocus]="false" [showIcon]="true" inputId="buttondisplay" dateFormat="dd/mm/yy" (onInput)="applyDateMask($event)" formControlName="dateBirth"/>
                     </div>
                 </div>
             </form>

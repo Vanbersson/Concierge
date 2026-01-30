@@ -2,7 +2,7 @@ import { Routes } from '@angular/router';
 import { AuthGuard } from './services/login/auth.guard';
 import { DriverMenuGuard } from './views/concierge/driver/driver.menu.guard';
 import { VehicleEntryMenuGuard } from './views/concierge/vehicle.entry/vehicle.entry.menu.guard';
-import { VehicleMenuGuard } from './views/concierge/vehicle/vehicle.menu';
+import { VehicleMenuGuard } from './views/concierge/vehicle/vehicle.menu.guard';
 import { UserGuard } from './views/settings/user/user.guard';
 import { CanDeactivateGuard } from './views/dashboard/can-deactivate.guard.ts';
 

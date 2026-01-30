@@ -11,15 +11,15 @@ public interface IDriverValidation {
 
     public MessageResponse update(Driver driver);
 
-    public String listAll(Integer companyId, Integer resaleId);
+    public MessageResponse listAll(Integer companyId, Integer resaleId);
 
-    public String filterDriverId(Integer companyId, Integer resaleId, Integer driverId);
+    public MessageResponse filterDriverId(Integer companyId, Integer resaleId, Integer driverId);
 
-    public String filterDriverCPF(Integer companyId, Integer resaleId, String cpf);
+    public MessageResponse filterDriverCPF(Integer companyId, Integer resaleId, String cpf);
 
-    public String filterDriverRG(Integer companyId, Integer resaleId, String rg);
+    public MessageResponse filterDriverRG(Integer companyId, Integer resaleId, String rg);
 
-    public String filterDriverName(Integer companyId, Integer resaleId, String name);
+    public MessageResponse filterDriverName(Integer companyId, Integer resaleId, String name);
 
-    public String filterDriverCNHRegister(Integer companyId, Integer resaleId, String cnhRegister);
+    public MessageResponse filterDriverCNHRegister(Integer companyId, Integer resaleId, String cnhRegister);
 }

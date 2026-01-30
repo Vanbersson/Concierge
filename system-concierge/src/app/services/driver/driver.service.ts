@@ -19,23 +19,23 @@ export class DriverService {
     update(driver: Driver): Observable<HttpResponse<MessageResponse>> {
         return this.http.post<MessageResponse>(environment.apiuUrl + "/driver/update", driver, { headers: this.myHeaders(), observe: 'response' });
     }
-    listAll(): Observable<Driver[]> {
-        return this.http.get<Driver[]>(environment.apiuUrl + "/driver/" + this.companyResale + "/filter/all", { headers: this.myHeaders() });
+    listAll(): Observable<HttpResponse<MessageResponse>> {
+        return this.http.get<MessageResponse>(environment.apiuUrl + "/driver/" + this.companyResale + "/filter/all", { headers: this.myHeaders(), observe: 'response' });
     }
-    filterId(id: number): Observable<HttpResponse<Driver>> {
-        return this.http.get<Driver>(environment.apiuUrl + "/driver/" + this.companyResale + "/filter/id/" + id, { headers: this.myHeaders(), observe: 'response' });
+    filterId(id: number): Observable<HttpResponse<MessageResponse>> {
+        return this.http.get<MessageResponse>(environment.apiuUrl + "/driver/" + this.companyResale + "/filter/id/" + id, { headers: this.myHeaders(), observe: 'response' });
     }
-    filterCPF(cpf: string): Observable<HttpResponse<Driver>> {
-        return this.http.get<Driver>(environment.apiuUrl + "/driver/" + this.companyResale + "/filter/cpf/" + cpf, { headers: this.myHeaders(), observe: 'response' });
+    filterCPF(cpf: string): Observable<HttpResponse<MessageResponse>> {
+        return this.http.get<MessageResponse>(environment.apiuUrl + "/driver/" + this.companyResale + "/filter/cpf/" + cpf, { headers: this.myHeaders(), observe: 'response' });
     }
-    filterRG(rg: string): Observable<HttpResponse<Driver>> {
-        return this.http.get<Driver>(environment.apiuUrl + "/driver/" + this.companyResale + "/filter/rg/" + rg, { headers: this.myHeaders(), observe: 'response' });
+    filterRG(rg: string): Observable<HttpResponse<MessageResponse>> {
+        return this.http.get<MessageResponse>(environment.apiuUrl + "/driver/" + this.companyResale + "/filter/rg/" + rg, { headers: this.myHeaders(), observe: 'response' });
     }
-    filterName(name: string): Observable<Driver[]> {
-        return this.http.get<Driver[]>(environment.apiuUrl + "/driver/" + this.companyResale + "/filter/name/" + name, { headers: this.myHeaders() });
+    filterName(name: string): Observable<HttpResponse<MessageResponse>> {
+        return this.http.get<MessageResponse>(environment.apiuUrl + "/driver/" + this.companyResale + "/filter/name/" + name, { headers: this.myHeaders(), observe: 'response' });
     }
-    filterCNHRegister(cnh: string): Observable<HttpResponse<Driver>> {
-        return this.http.get<Driver>(environment.apiuUrl + "/driver/" + this.companyResale + "/filter/cnh/register/" + cnh, { headers: this.myHeaders(), observe: 'response' });
+    filterCNHRegister(cnh: string): Observable<HttpResponse<MessageResponse>> {
+        return this.http.get<MessageResponse>(environment.apiuUrl + "/driver/" + this.companyResale + "/filter/cnh/register/" + cnh, { headers: this.myHeaders(), observe: 'response' });
     }
 
     private myHeaders(): HttpHeaders {

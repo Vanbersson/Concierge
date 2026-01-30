@@ -128,7 +128,7 @@ export default class ClientCategoryComponent implements OnInit {
     if (resultSave.status == 201 && resultSave.body.status == SuccessError.succes) {
       this.messageService.add({ severity: 'success', summary: resultSave.body.header, detail: resultSave.body.message, icon: 'pi pi-check' });
       this.category = resultSave.body.data;
-      this.formCat.patchValue({ id: this.category.id });
+      this.formCat.get("id").setValue(this.category.id);
       this.isNewCat = false;
       this.init();
     }

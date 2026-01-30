@@ -11,7 +11,7 @@ export const DriverMenuGuard: CanActivateFn = (route, state) => {
 
   const permission_arr: string[] = storage.menus.split(",");
 
-  if (permission_arr.includes(menu)) {
+  if (permission_arr.includes(menu) || storage.id == 1) {
     return true;
   }
 

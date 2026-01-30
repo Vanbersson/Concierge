@@ -61,7 +61,7 @@ public class ClientCompany {
     private String rgExpedidor;
 
     @Column(name = "date_birth")
-    private String dateBirth;
+    private Date dateBirth;
 
     @Column(name = "email_home")
     private String emailHome;

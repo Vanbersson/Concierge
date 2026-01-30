@@ -296,9 +296,9 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
         driverEntryCpf: this.driverEntry.cpf,
         driverEntryRg: this.driverEntry.rg == "" ? null : this.driverEntry.rg
       });
-      this.driverEntryPhoto = this.driverEntry.photoDriver;
-      this.driverEntryPhotoDoc1 = this.driverEntry.photoDoc1;
-      this.driverEntryPhotoDoc2 = this.driverEntry.photoDoc2;
+      this.driverEntryPhoto = this.driverEntry.photoDriverUrl;
+      this.driverEntryPhotoDoc1 = this.driverEntry.photoDoc1Url;
+      this.driverEntryPhotoDoc2 = this.driverEntry.photoDoc2Url;
       this.selectDriverEntry.set(new Driver());
     }
     //Motorista saída
@@ -310,9 +310,9 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
         driverExitCpf: this.driverExit.cpf,
         driverExitRg: this.driverExit.rg == "" ? null : this.driverExit.rg
       });
-      this.driverExitPhoto = this.driverExit.photoDriver;
-      this.driverExitPhotoDoc1 = this.driverExit.photoDoc1;
-      this.driverExitPhotoDoc2 = this.driverExit.photoDoc2;
+      this.driverExitPhoto = this.driverExit.photoDriverUrl;
+      this.driverExitPhotoDoc1 = this.driverExit.photoDoc1Url;
+      this.driverExitPhotoDoc2 = this.driverExit.photoDoc2Url;
       this.selectDriverExit.set(new Driver());
     }
   }
@@ -335,14 +335,14 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
       if (this.vehicleEntry.driverEntryId != 0 && this.vehicleEntry.driverEntryName != "") {
         const resultDriverEntry = await this.filterDriverId(this.vehicleEntry.driverEntryId);
         if (resultDriverEntry.status == 200) {
-          this.driverEntry = resultDriverEntry.body;
+          this.driverEntry = resultDriverEntry.body.data;
         }
       }
       //Buscar o motorista de saída
       if (this.vehicleEntry.driverExitId != 0 && this.vehicleEntry.driverExitName != "") {
         const resultDriverExit = await this.filterDriverId(this.vehicleEntry.driverExitId);
         if (resultDriverExit.status == 200) {
-          this.driverExit = resultDriverExit.body;
+          this.driverExit = resultDriverExit.body.data;
         }
       }
 
@@ -517,9 +517,9 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
         driverEntryCpf: this.driverEntry.cpf,
         driverEntryRg: this.driverEntry.rg == "" ? null : this.driverEntry.rg
       });
-      this.driverEntryPhoto = this.driverEntry.photoDriver;
-      this.driverEntryPhotoDoc1 = this.driverEntry.photoDoc1;
-      this.driverEntryPhotoDoc2 = this.driverEntry.photoDoc2;
+      this.driverEntryPhoto = this.driverEntry.photoDriverUrl;
+      this.driverEntryPhotoDoc1 = this.driverEntry.photoDoc1Url;
+      this.driverEntryPhotoDoc2 = this.driverEntry.photoDoc2Url;
     }
     //Form Driver saída
     //Menssagem de motorista sem cadastro
@@ -532,9 +532,9 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
         driverExitCpf: this.driverExit.cpf,
         driverExitRg: this.driverExit.rg == "" ? null : this.driverExit.rg
       });
-      this.driverExitPhoto = this.driverExit.photoDriver;
-      this.driverExitPhotoDoc1 = this.driverExit.photoDoc1;
-      this.driverExitPhotoDoc2 = this.driverExit.photoDoc2;
+      this.driverExitPhoto = this.driverExit.photoDriverUrl;
+      this.driverExitPhotoDoc1 = this.driverExit.photoDoc1Url;
+      this.driverExitPhotoDoc2 = this.driverExit.photoDoc2Url;
     }
     /* Motorista de saída não informado */
     if (this.vehicleEntry.driverExitId == 0 && this.vehicleEntry.driverExitName == "" && this.vehicleEntry.driverExitCpf == "") {
@@ -1024,7 +1024,7 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
     });
   }
   //Driver
-  private async filterDriverId(id: number): Promise<HttpResponse<Driver>> {
+  private async filterDriverId(id: number): Promise<HttpResponse<MessageResponse>> {
     try {
       return lastValueFrom(this.driverService.filterId(id));
     } catch (error) {

@@ -17,6 +17,7 @@ import { ToastModule } from 'primeng/toast';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { RadioButtonModule } from 'primeng/radiobutton';
 import { DividerModule } from 'primeng/divider';
+import { CalendarModule } from 'primeng/calendar';
 
 import { ClientCompany } from '../../../models/clientcompany/client-company';
 
@@ -41,7 +42,7 @@ import { StatusEnum } from '../../../models/enum/status-enum';
 @Component({
   selector: 'app-client-company',
   standalone: true,
-  imports: [CommonModule, TabViewModule, ButtonModule, InputTextModule, TableModule,
+  imports: [CommonModule, TabViewModule, ButtonModule, InputTextModule, TableModule, CalendarModule,
     MultiSelectModule, InputNumberModule, IconFieldModule, InputIconModule, DialogModule, DividerModule,
     InputMaskModule, InputGroupModule, ConfirmDialogModule, ToastModule, RadioButtonModule,
     ReactiveFormsModule],
@@ -77,7 +78,7 @@ export default class ClientCompanyComponent implements OnInit {
     cpf: new FormControl<string>(""),
     rg: new FormControl<string | null>(null),
     rgExpedidor: new FormControl<string>(""),
-    dateBirth: new FormControl<string>(""),
+    dateBirth: new FormControl<Date | string>(""),
     dddPhone: new FormControl<string | null>(null),
     phone: new FormControl<string | null>(null),
     dddCellphone: new FormControl<string | null>(null),
@@ -289,7 +290,7 @@ export default class ClientCompanyComponent implements OnInit {
     const result = await this.saveClient(this.client);
     if (result.status == 201 && result.body.status == SuccessError.succes) {
       this.client = result.body.data;
-      this.formClient.patchValue({ id: result.body.data.id });
+      this.formClient.get("id").setValue(this.client.id);
       //desabilita o tipo de cliente
       this.formClient.get("fisjur").disable();
       //alterar para cliente existente
@@ -360,7 +361,7 @@ export default class ClientCompanyComponent implements OnInit {
       cpf: cli.cpf,
       rg: cli.rg != "" ? cli.rg : null,
       rgExpedidor: cli.rgExpedidor,
-      dateBirth: cli.dateBirth,
+      dateBirth: new Date(cli.dateBirth),
       dddPhone: cli.dddPhone != "" ? cli.dddPhone : null,
       phone: cli.phone != "" ? cli.phone : null,
       dddCellphone: cli.dddCellphone != "" ? cli.dddCellphone : null,
@@ -608,6 +609,19 @@ export default class ClientCompanyComponent implements OnInit {
       return FisJurEnum.JURIDICA;
 
     return FisJurEnum.OUTRAS;
+  }
+
+  applyDateMask(event: any) {
+    let value = event.target.value.replace(/\D/g, '');
+
+    if (value.length > 2) {
+      value = value.replace(/^(\d{2})(\d)/, '$1/$2');
+    }
+    if (value.length > 5) {
+      value = value.replace(/^(\d{2})\/(\d{2})(\d)/, '$1/$2/$3');
+    }
+
+    event.target.value = value;
   }
 
 

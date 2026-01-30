@@ -32,10 +32,8 @@ public class DriverService implements IDriverService {
                 driver.setDateRegister(new Date());
                 Driver result = this.repository.save(driver);
                 response.setData(result);
-                return response;
-            } else {
-                return response;
             }
+            return response;
         } catch (Exception e) {
             throw new DriverException(e.getMessage());
         }
@@ -48,10 +46,8 @@ public class DriverService implements IDriverService {
             MessageResponse response = this.validation.update(driver);
             if (ConstantsMessage.SUCCESS.equals(response.getStatus())) {
                 this.repository.save(driver);
-                return response;
-            } else {
-                return response;
             }
+            return response;
         } catch (Exception e) {
             throw new DriverException(e.getMessage());
         }
@@ -59,12 +55,11 @@ public class DriverService implements IDriverService {
 
     @SneakyThrows
     @Override
-    public List<Map<String, Object>> listAll(Integer companyId, Integer resaleId) {
+    public MessageResponse listAll(Integer companyId, Integer resaleId) {
         try {
-            String message = this.validation.listAll(companyId, resaleId);
-            if (ConstantsMessage.SUCCESS.equals(message)) {
+            MessageResponse response = this.validation.listAll(companyId, resaleId);
+            if (ConstantsMessage.SUCCESS.equals(response.getStatus())) {
                 List<Driver> result = this.repository.listAll(companyId, resaleId);
-
                 List<Map<String, Object>> list = new ArrayList<>();
                 for (Driver driver : result) {
                     Map<String, Object> map = new HashMap<>();
@@ -76,10 +71,9 @@ public class DriverService implements IDriverService {
                     map.put("cnhCategory", driver.getCnhCategory());
                     list.add(map);
                 }
-                return list;
-            } else {
-                throw new DriverException(message);
+                response.setData(list);
             }
+            return response;
         } catch (Exception e) {
             throw new DriverException(e.getMessage());
         }
@@ -87,15 +81,14 @@ public class DriverService implements IDriverService {
 
     @SneakyThrows
     @Override
-    public Map<String, Object> filterDriverId(Integer companyId, Integer resaleId, Integer driverId) {
+    public MessageResponse filterDriverId(Integer companyId, Integer resaleId, Integer driverId) {
         try {
-            String message = this.validation.filterDriverId(companyId, resaleId, driverId);
-            if (ConstantsMessage.SUCCESS.equals(message)) {
+            MessageResponse response = this.validation.filterDriverId(companyId, resaleId, driverId);
+            if (ConstantsMessage.SUCCESS.equals(response.getStatus())) {
                 Driver result = this.repository.filterId(companyId, resaleId, driverId);
-                return this.load(result);
-            } else {
-                throw new DriverException(message);
+                response.setData(result);
             }
+            return response;
         } catch (Exception e) {
             throw new DriverException(e.getMessage());
         }
@@ -103,15 +96,14 @@ public class DriverService implements IDriverService {
 
     @SneakyThrows
     @Override
-    public Map<String, Object> filterDriverCPF(Integer companyId, Integer resaleId, String cpf) {
+    public MessageResponse filterDriverCPF(Integer companyId, Integer resaleId, String cpf) {
         try {
-            String message = this.validation.filterDriverCPF(companyId, resaleId, cpf);
-            if (ConstantsMessage.SUCCESS.equals(message)) {
-                Driver result = this.repository.filterCPF(companyId, resaleId, StatusEnableDisable.Habilitado, cpf);
-                return this.load(result);
-            } else {
-                throw new DriverException(message);
+            MessageResponse response = this.validation.filterDriverCPF(companyId, resaleId, cpf);
+            if (ConstantsMessage.SUCCESS.equals(response.getStatus())) {
+                Driver result = this.repository.filterCPF(companyId, resaleId, cpf);
+                response.setData(result);
             }
+            return response;
         } catch (Exception e) {
             throw new DriverException(e.getMessage());
         }
@@ -119,15 +111,14 @@ public class DriverService implements IDriverService {
 
     @SneakyThrows
     @Override
-    public Map<String, Object> filterDriverRG(Integer companyId, Integer resaleId, String rg) {
+    public MessageResponse filterDriverRG(Integer companyId, Integer resaleId, String rg) {
         try {
-            String message = this.validation.filterDriverRG(companyId, resaleId, rg);
-            if (ConstantsMessage.SUCCESS.equals(message)) {
-                Driver result = this.repository.filterRG(companyId, resaleId, StatusEnableDisable.Habilitado, rg);
-                return this.load(result);
-            } else {
-                throw new DriverException(message);
+            MessageResponse response = this.validation.filterDriverRG(companyId, resaleId, rg);
+            if (ConstantsMessage.SUCCESS.equals(response.getStatus())) {
+                Driver result = this.repository.filterRG(companyId, resaleId, rg);
+                response.setData(result);
             }
+            return response;
         } catch (Exception e) {
             throw new DriverException(e.getMessage());
         }
@@ -135,19 +126,14 @@ public class DriverService implements IDriverService {
 
     @SneakyThrows
     @Override
-    public List<Map<String, Object>> filterDriverName(Integer companyId, Integer resaleId, String name) {
+    public MessageResponse filterDriverName(Integer companyId, Integer resaleId, String name) {
         try {
-            String message = this.validation.filterDriverName(companyId, resaleId, name);
-            if (ConstantsMessage.SUCCESS.equals(message)) {
-                List<Driver> result = this.repository.filterName(companyId, resaleId, StatusEnableDisable.Habilitado, name);
-                List<Map<String, Object>> list = new ArrayList<>();
-                for (Driver driver : result) {
-                    list.add(this.load(driver));
-                }
-                return list;
-            } else {
-                throw new DriverException(message);
+            MessageResponse response = this.validation.filterDriverName(companyId, resaleId, name);
+            if (ConstantsMessage.SUCCESS.equals(response.getStatus())) {
+                List<Driver> result = this.repository.filterName(companyId, resaleId, name);
+                response.setData(result);
             }
+            return response;
         } catch (Exception e) {
             throw new DriverException(e.getMessage());
         }
@@ -155,64 +141,17 @@ public class DriverService implements IDriverService {
 
     @SneakyThrows
     @Override
-    public Map<String, Object> filterDriverCNHRegister(Integer companyId, Integer resaleId, String cnhRegister) {
+    public MessageResponse filterDriverCNHRegister(Integer companyId, Integer resaleId, String cnhRegister) {
         try {
-            String message = this.validation.filterDriverCNHRegister(companyId, resaleId, cnhRegister);
-            if (ConstantsMessage.SUCCESS.equals(message)) {
-                Driver result = this.repository.filterCNHRegister(companyId, resaleId, StatusEnableDisable.Habilitado, cnhRegister);
-                return this.load(result);
-            } else {
-                throw new DriverException(message);
+            MessageResponse response = this.validation.filterDriverCNHRegister(companyId, resaleId, cnhRegister);
+            if (ConstantsMessage.SUCCESS.equals(response.getStatus())) {
+                Driver result = this.repository.filterCNHRegister(companyId, resaleId, cnhRegister);
+                response.setData(result);
             }
+            return response;
         } catch (Exception e) {
             throw new DriverException(e.getMessage());
         }
     }
 
-    private Map<String, Object> load(Driver driver) {
-        Map<String, Object> map = new HashMap<>();
-        map.put("companyId", driver.getCompanyId());
-        map.put("resaleId", driver.getResaleId());
-        map.put("id", driver.getId());
-        map.put("status", driver.getStatus());
-        map.put("name", driver.getName());
-        map.put("cpf", driver.getCpf());
-        map.put("rg", driver.getRg());
-        map.put("maleFemale", driver.getMaleFemale());
-        map.put("dateBirth", driver.getDateBirth());
-        map.put("cnhRegister", driver.getCnhRegister());
-        map.put("cnhCategory", driver.getCnhCategory());
-        map.put("cnhValidation", driver.getCnhValidation());
-        map.put("email", driver.getEmail());
-        map.put("dddPhone", driver.getDddPhone());
-        map.put("phone", driver.getPhone());
-        map.put("dddCellphone", driver.getDddCellphone());
-        map.put("cellphone", driver.getCellphone());
-        map.put("zipCode", driver.getZipCode());
-        map.put("address", driver.getAddress());
-        map.put("addressNumber", driver.getAddressNumber());
-        map.put("state", driver.getState());
-        map.put("city", driver.getCity());
-        map.put("neighborhood", driver.getNeighborhood());
-        map.put("addressComplement", driver.getAddressComplement());
-        map.put("userId", driver.getUserId());
-        map.put("userName", driver.getUserName());
-        map.put("dateRegister", driver.getDateRegister());
-        if (driver.getPhotoDriver() == null) {
-            map.put("photoDriver", "");
-        } else {
-            map.put("photoDriver", driver.getPhotoDriver());
-        }
-        if (driver.getPhotoDoc1() == null) {
-            map.put("photoDoc1", "");
-        } else {
-            map.put("photoDoc1", driver.getPhotoDoc1());
-        }
-        if (driver.getPhotoDoc2() == null) {
-            map.put("photoDoc2", "");
-        } else {
-            map.put("photoDoc2", driver.getPhotoDoc2());
-        }
-        return map;
-    }
 }

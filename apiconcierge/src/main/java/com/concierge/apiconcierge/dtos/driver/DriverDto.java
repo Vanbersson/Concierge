@@ -2,13 +2,14 @@ package com.concierge.apiconcierge.dtos.driver;
 
 import com.concierge.apiconcierge.models.enums.MaleFemale;
 import com.concierge.apiconcierge.models.status.StatusEnableDisable;
-import jakarta.persistence.Column;
 
 import java.util.Date;
 
 public record DriverDto(Integer companyId,
 
                         Integer resaleId,
+
+                        Date dateRegister,
 
                         Integer id,
 
@@ -54,16 +55,10 @@ public record DriverDto(Integer companyId,
 
                         String addressComplement,
 
-                        byte[] photoDriver,
+                        String photoDriverUrl,
 
-                        byte[] photoDoc1,
+                        String photoDoc1Url,
 
-                        byte[] photoDoc2,
-
-                        Integer userId,
-
-                        String userName,
-
-                        Date dateRegister
+                        String photoDoc2Url
 ) {
 }

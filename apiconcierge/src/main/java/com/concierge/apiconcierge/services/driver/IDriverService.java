@@ -11,15 +11,15 @@ public interface IDriverService {
 
     public MessageResponse update(Driver driver);
 
-    public List<Map<String, Object>> listAll(Integer companyId, Integer resaleId);
+    public MessageResponse listAll(Integer companyId, Integer resaleId);
 
-    public Map<String, Object> filterDriverId(Integer companyId, Integer resaleId, Integer driverId);
+    public MessageResponse filterDriverId(Integer companyId, Integer resaleId, Integer driverId);
 
-    public Map<String, Object> filterDriverCPF(Integer companyId, Integer resaleId, String cpf);
+    public MessageResponse filterDriverCPF(Integer companyId, Integer resaleId, String cpf);
 
-    public Map<String, Object> filterDriverRG(Integer companyId, Integer resaleId, String rg);
+    public MessageResponse filterDriverRG(Integer companyId, Integer resaleId, String rg);
 
-    public List<Map<String, Object>> filterDriverName(Integer companyId, Integer resaleId, String name);
+    public MessageResponse filterDriverName(Integer companyId, Integer resaleId, String name);
 
-    public Map<String, Object> filterDriverCNHRegister(Integer companyId, Integer resaleId, String cnhRegister);
+    public MessageResponse filterDriverCNHRegister(Integer companyId, Integer resaleId, String cnhRegister);
 }

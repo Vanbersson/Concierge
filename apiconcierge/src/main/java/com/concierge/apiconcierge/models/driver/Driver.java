@@ -16,8 +16,6 @@ import java.util.Date;
 @EqualsAndHashCode(of = "id")
 @SecondaryTable(name = "tb_company", pkJoinColumns = @PrimaryKeyJoinColumn(name = "id"))
 @SecondaryTable(name = "tb_resale", pkJoinColumns = @PrimaryKeyJoinColumn(name = "id"))
-@SecondaryTable(name = "tb_user", pkJoinColumns = @PrimaryKeyJoinColumn(name = "id"))
-@SecondaryTable(name = "tb_client_company", pkJoinColumns = @PrimaryKeyJoinColumn(name = "id"))
 @Entity(name = "tb_driver")
 @Table(name = "tb_driver")
 public class Driver {
@@ -29,6 +27,9 @@ public class Driver {
     @JoinColumn(table = "tb_resale", referencedColumnName = "id")
     @Column(name = "resale_id")
     private Integer resaleId;
+
+    @Column(name="date_register")
+    private Date dateRegister;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -86,25 +87,12 @@ public class Driver {
     @Column(name = "address_complement")
     private String addressComplement;
 
-    @Lob
-    @Column(name = "photo_driver")
-    private byte[] photoDriver;
+    @Column(name = "photo_driver_url")
+    private String photoDriverUrl;
 
-    @Lob
-    @Column(name = " photo_doc1")
-    private byte[] photoDoc1;
+    @Column(name = " photo_doc1_url")
+    private String photoDoc1Url;
 
-    @Lob
-    @Column(name = " photo_doc2")
-    private byte[] photoDoc2;
-
-    @JoinColumn(table = "tb_user", referencedColumnName = "id")
-    @Column(name = "user_id")
-    private Integer userId;
-
-    @Column(name = "user_name")
-    private String userName;
-
-    @Column(name = "date_register")
-    private Date dateRegister;
+    @Column(name = " photo_doc2_url")
+    private String photoDoc2Url;
 }

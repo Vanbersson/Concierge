@@ -197,9 +197,9 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
         driverEntryRg: this.selectDriver().rg
       });
       this.driver = this.selectDriver();
-      this.driverEntryPhoto = this.selectDriver().photoDriver;
-      this.driverEntryPhotoDoc1 = this.selectDriver().photoDoc1;
-      this.driverEntryPhotoDoc2 = this.selectDriver().photoDoc2;
+      this.driverEntryPhoto = this.selectDriver().photoDriverUrl;
+      this.driverEntryPhotoDoc1 = this.selectDriver().photoDoc1Url;
+      this.driverEntryPhotoDoc2 = this.selectDriver().photoDoc2Url;
       this.selectDriver.set(new Driver());
     }
   }

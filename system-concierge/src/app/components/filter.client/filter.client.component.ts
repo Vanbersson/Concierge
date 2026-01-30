@@ -60,7 +60,7 @@ export class FilterClientComponent {
   public showDialogFilterClientCompany() {
     this.dialogVisibleClientCompany = true;
   }
-  
+
   public hideDialogFilterClientCompany() {
     this.dialogVisibleClientCompany = false;
   }
@@ -84,6 +84,21 @@ export class FilterClientComponent {
     if (cpf == "") return "";
     const CPF = cpf.substring(0, 3) + "." + cpf.substring(3, 6) + "." + cpf.substring(6, 9) + "-" + cpf.substring(9, 11);
     return CPF;
+  }
+
+  cleanAll() {
+    this.formClientCompanyFilter.patchValue({
+      clientCompanyId: null,
+      clientCompanyFantasia: "",
+      clientCompanyName: "",
+      clientCompanyCnpj: "",
+      clientCompanyCpf: "",
+      clientCompanyRg: null,
+      clientCompanyTipo: "j"
+    });
+
+    this.dialogListClientCompany = [];
+    this.selectClientCompany = null;
   }
 
   public async filterClientCompany() {

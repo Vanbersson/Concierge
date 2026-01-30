@@ -47,9 +47,10 @@
                 </div>
 
             </div>
-            <div class="col-12 flex">
-                <div class="block">
+            <div class="col-12 md:col-4">
+                <div class="flex gap-2">
                     <button pButton type="submit" label="Pesquisar" class="p-button-warning w-full" icon="pi pi-search"></button>
+                    <button pButton type="button" label="Limpar" class="p-button-danger w-full" icon="pi pi-times" (click)="cleanAll()"></button>
                 </div>
                 
             </div>
@@ -78,7 +79,6 @@
             </tr>
         </ng-template>
         <ng-template pTemplate="body" let-clientcompany>
-            
             <tr [pSelectableRow]="clientcompany"  
             [ngClass]="{'text-red-300':clientcompany.status == disabled}">
                 <td>{{clientcompany.id}}</td>

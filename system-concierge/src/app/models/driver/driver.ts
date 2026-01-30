@@ -1,8 +1,11 @@
+import { StatusEnum } from "../enum/status-enum";
+
 export class Driver {
     companyId: number = 0;
     resaleId: number = 0;
+    dateRegister: Date | string = "";
     id: number = 0;
-    status: string = "";
+    status: StatusEnum = StatusEnum.DISABLED;
     name: string = "";
     cpf: string = "";
     rg: string = "";
@@ -23,11 +26,7 @@ export class Driver {
     address: string = '';
     addressNumber: string = '';
     addressComplement: string = '';
-    photoDriver: string = '';
-    photoDoc1: string = '';
-    photoDoc2: string = '';
-    userId: number = 0;
-    userName: string = '';
-    dateRegister: Date | string = "";
-
+    photoDriverUrl: string = '';
+    photoDoc1Url: string = '';
+    photoDoc2Url: string = '';
 }

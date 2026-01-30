@@ -29,44 +29,45 @@ public class DriverValidation implements IDriverValidation {
             response.setMessage(ConstantsMessage.NOT_INFORMED);
             return response;
         }
-        if (driver.getStatus() == null){
+        if (driver.getStatus() == null) {
             response.setStatus(ConstantsMessage.ERROR);
             response.setHeader("Status");
             response.setMessage(ConstantsMessage.NOT_INFORMED);
             return response;
         }
-        if (driver.getName().isBlank()){
+        if (driver.getName().isBlank()) {
             response.setStatus(ConstantsMessage.ERROR);
             response.setHeader("Nome");
             response.setMessage(ConstantsMessage.NOT_INFORMED);
             return response;
         }
-        if (driver.getCpf().isBlank()){
+        if (driver.getCpf().isBlank()) {
             response.setStatus(ConstantsMessage.ERROR);
             response.setHeader("CPF");
             response.setMessage(ConstantsMessage.NOT_INFORMED);
             return response;
         }
         boolean isValidCpf = this.isValidCpf(driver.getCpf());
-        if(!isValidCpf){
+        if (!isValidCpf) {
             response.setStatus(ConstantsMessage.ERROR);
             response.setHeader("CPF");
             response.setMessage("CPF inválido");
             return response;
         }
-        if (driver.getRg().isBlank()){
-            response.setStatus(ConstantsMessage.ERROR);
-            response.setHeader("RG");
-            response.setMessage(ConstantsMessage.NOT_INFORMED);
-            return response;
-        }
-        Driver driver1 = this.repository.filterCPF(driver.getCompanyId(), driver.getResaleId(), driver.getCpf());
-        if (driver1 != null){
+        Driver result = this.repository.filterCPF(driver.getCompanyId(), driver.getResaleId(), driver.getCpf());
+        if (result != null) {
             response.setStatus(ConstantsMessage.ERROR);
             response.setHeader("Motorista");
             response.setMessage("Já cadastrado.");
             return response;
         }
+        if (driver.getRg().isBlank()) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("RG");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+
         response.setStatus(ConstantsMessage.SUCCESS);
         response.setHeader("Motorista");
         response.setMessage("Cadastrado com sucesso.");
@@ -88,118 +89,210 @@ public class DriverValidation implements IDriverValidation {
             response.setMessage(ConstantsMessage.NOT_INFORMED);
             return response;
         }
-        if (driver.getId() == null || driver.getId() == 0){
+        if (driver.getId() == null || driver.getId() == 0) {
             response.setStatus(ConstantsMessage.ERROR);
             response.setHeader("Código");
             response.setMessage(ConstantsMessage.NOT_INFORMED);
             return response;
         }
-        if (driver.getStatus() == null){
+        if (driver.getStatus() == null) {
             response.setStatus(ConstantsMessage.ERROR);
             response.setHeader("Status");
             response.setMessage(ConstantsMessage.NOT_INFORMED);
             return response;
         }
-        if (driver.getName().isBlank()){
+        if (driver.getName().isBlank()) {
             response.setStatus(ConstantsMessage.ERROR);
             response.setHeader("Nome");
             response.setMessage(ConstantsMessage.NOT_INFORMED);
             return response;
         }
-        if (driver.getCpf().isBlank()){
+        if (driver.getCpf().isBlank()) {
             response.setStatus(ConstantsMessage.ERROR);
             response.setHeader("CPF");
             response.setMessage(ConstantsMessage.NOT_INFORMED);
             return response;
         }
         boolean isValidCpf = this.isValidCpf(driver.getCpf());
-        if(!isValidCpf){
+        if (!isValidCpf) {
             response.setStatus(ConstantsMessage.ERROR);
             response.setHeader("CPF");
             response.setMessage("CPF inválido");
             return response;
         }
-        if (driver.getRg().isBlank()){
+        if (driver.getRg().isBlank()) {
             response.setStatus(ConstantsMessage.ERROR);
             response.setHeader("RG");
             response.setMessage(ConstantsMessage.NOT_INFORMED);
             return response;
         }
-        Driver driver1 = this.repository.filterCPF(driver.getCompanyId(), driver.getResaleId(), driver.getCpf());
-        if (driver1.getId() != driver.getId()){
+        Driver result = this.repository.filterCPF(driver.getCompanyId(), driver.getResaleId(), driver.getCpf());
+        if (result.getId() != driver.getId()) {
             response.setStatus(ConstantsMessage.ERROR);
             response.setHeader("Motorista já cadastrado.");
             response.setMessage(ConstantsMessage.NOT_INFORMED);
             return response;
         }
         response.setStatus(ConstantsMessage.SUCCESS);
-        response.setHeader("Informações");
+        response.setHeader("Motorista");
         response.setMessage("Atualizado com sucesso.");
         return response;
     }
 
     @Override
-    public String listAll(Integer companyId, Integer resaleId) {
-        if (companyId == null || companyId == 0)
-            return ConstantsMessage.ERROR_COMPANY;
-        if (resaleId == null || resaleId == 0)
-            return ConstantsMessage.ERROR_RESALE;
-        return ConstantsMessage.SUCCESS;
+    public MessageResponse listAll(Integer companyId, Integer resaleId) {
+        MessageResponse response = new MessageResponse();
+        if (companyId == null || companyId == 0) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Empresa");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (resaleId == null || resaleId == 0) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Revenda");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        response.setStatus(ConstantsMessage.SUCCESS);
+        response.setHeader("Motoristas");
+        response.setMessage("Encontrados com sucesso.");
+        return response;
     }
 
     @Override
-    public String filterDriverId(Integer companyId, Integer resaleId, Integer driverId) {
-        if (companyId == null || companyId == 0)
-            return ConstantsMessage.ERROR_COMPANY;
-        if (resaleId == null || resaleId == 0)
-            return ConstantsMessage.ERROR_RESALE;
-        if (driverId == null || driverId == 0)
-            return ConstantsMessage.ERROR_ID;
-        return ConstantsMessage.SUCCESS;
+    public MessageResponse filterDriverId(Integer companyId, Integer resaleId, Integer driverId) {
+        MessageResponse response = new MessageResponse();
+        if (companyId == null || companyId == 0) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Empresa");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (resaleId == null || resaleId == 0) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Revenda");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (driverId == null || driverId == 0) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Código");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        response.setStatus(ConstantsMessage.SUCCESS);
+        response.setHeader("Motorista");
+        response.setMessage("Encontrado com sucesso.");
+        return response;
     }
 
     @Override
-    public String filterDriverCPF(Integer companyId, Integer resaleId, String cpf) {
-        if (companyId == null || companyId == 0)
-            return ConstantsMessage.ERROR_COMPANY;
-        if (resaleId == null || resaleId == 0)
-            return ConstantsMessage.ERROR_RESALE;
-        if (cpf.isBlank())
-            return "CPF not informed.";
-        return ConstantsMessage.SUCCESS;
+    public MessageResponse filterDriverCPF(Integer companyId, Integer resaleId, String cpf) {
+        MessageResponse response = new MessageResponse();
+        if (companyId == null || companyId == 0) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Empresa");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (resaleId == null || resaleId == 0) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Revenda");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (cpf.isBlank()) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("CPF");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        response.setStatus(ConstantsMessage.SUCCESS);
+        response.setHeader("Motorista");
+        response.setMessage("Encontrado com sucesso.");
+        return response;
     }
 
     @Override
-    public String filterDriverRG(Integer companyId, Integer resaleId, String rg) {
-        if (companyId == null || companyId == 0)
-            return ConstantsMessage.ERROR_COMPANY;
-        if (resaleId == null || resaleId == 0)
-            return ConstantsMessage.ERROR_RESALE;
-        if (rg.isBlank())
-            return "RG not informed.";
-        return ConstantsMessage.SUCCESS;
+    public MessageResponse filterDriverRG(Integer companyId, Integer resaleId, String rg) {
+        MessageResponse response = new MessageResponse();
+        if (companyId == null || companyId == 0) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Empresa");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (resaleId == null || resaleId == 0) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Revenda");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (rg.isBlank()) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("RG");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        response.setStatus(ConstantsMessage.SUCCESS);
+        response.setHeader("Motorista");
+        response.setMessage("Encontrado com sucesso.");
+        return response;
     }
 
     @Override
-    public String filterDriverName(Integer companyId, Integer resaleId, String name) {
-        if (companyId == null || companyId == 0)
-            return ConstantsMessage.ERROR_COMPANY;
-        if (resaleId == null || resaleId == 0)
-            return ConstantsMessage.ERROR_RESALE;
-        if (name.isBlank())
-            return ConstantsMessage.ERROR_NAME;
-        return ConstantsMessage.SUCCESS;
+    public MessageResponse filterDriverName(Integer companyId, Integer resaleId, String name) {
+        MessageResponse response = new MessageResponse();
+        if (companyId == null || companyId == 0) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Empresa");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (resaleId == null || resaleId == 0) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Revenda");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (name.isBlank()) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Nome");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        response.setStatus(ConstantsMessage.SUCCESS);
+        response.setHeader("Motorista");
+        response.setMessage("Encontrado com sucesso.");
+        return response;
     }
 
     @Override
-    public String filterDriverCNHRegister(Integer companyId, Integer resaleId, String cnhRegister) {
-        if (companyId == null || companyId == 0)
-            return ConstantsMessage.ERROR_COMPANY;
-        if (resaleId == null || resaleId == 0)
-            return ConstantsMessage.ERROR_RESALE;
-        if (cnhRegister.isBlank())
-            return "CNH register not informed.";
-        return ConstantsMessage.SUCCESS;
+    public MessageResponse filterDriverCNHRegister(Integer companyId, Integer resaleId, String cnhRegister) {
+        MessageResponse response = new MessageResponse();
+        if (companyId == null || companyId == 0) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Empresa");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (resaleId == null || resaleId == 0) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Revenda");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (cnhRegister.isBlank()) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Número CNH");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        response.setStatus(ConstantsMessage.SUCCESS);
+        response.setHeader("Motorista");
+        response.setMessage("Encontrado com sucesso.");
+        return response;
     }
 
     private boolean isValidCpf(String cpf) {

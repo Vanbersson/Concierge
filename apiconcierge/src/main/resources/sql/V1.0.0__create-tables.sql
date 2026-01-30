@@ -162,7 +162,7 @@
      cpf varchar(11),
      rg varchar(11),
      rg_expedidor varchar(11),
-     date_birth varchar(8),
+     date_birth datetime,
      email_home varchar(100),
      email_work varchar(100),
      ddd_cellphone varchar(2),
@@ -332,6 +332,7 @@
  CREATE TABLE IF NOT EXISTS tb_driver(
        company_id int not null,
        resale_id int not null,
+       date_register datetime not null,
        id int not null AUTO_INCREMENT,
        status tinyint not null,
        name varchar(100) not null,
@@ -357,12 +358,8 @@
        photo_driver_url varchar(255),
        photo_doc1_url varchar(255),
        photo_doc2_url varchar(255),
-       user_id int not null,
-       user_name varchar(100) not null,
-       date_register datetime not null,
        FOREIGN KEY(company_id) REFERENCES tb_company(id),
        FOREIGN KEY(resale_id) REFERENCES tb_resale(id),
-       FOREIGN KEY(user_id) REFERENCES tb_user(id),
        PRIMARY KEY(id)
    );
 
