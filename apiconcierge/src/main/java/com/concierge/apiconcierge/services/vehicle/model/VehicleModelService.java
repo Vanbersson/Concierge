@@ -1,6 +1,7 @@
 package com.concierge.apiconcierge.services.vehicle.model;
 
 import com.concierge.apiconcierge.exceptions.vehicle.VehicleModelException;
+import com.concierge.apiconcierge.models.message.MessageResponse;
 import com.concierge.apiconcierge.models.vehicle.model.VehicleModel;
 import com.concierge.apiconcierge.repositories.vehicle.model.IVehicleModelRepository;
 import com.concierge.apiconcierge.util.ConstantsMessage;
@@ -25,19 +26,15 @@ public class VehicleModelService implements IVehicleModelService {
 
     @SneakyThrows
     @Override
-    public Map<String, Object> save(VehicleModel mod) {
+    public MessageResponse save(VehicleModel mod) {
         try {
-            String message = this.validation.save(mod);
-            if (ConstantsMessage.SUCCESS.equals(message)) {
+            MessageResponse response = this.validation.save(mod);
+            if (ConstantsMessage.SUCCESS.equals(response.getStatus())) {
                 mod.setId(null);
-                VehicleModel resultMod = this.repository.save(mod);
-
-                Map<String, Object> map = new HashMap<>();
-                map.put("id", resultMod.getId());
-                return map;
-            } else {
-                throw new VehicleModelException(message);
+                VehicleModel result = this.repository.save(mod);
+                response.setData(result);
             }
+            return response;
         } catch (Exception ex) {
             throw new VehicleModelException(ex.getMessage());
         }
@@ -45,15 +42,14 @@ public class VehicleModelService implements IVehicleModelService {
 
     @SneakyThrows
     @Override
-    public String update(VehicleModel mod) {
+    public MessageResponse update(VehicleModel mod) {
         try {
-            String message = this.validation.update(mod);
-            if (ConstantsMessage.SUCCESS.equals(message)) {
-                VehicleModel resultMod = this.repository.save(mod);
-                return ConstantsMessage.SUCCESS;
-            } else {
-                throw new VehicleModelException(message);
+            MessageResponse response = this.validation.update(mod);
+            if (ConstantsMessage.SUCCESS.equals(response.getStatus())) {
+                VehicleModel result = this.repository.save(mod);
+                response.setData(result);
             }
+            return response;
         } catch (Exception ex) {
             throw new VehicleModelException(ex.getMessage());
         }

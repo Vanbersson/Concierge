@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule, DatePipe } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { FormGroup, FormControl, ReactiveFormsModule, FormsModule, Validators } from '@angular/forms';
+import { environment } from '../../../../environments/environment';
 
 //PrimeNG
 import { InputTextModule } from 'primeng/inputtext';
@@ -21,7 +22,7 @@ import { RadioButtonModule } from 'primeng/radiobutton';
 import { DividerModule } from 'primeng/divider';
 
 //Constante
-import { IMAGE_MAX_SIZE } from '../../../util/constants';
+import { IMAGE_MAX_SIZE, IMAGE_MAX_SIZE_LABEL } from '../../../util/constants';
 //Class
 import { Driver } from '../../../models/driver/driver';
 //Service
@@ -37,6 +38,9 @@ import { MaleFemale } from '../../../models/enum/male-female';
 import { MessageResponse } from '../../../models/message/message-response';
 import { SuccessError } from '../../../models/enum/success-error';
 import { StatusEnum } from '../../../models/enum/status-enum';
+import { PhotoService } from '../../../services/photo/photo.service';
+import { PhotoResult } from '../../../interfaces/photo-result';
+import { PhotoResultStatus } from '../../../models/enum/photo-result-status';
 
 interface sexo {
   type: string;
@@ -64,8 +68,11 @@ export default class DriverComponent implements OnInit {
   //Dialog novo
   visibleDialogNew: boolean = false;
   driverPhotoUrl!: string;
+  isDeletePhotoDriver: boolean = false;
   driverPhotoDoc1Url!: string;
+  isDeletePhotoDoc1: boolean = false;
   driverPhotoDoc2Url!: string;
+  isDeletePhotoDoc2: boolean = false;
   sexos: sexo[] | undefined;
 
   formDriver = new FormGroup({
@@ -99,7 +106,8 @@ export default class DriverComponent implements OnInit {
     private messageService: MessageService,
     private driverService: DriverService,
     private busyService: BusyService,
-    private cepService: CEPService) { }
+    private cepService: CEPService,
+    private photoService: PhotoService) { }
 
   ngOnInit(): void {
     this.primeNGConfig.setTranslation({
@@ -190,60 +198,56 @@ export default class DriverComponent implements OnInit {
     this.driverPhotoDoc2Url = "";
   }
 
-  public async selectPhoto() {
-    this.ngxImageCompressService.uploadFile().then(({ image, orientation }) => {
-
-      if (this.ngxImageCompressService.byteCount(image) > IMAGE_MAX_SIZE) {
-        this.messageService.add({ severity: 'error', summary: 'Imagem', detail: 'Tamanha máximo 3MB', icon: 'pi pi-times', life: 3000 });
-      } else {
-        this.ngxImageCompressService.compressFile(image, orientation, 50, 40).then((compressedImage) => {
-
-          // Remover o prefixo "data:image/jpeg;base64," se existir
-          const base64Data = compressedImage.split(',')[1];
-          this.driverPhotoUrl = base64Data;
-
-        });
-      }
-    });
+  async selectPhoto() {
+    const photo: PhotoResult = await this.photoService.takePicture();
+    if (photo.status == PhotoResultStatus.SUCCESS) {
+      this.driverPhotoUrl = photo.base64;
+    }
+    if (photo.status == PhotoResultStatus.LIMIT) {
+      this.messageService.add({ severity: 'info', summary: 'Imagem', detail: IMAGE_MAX_SIZE_LABEL, icon: 'pi pi-info-circle', life: 3000 });
+    }
+    if (photo.status == PhotoResultStatus.ERROR) {
+      // this.messageService.add({ severity: 'error', summary: 'Erro', detail: "Ocorreu um problema.", icon: 'pi pi-times', life: 3000 });
+    }
   }
-  public deletePhoto() {
+  async photoFile1Driver() {
+    const photo: PhotoResult = await this.photoService.takePicture();
+    if (photo.status == PhotoResultStatus.SUCCESS) {
+      this.driverPhotoDoc1Url = photo.base64;
+    }
+    if (photo.status == PhotoResultStatus.LIMIT) {
+      this.messageService.add({ severity: 'info', summary: 'Imagem', detail: IMAGE_MAX_SIZE_LABEL, icon: 'pi pi-info-circle', life: 3000 });
+    }
+    if (photo.status == PhotoResultStatus.ERROR) {
+      // this.messageService.add({ severity: 'error', summary: 'Erro', detail: "Ocorreu um problema.", icon: 'pi pi-times', life: 3000 });
+    }
+  }
+  async photoFile2Driver() {
+    const photo: PhotoResult = await this.photoService.takePicture();
+    if (photo.status == PhotoResultStatus.SUCCESS) {
+      this.driverPhotoDoc2Url = photo.base64;
+    }
+    if (photo.status == PhotoResultStatus.LIMIT) {
+      this.messageService.add({ severity: 'info', summary: 'Imagem', detail: IMAGE_MAX_SIZE_LABEL, icon: 'pi pi-info-circle', life: 3000 });
+    }
+    if (photo.status == PhotoResultStatus.ERROR) {
+      // this.messageService.add({ severity: 'error', summary: 'Erro', detail: "Ocorreu um problema.", icon: 'pi pi-times', life: 3000 });
+    }
+  }
+  deletePhoto() {
     this.driverPhotoUrl = "";
+    this.driver.photoDriverUrl = "";
+    this.isDeletePhotoDriver = true;
   }
-  public async photoFile1Driver() {
-    this.ngxImageCompressService.uploadFile().then(({ image, orientation }) => {
-      if (this.ngxImageCompressService.byteCount(image) > IMAGE_MAX_SIZE) {
-        this.messageService.add({ severity: 'error', summary: 'Imagem', detail: 'Tamanha máximo 3MB', icon: 'pi pi-times', life: 3000 });
-      } else {
-        this.ngxImageCompressService.compressFile(image, orientation, 50, 40).then((compressedImage) => {
-
-          // Remover o prefixo "data:image/jpeg;base64," se existir
-          const base64Data = compressedImage.split(',')[1];
-          this.driverPhotoDoc1Url = base64Data;
-          // this.formDriver.patchValue({ driverEntryPhotoDoc2: this.driverEntryPhotoDoc2 });
-        });
-      }
-    });
-  }
-  public async photoFile2Driver() {
-    this.ngxImageCompressService.uploadFile().then(({ image, orientation }) => {
-      if (this.ngxImageCompressService.byteCount(image) > IMAGE_MAX_SIZE) {
-        this.messageService.add({ severity: 'error', summary: 'Imagem', detail: 'Tamanha máximo 3MB', icon: 'pi pi-times', life: 3000 });
-      } else {
-        this.ngxImageCompressService.compressFile(image, orientation, 50, 40).then((compressedImage) => {
-
-          // Remover o prefixo "data:image/jpeg;base64," se existir
-          const base64Data = compressedImage.split(',')[1];
-          this.driverPhotoDoc2Url = base64Data;
-          // this.formDriver.patchValue({ driverEntryPhotoDoc2: this.driverEntryPhotoDoc2 });
-        });
-      }
-    });
-  }
-  public deleteEntryFileDriver1() {
+  deleteEntryFileDriver1() {
     this.driverPhotoDoc1Url = "";
+    this.driver.photoDoc1Url = "";
+    this.isDeletePhotoDoc1 = true;
   }
-  public deleteEntryFileDriver2() {
+  deleteEntryFileDriver2() {
     this.driverPhotoDoc2Url = "";
+    this.driver.photoDoc2Url = "";
+    this.isDeletePhotoDoc2 = true;
   }
   public newDriver() {
     this.isNewDriver = true;
@@ -357,7 +361,48 @@ export default class DriverComponent implements OnInit {
     }
 
     //Update
-    this.driver.photoDriverUrl = this.driverPhotoUrl;
+    //Inicia load
+    this.busyService.busy();
+    //save photo
+    if (this.driverPhotoUrl != "" && this.driver.photoDriverUrl == "") {
+      this.driver.photoDriverUrl = await this.savePhoto(this.driverPhotoUrl, this.driver.id.toString());
+    }
+    if (this.driverPhotoDoc1Url != "" && this.driver.photoDoc1Url == "") {
+      this.driver.photoDoc1Url = await this.saveDoc1(this.driverPhotoDoc1Url, this.driver.id.toString());
+    }
+    if (this.driverPhotoDoc2Url != "" && this.driver.photoDoc2Url == "") {
+      this.driver.photoDoc2Url = await this.saveDoc2(this.driverPhotoDoc2Url, this.driver.id.toString());
+    }
+    //delete photo
+    const formData = new FormData();
+    if (this.isDeletePhotoDriver) {
+      this.isDeletePhotoDriver = false;
+      formData.append('driver', this.driver.id.toString());
+      formData.append('code', "1");
+      formData.append('company', this.storageService.companyId.toString());
+      formData.append('resale', this.storageService.resaleId.toString());
+      this.deleteImage(formData);
+      this.driver.photoDriverUrl = "";
+    }
+    if (this.isDeletePhotoDoc1) {
+      this.isDeletePhotoDoc1 = false;
+      formData.append('driver', this.driver.id.toString());
+      formData.append('code', "2");
+      formData.append('company', this.storageService.companyId.toString());
+      formData.append('resale', this.storageService.resaleId.toString());
+      this.deleteImage(formData);
+      this.driver.photoDoc1Url = "";
+    }
+    if (this.isDeletePhotoDoc2) {
+      this.isDeletePhotoDoc2 = false;
+      formData.append('driver', this.driver.id.toString());
+      formData.append('code', "3");
+      formData.append('company', this.storageService.companyId.toString());
+      formData.append('resale', this.storageService.resaleId.toString());
+      this.deleteImage(formData);
+      this.driver.photoDoc2Url = "";
+    }
+
     this.driver.status = value.status;
     this.driver.name = value.name;
     this.driver.dateBirth = value.dateBirth;
@@ -379,10 +424,6 @@ export default class DriverComponent implements OnInit {
     this.driver.city = value.city;
     this.driver.neighborhood = value.neighborhood;
     this.driver.addressComplement = value.addressComplement;
-    this.driver.photoDoc1Url = this.driverPhotoDoc1Url;
-    this.driver.photoDoc2Url = this.driverPhotoDoc2Url;
-    //Inicia load
-    this.busyService.busy();
     const resultSave = await this.updateDriver(this.driver);
     //Fecha load
     this.busyService.idle();
@@ -449,4 +490,122 @@ export default class DriverComponent implements OnInit {
       return error;
     }
   }
+
+  private async savePhoto(imgBase64: string, driverId: string): Promise<string> {
+    try {
+      const { base64, mime } = this.cleanBase64(imgBase64);
+      const imageFile = this.base64ToFile(base64, mime);
+
+      const formData = new FormData();
+      formData.append('file', imageFile);
+      formData.append('driver', driverId);
+      formData.append('company', this.storageService.companyId.toString());
+      formData.append('resale', this.storageService.resaleId.toString());
+
+      const resultSave = await this.savePhotoDriver(formData);
+      if (resultSave.status == 200 && resultSave.body.status == SuccessError.succes) {
+        // this.messageService.add({ severity: 'success', summary: resultSave.body.header, detail: resultSave.body.message, icon: 'pi pi-check' });
+        return `${environment.apiuUrl}${resultSave.body.data["url"]}`;
+      }
+    } catch (error) {
+      this.messageService.add({ severity: 'error', summary: 'Erro', detail: error.error.message, icon: 'pi pi-times' });
+    }
+    return "";
+  }
+  private async saveDoc1(imgBase64: string, driverId: string): Promise<string> {
+    try {
+      const { base64, mime } = this.cleanBase64(imgBase64);
+      const imageFile = this.base64ToFile(base64, mime);
+
+      const formData = new FormData();
+      formData.append('file', imageFile);
+      formData.append('driver', driverId);
+      formData.append('company', this.storageService.companyId.toString());
+      formData.append('resale', this.storageService.resaleId.toString());
+
+      const resultSave = await this.savePhotoDoc1(formData);
+      if (resultSave.status == 200 && resultSave.body.status == SuccessError.succes) {
+        // this.messageService.add({ severity: 'success', summary: resultSave.body.header, detail: resultSave.body.message, icon: 'pi pi-check' });
+        return `${environment.apiuUrl}${resultSave.body.data["url"]}`;
+      }
+    } catch (error) {
+      this.messageService.add({ severity: 'error', summary: 'Erro', detail: error.error.message, icon: 'pi pi-times' });
+    }
+    return "";
+  }
+  private async saveDoc2(imgBase64: string, driverId: string): Promise<string> {
+    try {
+      const { base64, mime } = this.cleanBase64(imgBase64);
+      const imageFile = this.base64ToFile(base64, mime);
+
+      const formData = new FormData();
+      formData.append('file', imageFile);
+      formData.append('driver', driverId);
+      formData.append('company', this.storageService.companyId.toString());
+      formData.append('resale', this.storageService.resaleId.toString());
+
+      const resultSave = await this.savePhotoDoc2(formData);
+      if (resultSave.status == 200 && resultSave.body.status == SuccessError.succes) {
+        // this.messageService.add({ severity: 'success', summary: resultSave.body.header, detail: resultSave.body.message, icon: 'pi pi-check' });
+        return `${environment.apiuUrl}${resultSave.body.data["url"]}`;
+      }
+    } catch (error) {
+      this.messageService.add({ severity: 'error', summary: 'Erro', detail: error.error.message, icon: 'pi pi-times' });
+    }
+    return "";
+  }
+  private cleanBase64(base64: string): { base64: string; mime: string } {
+    if (!base64.includes(',')) {
+      return { base64, mime: 'image/jpeg' };
+    }
+
+    const [header, data] = base64.split(',');
+    const mime = header.match(/data:(.*);base64/)?.[1] || 'image/jpeg';
+
+    return { base64: data, mime };
+  }
+  private base64ToFile(base64: string, mime: string): File {
+    const byteString = atob(base64);
+    const ab = new ArrayBuffer(byteString.length);
+    const ia = new Uint8Array(ab);
+
+    for (let i = 0; i < byteString.length; i++) {
+      ia[i] = byteString.charCodeAt(i);
+    }
+
+    return new File([ia], 'image.jpg', { type: mime });
+  }
+  private async savePhotoDriver(data: FormData): Promise<HttpResponse<MessageResponse>> {
+    try {
+      return await lastValueFrom(this.driverService.savePhotoDriver(data))
+    } catch (error) {
+      this.messageService.add({ severity: 'error', summary: 'Erro', detail: error.error.message, icon: 'pi pi-times' });
+      return error;
+    }
+  }
+  private async savePhotoDoc1(data: FormData): Promise<HttpResponse<MessageResponse>> {
+    try {
+      return await lastValueFrom(this.driverService.savePhotoDoc1(data))
+    } catch (error) {
+      this.messageService.add({ severity: 'error', summary: 'Erro', detail: error.error.message, icon: 'pi pi-times' });
+      return error;
+    }
+  }
+  private async savePhotoDoc2(data: FormData): Promise<HttpResponse<MessageResponse>> {
+    try {
+      return await lastValueFrom(this.driverService.savePhotoDoc2(data))
+    } catch (error) {
+      this.messageService.add({ severity: 'error', summary: 'Erro', detail: error.error.message, icon: 'pi pi-times' });
+      return error;
+    }
+  }
+  private async deleteImage(data: FormData): Promise<HttpResponse<MessageResponse>> {
+    try {
+      return await lastValueFrom(this.driverService.deletePhoto(data))
+    } catch (error) {
+      this.messageService.add({ severity: 'error', summary: 'Erro', detail: error.error.message, icon: 'pi pi-times' });
+      return error;
+    }
+  }
+
 }

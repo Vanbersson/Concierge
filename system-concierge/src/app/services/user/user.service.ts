@@ -31,8 +31,8 @@ export class UserService {
     return this.http.get<MessageResponse>(environment.apiuUrl + "/user/" + this.companyResale + "/filter/email/" + email, { headers: this.myHeaders(), observe: 'response' });
   }
 
-  filterRoleId(roleId: number): Observable<User[]> {
-    return this.http.get<User[]>(environment.apiuUrl + "/user/" + this.companyResale + "/filter/roleId/" + roleId, { headers: this.myHeaders() });
+  filterRoleId(roleId: number): Observable<HttpResponse<MessageResponse>> {
+    return this.http.get<MessageResponse>(environment.apiuUrl + "/user/" + this.companyResale + "/filter/roleId/" + roleId, { headers: this.myHeaders(), observe: 'response' });
   }
 
   uploadImage(data: FormData): Observable<HttpResponse<MessageResponse>> {
@@ -40,7 +40,7 @@ export class UserService {
   }
 
   public deleteImage(): Observable<HttpResponse<MessageResponse>> {
-    return this.http.post<MessageResponse>(environment.apiuUrl + "/user/delete/image",{}, { headers: this.myHeaders(), observe: 'response' });
+    return this.http.post<MessageResponse>(environment.apiuUrl + "/user/delete/image", {}, { headers: this.myHeaders(), observe: 'response' });
   }
 
   private myHeaders(): HttpHeaders {

@@ -3,18 +3,27 @@ package com.concierge.apiconcierge.services.driver;
 import com.concierge.apiconcierge.exceptions.driver.DriverException;
 import com.concierge.apiconcierge.models.driver.Driver;
 import com.concierge.apiconcierge.models.message.MessageResponse;
-import com.concierge.apiconcierge.models.status.StatusEnableDisable;
+import com.concierge.apiconcierge.models.user.User;
 import com.concierge.apiconcierge.repositories.driver.IDriverRepository;
 import com.concierge.apiconcierge.util.ConstantsMessage;
 import com.concierge.apiconcierge.validation.driver.IDriverValidation;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.*;
 
 @Service
 public class DriverService implements IDriverService {
+
+    @Value("${local.image.upload}")
+    private String UPLOAD_DIR;
 
     @Autowired
     IDriverRepository repository;
@@ -151,6 +160,153 @@ public class DriverService implements IDriverService {
             return response;
         } catch (Exception e) {
             throw new DriverException(e.getMessage());
+        }
+    }
+
+    @SneakyThrows
+    @Override
+    public MessageResponse savePhotoDriver(MultipartFile file, String driverId, String companyId, String resaleId) {
+        try {
+            MessageResponse response = new MessageResponse();
+            response.setStatus(ConstantsMessage.SUCCESS);
+            response.setHeader("Imagem");
+            response.setMessage("Salvo com sucesso.");
+
+            String local = companyId + "/" +
+                    resaleId + "/drivers/" +
+                    driverId + "/image1.jpg";
+
+            Path filePath = Paths.get(UPLOAD_DIR + local);
+
+            // Cria diretórios se necessário
+            Files.createDirectories(filePath.getParent());
+
+            // Salva ou substitui se existir)
+            Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+            // URL pública
+            String url = "/images/" + local;
+
+            // Retornar o caminho do arquivo salvo
+            Map<String, String> map = new HashMap<>();
+            map.put("url", url);
+
+            response.setData(map);
+            return response;
+        } catch (Exception e) {
+            throw new Exception(e.getMessage());
+        }
+    }
+
+    @SneakyThrows
+    @Override
+    public MessageResponse savePhotoDoc1(MultipartFile file, String driverId, String companyId, String resaleId) {
+        try {
+            MessageResponse response = new MessageResponse();
+            response.setStatus(ConstantsMessage.SUCCESS);
+            response.setHeader("Imagem");
+            response.setMessage("Salvo com sucesso.");
+
+            String local = companyId + "/" +
+                    resaleId + "/drivers/" +
+                    driverId + "/image2.jpg";
+
+            Path filePath = Paths.get(UPLOAD_DIR + local);
+
+            // Cria diretórios se necessário
+            Files.createDirectories(filePath.getParent());
+
+            // Salva ou substitui se existir)
+            Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+            // URL pública
+            String url = "/images/" + local;
+
+            // Retornar o caminho do arquivo salvo
+            Map<String, String> map = new HashMap<>();
+            map.put("url", url);
+
+            response.setData(map);
+            return response;
+        } catch (Exception e) {
+            throw new Exception(e.getMessage());
+        }
+    }
+
+    @SneakyThrows
+    @Override
+    public MessageResponse savePhotoDoc2(MultipartFile file, String driverId, String companyId, String resaleId) {
+        try {
+            MessageResponse response = new MessageResponse();
+            response.setStatus(ConstantsMessage.SUCCESS);
+            response.setHeader("Imagem");
+            response.setMessage("Salvo com sucesso.");
+
+            String local = companyId + "/" +
+                    resaleId + "/drivers/" +
+                    driverId + "/image3.jpg";
+
+            Path filePath = Paths.get(UPLOAD_DIR + local);
+
+            // Cria diretórios se necessário
+            Files.createDirectories(filePath.getParent());
+
+            // Salva ou substitui se existir)
+            Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+            // URL pública
+            String url = "/images/" + local;
+
+            // Retornar o caminho do arquivo salvo
+            Map<String, String> map = new HashMap<>();
+            map.put("url", url);
+
+            response.setData(map);
+            return response;
+        } catch (Exception e) {
+            throw new Exception(e.getMessage());
+        }
+    }
+
+    @SneakyThrows
+    @Override
+    public MessageResponse deletePhoto(String driverId, String code, String companyId, String resaleId) {
+        try {
+            MessageResponse response = new MessageResponse();
+            response.setStatus(ConstantsMessage.SUCCESS);
+            response.setHeader("Imagem");
+            response.setMessage("Excluído com sucesso.");
+
+            Path basePath = Paths.get(UPLOAD_DIR).toAbsolutePath().normalize();
+
+            String local = companyId + "/" +
+                    resaleId + "/drivers/" +
+                    driverId + "/image" + code + ".jpg";
+
+            Path filePath = basePath.resolve(local).normalize();
+
+            // Proteção contra path traversal
+            if (!filePath.startsWith(basePath)) {
+                response.setStatus(ConstantsMessage.ERROR);
+                response.setMessage("Caminho inválido.");
+                return response;
+            }
+
+            if (!Files.exists(filePath) || !Files.isRegularFile(filePath)) {
+                response.setStatus(ConstantsMessage.ERROR);
+                response.setMessage("Imagem não encontrada.");
+                return response;
+            }
+
+            Files.delete(filePath);
+
+
+//            responseUser.setPhotoUrl("");
+//            this.repository.save(responseUser);
+
+            return response;
+        } catch (Exception e) {
+            throw new Exception(e.getMessage());
         }
     }
 

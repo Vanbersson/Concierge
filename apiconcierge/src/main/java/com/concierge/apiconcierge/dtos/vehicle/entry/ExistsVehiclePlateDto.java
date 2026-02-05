@@ -1,8 +1,8 @@
 package com.concierge.apiconcierge.dtos.vehicle.entry;
 
-public record ExistsPlacaDto(
+public record ExistsVehiclePlateDto(
         Integer companyId,
         Integer resaleId,
-        String placa
+        String vehiclePlate
 ) {
 }

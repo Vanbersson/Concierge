@@ -4,11 +4,16 @@ public class ConstantsMessage {
 
     public static final String SUCCESS = "Success.";
     public static final String ERROR = "Error.";
-    public static final String FAILED = "Failed.";
-    public static final String INFO = "Info.";
 
     public static final String NOT_INFORMED = "Não informado.";
     public static final String NOT_PERMISSION = "Você não tem permissão.";
+
+    public static final String ERROR_COMPANY = "Empresa não informada.";
+    public static final String ERROR_RESALE = "Revenda não informada.";
+
+
+
+
 
 
 
@@ -19,8 +24,9 @@ public class ConstantsMessage {
     public static final String ERROR_CLIENT_EXISTS = "Client already exists.";
 
 
-    public static final String ERROR_COMPANY = "Company not informed.";
-    public static final String ERROR_RESALE = "Resale not informed.";
+
+
+
     public static final String ERROR_ID = "Id not informed.";
     public static final String ERROR_STATUS = "Status not informed.";
     public static final String ERROR_STATUS_DIFFERENT = "Status different.";

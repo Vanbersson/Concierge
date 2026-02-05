@@ -114,7 +114,7 @@ public class BudgetTokenController {
             MessageResponse response = this.clientCompanyService.filterId(token.getCompanyId(), token.getResaleId(), Integer.parseInt(budget.get("clientCompanyId").toString()));
             ClientCompany client = (ClientCompany) response.getData();
 
-            Map<String, Object> vehicle = this.vehicleEntryService.filterId(token.getCompanyId(), token.getResaleId(), Integer.parseInt(budget.get("vehicleEntryId").toString()));
+           MessageResponse vehicle = this.vehicleEntryService.filterId(token.getCompanyId(), token.getResaleId(), Integer.parseInt(budget.get("vehicleEntryId").toString()));
 
             Map<String, Object> complete = new HashMap<>();
             complete.put("Budget", budget);
@@ -122,7 +122,7 @@ public class BudgetTokenController {
             complete.put("BudgetItemService", listSer);
             complete.put("BudgetItemPart", listParts);
             complete.put("Client", client);
-            complete.put("Vehicle", vehicle);
+            complete.put("Vehicle", vehicle.getData());
 
             return ResponseEntity.status(HttpStatus.OK).body(complete);
         } catch (Exception ex) {

@@ -2,6 +2,7 @@ package com.concierge.apiconcierge.controllers.vehicle;
 
 import com.concierge.apiconcierge.dtos.message.MessageResponseDto;
 import com.concierge.apiconcierge.dtos.vehicle.model.VehicleModelDto;
+import com.concierge.apiconcierge.models.message.MessageResponse;
 import com.concierge.apiconcierge.models.vehicle.model.VehicleModel;
 import com.concierge.apiconcierge.services.vehicle.model.VehicleModelService;
 import org.springframework.beans.BeanUtils;
@@ -11,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/vehicle/model")
@@ -25,9 +25,8 @@ public class VehicleModelController {
         try {
             VehicleModel model = new VehicleModel();
             BeanUtils.copyProperties(data, model);
-            Map<String, Object> map = this.service.save(model);
-
-            return ResponseEntity.status(HttpStatus.CREATED).body(map);
+            MessageResponse response = this.service.save(model);
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
         }
@@ -38,9 +37,8 @@ public class VehicleModelController {
         try {
             VehicleModel model = new VehicleModel();
             BeanUtils.copyProperties(data, model);
-            String message = this.service.update(model);
-
-            return ResponseEntity.status(HttpStatus.OK).body(new MessageResponseDto(message));
+            MessageResponse response = this.service.update(model);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
         }

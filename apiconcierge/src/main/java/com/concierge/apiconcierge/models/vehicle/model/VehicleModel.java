@@ -30,7 +30,4 @@ public class VehicleModel {
     private StatusEnableDisable status;
 
     private String description;
-
-    @Column(name = "photo_url")
-    private String photoUrl;
 }

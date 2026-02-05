@@ -1,5 +1,6 @@
 package com.concierge.apiconcierge.validation.vehicle.model;
 
+import com.concierge.apiconcierge.models.message.MessageResponse;
 import com.concierge.apiconcierge.models.vehicle.model.VehicleModel;
 import com.concierge.apiconcierge.util.ConstantsMessage;
 import org.springframework.stereotype.Service;
@@ -7,33 +8,77 @@ import org.springframework.stereotype.Service;
 @Service
 public class VehicleModelValidation implements IVehicleModelValidation {
     @Override
-    public String save(VehicleModel mod) {
-        if (mod.getCompanyId() == null || mod.getCompanyId() == 0)
-            return ConstantsMessage.ERROR_COMPANY;
-        if (mod.getResaleId() == null || mod.getResaleId() == 0)
-            return ConstantsMessage.ERROR_RESALE;
-        if (mod.getStatus() == null)
-            return ConstantsMessage.ERROR_STATUS;
-        if (mod.getDescription().isBlank())
-            return ConstantsMessage.ERROR_NAME;
+    public MessageResponse save(VehicleModel mod) {
+        MessageResponse response = new MessageResponse();
+        if (mod.getCompanyId() == null || mod.getCompanyId() == 0) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Empresa");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (mod.getResaleId() == null || mod.getResaleId() == 0) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Revenda");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (mod.getStatus() == null) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Status");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (mod.getDescription().isBlank()) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Descrição");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
 
-
-        return ConstantsMessage.SUCCESS;
+        response.setStatus(ConstantsMessage.SUCCESS);
+        response.setHeader("Modelo");
+        response.setMessage("Cadastrado com sucesso.");
+        return response;
     }
 
     @Override
-    public String update(VehicleModel mod) {
-        if (mod.getCompanyId() == null || mod.getCompanyId() == 0)
-            return ConstantsMessage.ERROR_COMPANY;
-        if (mod.getResaleId() == null || mod.getResaleId() == 0)
-            return ConstantsMessage.ERROR_RESALE;
-        if (mod.getId() == null || mod.getId() == 0)
-            return ConstantsMessage.ERROR_ID;
-        if (mod.getStatus() == null)
-            return ConstantsMessage.ERROR_STATUS;
-        if (mod.getDescription().isBlank())
-            return ConstantsMessage.ERROR_NAME;
-        return ConstantsMessage.SUCCESS;
+    public MessageResponse update(VehicleModel mod) {
+        MessageResponse response = new MessageResponse();
+        if (mod.getCompanyId() == null || mod.getCompanyId() == 0) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Empresa");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (mod.getResaleId() == null || mod.getResaleId() == 0) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Revenda");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (mod.getStatus() == null) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Status");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if(mod.getId() == null || mod.getId() == 0){
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Código");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (mod.getDescription().isBlank()) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Descrição");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+
+        response.setStatus(ConstantsMessage.SUCCESS);
+        response.setHeader("Modelo");
+        response.setMessage("Atualizado com sucesso.");
+        return response;
     }
 
     @Override

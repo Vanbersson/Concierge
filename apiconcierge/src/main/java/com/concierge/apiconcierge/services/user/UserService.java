@@ -5,6 +5,7 @@ import com.concierge.apiconcierge.dtos.file.FileLocalDto;
 import com.concierge.apiconcierge.dtos.message.MessageResponseDto;
 import com.concierge.apiconcierge.exceptions.user.UserException;
 import com.concierge.apiconcierge.models.message.MessageResponse;
+import com.concierge.apiconcierge.models.status.StatusEnableDisable;
 import com.concierge.apiconcierge.models.user.User;
 import com.concierge.apiconcierge.repositories.user.IUserRepository;
 import com.concierge.apiconcierge.util.ConstantsMessage;
@@ -74,7 +75,7 @@ public class UserService implements IUserService {
                 user.setPassword(userResult.getPassword());
 
                 User result = this.repository.save(user);
-                response.setData(result);
+                response.setData(this.loadUser(result));
                 return response;
             } else {
                 return response;
@@ -111,7 +112,7 @@ public class UserService implements IUserService {
             if (ConstantsMessage.SUCCESS.equals(response.getStatus())) {
                 User user = this.repository.filterId(companyId, resaleId, id);
                 if (user == null) {
-                    response.setStatus(ConstantsMessage.INFO);
+                    response.setStatus(ConstantsMessage.ERROR);
                     response.setHeader("Usuário");
                     response.setMessage("Usuário não encontrado.");
                     return response;
@@ -130,7 +131,7 @@ public class UserService implements IUserService {
         try {
             MessageResponse response = this.validation.filterRoleId(companyId, resaleId, roleId);
             if (ConstantsMessage.SUCCESS.equals(response.getStatus())) {
-                List<User> usersResult = this.repository.findByRoleId(companyId, resaleId, roleId);
+                List<User> usersResult = this.repository.filterRoleId(companyId, resaleId, StatusEnableDisable.Habilitado ,roleId);
                 List<Map<String, Object>> list = new ArrayList<>();
                 for (User user : usersResult) {
                     list.add(this.loadUser(user));
@@ -151,7 +152,7 @@ public class UserService implements IUserService {
             if (ConstantsMessage.SUCCESS.equals(response.getStatus())) {
                 User user = this.repository.filterEmail(companyId, resaleId, email);
                 if (user == null) {
-                    response.setStatus(ConstantsMessage.INFO);
+                    response.setStatus(ConstantsMessage.ERROR);
                     response.setHeader("Usuário");
                     response.setMessage("Usuário não encontrado.");
                     return response;
@@ -171,7 +172,7 @@ public class UserService implements IUserService {
             MessageResponse response = new MessageResponse();
             response.setStatus(ConstantsMessage.SUCCESS);
             response.setHeader("Imagem");
-            response.setMessage("Salva com socesso.");
+            response.setMessage("Salvo com sucesso.");
 
             // Segurança básica
             if (local.contains("..")) {
@@ -211,7 +212,7 @@ public class UserService implements IUserService {
             MessageResponse response = new MessageResponse();
             response.setStatus(ConstantsMessage.SUCCESS);
             response.setHeader("Imagem");
-            response.setMessage("Excluída com socesso.");
+            response.setMessage("Excluída com sucesso.");
 
             Path basePath = Paths.get(UPLOAD_DIR).toAbsolutePath().normalize();
 

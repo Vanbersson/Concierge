@@ -4,6 +4,7 @@ import com.concierge.apiconcierge.controllers.dashboard.interfaces.IDashCountVeh
 import com.concierge.apiconcierge.controllers.dashboard.interfaces.IDashValueTotalBudget;
 import com.concierge.apiconcierge.models.enums.YesNot;
 import com.concierge.apiconcierge.models.vehicle.entry.VehicleEntry;
+import com.concierge.apiconcierge.models.vehicle.enums.StatusVehicleEnum;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -12,23 +13,19 @@ import java.util.List;
 
 @Repository
 public interface IVehicleEntryRepository extends JpaRepository<VehicleEntry, Integer> {
-    @Query(value = "SELECT * FROM `tb_vehicle_entry` WHERE company_id = ?1 and resale_id = ?2 and id = ?3",
+    @Query(value = "SELECT * FROM `tb_vehicle_entry` WHERE company_id=?1 AND resale_id=?2 AND id=?3",
             nativeQuery = true)
-    VehicleEntry filterVehicleId(Integer companyId, Integer resaleId, Integer id);
+    VehicleEntry filterId(Integer companyId, Integer resaleId, Integer id);
 
-    @Query(value = "SELECT * FROM `tb_vehicle_entry` WHERE company_id = ?1 and resale_id = ?2 and placa = ?3",
+    @Query(value = "SELECT * FROM `tb_vehicle_entry` WHERE company_id=?1 AND resale_id=?2 AND vehicle_plate=?3",
             nativeQuery = true)
-    VehicleEntry findByPlaca(Integer companyId, Integer resaleId, String placa);
+    VehicleEntry filterPlate(Integer companyId, Integer resaleId, String plate);
 
-    @Query(value = "SELECT * FROM `tb_vehicle_entry` WHERE company_id = ?1 and resale_id = ?2 and status = 0 and placa = ?3",
-            nativeQuery = true)
-    VehicleEntry findByExistsPlaca(Integer companyId, Integer resaleId, String placa);
-
-    @Query(value = "select * from tb_vehicle_entry where company_id = ?1 and resale_id = ?2 and status_auth_exit = 2 and step_entry != 4;",
+    @Query(value = "select * from tb_vehicle_entry where company_id=?1 AND resale_id=?2 AND auth_exit_status=2 AND step_entry!=4;",
             nativeQuery = true)
     List<VehicleEntry> allAuthorized(Integer companyId, Integer resaleId);
 
-    @Query(value = "select * from tb_vehicle_entry where company_id = ?1 and resale_id = ?2 and step_entry != 4",
+    @Query(value = "select * from tb_vehicle_entry where company_id=?1 and resale_id=?2 and step_entry!=4",
             nativeQuery = true)
     List<VehicleEntry> allPendingAuthorization(Integer companyId, Integer resaleId);
 

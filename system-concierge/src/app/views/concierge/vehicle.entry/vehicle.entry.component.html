@@ -93,7 +93,7 @@
                     <div class="p-fluid p-formgrid grid">
                         <div class="col-12 flex align-items-center mt-2">
                             <div class="layout-photo-person">
-                                <p-image *ngIf="driverEntryPhoto" [imageStyle]="{'border-radius':'100%','object-fit':'cover','width':'80px','height':'80px'}" src="data:image/png;base64,{{driverEntryPhoto}}" alt="imagem motorista" [preview]="true" />  
+                                <p-image *ngIf="driverEntryPhoto" [imageStyle]="{'border-radius':'100%','object-fit':'cover','width':'80px','height':'80px'}" [src]="driverEntryPhoto" alt="imagem motorista" [preview]="true" />  
                             </div>
                         </div>
                             <div class="col-12 md:col-1">
@@ -121,12 +121,12 @@
                         <div class="col-12 md:col-6 flex align-items-center gap-2">
                             <div class="layout-file">
                                 <div class="layout-file-img">
-                                    <p-image *ngIf="driverEntryPhotoDoc1"  [imageStyle]="{'border-radius':'8px','object-fit':'cover'}" src="data:image/png;base64,{{driverEntryPhotoDoc1}}" alt="" [preview]="true" />
+                                    <p-image *ngIf="driverEntryPhotoDoc1"  [imageStyle]="{'border-radius':'8px','object-fit':'cover'}" [src]="driverEntryPhotoDoc1" alt="" [preview]="true" />
                                 </div>
                             </div>
                             <div class="layout-file">
                                 <div class="layout-file-img">
-                                    <p-image *ngIf="driverEntryPhotoDoc2"  [imageStyle]="{'border-radius':'8px','object-fit':'cover'}" src="data:image/png;base64,{{driverEntryPhotoDoc2}}" alt="" [preview]="true" />
+                                    <p-image *ngIf="driverEntryPhotoDoc2"  [imageStyle]="{'border-radius':'8px','object-fit':'cover'}" [src]="driverEntryPhotoDoc2" alt="" [preview]="true" />
                                 </div>
                             </div>
                         </div>
@@ -187,17 +187,12 @@
                         </div>
                         <div class="col-12 md:col-2 ">
                             <label for="dateEntry">Data Entrada</label>
-                            <p-calendar [iconDisplay]="'input'" 
-                                [showIcon]="true" 
-                                [showTime]="true"
-                                dateFormat="dd/mm/yy" 
-                                inputId="dateEntry" 
-                                formControlName="dateEntry" />
+                            <p-calendar [showOnFocus]="false" [showIcon]="true" inputId="dateEntry" [showTime]="true" dateFormat="dd/mm/yy" (onInput)="applyDateTimeMask($event)" formControlName="dateEntry"/>
                             <small class="p-error block" *ngIf="formVehicle.get('dateEntry')?.invalid">Campo obrigatório</small>
                         </div>
                         <div class="col-12 md:col-2 ">
                             <label for="datePrevisionExit">Previsão saída</label>
-                            <p-calendar [iconDisplay]="'input'" [showIcon]="true" [showTime]="true"  dateFormat="dd/mm/yy" inputId="datePrevisionExit" formControlName="datePrevisionExit" />
+                            <p-calendar [showOnFocus]="false" [showIcon]="true" inputId="datePrevisionExit" [showTime]="true" dateFormat="dd/mm/yy" (onInput)="applyDateTimeMask($event)" formControlName="datePrevisionExit"/>
                         </div>
                         <div class="col-12 md:col-2">
                             <label for="vehiclecolorid">Cor</label>
@@ -230,9 +225,8 @@
                         </div>
                         <div class="col-12 md:col-2">
                             <label for="consultorid">Consultor</label>
-                            <p-multiSelect id="consultorid" [options]="consultores$ | async" [selectionLimit]="1"  optionLabel="name" placeholder="Selecione" [style]="{'text-transform':'capitalize'}" formControlName="UserAttendant" />
+                            <p-multiSelect id="consultorid" [options]="attendants" [selectionLimit]="1"  optionLabel="name" placeholder="Selecione" [style]="{'text-transform':'capitalize'}" formControlName="UserAttendant" />
                         </div>
-
                         <div class="col-12 md:col-3">
                             <label for="">Veículo novo</label>
                             <div class="flex align-items-center gap-2 border-1 border-round border-300 p-3">
@@ -267,7 +261,7 @@
                         <div class="col-12 md:col-4 flex justify-content-between gap-1">
                             <div class="layout-file">
                                 <div class="layout-file-img">
-                                    <p-image *ngIf="photoVehicle1" [imageStyle]="{'object-fit':'cover'}" src="data:image/png;base64,{{photoVehicle1}}" alt="" [preview]="true"/>
+                                    <p-image *ngIf="photoVehicle1" [imageStyle]="{'object-fit':'cover'}" [src]="photoVehicle1" alt="" [preview]="true"/>
                                 </div>
                                 <button pButton *ngIf="photoVehicle1" severity="danger" (click)="deleteFileVehicle1()">
                                     <i class="pi pi-trash"></i>
@@ -280,7 +274,7 @@
                             </div> 
                             <div class="layout-file">
                                 <div class="layout-file-img">
-                                    <p-image *ngIf="photoVehicle2" [imageStyle]="{'object-fit':'cover'}" src="data:image/png;base64,{{photoVehicle2}}" alt="" [preview]="true"/>
+                                    <p-image *ngIf="photoVehicle2" [imageStyle]="{'object-fit':'cover'}" [src]="photoVehicle2" alt="" [preview]="true"/>
                                 </div>
                                 <button *ngIf="photoVehicle2" pButton severity="danger" (click)="deleteFileVehicle2()">
                                     <i class="pi pi-trash"></i>
@@ -293,7 +287,7 @@
                             </div>
                             <div class="layout-file">
                                 <div class="layout-file-img">
-                                    <p-image *ngIf="photoVehicle3" [imageStyle]="{'object-fit':'cover'}" src="data:image/png;base64,{{photoVehicle3}}" alt="" [preview]="true"/>
+                                    <p-image *ngIf="photoVehicle3" [imageStyle]="{'object-fit':'cover'}" [src]="photoVehicle3" alt="" [preview]="true"/>
                                 </div>
                                 <button *ngIf="photoVehicle3" pButton severity="danger" (click)="deleteFileVehicle3()">
                                     <i class="pi pi-trash"></i>
@@ -306,7 +300,7 @@
                             </div>
                             <div class="layout-file">
                                 <div class="layout-file-img">
-                                    <p-image *ngIf="photoVehicle4" [imageStyle]="{'object-fit':'cover'}" src="data:image/png;base64,{{photoVehicle4}}" alt="" [preview]="true"/>
+                                    <p-image *ngIf="photoVehicle4" [imageStyle]="{'object-fit':'cover'}" [src]="photoVehicle4" alt="" [preview]="true"/>
                                 </div>
                                 <button *ngIf="photoVehicle4" pButton severity="danger" (click)="deleteFileVehicle4()">
                                     <i class="pi pi-trash"></i>

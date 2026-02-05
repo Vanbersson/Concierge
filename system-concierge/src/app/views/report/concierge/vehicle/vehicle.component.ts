@@ -43,6 +43,8 @@ import { saveAs } from 'file-saver';
 import { YesNot } from '../../../../models/enum/yes-not';
 import { User } from '../../../../models/user/user';
 import { UserService } from '../../../../services/user/user.service';
+import { SuccessError } from '../../../../models/enum/success-error';
+import { MessageResponse } from '../../../../models/message/message-response';
 
 interface IFilterVehicles {
   type: string;
@@ -97,7 +99,7 @@ interface IExportVehicle {
 @Component({
   selector: 'app-vehicle',
   standalone: true,
-  imports: [CommonModule, FilterClientComponent, ToastModule, ButtonModule, TableModule, 
+  imports: [CommonModule, FilterClientComponent, ToastModule, ButtonModule, TableModule,
     InputTextModule, IconFieldModule, InputIconModule, TagModule,
     DialogModule, ReactiveFormsModule, FormsModule, InputNumberModule,
     CalendarModule, InputGroupModule, MultiSelectModule, ImageModule,
@@ -138,7 +140,8 @@ export default class VehicleComponent implements OnInit, DoCheck {
     private reportService: VehicleReportService,
     private vehicleModelService: VehicleModelService,
     private busyService: BusyService,
-    private storageService: StorageService) {
+    private storageService: StorageService,
+    private messageService: MessageService) {
   }
   ngOnInit(): void {
     this.primeNGConfig.setTranslation({
@@ -168,7 +171,7 @@ export default class VehicleComponent implements OnInit, DoCheck {
   }
   private async init() {
     //Attendant
-    this.attendantsUser = await this.getUserRole();
+    this.getAttendants();
     this.clientdisable();
   }
   private clientEnable() {
@@ -334,13 +337,34 @@ export default class VehicleComponent implements OnInit, DoCheck {
       return error;
     }
   }
-  private async getUserRole(): Promise<User[]> {
+ /*  private async getUserRole(): Promise<User[]> {
     try {
       return await lastValueFrom(this.userService.filterRoleId(2));
     } catch (error) {
       return [];
     }
+  } */
+
+  private async getAttendants() {
+    const result = await this.filterUserRoleId();
+    if (result.status == 200 && result.body.status == SuccessError.succes) {
+      //this.messageService.add({ severity: 'success', summary: result.body.header, detail: result.body.message, icon: 'pi pi-check' });
+      this.attendantsUser = result.body.data;
+    }
+    if (result.status == 200 && result.body.status == SuccessError.error) {
+      this.messageService.add({ severity: 'info', summary: result.body.header, detail: result.body.message, icon: 'pi pi-info-circle' });
+    }
   }
+
+  private async filterUserRoleId(): Promise<HttpResponse<MessageResponse>> {
+    try {
+      return await lastValueFrom(this.userService.filterRoleId(2));
+    } catch (error) {
+      this.messageService.add({ severity: 'error', summary: 'Erro', detail: error.error.message, icon: 'pi pi-times' });
+      return error;
+    }
+  }
+
   showVeiculo(id: number) {
     //Show dialog
     this.dialogVisibleVehicleDetails = true;

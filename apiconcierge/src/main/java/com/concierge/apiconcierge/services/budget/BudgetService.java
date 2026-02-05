@@ -44,7 +44,7 @@ public class BudgetService implements IBudgetService {
             if (!ConstantsMessage.SUCCESS.equals(message))
                 throw new BudgetException(message);
 
-            VehicleEntry vehicleEntry = this.repositoryVehicleEntry.filterVehicleId(budgetNewDto.companyId(), budgetNewDto.resaleId(), budgetNewDto.vehicleEntryId());
+            VehicleEntry vehicleEntry = this.repositoryVehicleEntry.filterId(budgetNewDto.companyId(), budgetNewDto.resaleId(), budgetNewDto.vehicleEntryId());
             if (vehicleEntry == null)
                 throw new BudgetException("Vehicle not found.");
 
@@ -57,7 +57,7 @@ public class BudgetService implements IBudgetService {
                 budget.setStatus(StatusBudgetEnum.OpenBudget);
                 budget.setDateGeneration(new Date());
                 budget.setVehicleEntryId(vehicleEntry.getId());
-                budget.setIdUserAttendant(vehicleEntry.getIdUserAttendant());
+                budget.setIdUserAttendant(vehicleEntry.getAttendantUserId());
                 budget.setClientCompanyId(vehicleEntry.getClientCompanyId());
                 budget.setTypePayment("");
                 budget.setNameResponsible("");
@@ -69,7 +69,6 @@ public class BudgetService implements IBudgetService {
                 if (vehicleEntry.getStepEntry() == StepVehicleEnum.Attendant)
                     vehicleEntry.setStepEntry(StepVehicleEnum.Budget);
 
-                vehicleEntry.setBudgetStatus(StatusBudgetEnum.OpenBudget);
                 this.repositoryVehicleEntry.save(vehicleEntry);
             } else {
                 throw new BudgetException(message);
@@ -115,9 +114,9 @@ public class BudgetService implements IBudgetService {
                 bud.setStatus(budget.getStatus());
                 this.repository.save(bud);
 
-                VehicleEntry veh = this.repositoryVehicleEntry.filterVehicleId(budget.getCompanyId(), budget.getResaleId(), budget.getVehicleEntryId());
-                veh.setBudgetStatus(budget.getStatus());
-                this.repositoryVehicleEntry.save(veh);
+//                VehicleEntry veh = this.repositoryVehicleEntry.filterId(budget.getCompanyId(), budget.getResaleId(), budget.getVehicleEntryId());
+//                veh.setBudgetStatus(budget.getStatus());
+//                this.repositoryVehicleEntry.save(veh);
 
                 return ConstantsMessage.SUCCESS;
             } else {
@@ -168,9 +167,9 @@ public class BudgetService implements IBudgetService {
             if (ConstantsMessage.SUCCESS.equals(message)) {
 
                 //update status vehicle
-                VehicleEntry vehicle = this.repositoryVehicleEntry.filterVehicleId(budget.getCompanyId(), budget.getResaleId(), budget.getVehicleEntryId());
-                vehicle.setBudgetStatus(StatusBudgetEnum.OpenBudget);
-                this.repositoryVehicleEntry.save(vehicle);
+//                VehicleEntry vehicle = this.repositoryVehicleEntry.filterId(budget.getCompanyId(), budget.getResaleId(), budget.getVehicleEntryId());
+//                vehicle.setBudgetStatus(StatusBudgetEnum.OpenBudget);
+//                this.repositoryVehicleEntry.save(vehicle);
 
                 //update status budget
                 budget.setStatus(StatusBudgetEnum.OpenBudget);
@@ -193,9 +192,9 @@ public class BudgetService implements IBudgetService {
             String message = this.validation.closeBudget(budget);
             if (ConstantsMessage.SUCCESS.equals(message)) {
                 //update status vehicle
-                VehicleEntry vehicle = this.repositoryVehicleEntry.filterVehicleId(budget.getCompanyId(), budget.getResaleId(), budget.getVehicleEntryId());
-                vehicle.setBudgetStatus(StatusBudgetEnum.CompleteBudget);
-                this.repositoryVehicleEntry.save(vehicle);
+//                VehicleEntry vehicle = this.repositoryVehicleEntry.filterVehicleId(budget.getCompanyId(), budget.getResaleId(), budget.getVehicleEntryId());
+//                vehicle.setBudgetStatus(StatusBudgetEnum.CompleteBudget);
+//                this.repositoryVehicleEntry.save(vehicle);
 
                 //update status budget
                 budget.setStatus(StatusBudgetEnum.CompleteBudget);

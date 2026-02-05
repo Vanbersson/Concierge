@@ -1,11 +1,9 @@
-import { IModelVehicle } from "../../interfaces/vehicle-model/imodel-vehicle";
+import { StatusEnum } from "../enum/status-enum";
 
-export class ModelVehicle implements IModelVehicle {
+export class ModelVehicle {
     companyId: number = 0;
     resaleId: number = 0;
     id: number = 0;
-    status: string = '';
+    status: StatusEnum = StatusEnum.DISABLED;
     description: string = '';
-    photo?: string = '';
-
 }

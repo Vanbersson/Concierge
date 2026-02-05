@@ -102,11 +102,7 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
     driverEntryId: new FormControl<number | null>({ value: null, disabled: true }),
     driverEntryName: new FormControl<string>({ value: '', disabled: true }),
     driverEntryCpf: new FormControl<string>({ value: '', disabled: true }),
-    driverEntryRg: new FormControl<string | null>({ value: null, disabled: true }),
-    driverEntryPhoto: new FormControl(null),
-    driverEntrySignature: new FormControl(null),
-    driverEntryPhotoDoc1: new FormControl(null),
-    driverEntryPhotoDoc2: new FormControl(null),
+    driverEntryRg: new FormControl<string | null>({ value: null, disabled: true })
   });
 
   //Vehicle
@@ -141,7 +137,7 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
     informationConcierge: new FormControl<string>(''),
   });
 
-  consultores$ = this.userService.filterRoleId(2);
+  attendants: User[] = [];
 
   formCompanyIsEditable = false;
 
@@ -203,6 +199,26 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
       this.selectDriver.set(new Driver());
     }
   }
+
+  private async getAttendants() {
+    const result = await this.filterUserRoleId();
+    if (result.status == 200 && result.body.status == SuccessError.succes) {
+      //this.messageService.add({ severity: 'success', summary: result.body.header, detail: result.body.message, icon: 'pi pi-check' });
+      this.attendants = result.body.data;
+    }
+    if (result.status == 200 && result.body.status == SuccessError.error) {
+      this.messageService.add({ severity: 'info', summary: result.body.header, detail: result.body.message, icon: 'pi pi-info-circle' });
+    }
+  }
+
+  private async filterUserRoleId(): Promise<HttpResponse<MessageResponse>> {
+    try {
+      return await lastValueFrom(this.userService.filterRoleId(2));
+    } catch (error) {
+      this.messageService.add({ severity: 'error', summary: 'Erro', detail: error.error.message, icon: 'pi pi-times' });
+      return error;
+    }
+  }
   //ClientCompany
   public validationClientCompany() {
     if (this.formClientCompany.get('clientCompanyNot').value.length == 0) {
@@ -240,6 +256,8 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
     if (this.driver != null) {
       //Aba veículo
       this.activeStepper = 2;
+      //Consulta os Attendants
+      this.getAttendants();
     } else {
       this.messageService.add({ severity: 'info', summary: 'Atenção', detail: 'Motorista não informado', icon: 'pi pi-info-circle' });
     }
@@ -264,6 +282,28 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
     this.driverEntryPhotoDoc2 = '';
   }
   //Vehicle
+  applyDateTimeMask(event: any) {
+    let value = event.target.value.replace(/\D/g, '');
+
+    if (value.length > 2) {
+      value = value.replace(/^(\d{2})(\d)/, '$1/$2');
+    }
+
+    if (value.length > 5) {
+      value = value.replace(/^(\d{2})\/(\d{2})(\d)/, '$1/$2/$3');
+    }
+
+    if (value.length > 10) {
+      value = value.replace(/^(\d{2})\/(\d{2})\/(\d{4})(\d)/, '$1/$2/$3 $4');
+    }
+
+    if (value.length > 12) {
+      value = value.replace(/^(\d{2})\/(\d{2})\/(\d{4}) (\d{2})(\d)/, '$1/$2/$3 $4:$5');
+    }
+
+    event.target.value = value;
+  }
+
   public stepperVehicle() {
     if (this.clientCompany != null) {
       if (this.driver != null) {
@@ -286,7 +326,7 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
       this.messageService.add({ severity: 'info', summary: 'Imagem', detail: IMAGE_MAX_SIZE_LABEL, icon: 'pi pi-info-circle', life: 3000 });
     }
     if (photo.status == PhotoResultStatus.ERROR) {
-     // this.messageService.add({ severity: 'error', summary: 'Erro', detail: "Ocorreu um problema.", icon: 'pi pi-times', life: 3000 });
+      // this.messageService.add({ severity: 'error', summary: 'Erro', detail: "Ocorreu um problema.", icon: 'pi pi-times', life: 3000 });
     }
   }
   public async photoFile2Vehicle() {
@@ -322,7 +362,7 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
       this.messageService.add({ severity: 'info', summary: 'Imagem', detail: IMAGE_MAX_SIZE_LABEL, icon: 'pi pi-info-circle', life: 3000 });
     }
     if (photo.status == PhotoResultStatus.ERROR) {
-     //this.messageService.add({ severity: 'error', summary: 'Erro', detail: "Ocorreu um problema.", icon: 'pi pi-times', life: 3000 });
+      //this.messageService.add({ severity: 'error', summary: 'Erro', detail: "Ocorreu um problema.", icon: 'pi pi-times', life: 3000 });
     }
   }
   public deleteFileVehicle1() {
@@ -642,7 +682,7 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
     }
     return SuccessError.succes;
   }
-   private base64ToFile(base64: string): File {
+  private base64ToFile(base64: string): File {
     const byteString = atob(base64);
     const ab = new ArrayBuffer(byteString.length);
     const ia = new Uint8Array(ab);
@@ -660,6 +700,6 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
       return error;
     }
   }
- 
+
 
 }

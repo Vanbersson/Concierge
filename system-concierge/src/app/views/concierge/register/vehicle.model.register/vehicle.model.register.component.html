@@ -1,14 +1,12 @@
 <div class="layout-card">
     <p-toast />
-
     <div class="layout-card-title">
-        <span>Lista de modelos</span>
-        <p-button icon="pi pi-plus" [text]="true" label="Adicionar" (onClick)="showDialog()" />
+        <span>Modelos</span>
+        <p-button icon="pi pi-plus" [text]="true" label="Modelo" (onClick)="showNewModel()" />
     </div>
-
-    <p-table #tableModel [value]="modelVehicles"
+    <p-table #tableModel [value]="models"
         currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} Cadastros"
-        [globalFilterFields]="['id','description']" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 25, 50]"
+        [globalFilterFields]="['id','status','description']" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 25, 50]"
         styleClass="p-datatable-sm">
         <ng-template pTemplate="caption">
             <div class="flex justify-content-between">
@@ -25,58 +23,38 @@
             <tr>
                 <th pSortableColumn="id" style="width:10%">Código <p-sortIcon
                         field="id"></p-sortIcon></th>
-                <th pSortableColumn="status" style="width:10%">Ativo<p-sortIcon
+                <th pSortableColumn="status" style="width:10%">Status<p-sortIcon
                         field="status"></p-sortIcon></th>
-                <th pSortableColumn="image" style="width:10%">Foto<p-sortIcon
-                        field="image"></p-sortIcon></th>
-                <th pSortableColumn="description" style="width:40%">Descrição <p-sortIcon
+                <th pSortableColumn="description" style="width:80%">Descrição<p-sortIcon
                         field="description"></p-sortIcon></th>
-                <th style="width:10%">Editar</th>
+                <th></th>
             </tr>
         </ng-template>
-        <ng-template pTemplate="body" let-modelo>
+        <ng-template pTemplate="body" let-mod>
             <tr>
-                <td>{{modelo.id}}</td>
+                <td>{{mod.id}}</td>
                 <td>
                     <i class="pi " [ngClass]="{
-                        'pi-times-circle text-red-500':modelo.status == disabled,
-                        'pi-check-circle text-green-500':modelo.status == enabled}">
-                    </i>
+                        'pi-times-circle text-red-500':mod.status == disabled,
+                        'pi-check-circle text-green-500':mod.status == enabled}">
+                    </i> {{mod.status | uppercase}}
                 </td>
+                <td>{{mod.description | uppercase}}</td>
                 <td>
-                    @if (modelo.photo) {
-                    <img class="layout-img-small" src="data:image/png;base64,{{modelo.photo}}" alt="Vehicle Model" width="32" height="32" loading="lazy">
-                    }
-                </td>
-                <td>{{modelo.description | uppercase}}</td>
-                <td>
-                    <p-button icon="pi pi-pencil" label="Editar" zise="small" [text]="true" severity="primary" (click)="editModel(modelo)"></p-button>
+                    <p-button icon="pi pi-pencil" label="Editar" [text]="true" severity="secondary-custom" size="small" (onClick)="edit(mod)"/>
                 </td>
             </tr>
         </ng-template>
     </p-table>
 </div>
 
-<p-dialog header="Modelo" [(visible)]="dialogVisible" [style]="{width: '450px'}">
-    <form [formGroup]="formModel" (ngSubmit)="saveMod()">
-
+<p-dialog header="Cadastro de Modelo" [(visible)]="dialogVisible" [modal]="true" [style]="{width: '450px'}" [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }">
+    <form [formGroup]="formModel" (ngSubmit)="save()">
         <div class="p-fluid p-formgrid grid">
-
-            <div class="mt-5 layout-dialog-img">
-                @if(photoModel){
-                <img class="layout-img-large" src="data:image/png;base64,{{photoModel}}" alt="Vehicle Model" width="140" height="140" loading="lazy">
-                }
-            </div>
             <div class="field col-12">
                 <label for="descricao">Descrição</label>
                 <input pInputText id="descricao" formControlName="description" />
                 <small class="p-error block" *ngIf="formModel.get('description')?.invalid">Campo obrigatório</small>
-            </div>
-            <div class="field col-10">
-                <button pButton type="button" label="Selecionar imagem" (click)="onSelectFile()"></button>
-            </div>
-            <div class="field col-2 flex align-items-center">
-                <button type="button" pButton icon="pi pi-trash" severity="danger" (click)="deleteFile()"></button>
             </div>
             <div class="field col-12 layout-card-status">
                 <span>Situação</span>
@@ -90,12 +68,9 @@
                 </div>
             </div>
         </div>
-
         <div class="flex justify-content-end gap-2 mt-3">
-            <button pButton type="button" pRipple label="Fechar" icon="pi pi-times" class="p-button-text"
-                (click)=" hideDialog()"></button>
+            <button pButton type="button" pRipple label="Fechar" icon="pi pi-times" class="p-button-text" (click)=" hideDialog()"></button>
             <button pButton type="submit" pRipple label="Salvar" icon="pi pi-check" class="p-button-text"></button>
         </div>
-
     </form>
 </p-dialog>

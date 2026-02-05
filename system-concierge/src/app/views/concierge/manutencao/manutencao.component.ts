@@ -320,7 +320,7 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
     //Show load
     this.busyService.busy();
     //Attendant
-    this.attendantsUser = await this.getUserRole();
+    this.getAttendants();
     //Model
     this.modelVehicles = await this.getVehicleModel();
     //Vehicle
@@ -549,13 +549,27 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
       this.driverExitPhotoDoc2 = "";
     }
   }
-  private async getUserRole(): Promise<User[]> {
+
+  private async getAttendants() {
+    const result = await this.filterUserRoleId();
+    if (result.status == 200 && result.body.status == SuccessError.succes) {
+      //this.messageService.add({ severity: 'success', summary: result.body.header, detail: result.body.message, icon: 'pi pi-check' });
+      this.attendantsUser = result.body.data;
+    }
+    if (result.status == 200 && result.body.status == SuccessError.error) {
+      this.messageService.add({ severity: 'info', summary: result.body.header, detail: result.body.message, icon: 'pi pi-info-circle' });
+    }
+  }
+
+  private async filterUserRoleId(): Promise<HttpResponse<MessageResponse>> {
     try {
       return await lastValueFrom(this.userService.filterRoleId(2));
     } catch (error) {
-      return [];
+      this.messageService.add({ severity: 'error', summary: 'Erro', detail: error.error.message, icon: 'pi pi-times' });
+      return error;
     }
   }
+
   private async getVehicleModel(): Promise<ModelVehicle[]> {
     try {
       return await lastValueFrom(this.vehicleModelService.getAllEnabled());

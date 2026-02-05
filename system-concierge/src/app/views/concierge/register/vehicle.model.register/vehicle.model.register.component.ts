@@ -24,6 +24,8 @@ import { ModelVehicle } from '../../../../models/vehicle-model/model-vehicle';
 //Const
 import { IMAGE_MAX_SIZE } from '../../../../util/constants';
 import { StatusEnum } from '../../../../models/enum/status-enum';
+import { MessageResponse } from '../../../../models/message/message-response';
+import { SuccessError } from '../../../../models/enum/success-error';
 
 @Component({
   selector: 'app-vehicle.model.register',
@@ -37,18 +39,16 @@ import { StatusEnum } from '../../../../models/enum/status-enum';
   providers: [MessageService],
 })
 export default class VehicleModelRegisterComponent implements OnInit {
-
+  isNewModel: boolean = true;
   enabled = StatusEnum.ENABLED;
   disabled = StatusEnum.DISABLED;
-  modelVehicles: ModelVehicle[] = [];
-  modelVehicle: ModelVehicle;
+  models: ModelVehicle[] = [];
+  model: ModelVehicle;
   dialogVisible: boolean = false;
-  photoModel: string = "";
 
   formModel = new FormGroup({
     description: new FormControl<string>('', Validators.required),
-    status: new FormControl<string>('', Validators.required),
-    photo: new FormControl<string | null>(null),
+    status: new FormControl<StatusEnum>(StatusEnum.DISABLED, Validators.required),
   });
 
   constructor(
@@ -65,7 +65,7 @@ export default class VehicleModelRegisterComponent implements OnInit {
     //Inicia load
     this.busyService.busy();
     this.vehicleModelService.listAll().subscribe((data) => {
-      this.modelVehicles = data;
+      this.models = data;
       //Fecha load
       this.busyService.idle();
     }, error => {
@@ -83,90 +83,98 @@ export default class VehicleModelRegisterComponent implements OnInit {
   cleanForm() {
     this.formModel.patchValue({
       description: "",
-      status: this.enabled,
-      photo: ""
+      status: this.enabled
     });
-    this.photoModel = "";
   }
-  editModel(mod: ModelVehicle) {
+
+  edit(mod: ModelVehicle) {
+    this.isNewModel = false;
     this.showDialog();
-    this.modelVehicle = mod;
+    this.model = mod;
 
     this.formModel.patchValue({
       description: mod.description,
       status: mod.status,
-      photo: mod.photo
-    });
-    this.photoModel = mod.photo;
-  }
-  public async onSelectFile() {
-    this.ngxImageCompressService.uploadFile().then(({ image, orientation }) => {
-      if (this.ngxImageCompressService.byteCount(image) > IMAGE_MAX_SIZE) {
-        this.messageService.add({ severity: 'error', summary: 'Imagem', detail: 'Tamanha máximo 3MB', icon: 'pi pi-times', life: 3000 });
-      } else {
-        this.ngxImageCompressService.compressFile(image, orientation, 50, 40).then((compressedImage) => {
 
-          // Remover o prefixo "data:image/jpeg;base64," se existir
-          const base64Data = compressedImage.split(',')[1];
-          this.photoModel = base64Data;
-          this.formModel.patchValue({ photo: this.photoModel });
-        });
-      }
     });
+  }
 
+  showNewModel() {
+    this.isNewModel = true;
+    this.model = new ModelVehicle();
+    this.showDialog();
   }
-  deleteFile() {
-    this.formModel.patchValue({ photo: "" });
-    this.photoModel = "";
+
+  save() {
+    if (this.isNewModel) {
+      this.saveNewModel();
+    } else {
+      this.saveUpdateModel();
+    }
   }
-  async saveMod() {
+
+  private async saveNewModel() {
     const { valid, value } = this.formModel;
     if (!valid) {
       return;
     }
+
+    this.model.companyId = this.storageService.companyId;
+    this.model.resaleId = this.storageService.resaleId;
+    this.model.status = value.status;
+    this.model.description = value.description;
     //Fecha load
     this.busyService.busy();
-    if (this.modelVehicle == null) {
-      //Save
-      this.modelVehicle = new ModelVehicle();
-      this.modelVehicle.companyId = this.storageService.companyId;
-      this.modelVehicle.resaleId = this.storageService.resaleId;
-      this.modelVehicle.status = value.status;
-      this.modelVehicle.description = value.description;
-      this.modelVehicle.photo = value.photo;
-
-      const resultSave = await this.saveModel(this.modelVehicle);
-      if (resultSave.status == 201) {
-        this.modelVehicle.id = resultSave.body.id;
-        this.messageService.add({ severity: 'success', summary: 'Modelo', detail: 'Salvo com sucesso', icon: 'pi pi-check' });
-        this.listaModel();
-      }
-    } else {
-      //Update
-      this.modelVehicle.status = value.status;
-      this.modelVehicle.description = value.description;
-      this.modelVehicle.photo = value.photo;
-
-      const resultUpdate = await this.updateModel(this.modelVehicle);
-      if (resultUpdate.status == 200) {
-        this.messageService.add({ severity: 'success', summary: 'Modelo', detail: 'Atualizado com sucesso', icon: 'pi pi-check' });
-        this.listaModel();
-      }
-    }
+    const resultSave = await this.saveModel(this.model);
     //Fecha load
     this.busyService.idle();
+    if (resultSave.status == 201 && resultSave.body.status == SuccessError.succes) {
+      this.messageService.add({ severity: 'success', summary: resultSave.body.header, detail: resultSave.body.message, icon: 'pi pi-check' });
+      this.model = resultSave.body.data;
+      this.isNewModel = false;
+      this.listaModel();
+    }
+    if (resultSave.status == 201 && resultSave.body.status == SuccessError.error) {
+      this.messageService.add({ severity: 'info', summary: resultSave.body.header, detail: resultSave.body.message, icon: 'pi pi-info-circle' });
+    }
+
   }
-  private async saveModel(mod: ModelVehicle): Promise<HttpResponse<ModelVehicle>> {
+  private async saveUpdateModel() {
+    const { valid, value } = this.formModel;
+    if (!valid) {
+      return;
+    }
+
+    this.model.status = value.status;
+    this.model.description = value.description;
+    //Fecha load
+    this.busyService.busy();
+    const resultSave = await this.updateModel(this.model);
+    //Fecha load
+    this.busyService.idle();
+    if (resultSave.status == 200 && resultSave.body.status == SuccessError.succes) {
+      this.messageService.add({ severity: 'success', summary: resultSave.body.header, detail: resultSave.body.message, icon: 'pi pi-check' });
+      this.model = resultSave.body.data;
+      this.listaModel();
+    }
+    if (resultSave.status == 200 && resultSave.body.status == SuccessError.error) {
+      this.messageService.add({ severity: 'info', summary: resultSave.body.header, detail: resultSave.body.message, icon: 'pi pi-info-circle' });
+    }
+  }
+
+  private async saveModel(mod: ModelVehicle): Promise<HttpResponse<MessageResponse>> {
     try {
       return await lastValueFrom(this.vehicleModelService.save(mod));
     } catch (error) {
+      this.messageService.add({ severity: 'error', summary: 'Erro', detail: error.error.message, icon: 'pi pi-times' });
       return error;
     }
   }
-  private async updateModel(mod: ModelVehicle): Promise<HttpResponse<ModelVehicle>> {
+  private async updateModel(mod: ModelVehicle): Promise<HttpResponse<MessageResponse>> {
     try {
       return await lastValueFrom(this.vehicleModelService.update(mod));
     } catch (error) {
+      this.messageService.add({ severity: 'error', summary: 'Erro', detail: error.error.message, icon: 'pi pi-times' });
       return error;
     }
   }
