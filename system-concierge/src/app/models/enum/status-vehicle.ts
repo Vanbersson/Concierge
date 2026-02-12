@@ -1,4 +1,4 @@
 export enum StatusVehicle {
-    entry = "entradaAutorizada", 
-    exit = "saidaAutorizada"
+    ENTERED = "Entered", 
+    EXITED = "Exited"
 }

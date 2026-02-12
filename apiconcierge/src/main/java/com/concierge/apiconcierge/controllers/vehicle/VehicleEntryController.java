@@ -54,7 +54,7 @@ public class VehicleEntryController {
     }
 
     @PostMapping("/exit")
-    public ResponseEntity<Object> confirmationExit(@RequestBody VehicleExitDto data, HttpServletRequest request) {
+    public ResponseEntity<Object> exit(@RequestBody VehicleExitDto data, HttpServletRequest request) {
         try {
             String userEmail = this.getEmail(request);
             MessageResponse response = this.service.exit(data, userEmail);

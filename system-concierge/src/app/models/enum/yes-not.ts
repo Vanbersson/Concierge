@@ -1,4 +1,4 @@
 export enum YesNot {
     yes = "yes",
-    not = "yot"
+    not = "not"
 }

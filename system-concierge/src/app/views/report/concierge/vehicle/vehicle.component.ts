@@ -198,7 +198,7 @@ export default class VehicleComponent implements OnInit, DoCheck {
   }
   private preList(vehicle: VehicleEntry): VehicleEntry {
     //Format Date
-    vehicle.dateEntry = this.datePipeBR.transform(this.formatDateTime(new Date(vehicle.dateEntry)), 'dd/MM/yyyy HH:mm');
+    /* vehicle.dateEntry = this.datePipeBR.transform(this.formatDateTime(new Date(vehicle.dateEntry)), 'dd/MM/yyyy HH:mm');
     vehicle.dateExit = vehicle.dateExit != "" ? this.datePipeBR.transform(this.formatDateTime(new Date(vehicle.dateExit)), 'dd/MM/yyyy HH:mm') : "";
     vehicle.datePrevisionExit = vehicle.datePrevisionExit != "" ? this.datePipeBR.transform(this.formatDateTime(new Date(vehicle.datePrevisionExit)), 'dd/MM/yyyy HH:mm') : "";
 
@@ -207,13 +207,13 @@ export default class VehicleComponent implements OnInit, DoCheck {
     } else {
       vehicle.placa = this.upperCasePipe.transform(vehicle.placa);
       vehicle.placa = vehicle.placa.substring(0, 3) + "-" + vehicle.placa.substring(3, 7);
-    }
+    } */
     //Model
     vehicle.modelDescription = this.upperCasePipe.transform(vehicle.modelDescription);
 
-    if (vehicle.idUserAttendant != 0) {
+   /*  if (vehicle.idUserAttendant != 0) {
       vehicle.nameUserAttendant = this.upperCasePipe.transform(vehicle.nameUserAttendant);
-    }
+    } */
 
     if (vehicle.clientCompanyName != "") {
       var names = vehicle.clientCompanyName.split(' ');
@@ -226,7 +226,7 @@ export default class VehicleComponent implements OnInit, DoCheck {
 
 
 
-    switch (vehicle.budgetStatus) {
+   /*  switch (vehicle.budgetStatus) {
       case 'PendingApproval':
         vehicle.budgetStatus = 'Pendente Aprovação';
         break;
@@ -248,7 +248,7 @@ export default class VehicleComponent implements OnInit, DoCheck {
       case 'NotApproved':
         vehicle.budgetStatus = 'Não Aprovado';
         break;
-    }
+    } */
     return vehicle;
   }
   getSeverity(value: string): any {
@@ -374,7 +374,7 @@ export default class VehicleComponent implements OnInit, DoCheck {
   exportExcel() {
     var listExp: IExportVehicle[] = [];
     for (let item of this.listVehicleEntry) {
-      listExp.push({
+      /* listExp.push({
         Empresa: item.companyId,
         Revenda: item.resaleId,
         Codigo: item.id,
@@ -402,7 +402,7 @@ export default class VehicleComponent implements OnInit, DoCheck {
         Nr_NFe: item.numNfe,
         Nr_NFEs: item.numNfse,
         inf: item.information
-      });
+      }); */
     }
 
     // converte JSON → planilha

@@ -79,14 +79,14 @@ export default class VehicleExitComponent implements OnInit, OnDestroy {
     this.busyService.idle();
     if (data.length > 0) {
       const datePipe = new DatePipe('pt-BR');
-      for (let index = 0; index < data.length; index++) {
+    /*   for (let index = 0; index < data.length; index++) {
         data[index].dateEntry = datePipe.transform(this.formatDateTime(new Date(data[index].dateEntry)), 'dd/MM/yyyy HH:mm');
         if (data[index].vehicleNew == "yes") {
           data[index].placa = "NOVO";
         }
         var nome = data[index].clientCompanyName.split(' ');
         data[index].clientCompanyName = nome[0] + " " + nome[1];
-      }
+      } */
       this.listVehicleExit = data;
     }else{
       this.listVehicleExit = data;
@@ -96,14 +96,14 @@ export default class VehicleExitComponent implements OnInit, OnDestroy {
     const data = await this.allAuthorized();
     if (data.length > 0) {
       const datePipe = new DatePipe('pt-BR');
-      for (let index = 0; index < data.length; index++) {
+     /*  for (let index = 0; index < data.length; index++) {
         data[index].dateEntry = datePipe.transform(this.formatDateTime(new Date(data[index].dateEntry)), 'dd/MM/yyyy HH:mm');
         if (data[index].vehicleNew == "yes") {
           data[index].placa = "NOVO";
         }
         var nome = data[index].clientCompanyName.split(' ');
         data[index].clientCompanyName = nome[0] + " " + nome[1];
-      }
+      } */
       this.listVehicleExit = data;
     }
   }
@@ -195,7 +195,7 @@ export default class VehicleExitComponent implements OnInit, OnDestroy {
       this.photoVehicle4 = null;
 
       var element = this.selectedVehicle[index];
-      this.valueInfoPlaca = element.placa;
+      this.valueInfoPlaca = element.vehiclePlate;
       this.valueInfoModel = element.modelDescription;
 
       var vehicleExit: VehicleExit = new VehicleExit();

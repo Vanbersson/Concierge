@@ -102,7 +102,7 @@
                         </div>
                         <div class="col-10 md:col-6">
                             <label for="driverEntryName">Nome</label>
-                            <input pInputText id="driverEntryName" type="text" formControlName="driverEntryName" [style]="{'text-transform':'capitalize'}">
+                            <input pInputText id="driverEntryName" type="text" formControlName="driverEntryName" [style]="{'text-transform':'uppercase'}">
                         </div>
                         <div class="col-2 md:col-1 flex flex-column">
                             <label for="">Filtro</label>
@@ -158,84 +158,82 @@
                     <span>Vamos informar agora os dados do veículo</span>
                     <div class="p-fluid p-formgrid grid">
                         <div class="col-12 md:col-1">
-                            <label for="placa">Placa</label>
-                            <p-inputMask id="placa" mask="***-****" [unmask]="true" [style]="{'text-transform':'uppercase'}" formControlName="placa" />
-                            <small class="p-error block" *ngIf="formVehicle.get('placa')?.invalid">Campo obrigatório</small>
+                            <label for="plate">Placa</label>
+                            <p-inputMask id="plate" mask="***-****" [unmask]="true" [style]="{'text-transform':'uppercase'}" formControlName="vehiclePlate" />
+                            <small class="p-error block" *ngIf="formVehicle.get('vehiclePlate')?.invalid">Campo obrigatório</small>
                         </div>
                         <div class="col-12 md:col-1">
-                            <label for="frotaId">Frota</label>
-                            <p-inputNumber inputId="frotaId" [useGrouping]="false" maxlength="10" formControlName="frota" />
+                            <label for="fleet">Frota</label>
+                            <input pInputText type="text" maxlength="10" [style]="{'text-transform':'uppercase'}" formControlName="vehicleFleet"/>
                         </div>
                         <div class="col-12 md:col-2">
                             <label for="vehiclemodelid">Modelos</label>
-                            <p-multiSelect [options]="vehicleModels$ | async" [selectionLimit]="1" placeholder="Selecione" optionLabel="description" formControlName="modelVehicle">
-                                <ng-template let-value pTemplate="selectedItems">
-                                    <div class="inline-flex align-items-center gap-2" *ngFor="let model of value">
-                                        <img *ngIf="model.photo" src="data:image/png;base64,{{model.photo}}" alt="photo vehicle" height="15" width="15"/>
-                                        <div>{{ model.description }}</div>
-                                    </div>
-                                    <div *ngIf="!value || value.length === 0">Selecione</div>
-                                </ng-template>
-                                <ng-template let-model pTemplate="item">
-                                    <div class="flex align-items-center gap-2">
-                                        <img *ngIf="model.photo" src="data:image/png;base64,{{model.photo}}" alt="photo vehicle" height="22" width="22"/>
-                                        <div>{{ model.description }}</div>
-                                    </div>
-                                </ng-template>
-                            </p-multiSelect>
+                            <p-dropdown 
+                            formControlName="modelVehicle"
+                            [options]="vehicleModels$ | async"
+                            optionLabel="description"
+                            [style]="{'text-transform':'uppercase'}"/>
                             <small class="p-error block" *ngIf="formVehicle.get('modelVehicle')?.invalid">Campo obrigatório</small>
                         </div>
                         <div class="col-12 md:col-2 ">
                             <label for="dateEntry">Data Entrada</label>
-                            <p-calendar [showOnFocus]="false" [showIcon]="true" inputId="dateEntry" [showTime]="true" dateFormat="dd/mm/yy" (onInput)="applyDateTimeMask($event)" formControlName="dateEntry"/>
-                            <small class="p-error block" *ngIf="formVehicle.get('dateEntry')?.invalid">Campo obrigatório</small>
+                            <p-calendar [showOnFocus]="false" [showIcon]="true" inputId="dateEntry" [showTime]="true" dateFormat="dd/mm/yy" (onInput)="applyDateTimeMask($event)" formControlName="entryDate"/>
+                            <small class="p-error block" *ngIf="formVehicle.get('entryDate')?.invalid">Campo obrigatório</small>
                         </div>
                         <div class="col-12 md:col-2 ">
-                            <label for="datePrevisionExit">Previsão saída</label>
-                            <p-calendar [showOnFocus]="false" [showIcon]="true" inputId="datePrevisionExit" [showTime]="true" dateFormat="dd/mm/yy" (onInput)="applyDateTimeMask($event)" formControlName="datePrevisionExit"/>
+                            <label for="exitDatePrevision">Previsão saída</label>
+                            <p-calendar [showOnFocus]="false" [showIcon]="true" inputId="exitDatePrevision" [showTime]="true" dateFormat="dd/mm/yy" (onInput)="applyDateTimeMask($event)" formControlName="exitDatePrevision"/>
                         </div>
                         <div class="col-12 md:col-2">
                             <label for="vehiclecolorid">Cor</label>
-                            <p-multiSelect id="vehiclecolorid" [options]="cores" optionLabel="color"  [selectionLimit]="1" placeholder="Selecione" [style]="{'text-transform':'capitalize'}" formControlName="color" />
-                            <small class="p-error block" *ngIf="formVehicle.get('color')?.invalid">Campo obrigatório</small>
+                            <p-dropdown 
+                            formControlName="vehicleColor"
+                            [options]="colors"
+                            optionLabel="color"
+                            [style]="{'text-transform':'uppercase'}"/>
                         </div>
                         <div class="col-12 md:col-2">
                             <label for="kmatual">KM Atual</label>
-                            <p-inputNumber inputId="kmatual" [useGrouping]="false" maxlength="10" formControlName="kmEntry" />
+                            <p-inputNumber inputId="kmatual" [useGrouping]="false" maxlength="10" formControlName="vehicleKmEntry" />
                         </div>
                         <div class="col-12 md:col-2">
                             <label for="coneid">Cone</label>
-                            <p-inputNumber inputId="coneid" [useGrouping]="false" formControlName="quantityTrafficCone" />
+                            <p-inputNumber inputId="coneid" [useGrouping]="false" formControlName="checkItem1" />
                         </div>
                         <div class="col-12 md:col-2">
                             <label for="extintorid">Extintor</label>
-                            <p-inputNumber inputId="extintorid" [useGrouping]="false" formControlName="quantityExtinguisher" />
+                            <p-inputNumber inputId="extintorid" [useGrouping]="false" formControlName="checkItem2" />
                         </div>
                         <div class="col-12 md:col-2">
                             <label for="pneuid">Pneu</label>
-                            <p-inputNumber inputId="pneuid" [useGrouping]="false" formControlName="quantityTire" />
+                            <p-inputNumber inputId="pneuid" [useGrouping]="false" formControlName="checkItem3" />
                         </div>
                         <div class="col-12 md:col-2">
                             <label for="pneurodaid">Pneu c/roda</label>
-                            <p-inputNumber inputId="pneurodaid" [useGrouping]="false"  formControlName="quantityTireComplete" />
+                            <p-inputNumber inputId="pneurodaid" [useGrouping]="false"  formControlName="checkItem4" />
                         </div>
                         <div class="col-12 md:col-2">
                             <label for="cxferramentaid">Cx ferramenta</label>
-                            <p-inputNumber inputId="cxferramentaid" [useGrouping]="false" formControlName="quantityToolBox" />
+                            <p-inputNumber inputId="cxferramentaid" [useGrouping]="false" formControlName="checkItem5" />
                         </div>
                         <div class="col-12 md:col-2">
                             <label for="consultorid">Consultor</label>
-                            <p-multiSelect id="consultorid" [options]="attendants" [selectionLimit]="1"  optionLabel="name" placeholder="Selecione" [style]="{'text-transform':'capitalize'}" formControlName="UserAttendant" />
+                             <p-dropdown 
+                            formControlName="attendant"
+                            [options]="attendants"
+                            optionLabel="name"
+                            [style]="{'text-transform':'capitalize'}"/>
+                            <!-- <p-multiSelect id="consultorid" [options]="attendants" [selectionLimit]="1"  optionLabel="name" placeholder="Selecione"  formControlName="UserAttendant" /> -->
                         </div>
                         <div class="col-12 md:col-3">
                             <label for="">Veículo novo</label>
                             <div class="flex align-items-center gap-2 border-1 border-round border-300 p-3">
                                 <div class="flex align-items-center">
-                                    <p-radioButton inputId="newyes" value="yes" formControlName="vehicleNew" (onClick)="deleteRequirePlaca()"></p-radioButton>
+                                    <p-radioButton inputId="newyes" [value]="yes" formControlName="vehicleNew" (onClick)="deleteRequirePlaca()"></p-radioButton>
                                     <label for="newyes" class="ml-2">Sim</label>
                                 </div>
                                 <div class="flex align-items-center">
-                                    <p-radioButton inputId="newnot" value="not" formControlName="vehicleNew" (onClick)="addRequirePlaca()"></p-radioButton>
+                                    <p-radioButton inputId="newnot" [value]="not" formControlName="vehicleNew" (onClick)="addRequirePlaca()"></p-radioButton>
                                     <label for="newnot" class="ml-2">Não</label>
                                 </div>
                             </div>
@@ -244,11 +242,11 @@
                             <label>Ordem serviço</label>
                             <div class="flex align-items-center gap-2 border-1 border-round border-300 p-3">
                                 <div class="flex align-items-center">
-                                    <p-radioButton inputId="serviceyes" value="yes" formControlName="serviceOrder"></p-radioButton>
+                                    <p-radioButton inputId="serviceyes" [value]="yes" formControlName="vehicleServiceOrder"></p-radioButton>
                                     <label for="serviceyes" class="ml-2">Sim</label>
                                 </div>
                                 <div class="flex align-items-center">
-                                    <p-radioButton inputId="serviceno" value="not" formControlName="serviceOrder"></p-radioButton>
+                                    <p-radioButton inputId="serviceno" [value]="not" formControlName="vehicleServiceOrder"></p-radioButton>
                                     <label for="serviceno" class="ml-2">Não</label>
                                 </div>
                             </div>
@@ -256,7 +254,7 @@
                         <div class="md:col-6"></div>
                         <div class="col-12">
                             <label for="informacao" class="ml-2">Informações</label>
-                            <textarea pInputTextarea maxlength="255" id="informacao" rows="4" cols="30" formControlName="informationConcierge"></textarea>
+                            <textarea pInputTextarea maxlength="255" id="informacao" rows="4" cols="30" formControlName="entryInformation"></textarea>
                         </div>
                         <div class="col-12 md:col-4 flex justify-content-between gap-1">
                             <div class="layout-file">
@@ -330,35 +328,24 @@
     <p-table [value]="listVehicleEntry"  [tableStyle]="{ 'min-width': '60rem' }" styleClass="p-datatable-sm">
         <ng-template pTemplate="header">
             <tr>
-                <th pSortableColumn="placa">Placa<p-sortIcon field="placa"></p-sortIcon></th>
-                <th pSortableColumn="frota">Frota<p-sortIcon field="frota"></p-sortIcon></th>
+                <th pSortableColumn="vehiclePlate">Placa<p-sortIcon field="vehiclePlate"></p-sortIcon></th>
+                <th pSortableColumn="vehicleFleet">Frota<p-sortIcon field="vehicleFleet"></p-sortIcon></th>
                 <th pSortableColumn="modelDescription">Modelo<p-sortIcon field="modelDescription"></p-sortIcon></th>
-                <th pSortableColumn="nameUserAttendant">Consultor<p-sortIcon field="nameUserAttendant"></p-sortIcon></th>
+                <th pSortableColumn="attendantUserName">Consultor<p-sortIcon field="attendantUserName"></p-sortIcon></th>
                 <th pSortableColumn="clientCompanyName">Empresa<p-sortIcon field="clientCompanyName"></p-sortIcon></th>
                 <th></th>
             </tr>
         </ng-template>
         <ng-template pTemplate="body" let-vehicle let-index="rowIndex">
             <tr>
-                <td>
-                    @if (vehicle.vehicleNew == "yes") {
-                    <p-tag value="NOVO" severity="danger"></p-tag>
-                    }@else{
-                    <span class="text-500">{{vehicle.placa | uppercase}}</span>
-                    }
-                </td>
-                <td><span class="text-500">{{vehicle.frota}}</span></td>
-                <td><span class="text-500">{{vehicle.modelDescription | uppercase}}</span></td>
-                @if(vehicle.nameUserAttendant == ""){
-                <td><p-tag value="FALTA" severity="danger"></p-tag></td>
-                }@else {
-                <td><span class="text-500">{{vehicle.nameUserAttendant | uppercase}}</span></td>
-                }
-                @if(vehicle.clientCompanyName ==""){
-                <td> <p-tag value="FALTA" severity="danger"></p-tag> </td>
-                }@else {
-                <td><span class="text-500">{{ firstSecondaryName(vehicle.clientCompanyName)  | uppercase }}</span></td>
-                }
+                <td *ngIf="vehicle.vehicleNew == yes"><p-tag value="NOVO" severity="danger"></p-tag></td>
+                <td *ngIf="vehicle.vehicleNew == not">{{vehicle.vehiclePlate | uppercase}}</td>
+                <td>{{vehicle.vehicleFleet}}</td>
+                <td>{{vehicle.modelDescription | uppercase}}</td>
+                <td *ngIf="vehicle.attendantUserId == 0"><p-tag value="FALTA" severity="danger"></p-tag></td>
+                <td *ngIf="vehicle.attendantUserId != 0">{{vehicle.attendantUserName | uppercase}}</td>
+                <td *ngIf="vehicle.clientCompanyId == 0"><p-tag value="FALTA" severity="danger"></p-tag></td>
+                <td *ngIf="vehicle.clientCompanyId != 0" >{{ firstSecondaryName(vehicle.clientCompanyName)  | uppercase }}</td>
                 <td>
                     <button pButton [text]="true" icon="pi pi-trash" severity="danger" (click)="deleteVehicleEntry(index)"></button>
                 </td>
@@ -366,6 +353,6 @@
         </ng-template>
     </p-table>
     <div class="flex justify-content-end mt-3">
-        <button pButton type="submit" pRipple label="Finalizar" icon="pi pi-check" class="p-button-text"  (click)="saveVehicleEntry()"></button>
+        <button pButton type="submit" pRipple label="Finalizar" icon="pi pi-check" class="p-button-text" (click)="save()"></button>
     </div>
 </p-dialog>

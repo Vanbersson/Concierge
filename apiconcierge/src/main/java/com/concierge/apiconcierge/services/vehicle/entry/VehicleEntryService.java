@@ -73,6 +73,7 @@ public class VehicleEntryService implements IVehicleEntryService {
                 vehicle.setDriverExitId(null);
                 vehicle.setAuth1ExitUserId(null);
                 vehicle.setAuth2ExitUserId(null);
+                vehicle.setAuthExitStatus(StatusAuthExitEnum.NotAuth);
                 VehicleEntry result = this.repository.save(vehicle);
                 response.setData(result);
 
@@ -291,29 +292,6 @@ public class VehicleEntryService implements IVehicleEntryService {
             throw new VehicleEntryException(ex.getMessage());
         }
     }
-
-//    @SneakyThrows
-//    @Override
-//    public String existsPlaca(ExistsVehiclePlateDto placa) {
-//        try {
-//            String message = this.validation.existsPlaca(placa);
-//
-//            if (ConstantsMessage.SUCCESS.equals(message)) {
-//
-//                VehicleEntry vehicle = repository.findByExistsPlaca(placa.companyId(), placa.resaleId(), placa.placa());
-//                if (vehicle != null) {
-//                    return "yes";
-//                } else {
-//                    return "not";
-//                }
-//
-//            } else {
-//                throw new VehicleEntryException(message);
-//            }
-//        } catch (Exception ex) {
-//            throw new VehicleEntryException(ex.getMessage());
-//        }
-//    }
 
     @SneakyThrows
     @Override

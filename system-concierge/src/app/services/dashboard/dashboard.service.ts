@@ -9,7 +9,7 @@ import { VehicleEntry } from '../../models/vehicle/vehicle-entry';
 import { VehicleEntryAuth } from '../../models/vehicle/vehicle-entry-auth';
 import { VehicleExit } from '../../models/vehicle/vehicle-exit';
 import { MessageResponse } from '../../models/message/message-response';
-import { ExistsPlaca } from '../../models/vehicle/exists-placa';
+
 
 @Injectable({
     providedIn: 'root'

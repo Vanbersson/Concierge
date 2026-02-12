@@ -1,92 +1,98 @@
-export class VehicleEntry {
-    companyId: number = 0;
-    resaleId: number = 0;
-    id: number = 0;
-    status: string = '';
-    stepEntry: string = '';
-    budgetStatus: string = '';
+import { StatusAuthExit } from "../enum/status-auth-exit";
+import { StatusStepVehicleEntry } from "../enum/status-step-vehicle-entry";
+import { StatusVehicle } from "../enum/status-vehicle";
 
-    idUserEntry: number = 0;
-    nameUserEntry: string = '';
-    dateEntry: Date | string = '';
-    entryPhoto1: string = '';
-    entryPhoto2: string = '';
-    entryPhoto3: string = '';
-    entryPhoto4: string = '';
-    datePrevisionExit: Date | string = '';
+
+export class VehicleEntry {
+    companyId: number | null = null;
+    resaleId: number | null = null;
+    id: number | null = null;
+    status: StatusVehicle = StatusVehicle.ENTERED;
+    stepEntry: StatusStepVehicleEntry = StatusStepVehicleEntry.ATTENDANT;
+    budgetId: number | null = null;
+
+    entryUserId: number | null = null;
+    entryUserName: string = '';
+    entryDate: Date | string = '';
+    entryPhoto1Url: string = '';
+    entryPhoto2Url: string = '';
+    entryPhoto3Url: string = '';
+    entryPhoto4Url: string = '';
+    entryInformation: string = '';
+
+    exitDatePrevision: Date | string = '';
     days: number = 0;
 
-    userIdExit: number = 0;
-    userNameExit: string = '';
-    dateExit: Date | string = '';
-    exitPhoto1: string = '';
-    exitPhoto2: string = '';
-    exitPhoto3: string = '';
-    exitPhoto4: string = '';
+    exitUserId: number | null = null;
+    exitUserName: string = '';
+    exitDate: Date | string = '';
+    exitPhoto1Url: string = '';
+    exitPhoto2Url: string = '';
+    exitPhoto3Url: string = '';
+    exitPhoto4Url: string = '';
     exitInformation: string = '';
 
-    idUserAttendant: number = 0;
-    nameUserAttendant: string = '';
-    photo1: string = '';
-    photo2: string = '';
-    photo3: string = '';
-    photo4: string = '';
+    attendantUserId: number | null = null;
+    attendantUserName: string = '';
+    attendantPhoto1Url: string = '';
+    attendantPhoto2Url: string = '';
+    attendantPhoto3Url: string = '';
+    attendantPhoto4Url: string = '';
 
-    idUserExitAuth1: number = 0;
-    nameUserExitAuth1: string = '';
-    dateExitAuth1: Date | string = '';
+    authExitStatus: StatusAuthExit = StatusAuthExit.NOT;
 
-    idUserExitAuth2: number = 0;
-    nameUserExitAuth2: string = '';
-    dateExitAuth2: Date | string = '';
+    auth1ExitUserId: number | null = null;
+    auth1ExitUserName: string = '';
+    auth1ExitDate: Date | string = '';
 
-    statusAuthExit: string = '';
+    auth2ExitUserId: number | null = null;
+    auth2ExitUserName: string = '';
+    auth2ExitDate: Date | string = '';
 
-    modelId: number = 0;
+    modelId: number | null= null;
     modelDescription: string = '';
 
-    clientCompanyId: number = 0;
+    clientCompanyId: number | null = null;
     clientCompanyName: string = '';
-    clientCompanyCnpj: string = '';
-    clientCompanyCpf: string = '';
-    clientCompanyRg: string = '';
 
-    driverEntryId: number = 0;
+    driverEntryId: number | null = null;
     driverEntryName: string = '';
-    driverEntryCpf: string = '';
-    driverEntryRg: string = '';
-    driverEntryPhoto: string = '';
-    driverEntrySignature: string = '';
-    driverEntryPhotoDoc1: string = '';
-    driverEntryPhotoDoc2: string = '';
 
-    driverExitId: number = 0;
+    driverExitId: number | null = null;
     driverExitName: string = '';
-    driverExitCpf: string = '';
-    driverExitRg: string = '';
-    driverExitPhoto: string = '';
-    driverExitSignature: string = '';
-    driverExitPhotoDoc1: string = '';
-    driverExitPhotoDoc2: string = '';
 
-    color: string = '';
-    placa: string = '';
-    placasJunto: string = '';
-    frota: string = '';
+    vehiclePlate: string = '';
+    vehiclePlateTogether: string = '';
+    vehicleFleet: string = '';
+    vehicleColor: string = '';
+    vehicleKmEntry: string = '';
+    vehicleKmExit: string = '';
     vehicleNew: string = '';
-    kmEntry: string = '';
-    kmExit: string = '';
+    vehicleServiceOrder: string = '';
 
-    quantityExtinguisher: number = 0;
-    quantityTrafficCone: number = 0;
-    quantityTire: number = 0;
-    quantityTireComplete: number = 0;
-    quantityToolBox: number = 0;
-    serviceOrder: string = '';
     numServiceOrder: string = '';
     numNfe: string = '';
     numNfse: string = '';
-    information: string = '';
-    informationConcierge: string = '';
+
+    checkItem1: string = '';
+    checkItem2: string = '';
+    checkItem3: string = '';
+    checkItem4: string = '';
+    checkItem5: string = '';
+    checkItem6: string = '';
+    checkItem7: string = '';
+    checkItem8: string = '';
+    checkItem9: string = '';
+    checkItem10: string = '';
+    checkItem11: string = '';
+    checkItem12: string = '';
+    checkItem13: string = '';
+    checkItem14: string = '';
+    checkItem15: string = '';
+    checkItem16: string = '';
+    checkItem17: string = '';
+    checkItem18: string = '';
+    checkItem19: string = '';
+    checkItem20: string = '';
 
 }

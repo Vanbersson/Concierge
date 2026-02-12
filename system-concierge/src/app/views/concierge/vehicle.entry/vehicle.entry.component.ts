@@ -11,7 +11,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { ButtonModule } from 'primeng/button';
 import { InputGroupModule } from 'primeng/inputgroup';
 import { InputMaskModule } from 'primeng/inputmask';
-import { MultiSelectModule } from 'primeng/multiselect';
+
 import { RadioButtonModule } from 'primeng/radiobutton';
 import { CalendarModule } from 'primeng/calendar';
 import { InputTextareaModule } from 'primeng/inputtextarea';
@@ -28,6 +28,7 @@ import { TagModule } from 'primeng/tag';
 import { ImageModule } from 'primeng/image';
 import { CheckboxModule } from 'primeng/checkbox';
 import { DividerModule } from 'primeng/divider';
+import { DropdownModule } from 'primeng/dropdown';
 
 //Service
 import { VehicleModelService } from '../../../services/vehicle-model/vehicle-model.service';
@@ -36,7 +37,6 @@ import { VehicleService } from '../../../services/vehicle/vehicle.service';
 import { PhotoService } from '../../../services/photo/photo.service';
 //Interface
 import { StorageService } from '../../../services/storage/storage.service';
-import { IModelVehicle } from '../../../interfaces/vehicle-model/imodel-vehicle';
 //Class
 import { User } from '../../../models/user/user';
 import { ClientCompany } from '../../../models/clientcompany/client-company';
@@ -45,7 +45,6 @@ import { IColor } from '../../../interfaces/icolor';
 import { IMAGE_MAX_SIZE_LABEL, MESSAGE_RESPONSE_NOT_COLOR, MESSAGE_RESPONSE_NOT_MODEL, MESSAGE_RESPONSE_NOT_PLACA, MESSAGE_RESPONSE_PLACAEXISTS } from '../../../util/constants';
 //Components
 import { MessageResponse } from '../../../models/message/message-response';
-import { ExistsPlaca } from '../../../models/vehicle/exists-placa';
 //Enum
 import { Driver } from '../../../models/driver/driver';
 //Filters
@@ -56,6 +55,11 @@ import { PhotoResult } from '../../../interfaces/photo-result';
 import { PhotoResultStatus } from '../../../models/enum/photo-result-status';
 import { SuccessError } from '../../../models/enum/success-error';
 import { BusyService } from '../../../components/loading/busy.service';
+import { ModelVehicle } from '../../../models/vehicle-model/model-vehicle';
+import { YesNot } from '../../../models/enum/yes-not';
+import { StatusVehicle } from '../../../models/enum/status-vehicle';
+import { StatusStepVehicleEntry } from '../../../models/enum/status-step-vehicle-entry';
+import { StatusAuthExit } from '../../../models/enum/status-auth-exit';
 
 @Component({
   selector: 'app-vehicle.entry',
@@ -63,12 +67,12 @@ import { BusyService } from '../../../components/loading/busy.service';
   imports: [
     CommonModule, FilterClientComponent, FilterDriverComponent, FormsModule, ReactiveFormsModule, DividerModule,
     StepperModule, ImageModule, ToastModule,
-    CheckboxModule, TagModule, DialogModule,
+    CheckboxModule, TagModule, DialogModule, DropdownModule,
     BadgeModule, TabViewModule, TableModule,
     IconFieldModule, InputIconModule, CardModule,
     InputNumberModule, ButtonModule, InputTextModule,
     InputTextareaModule, CalendarModule, RadioButtonModule,
-    InputGroupModule, InputMaskModule, MultiSelectModule],
+    InputGroupModule, InputMaskModule],
   providers: [MessageService],
   templateUrl: './vehicle.entry.component.html',
   styleUrl: './vehicle.entry.component.scss'
@@ -106,7 +110,7 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
   });
 
   //Vehicle
-  cores: IColor[] = []
+  colors: IColor[] = []
   photoVehicle1!: string;
   photoVehicle2!: string;
   photoVehicle3!: string;
@@ -117,24 +121,26 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
   private photoVehicle3Temp!: string;
   private photoVehicle4Temp!: string;
   vehicleModels$ = this.vehicleModelService.getAllEnabled();
-
+  yes = YesNot.yes;
+  not = YesNot.not;
   formVehicle = new FormGroup({
-    placa: new FormControl<string>(''),
-    frota: new FormControl<string | null>(null),
-    kmEntry: new FormControl<string | null>(null),
-    modelVehicle: new FormControl<IModelVehicle[]>([], Validators.required),
-    dateEntry: new FormControl<Date | null>(new Date(), Validators.required),
-    datePrevisionExit: new FormControl<Date | null>(null),
-    color: new FormControl<IColor[]>([], Validators.required),
-    quantityExtinguisher: new FormControl<number | null>(null),
-    quantityTrafficCone: new FormControl<number | null>(null),
-    quantityTire: new FormControl<number | null>(null),
-    quantityTireComplete: new FormControl<number | null>(null),
-    quantityToolBox: new FormControl<number | null>(null),
-    UserAttendant: new FormControl<User[]>([]),
-    vehicleNew: new FormControl<string>('not', Validators.required),
-    serviceOrder: new FormControl<string>('yes', Validators.required),
-    informationConcierge: new FormControl<string>(''),
+    vehiclePlate: new FormControl<string>(''),
+    vehicleFleet: new FormControl<string>(''),
+    vehicleKmEntry: new FormControl<number | null>(null),
+    modelVehicle: new FormControl<ModelVehicle | null>(null, Validators.required),
+    entryDate: new FormControl<Date | null>(new Date(), Validators.required),
+    exitDatePrevision: new FormControl<Date | null>(null),
+    vehicleColor: new FormControl<IColor | null>(null),
+    checkItem1: new FormControl<number | null>(null),
+    checkItem2: new FormControl<number | null>(null),
+    checkItem3: new FormControl<number | null>(null),
+    checkItem4: new FormControl<number | null>(null),
+    checkItem5: new FormControl<number | null>(null),
+
+    attendant: new FormControl<User | null>(null),
+    vehicleNew: new FormControl<YesNot>(YesNot.not),
+    vehicleServiceOrder: new FormControl<YesNot>(YesNot.yes),
+    entryInformation: new FormControl<string>(''),
   });
 
   attendants: User[] = [];
@@ -155,7 +161,7 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
     private fileService: FileService) { }
 
   ngOnInit(): void {
-    this.cores = [
+    this.colors = [
       { color: 'Branco' },
       { color: 'Preto' },
       { color: 'Azul' },
@@ -180,7 +186,7 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
         clientCompanyName: this.selectClientCompany().name,
         clientCompanyCnpj: this.selectClientCompany().cnpj,
         clientCompanyCpf: this.selectClientCompany().cpf,
-        clientCompanyRg: this.selectClientCompany().rg
+        clientCompanyRg: this.selectClientCompany().rg == "" ? null : this.selectClientCompany().rg
       });
       this.selectClientCompany.set(new ClientCompany());
     }
@@ -300,7 +306,6 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
     if (value.length > 12) {
       value = value.replace(/^(\d{2})\/(\d{2})\/(\d{4}) (\d{2})(\d)/, '$1/$2/$3 $4:$5');
     }
-
     event.target.value = value;
   }
 
@@ -378,30 +383,30 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
     this.photoVehicle4 = "";
   }
   public addRequirePlaca() {
-    this.formVehicle.controls['placa'].addValidators(Validators.required);
-    this.formVehicle.controls['placa'].updateValueAndValidity();
+    this.formVehicle.controls['vehiclePlate'].addValidators(Validators.required);
+    this.formVehicle.controls['vehiclePlate'].updateValueAndValidity();
   }
   public deleteRequirePlaca() {
-    this.formVehicle.controls['placa'].removeValidators(Validators.required);
-    this.formVehicle.controls['placa'].updateValueAndValidity();
+    this.formVehicle.controls['vehiclePlate'].removeValidators(Validators.required);
+    this.formVehicle.controls['vehiclePlate'].updateValueAndValidity();
     this.cleanPlaca();
   }
   private cleanPlaca() {
-    this.formVehicle.patchValue({ placa: '' });
+    this.formVehicle.patchValue({ vehiclePlate: '' });
   }
   private cleanFormVehicle() {
     this.formVehicle.reset();
 
     this.formVehicle.patchValue({
-      placa: '',
-      frota: null,
-      modelVehicle: [],
-      dateEntry: new Date(),
-      datePrevisionExit: null,
-      color: [],
-      vehicleNew: 'not',
-      serviceOrder: 'yes',
-      UserAttendant: []
+      vehiclePlate: '',
+      vehicleFleet: null,
+      modelVehicle: null,
+      entryDate: new Date(),
+      exitDatePrevision: null,
+      vehicleColor: null,
+      vehicleNew: YesNot.not,
+      vehicleServiceOrder: YesNot.yes,
+      attendant: null
     });
     this.photoVehicle1 = '';
     this.photoVehicle2 = '';
@@ -415,72 +420,62 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
     this.dialogVehicleVisible = true;
   }
   //Valid
-  private validVehicleEntry(): boolean {
-
-    const { value, valid } = this.formVehicle;
-
+  /*  private validVehicleEntry(): boolean {
+ 
+     const { value, valid } = this.formVehicle;
+ 
     if ((value.placa == "" && value.vehicleNew == "not")) {
-      this.messageService.add({ severity: 'error', summary: 'Placa', detail: "Não informada", icon: 'pi pi-times' });
-      return false;
-    }
-    if ((value.placa != "" && value.vehicleNew == "not") && this.listVehicleEntry.length > 0) {
-      for (let item of this.listVehicleEntry) {
-        if (item.placa == value.placa) {
-          this.messageService.add({ severity: 'error', summary: 'Placa', detail: "Já adicionada", icon: 'pi pi-times' });
-          return false;
-        }
+        this.messageService.add({ severity: 'error', summary: 'Placa', detail: "Não informada", icon: 'pi pi-times' });
+        return false;
       }
-    }
-    if (value.modelVehicle.length == 0) {
-      this.messageService.add({ severity: 'error', summary: 'Modelo', detail: "Não selecionado", icon: 'pi pi-times' });
-      return false;
-    }
-    if (value.dateEntry == null) {
-      this.messageService.add({ severity: 'error', summary: 'Data Entrada', detail: "Não informada", icon: 'pi pi-times' });
-      return false;
-    }
-    if (value.dateEntry > new Date()) {
-      this.messageService.add({ severity: 'error', summary: 'Data Entrada', detail: "Maior que data atual", icon: 'pi pi-times' });
-      return false;
-    }
-    if (value.datePrevisionExit != null && value.datePrevisionExit < new Date()) {
-      this.messageService.add({ severity: 'error', summary: 'Data Previsão Saída', detail: "Menor que data atual", icon: 'pi pi-times' });
-      return false;
-    }
-    if (value.color.length == 0) {
-      this.messageService.add({ severity: 'error', summary: 'Cor', detail: "Não seleciona", icon: 'pi pi-times' });
-      return false;
-    }
+        if ((value.placa != "" && value.vehicleNew == "not") && this.listVehicleEntry.length > 0) {
+         for (let item of this.listVehicleEntry) {
+           if (item.placa == value.placa) {
+             this.messageService.add({ severity: 'error', summary: 'Placa', detail: "Já adicionada", icon: 'pi pi-times' });
+             return false;
+           }
+         }
+       } 
+     if (value.modelVehicle.length == 0) {
+       this.messageService.add({ severity: 'error', summary: 'Modelo', detail: "Não selecionado", icon: 'pi pi-times' });
+       return false;
+     }
+     if (value.dateEntry == null) {
+        this.messageService.add({ severity: 'error', summary: 'Data Entrada', detail: "Não informada", icon: 'pi pi-times' });
+        return false;
+      }
+      if (value.dateEntry > new Date()) {
+        this.messageService.add({ severity: 'error', summary: 'Data Entrada', detail: "Maior que data atual", icon: 'pi pi-times' });
+        return false;
+      }
+      if (value.datePrevisionExit != null && value.datePrevisionExit < new Date()) {
+        this.messageService.add({ severity: 'error', summary: 'Data Previsão Saída', detail: "Menor que data atual", icon: 'pi pi-times' });
+        return false;
+      } 
+     if (value.color.length == 0) {
+       this.messageService.add({ severity: 'error', summary: 'Cor', detail: "Não seleciona", icon: 'pi pi-times' });
+       return false;
+     } 
+ 
+     if (valid) {
+       return true;
+     } else {
+       return false;
+     }
+ 
+   } */
 
-    if (valid) {
-      return true;
-    } else {
-      return false;
-    }
 
-  }
-  private async existsPlaca(): Promise<HttpResponse<MessageResponse>> {
-
-    try {
-      const existsPlaca: ExistsPlaca = {
-        companyId: this.storageService.companyId,
-        resaleId: this.storageService.resaleId,
-        placa: this.formVehicle.value.placa
-      };
-
-      return await lastValueFrom(this.vehicleService.existsPlaca(existsPlaca));
-    } catch (error) {
-      return error;
-    }
-
-  }
-  //Add or Delete Vehicle entry
+  //adicionar o veículo a lista de entrada
   public async addVehicleEntry() {
-    if (this.validVehicleEntry()) {
-      if (this.formVehicle.value.vehicleNew == "not") {
-        const resultPlaca = await this.existsPlaca();
-        if (resultPlaca.body.message == "yes") {
-          this.messageService.add({ severity: 'error', summary: 'Veículo ' + this.upperCasePipe.transform(this.formVehicle.value.placa), detail: "Já se encontra na empresa", icon: 'pi pi-truck', life: 10000 });
+    const { valid } = this.formVehicle;
+    if (valid) {
+      if (this.formVehicle.get('vehicleNew').value == YesNot.not) {
+        //verifica se o veículo ja se encontra na empresa
+        const plate = this.formVehicle.get('vehiclePlate').value;
+        const result = await this.filterPlate(plate);
+        if (result.status == 200 && result.body.status == SuccessError.succes) {
+          this.messageService.add({ severity: 'error', summary: 'Veículo ' + this.upperCasePipe.transform(plate), detail: "Já se encontra na empresa", icon: 'pi pi-truck', life: 10000 });
         } else {
           this.loadVehicleEntry();
         }
@@ -488,6 +483,8 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
         this.loadVehicleEntry();
       }
     }
+
+
   }
   public deleteVehicleEntry(index: number) {
 
@@ -532,50 +529,53 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
     this.vehicleEntry = new VehicleEntry();
     this.vehicleEntry.companyId = this.storageService.companyId;
     this.vehicleEntry.resaleId = this.storageService.resaleId;
-    this.vehicleEntry.idUserEntry = this.storageService.id;
-    this.vehicleEntry.nameUserEntry = this.storageService.name;
 
-    this.vehicleEntry.entryPhoto1 = this.photoVehicle1;
-    this.vehicleEntry.entryPhoto2 = this.photoVehicle2;
-    this.vehicleEntry.entryPhoto3 = this.photoVehicle3;
-    this.vehicleEntry.entryPhoto4 = this.photoVehicle4;
+    /* this.vehicleEntry.stepEntry = StatusStepVehicleEntry.ATTENDANT;
+    this.vehicleEntry.status = StatusVehicle.ENTERED;
+    this.vehicleEntry.authExitStatus = StatusAuthExit.NOT; */
+
+    this.vehicleEntry.entryUserId = this.storageService.id;
+    this.vehicleEntry.entryUserName = this.storageService.name;
+    this.vehicleEntry.entryDate = this.formatDateTime(vehicleValue.entryDate)
+    this.vehicleEntry.exitDatePrevision = vehicleValue.exitDatePrevision == null ? "" : this.formatDateTime(vehicleValue.exitDatePrevision);
+    this.vehicleEntry.entryInformation = vehicleValue?.entryInformation ?? "";
+
+    /* this.vehicleEntry.entryPhoto1Url = this.photoVehicle1;
+    this.vehicleEntry.entryPhoto2Url = this.photoVehicle2;
+    this.vehicleEntry.entryPhoto3Url = this.photoVehicle3;
+    this.vehicleEntry.entryPhoto4Url = this.photoVehicle4; */
 
     if (this.formClientCompany.get('clientCompanyNot').value.length == 0) {
       this.vehicleEntry.clientCompanyId = this.clientCompany.id;
       this.vehicleEntry.clientCompanyName = this.clientCompany.name;
-      this.vehicleEntry.clientCompanyCnpj = this.clientCompany.cnpj;
-      this.vehicleEntry.clientCompanyCpf = this.clientCompany.cpf;
-      this.vehicleEntry.clientCompanyRg = this.clientCompany.rg;
     } else {
-      this.vehicleEntry.clientCompanyId = 0;
+      this.vehicleEntry.clientCompanyId = null;
     }
 
     this.vehicleEntry.driverEntryId = this.driver.id;
     this.vehicleEntry.driverEntryName = this.driver.name;
-    this.vehicleEntry.driverEntryCpf = this.driver.cpf;
-    this.vehicleEntry.driverEntryRg = this.driver.rg;
 
-    this.vehicleEntry.placa = vehicleValue?.placa ?? "";
-    this.vehicleEntry.placasJunto = "";
-    this.vehicleEntry.frota = vehicleValue?.frota ?? "";
-    this.vehicleEntry.modelId = vehicleValue.modelVehicle.at(0).id;
-    this.vehicleEntry.modelDescription = vehicleValue.modelVehicle.at(0).description;
-    this.vehicleEntry.dateEntry = this.formatDateTime(vehicleValue.dateEntry);
-    this.vehicleEntry.datePrevisionExit = vehicleValue.datePrevisionExit == null ? "" : this.formatDateTime(vehicleValue.datePrevisionExit);
-    this.vehicleEntry.color = vehicleValue.color.at(0).color;
-    this.vehicleEntry.kmEntry = vehicleValue?.kmEntry ?? "";
+    this.vehicleEntry.attendantUserId = vehicleValue.attendant?.id ?? null;
+    this.vehicleEntry.attendantUserName = vehicleValue.attendant?.name ?? "";
+
+    this.vehicleEntry.modelId = vehicleValue.modelVehicle.id;
+    this.vehicleEntry.modelDescription = vehicleValue.modelVehicle.description;
+
+    this.vehicleEntry.vehiclePlate = vehicleValue?.vehiclePlate ?? "";
+    this.vehicleEntry.vehicleFleet = vehicleValue.vehicleFleet != null ? vehicleValue.vehicleFleet : "";
+    this.vehicleEntry.vehicleNew = vehicleValue.vehicleNew;
+    this.vehicleEntry.vehicleServiceOrder = vehicleValue.vehicleServiceOrder;
+    this.vehicleEntry.vehicleColor = vehicleValue.vehicleColor?.color ?? "";
+    this.vehicleEntry.vehicleKmEntry = vehicleValue.vehicleKmEntry != null ? vehicleValue.vehicleKmEntry.toString() : "";
+
+    /* 
     this.vehicleEntry.quantityTrafficCone = vehicleValue?.quantityTrafficCone ?? 0;
     this.vehicleEntry.quantityExtinguisher = vehicleValue?.quantityExtinguisher ?? 0;
     this.vehicleEntry.quantityTire = vehicleValue?.quantityTire ?? 0;
     this.vehicleEntry.quantityTireComplete = vehicleValue?.quantityTireComplete ?? 0;
     this.vehicleEntry.quantityToolBox = vehicleValue?.quantityToolBox ?? 0;
+    */
 
-    this.vehicleEntry.idUserAttendant = vehicleValue.UserAttendant.at(0)?.id ?? 0;
-    this.vehicleEntry.nameUserAttendant = vehicleValue.UserAttendant.at(0)?.name ?? "";
-
-    this.vehicleEntry.vehicleNew = vehicleValue?.vehicleNew ?? "";
-    this.vehicleEntry.serviceOrder = vehicleValue?.serviceOrder ?? "";
-    this.vehicleEntry.informationConcierge = vehicleValue?.informationConcierge ?? "";
     //Add list of vehicle
     this.listVehicleEntry.push(this.vehicleEntry);
     this.messageService.add({ severity: 'success', summary: 'Veículo adicionado', detail: this.vehicleEntry.modelDescription, icon: 'pi pi-car' });
@@ -590,24 +590,29 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
   }
   firstSecondaryName(name: string): string {
     var nameArr = name.split(' ');
-    name = nameArr[0] + " " + nameArr[1];
+    if (nameArr.length == 1) {
+      name = nameArr[0];
+    }
+    if (nameArr.length >= 2) {
+      name = nameArr[0] + " " + nameArr[1];
+    }
     return name;
   }
-  public async saveVehicleEntry() {
+  public async save() {
     this.busyService.busy();
     //Save vehicles
     for (let index = 0; index < this.listVehicleEntry.length; index++) {
       const vehicle = this.listVehicleEntry[index];
       //Temp
-      this.photoVehicle1Temp = vehicle?.entryPhoto1 ?? null;
-      this.photoVehicle2Temp = vehicle?.entryPhoto2 ?? null;
-      this.photoVehicle3Temp = vehicle?.entryPhoto3 ?? null;
-      this.photoVehicle4Temp = vehicle?.entryPhoto4 ?? null;
-
-      vehicle.entryPhoto1 = "";
-      vehicle.entryPhoto2 = "";
-      vehicle.entryPhoto3 = "";
-      vehicle.entryPhoto4 = "";
+      /*  this.photoVehicle1Temp = vehicle?.entryPhoto1 ?? null;
+       this.photoVehicle2Temp = vehicle?.entryPhoto2 ?? null;
+       this.photoVehicle3Temp = vehicle?.entryPhoto3 ?? null;
+       this.photoVehicle4Temp = vehicle?.entryPhoto4 ?? null;
+ 
+       vehicle.entryPhoto1 = "";
+       vehicle.entryPhoto2 = "";
+       vehicle.entryPhoto3 = "";
+       vehicle.entryPhoto4 = ""; */
 
       const result = await this.saveVehicle(vehicle);
       if (result.status == 201) {
@@ -623,7 +628,7 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
 
         if (vehicle.vehicleNew == 'not') {
           const uppercase = new UpperCasePipe();
-          this.messageService.add({ severity: 'success', summary: 'Veículo Salvo', detail: "Placa " + uppercase.transform(vehicle.placa), icon: 'pi pi-check' });
+          // this.messageService.add({ severity: 'success', summary: 'Veículo Salvo', detail: "Placa " + uppercase.transform(vehicle.placa), icon: 'pi pi-check' });
         }
         if (index == (this.listVehicleEntry.length - 1)) {
           this.messageService.add({ severity: 'success', summary: 'Veículos', detail: "Salvo com sucesso", icon: 'pi pi-check' });
@@ -648,7 +653,7 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
     const RG: string = "Invalid RG.";
 
     try {
-      return await lastValueFrom(this.vehicleService.entrySave$(vehicle));
+      return await lastValueFrom(this.vehicleService.entrySave(vehicle));
     } catch (error) {
 
       if (error.status == 401) {
@@ -697,6 +702,15 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
       return await lastValueFrom(this.fileService.uploadImage(data))
     } catch (error) {
       this.messageService.add({ severity: 'error', summary: 'Erro', detail: error.error.message, icon: 'pi pi-times' });
+      return error;
+    }
+  }
+
+  private async filterPlate(plate: string): Promise<HttpResponse<MessageResponse>> {
+    try {
+      return await lastValueFrom(this.vehicleService.filterPlate(plate));
+    } catch (error) {
+      //this.messageService.add({ severity: 'error', summary: 'Erro', detail: error.error.message, icon: 'pi pi-times' });
       return error;
     }
   }

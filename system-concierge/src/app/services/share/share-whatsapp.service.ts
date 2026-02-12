@@ -18,7 +18,7 @@ export class ShareWhatsAppService {
         const uppercase = new UpperCasePipe();
         const datePipe = new DatePipe('pt-BR');
         //Alterar o fuso horário para o horário local
-        vehicle.dateEntry = this.formatDateTime(new Date(vehicle.dateEntry));
+        /* vehicle.dateEntry = this.formatDateTime(new Date(vehicle.dateEntry));
         if (vehicle.dateExit)
             vehicle.dateExit = this.formatDateTime(new Date(vehicle.dateExit));
         if (vehicle.dateExitAuth1)
@@ -51,7 +51,7 @@ export class ShareWhatsAppService {
           Auto 1ª: ${vehicle.nameUserExitAuth1} ${vehicle.dateExitAuth1 == "" ? "" : datePipe.transform(vehicle.dateExitAuth1, "dd/MM/yyyy HH:mm")}
           Auto 2ª: ${vehicle.nameUserExitAuth2} ${vehicle.dateExitAuth2 == "" ? "" : datePipe.transform(vehicle.dateExitAuth2, "dd/MM/yyyy HH:mm")}
           `);
-        window.open(`https://wa.me/?text=${message}`, '_blank');
+        window.open(`https://wa.me/?text=${message}`, '_blank'); */
     }
 
     private formatDateTime(date: Date): string {

@@ -382,8 +382,8 @@
 
      exit_date_prevision datetime,
 
-     exit_user_id int not null,
-     exit_user_name varchar(100) not null,
+     exit_user_id int,
+     exit_user_name varchar(100),
      exit_date datetime,
      exit_photo1_url varchar(255),
      exit_photo2_url varchar(255),

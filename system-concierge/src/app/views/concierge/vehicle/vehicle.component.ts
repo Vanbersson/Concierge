@@ -93,7 +93,7 @@ export default class VeiculosComponent implements OnInit, OnDestroy {
     this.taskService.stopTask();
   }
   private listTaskVehicle() {
-    this.vehicleService.allPendingAuthorization$().subscribe({
+    this.vehicleService.allPendingAuthorization().subscribe({
       next: (data) => {
         for (let index = 0; index < data.length; index++) {
           data[index] = this.preList(data[index]);
@@ -107,7 +107,7 @@ export default class VeiculosComponent implements OnInit, OnDestroy {
   private preList(vehicle: VehicleEntry): VehicleEntry {
     //Format Date
     const datePipe = new DatePipe('pt-BR');
-    vehicle.dateEntry = datePipe.transform(this.formatDateTime(new Date(vehicle.dateEntry)), 'dd/MM/yyyy HH:mm');
+   /*  vehicle.dateEntry = datePipe.transform(this.formatDateTime(new Date(vehicle.dateEntry)), 'dd/MM/yyyy HH:mm');
     if (vehicle.vehicleNew == "yes") {
       vehicle.placa = "NOVO";
     }
@@ -142,12 +142,12 @@ export default class VeiculosComponent implements OnInit, OnDestroy {
       case 'NotApproved':
         vehicle.budgetStatus = 'Não Aprovado';
         break;
-    }
+    } */
     return vehicle;
   }
   public listVehicles() {
     this.busyService.busy();
-    this.vehicleService.allPendingAuthorization$().subscribe((data) => {
+    this.vehicleService.allPendingAuthorization().subscribe((data) => {
       for (let index = 0; index < data.length; index++) {
         data[index] = this.preList(data[index]);
       }
@@ -188,7 +188,7 @@ export default class VeiculosComponent implements OnInit, OnDestroy {
     }
   }
   public async authExit(vehicle: VehicleEntry) {
-    if (vehicle.statusAuthExit != this.authorized) {
+   /*  if (vehicle.statusAuthExit != this.authorized) {
       const result = await this.addAuthExit(vehicle);
       if (result.status == 200 && result.body.status == SuccessError.succes) {
         if (vehicle.statusAuthExit == this.notAuth) {
@@ -209,7 +209,7 @@ export default class VeiculosComponent implements OnInit, OnDestroy {
       }
     } else {
       this.messageService.add({ severity: 'info', summary: 'Veículo', detail: "Já liberado", icon: 'pi pi-info-circle' });
-    }
+    } */
   }
   formatDateTime(date: Date): string {
     const datePipe = new DatePipe('en-US');

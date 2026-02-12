@@ -304,6 +304,18 @@ export default class DriverComponent implements OnInit {
       this.driver = resultSave.body.data;
       this.formDriver.get('id').setValue(this.driver.id);
       this.isNewDriver = false;
+
+      /* //save photo
+      if (this.driverPhotoUrl != "" && this.driver.photoDriverUrl == "") {
+        this.driver.photoDriverUrl = await this.savePhoto(this.driverPhotoUrl, this.driver.id.toString());
+      }
+      if (this.driverPhotoDoc1Url != "" && this.driver.photoDoc1Url == "") {
+        this.driver.photoDoc1Url = await this.saveDoc1(this.driverPhotoDoc1Url, this.driver.id.toString());
+      }
+      if (this.driverPhotoDoc2Url != "" && this.driver.photoDoc2Url == "") {
+        this.driver.photoDoc2Url = await this.saveDoc2(this.driverPhotoDoc2Url, this.driver.id.toString());
+      } */
+
       //Lista motoristas
       this.listDrivers();
     } else if (resultSave.status == 201 && resultSave.body.status == SuccessError.error) {
