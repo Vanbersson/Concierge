@@ -22,31 +22,29 @@ public class UserRoleController {
     IUserRoleRepository repository;
 
     @PostMapping("/save")
-    public ResponseEntity<Object> saveRole(@RequestBody UserRoleDto data) {
+    public ResponseEntity<Object> save(@RequestBody UserRoleDto data) {
         UserRole role = new UserRole();
         BeanUtils.copyProperties(data, role);
-        role.setId(0);
-
+        role.setId(null);
         return ResponseEntity.status(HttpStatus.CREATED).body(repository.save(role));
     }
 
     @PostMapping("/update")
-    public ResponseEntity<Object> updateRole(@RequestBody UserRoleDto data) {
+    public ResponseEntity<Object> update(@RequestBody UserRoleDto data) {
         UserRole role = new UserRole();
         BeanUtils.copyProperties(data, role);
-
         return ResponseEntity.status(HttpStatus.OK).body(repository.save(role));
     }
 
     @GetMapping("/{companyId}/{resaleId}/all")
-    public ResponseEntity<List<UserRole>> allRole(@PathVariable(name = "companyId") Integer companyId,
+    public ResponseEntity<List<UserRole>> listAll(@PathVariable(name = "companyId") Integer companyId,
                                                   @PathVariable(name = "resaleId") Integer resaleId) {
         List<UserRole> roles = repository.listAll(companyId, resaleId);
         return ResponseEntity.ok(roles);
     }
 
     @GetMapping("/{companyId}/{resaleId}/all/enabled")
-    public ResponseEntity<List<UserRole>> allRoleEnabled(@PathVariable(name = "companyId") Integer companyId,
+    public ResponseEntity<List<UserRole>> listAllEnabled(@PathVariable(name = "companyId") Integer companyId,
                                                          @PathVariable(name = "resaleId") Integer resaleId) {
         List<UserRole> roles = repository.listAllEnabled(companyId, resaleId);
         return ResponseEntity.ok(roles);

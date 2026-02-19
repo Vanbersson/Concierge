@@ -3,6 +3,7 @@ import { CommonModule, DatePipe, UpperCasePipe } from '@angular/common';
 import { Validators, FormsModule, ReactiveFormsModule, FormGroup, FormControl } from '@angular/forms';
 import { lastValueFrom } from 'rxjs';
 import { HttpResponse } from '@angular/common/http';
+import { environment } from '../../../../environments/environment';
 
 //PrimeNg
 import { StepperModule } from 'primeng/stepper';
@@ -42,7 +43,7 @@ import { User } from '../../../models/user/user';
 import { ClientCompany } from '../../../models/clientcompany/client-company';
 import { VehicleEntry } from '../../../models/vehicle/vehicle-entry';
 import { IColor } from '../../../interfaces/icolor';
-import { IMAGE_MAX_SIZE_LABEL, MESSAGE_RESPONSE_NOT_COLOR, MESSAGE_RESPONSE_NOT_MODEL, MESSAGE_RESPONSE_NOT_PLACA, MESSAGE_RESPONSE_PLACAEXISTS } from '../../../util/constants';
+import { IMAGE_MAX_SIZE_LABEL } from '../../../util/constants';
 //Components
 import { MessageResponse } from '../../../models/message/message-response';
 //Enum
@@ -50,16 +51,13 @@ import { Driver } from '../../../models/driver/driver';
 //Filters
 import { FilterClientComponent } from '../../../components/filter.client/filter.client.component';
 import { FilterDriverComponent } from '../../../components/filter.driver/filter.driver.component';
-import { FileService } from '../../../services/file/file.service';
 import { PhotoResult } from '../../../interfaces/photo-result';
 import { PhotoResultStatus } from '../../../models/enum/photo-result-status';
 import { SuccessError } from '../../../models/enum/success-error';
 import { BusyService } from '../../../components/loading/busy.service';
 import { ModelVehicle } from '../../../models/vehicle-model/model-vehicle';
 import { YesNot } from '../../../models/enum/yes-not';
-import { StatusVehicle } from '../../../models/enum/status-vehicle';
-import { StatusStepVehicleEntry } from '../../../models/enum/status-step-vehicle-entry';
-import { StatusAuthExit } from '../../../models/enum/status-auth-exit';
+
 
 @Component({
   selector: 'app-vehicle.entry',
@@ -80,6 +78,7 @@ import { StatusAuthExit } from '../../../models/enum/status-auth-exit';
 export default class VehicleEntryComponent implements OnInit, DoCheck {
 
   private vehicleEntry: VehicleEntry;
+  private vehiclePlateFisrt!: number;
 
   activeStepper: number | undefined = 0;
   private upperCasePipe = new UpperCasePipe();
@@ -115,11 +114,6 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
   photoVehicle2!: string;
   photoVehicle3!: string;
   photoVehicle4!: string;
-
-  private photoVehicle1Temp!: string;
-  private photoVehicle2Temp!: string;
-  private photoVehicle3Temp!: string;
-  private photoVehicle4Temp!: string;
   vehicleModels$ = this.vehicleModelService.getAllEnabled();
   yes = YesNot.yes;
   not = YesNot.not;
@@ -142,9 +136,7 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
     vehicleServiceOrder: new FormControl<YesNot>(YesNot.yes),
     entryInformation: new FormControl<string>(''),
   });
-
   attendants: User[] = [];
-
   formCompanyIsEditable = false;
 
   //Dialog Vehicle entry
@@ -157,8 +149,7 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
     private vehicleService: VehicleService,
     private userService: UserService,
     private messageService: MessageService,
-    private photoService: PhotoService,
-    private fileService: FileService) { }
+    private photoService: PhotoService) { }
 
   ngOnInit(): void {
     this.colors = [
@@ -206,25 +197,7 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
     }
   }
 
-  private async getAttendants() {
-    const result = await this.filterUserRoleId();
-    if (result.status == 200 && result.body.status == SuccessError.succes) {
-      //this.messageService.add({ severity: 'success', summary: result.body.header, detail: result.body.message, icon: 'pi pi-check' });
-      this.attendants = result.body.data;
-    }
-    if (result.status == 200 && result.body.status == SuccessError.error) {
-      this.messageService.add({ severity: 'info', summary: result.body.header, detail: result.body.message, icon: 'pi pi-info-circle' });
-    }
-  }
 
-  private async filterUserRoleId(): Promise<HttpResponse<MessageResponse>> {
-    try {
-      return await lastValueFrom(this.userService.filterRoleId(2));
-    } catch (error) {
-      this.messageService.add({ severity: 'error', summary: 'Erro', detail: error.error.message, icon: 'pi pi-times' });
-      return error;
-    }
-  }
   //ClientCompany
   public validationClientCompany() {
     if (this.formClientCompany.get('clientCompanyNot').value.length == 0) {
@@ -308,12 +281,24 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
     }
     event.target.value = value;
   }
+  private async getAttendants() {
+    const result = await this.filterUserRoleId();
+    if (result.status == 200 && result.body.status == SuccessError.succes) {
+      //this.messageService.add({ severity: 'success', summary: result.body.header, detail: result.body.message, icon: 'pi pi-check' });
+      this.attendants = result.body.data;
+    }
+    if (result.status == 200 && result.body.status == SuccessError.error) {
+      this.messageService.add({ severity: 'info', summary: result.body.header, detail: result.body.message, icon: 'pi pi-info-circle' });
+    }
+  }
 
   public stepperVehicle() {
     if (this.clientCompany != null) {
       if (this.driver != null) {
         //Aba veículo
         this.activeStepper = 2;
+        //Consulta os Attendants
+        this.getAttendants();
       } else {
         this.messageService.add({ severity: 'info', summary: 'Atenção', detail: 'Motorista não informado', icon: 'pi pi-info-circle' });
       }
@@ -326,6 +311,7 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
     const photo: PhotoResult = await this.photoService.takePicture();
     if (photo.status == PhotoResultStatus.SUCCESS) {
       this.photoVehicle1 = photo.base64;
+      this.vehicleEntry.entryPhoto1Url = this.photoVehicle1;
     }
     if (photo.status == PhotoResultStatus.LIMIT) {
       this.messageService.add({ severity: 'info', summary: 'Imagem', detail: IMAGE_MAX_SIZE_LABEL, icon: 'pi pi-info-circle', life: 3000 });
@@ -338,6 +324,7 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
     const photo = await this.photoService.takePicture();
     if (photo.status == PhotoResultStatus.SUCCESS) {
       this.photoVehicle2 = photo.base64;
+      this.vehicleEntry.entryPhoto2Url = this.photoVehicle2;
     }
     if (photo.status == PhotoResultStatus.LIMIT) {
       this.messageService.add({ severity: 'info', summary: 'Imagem', detail: IMAGE_MAX_SIZE_LABEL, icon: 'pi pi-info-circle', life: 3000 });
@@ -350,6 +337,7 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
     const photo = await this.photoService.takePicture();
     if (photo.status == PhotoResultStatus.SUCCESS) {
       this.photoVehicle3 = photo.base64;
+      this.vehicleEntry.entryPhoto3Url = this.photoVehicle3;
     }
     if (photo.status == PhotoResultStatus.LIMIT) {
       this.messageService.add({ severity: 'info', summary: 'Imagem', detail: IMAGE_MAX_SIZE_LABEL, icon: 'pi pi-info-circle', life: 3000 });
@@ -362,6 +350,7 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
     const photo = await this.photoService.takePicture();
     if (photo.status == PhotoResultStatus.SUCCESS) {
       this.photoVehicle4 = photo.base64;
+      this.vehicleEntry.entryPhoto4Url = this.photoVehicle4;
     }
     if (photo.status == PhotoResultStatus.LIMIT) {
       this.messageService.add({ severity: 'info', summary: 'Imagem', detail: IMAGE_MAX_SIZE_LABEL, icon: 'pi pi-info-circle', life: 3000 });
@@ -372,15 +361,19 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
   }
   public deleteFileVehicle1() {
     this.photoVehicle1 = "";
+    this.vehicleEntry.entryPhoto1Url = "";
   }
   public deleteFileVehicle2() {
     this.photoVehicle2 = "";
+    this.vehicleEntry.entryPhoto2Url = "";
   }
   public deleteFileVehicle3() {
     this.photoVehicle3 = "";
+    this.vehicleEntry.entryPhoto3Url = "";
   }
   public deleteFileVehicle4() {
     this.photoVehicle4 = "";
+    this.vehicleEntry.entryPhoto4Url = "";
   }
   public addRequirePlaca() {
     this.formVehicle.controls['vehiclePlate'].addValidators(Validators.required);
@@ -392,13 +385,11 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
     this.cleanPlaca();
   }
   private cleanPlaca() {
-    this.formVehicle.patchValue({ vehiclePlate: '' });
+    this.formVehicle.get("vehiclePlate").setValue("");
   }
   private cleanFormVehicle() {
-    this.formVehicle.reset();
-
     this.formVehicle.patchValue({
-      vehiclePlate: '',
+      vehiclePlate: "",
       vehicleFleet: null,
       modelVehicle: null,
       entryDate: new Date(),
@@ -406,12 +397,13 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
       vehicleColor: null,
       vehicleNew: YesNot.not,
       vehicleServiceOrder: YesNot.yes,
-      attendant: null
+      attendant: null,
+      entryInformation: ""
     });
-    this.photoVehicle1 = '';
-    this.photoVehicle2 = '';
-    this.photoVehicle3 = '';
-    this.photoVehicle4 = '';
+    this.photoVehicle1 = "";
+    this.photoVehicle2 = "";
+    this.photoVehicle3 = "";
+    this.photoVehicle4 = "";
 
     this.addRequirePlaca();
   }
@@ -525,14 +517,9 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
   //save
   private loadVehicleEntry() {
     const vehicleValue = this.formVehicle.value;
-
     this.vehicleEntry = new VehicleEntry();
     this.vehicleEntry.companyId = this.storageService.companyId;
     this.vehicleEntry.resaleId = this.storageService.resaleId;
-
-    /* this.vehicleEntry.stepEntry = StatusStepVehicleEntry.ATTENDANT;
-    this.vehicleEntry.status = StatusVehicle.ENTERED;
-    this.vehicleEntry.authExitStatus = StatusAuthExit.NOT; */
 
     this.vehicleEntry.entryUserId = this.storageService.id;
     this.vehicleEntry.entryUserName = this.storageService.name;
@@ -540,16 +527,9 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
     this.vehicleEntry.exitDatePrevision = vehicleValue.exitDatePrevision == null ? "" : this.formatDateTime(vehicleValue.exitDatePrevision);
     this.vehicleEntry.entryInformation = vehicleValue?.entryInformation ?? "";
 
-    /* this.vehicleEntry.entryPhoto1Url = this.photoVehicle1;
-    this.vehicleEntry.entryPhoto2Url = this.photoVehicle2;
-    this.vehicleEntry.entryPhoto3Url = this.photoVehicle3;
-    this.vehicleEntry.entryPhoto4Url = this.photoVehicle4; */
-
     if (this.formClientCompany.get('clientCompanyNot').value.length == 0) {
       this.vehicleEntry.clientCompanyId = this.clientCompany.id;
       this.vehicleEntry.clientCompanyName = this.clientCompany.name;
-    } else {
-      this.vehicleEntry.clientCompanyId = null;
     }
 
     this.vehicleEntry.driverEntryId = this.driver.id;
@@ -565,7 +545,7 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
     this.vehicleEntry.vehicleFleet = vehicleValue.vehicleFleet != null ? vehicleValue.vehicleFleet : "";
     this.vehicleEntry.vehicleNew = vehicleValue.vehicleNew;
     this.vehicleEntry.vehicleServiceOrder = vehicleValue.vehicleServiceOrder;
-    this.vehicleEntry.vehicleColor = vehicleValue.vehicleColor?.color ?? "";
+    this.vehicleEntry.vehicleColor = vehicleValue.vehicleColor?.color ?? null;
     this.vehicleEntry.vehicleKmEntry = vehicleValue.vehicleKmEntry != null ? vehicleValue.vehicleKmEntry.toString() : "";
 
     /* 
@@ -603,36 +583,57 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
     //Save vehicles
     for (let index = 0; index < this.listVehicleEntry.length; index++) {
       const vehicle = this.listVehicleEntry[index];
-      //Temp
-      /*  this.photoVehicle1Temp = vehicle?.entryPhoto1 ?? null;
-       this.photoVehicle2Temp = vehicle?.entryPhoto2 ?? null;
-       this.photoVehicle3Temp = vehicle?.entryPhoto3 ?? null;
-       this.photoVehicle4Temp = vehicle?.entryPhoto4 ?? null;
- 
-       vehicle.entryPhoto1 = "";
-       vehicle.entryPhoto2 = "";
-       vehicle.entryPhoto3 = "";
-       vehicle.entryPhoto4 = ""; */
+
+      //veículos que entrou juntos
+      if (index != 0) {
+        vehicle.vehiclePlateTogether = this.vehiclePlateFisrt;
+      }
+      const img1Temp = vehicle.entryPhoto1Url;
+      const img2Temp = vehicle.entryPhoto2Url;
+      const img3Temp = vehicle.entryPhoto3Url;
+      const img4Temp = vehicle.entryPhoto4Url;
+
+      vehicle.entryPhoto1Url = "";
+      vehicle.entryPhoto2Url = "";
+      vehicle.entryPhoto3Url = "";
+      vehicle.entryPhoto4Url = "";
 
       const result = await this.saveVehicle(vehicle);
-      if (result.status == 201) {
-        //Image save
-        const img1 = await this.saveImg(result.body.id, this.photoVehicle1Temp, 1);
-        this.photoVehicle1Temp = null;
-        const img2 = await this.saveImg(result.body.id, this.photoVehicle2Temp, 2);
-        this.photoVehicle2Temp = null;
-        const img3 = await this.saveImg(result.body.id, this.photoVehicle3Temp, 3);
-        this.photoVehicle3Temp = null;
-        const img4 = await this.saveImg(result.body.id, this.photoVehicle4Temp, 4);
-        this.photoVehicle4Temp = null;
 
-        if (vehicle.vehicleNew == 'not') {
-          const uppercase = new UpperCasePipe();
-          // this.messageService.add({ severity: 'success', summary: 'Veículo Salvo', detail: "Placa " + uppercase.transform(vehicle.placa), icon: 'pi pi-check' });
+      if (result.status == 201 && result.body.status == SuccessError.succes) {
+        vehicle.id = result.body.data.id;
+        //primeiro veículo
+        if (index == 0) {
+          this.vehiclePlateFisrt = vehicle.id;
         }
-        if (index == (this.listVehicleEntry.length - 1)) {
-          this.messageService.add({ severity: 'success', summary: 'Veículos', detail: "Salvo com sucesso", icon: 'pi pi-check' });
 
+        let isUpdatePhoto: boolean = false;
+        //Image save
+        const img1 = await this.savePhoto(vehicle, img1Temp, 1);
+        if (img1) {
+          vehicle.entryPhoto1Url = img1;
+          isUpdatePhoto = true;
+        }
+        const img2 = await this.savePhoto(vehicle, img2Temp, 2);
+        if (img2) {
+          vehicle.entryPhoto2Url = img2;
+          isUpdatePhoto = true;
+        }
+        const img3 = await this.savePhoto(vehicle, img3Temp, 3);
+        if (img3) {
+          vehicle.entryPhoto3Url = img3;
+          isUpdatePhoto = true;
+        }
+        const img4 = await this.savePhoto(vehicle, img4Temp, 4);
+        if (img4) {
+          vehicle.entryPhoto4Url = img4;
+          isUpdatePhoto = true;
+        }
+        if (isUpdatePhoto) {
+          const restulUpdate = await this.updateVehicle(vehicle);
+        }
+        this.messageService.add({ severity: 'success', summary: vehicle.modelDescription, detail: "Salvo com sucesso", icon: 'pi pi-check' });
+        if (index == (this.listVehicleEntry.length - 1)) {
           this.dialogVehicleVisible = false;
           this.listVehicleEntry = [];
 
@@ -643,51 +644,71 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
           this.stepperClientCompany();
           this.addRequirePlaca();
         }
+      } else if (result.status == 201 && result.body.status == SuccessError.error) {
+        this.messageService.add({ severity: 'info', summary: result.body.header, detail: result.body.message, icon: 'pi pi-info-circle' });
       }
 
     }
     this.busyService.idle();
   }
-  private async saveVehicle(vehicle: VehicleEntry): Promise<HttpResponse<VehicleEntry>> {
 
-    const RG: string = "Invalid RG.";
+  private async savePhoto(ve: VehicleEntry, img: string, order: number): Promise<string> {
 
-    try {
-      return await lastValueFrom(this.vehicleService.entrySave(vehicle));
-    } catch (error) {
-
-      if (error.status == 401) {
-        if (error.error.message == MESSAGE_RESPONSE_NOT_PLACA) {
-          this.messageService.add({ severity: 'error', summary: 'Erro', detail: "Placa não informada", icon: 'pi pi-times' });
-        } else if (error.error.message == MESSAGE_RESPONSE_PLACAEXISTS) {
-          this.messageService.add({ severity: 'error', summary: 'Erro', detail: "Já se encontra na empresa", icon: 'pi pi-times' });
-        } else if (error.error.message == MESSAGE_RESPONSE_NOT_MODEL) {
-          this.messageService.add({ severity: 'error', summary: 'Erro', detail: "Modelo não informado", icon: 'pi pi-times' });
-        } else if (error.error.message == MESSAGE_RESPONSE_NOT_COLOR) {
-          this.messageService.add({ severity: 'error', summary: 'Erro', detail: "Cor não informada", icon: 'pi pi-times' });
-        } else if (error.error.message == RG) {
-          this.messageService.add({ severity: 'error', summary: 'Erro', detail: "Rg inválido", icon: 'pi pi-times' });
-        }
-      }
-      return error;
+    if (img == "") {
+      return "";
     }
+    try {
+      let path =
+        `${this.storageService.companyId}/` +
+        `${this.storageService.resaleId}/concierge/vehicle/` +
+        `${ve.id}/entry/`;
 
-  }
-  private async saveImg(id: number, img: string, order: number): Promise<string> {
-    if (img != null) {
-      // Base64 -> File  
-      const imageFile = this.base64ToFile(img);
+      const { base64, mime } = this.cleanBase64(img);
+      const file = this.base64ToFile(base64, mime);
+
       const formData = new FormData();
-      formData.append('file', imageFile, 'image' + order + '.jpg');
-      formData.append('local', this.storageService.companyId + '/' + this.storageService.resaleId + '/concierge/' + id + '/driver/entry/');
+      formData.append('file', file);
+
+      switch (order) {
+        case 1:
+          path += "image1.jpg";
+          formData.append('local', path);
+          break;
+        case 2:
+          path += "image2.jpg";
+          formData.append('local', path);
+          break;
+        case 3:
+          path += "image3.jpg";
+          formData.append('local', path);
+          break;
+        case 4:
+          path += "image4.jpg";
+          formData.append('local', path);
+          break;
+      }
       const resultSave = await this.saveImage(formData);
       if (resultSave.status == 200 && resultSave.body.status == SuccessError.succes) {
-        // this.messageService.add({ severity: 'success', summary: resultSave.body.header, detail: resultSave.body.message, icon: 'pi pi-check' });
+        return `${environment.apiuUrl}${resultSave.body.data["url"]}`;
       }
+    } catch (error) {
+      return "";
     }
-    return SuccessError.succes;
+    return "";
+
   }
-  private base64ToFile(base64: string): File {
+
+  private cleanBase64(base64: string): { base64: string; mime: string } {
+    if (!base64.includes(',')) {
+      return { base64, mime: 'image/jpeg' };
+    }
+
+    const [header, data] = base64.split(',');
+    const mime = header.match(/data:(.*);base64/)?.[1] || 'image/jpeg';
+
+    return { base64: data, mime };
+  }
+  private base64ToFile(base64: string, mime: string): File {
     const byteString = atob(base64);
     const ab = new ArrayBuffer(byteString.length);
     const ia = new Uint8Array(ab);
@@ -695,17 +716,34 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
     for (let i = 0; i < byteString.length; i++) {
       ia[i] = byteString.charCodeAt(i);
     }
-    return new File([ia], 'image', { type: 'image/jpeg' });
+
+    return new File([ia], 'image.jpg', { type: mime });
   }
-  private async saveImage(data: FormData): Promise<HttpResponse<MessageResponse>> {
+
+  private async saveVehicle(vehicle: VehicleEntry): Promise<HttpResponse<MessageResponse>> {
     try {
-      return await lastValueFrom(this.fileService.uploadImage(data))
+      return await lastValueFrom(this.vehicleService.entrySave(vehicle));
     } catch (error) {
       this.messageService.add({ severity: 'error', summary: 'Erro', detail: error.error.message, icon: 'pi pi-times' });
       return error;
     }
   }
-
+  private async updateVehicle(vehicle: VehicleEntry): Promise<HttpResponse<MessageResponse>> {
+    try {
+      return await lastValueFrom(this.vehicleService.entryUpdate(vehicle));
+    } catch (error) {
+      this.messageService.add({ severity: 'error', summary: 'Erro', detail: error.error.message, icon: 'pi pi-times' });
+      return error;
+    }
+  }
+  private async saveImage(data: FormData): Promise<HttpResponse<MessageResponse>> {
+    try {
+      return await lastValueFrom(this.vehicleService.saveImage(data))
+    } catch (error) {
+      this.messageService.add({ severity: 'error', summary: 'Erro', detail: error.error.message, icon: 'pi pi-times' });
+      return error;
+    }
+  }
   private async filterPlate(plate: string): Promise<HttpResponse<MessageResponse>> {
     try {
       return await lastValueFrom(this.vehicleService.filterPlate(plate));
@@ -714,6 +752,13 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
       return error;
     }
   }
-
+  private async filterUserRoleId(): Promise<HttpResponse<MessageResponse>> {
+    try {
+      return await lastValueFrom(this.userService.filterRoleId(2));
+    } catch (error) {
+      this.messageService.add({ severity: 'error', summary: 'Erro', detail: error.error.message, icon: 'pi pi-times' });
+      return error;
+    }
+  }
 
 }

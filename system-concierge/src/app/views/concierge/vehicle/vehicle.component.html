@@ -2,7 +2,7 @@
     <p-toast />
     <div class="layout-card-title">
         <span>Veículos</span>
-        <p-button icon="pi pi-sync" [text]="true" label="Recarregar" (onClick)="listVehicles()" />
+        <p-button icon="pi pi-sync" [text]="true" label="Recarregar" (onClick)="init()" />
     </div>
     <!-- Desktop -->
     <div class="mobile-visible-none">
@@ -14,16 +14,14 @@
                 <tr>
                     <th>Sel.</th>
                     <th pSortableColumn="id">Código<p-sortIcon field="id"></p-sortIcon></th>
-                    <th pSortableColumn="placa">Placa<p-sortIcon field="placa"></p-sortIcon></th>
+                    <th pSortableColumn="vehiclePlate">Placa<p-sortIcon field="vehiclePlate"></p-sortIcon></th>
                     <th pSortableColumn="modelDescription" >Modelo<p-sortIcon field="modelDescription"></p-sortIcon></th>
-                    <th pSortableColumn="frota">Frota<p-sortIcon field="frota"></p-sortIcon></th>
+                    <th pSortableColumn="vehicleFleet">Frota<p-sortIcon field="vehicleFleet"></p-sortIcon></th>
                     <th pSortableColumn="numServiceOrder">Nro. O.S.<p-sortIcon field="numServiceOrder"></p-sortIcon></th>
-                    <th pSortableColumn="dateEntry" >Entrada<p-sortIcon field="dateEntry"></p-sortIcon></th>
+                    <th pSortableColumn="entryDate" >Entrada<p-sortIcon field="entryDate"></p-sortIcon></th>
                     <th pSortableColumn="clientCompanyName">Empresa<p-sortIcon field="clientCompanyName"></p-sortIcon></th>
-                    <th pSortableColumn="nameUserAttendant">Consultor<p-sortIcon field="nameUserAttendant"></p-sortIcon></th>
-                    <th pSortableColumn="budgetStatus">Orçamento<p-sortIcon field="budgetStatus"></p-sortIcon></th>
+                    <th pSortableColumn="attendantUserName">Consultor<p-sortIcon field="attendantUserName"></p-sortIcon></th>
                     <th pSortableColumn="statusAuthExit">Liberação<p-sortIcon field="statusAuthExit"></p-sortIcon></th>
-                    <th pSortableColumn="days" style="width: 5%">Dias<p-sortIcon field="days"></p-sortIcon></th>
                     <th></th>
                     <th></th>
                 </tr>
@@ -34,25 +32,25 @@
                         <p-columnFilter type="text" field="id"></p-columnFilter>
                     </th>
                     <th>
-                        <p-columnFilter type="text" field="placa"></p-columnFilter>
+                        <p-columnFilter type="text" field="vehiclePlate"></p-columnFilter>
                     </th>
                     <th>
                         <p-columnFilter type="text" field="modelDescription"></p-columnFilter>
                     </th>
                     <th>
-                        <p-columnFilter type="text" field="frota"></p-columnFilter>
+                        <p-columnFilter type="text" field="vehicleFleet"></p-columnFilter>
                     </th>
                     <th>
                         <p-columnFilter type="text" field="numServiceOrder"></p-columnFilter>
                     </th>
                     <th>
-                        <p-columnFilter type="text" field="dateEntry"></p-columnFilter>
+                        <p-columnFilter type="text" field="entryDate"></p-columnFilter>
                     </th>
                     <th>
                         <p-columnFilter type="text" field="clientCompanyName"></p-columnFilter>
                     </th>
                     <th>
-                        <p-columnFilter type="text" field="nameUserAttendant"></p-columnFilter>
+                        <p-columnFilter type="text" field="attendantUserName"></p-columnFilter>
                     </th>
                     <th>
                         <p-columnFilter field="budgetStatus" matchMode="equals" [showMenu]="false">
@@ -65,23 +63,6 @@
                             </ng-template>
                         </p-columnFilter>
                     </th>
-                    <th>
-                        <p-columnFilter field="statusAuthExit" matchMode="equals" [showMenu]="false">
-                            <ng-template pTemplate="filter" let-value let-filter="filterCallback">
-                                <p-dropdown [ngModel]="value" [options]="statusLiberacao" (onChange)="filter($event.value)"
-                                    [showClear]="true">
-                                    <ng-template let-option pTemplate="item">
-                                        <i class="pi " [ngClass]="{
-                                            'pi-times-circle text-red-500':option.value == notAuth,
-                                            'pi-check-circle text-green-500':option.value == firstAuth,
-                                            'pi-thumbs-up-fill text-green-600':option.value == authorized}">
-                                        </i>
-                                    </ng-template>
-                                </p-dropdown>
-                            </ng-template>
-                        </p-columnFilter>
-                    </th>
-                    <th></th>
                     <th></th>
                     <th>
                         <p-button *ngIf="selectedItems.length > 0" type="button" label="Liberar" icon="pi pi-car" text="true" size="small" severity="success-custom" (onClick)="addAuthorizationAll()"></p-button>
@@ -93,20 +74,20 @@
                     <td> <p-tableCheckbox [value]="vehicle"></p-tableCheckbox> </td>
                     <td><span class="text-500">{{ vehicle.id }}</span></td>
                     <td>
-                        @if(vehicle.placa == "NOVO"){
+                        @if(vehicle.vehiclePlate == "NOVO"){
                         <div class="flex align-items-center justify-content-center bg-blue-100 border-round"
                             [ngStyle]="{width: '3.5rem', height: '2.5rem'}">
                             <span class="text-500">NOVO</span>
                         </div>
                         }@else {
-                        <span class="text-500">{{vehicle.placa | uppercase}}</span>
+                        <span class="text-500">{{vehicle.vehiclePlate | uppercase}}</span>
                         }
                     </td>
                     <td><span class="text-500">{{ vehicle.modelDescription | uppercase }}</span>
                     </td>
-                    <td><span class="text-500">{{ vehicle.frota }}</span></td>
+                    <td><span class="text-500">{{ vehicle.vehicleFleet | uppercase}}</span></td>
                     <td><span class="text-500">{{ vehicle.numServiceOrder}}</span></td>
-                    <td><span class="text-500">{{ vehicle.dateEntry }}</span></td>
+                    <td><span class="text-500">{{ vehicle.entryDate }}</span></td>
                     <td>
                         @if(vehicle.clientCompanyName =="FALTA"){
                         <p-tag value="FALTA" severity="danger"></p-tag>
@@ -115,25 +96,18 @@
                         }
                     </td>
                     <td>
-                        @if(vehicle.nameUserAttendant == "FALTA"){
+                        @if(vehicle.attendantUserName == "FALTA"){
                         <p-tag value="FALTA" severity="danger"></p-tag>
                         }@else {
-                        <span class="text-500">{{ vehicle.nameUserAttendant | uppercase }}</span>
+                        <span class="text-500">{{ vehicle.attendantUserName | uppercase }}</span>
                         }
                     </td>
-                    <td><p-tag [value]="vehicle.budgetStatus" [severity]="getSeverity(vehicle.budgetStatus)"></p-tag></td>
                     <td class="text-center">
                         <i class="pi " [ngClass]="{
-                            'pi-times-circle text-red-500':vehicle.statusAuthExit == notAuth,
-                            'pi-check-circle text-green-500':vehicle.statusAuthExit == firstAuth,
-                            'pi-thumbs-up-fill text-green-600':vehicle.statusAuthExit == authorized}">
+                            'pi-times-circle text-red-500':vehicle.authExitStatus == notAuth,
+                            'pi-check-circle text-green-500':vehicle.authExitStatus == firstAuth,
+                            'pi-thumbs-up-fill text-green-600':vehicle.authExitStatus == authorized}">
                         </i>
-                    </td>
-                    <td>
-                        <div class="flex align-items-center justify-content-center bg-blue-100 border-round"
-                            [ngStyle]="{width: '2.5rem', height: '2.5rem'}">
-                            <span class="text-500"> {{vehicle.days}}</span>
-                        </div>
                     </td>
                     <td>
                         <p-button type="button" label="Editar" icon="pi pi-pencil" text="true" size="small" severity="secondary-custom" (onClick)="editVeiculo(vehicle.id)"></p-button>
@@ -149,7 +123,7 @@
     <div class="mobile-visible">
         <p-table #tableFilter dataKey="id" [value]="listVehicleEntry" [rowHover]="true" 
         currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords}" 
-        [globalFilterFields]="['id','placa','modelDescription', 'frota','dateEntry','clientCompanyName','nameUserAttendant']"
+        [globalFilterFields]="['id','vehiclePlate','modelDescription', 'vehicleFleet','entryDate','clientCompanyName','attendantUserName']"
         [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 25, 50]" [showCurrentPageReport]="true"
          [tableStyle]="{ 'min-width': '20rem' ,'min-height': '20rem'}" styleClass="p-datatable-sm">
         <ng-template pTemplate="caption">
@@ -164,9 +138,9 @@
         </ng-template>
         <ng-template pTemplate="header">
              <tr>
-                <th pSortableColumn="placa">Placa<p-sortIcon field="placa"></p-sortIcon></th>
-                <th pSortableColumn="statusAuthExit">Lib.<p-sortIcon field="statusAuthExit"></p-sortIcon></th>
-                <th pSortableColumn="days">Dias<p-sortIcon field="days"></p-sortIcon></th>
+                <th pSortableColumn="vehiclePlate">Placa<p-sortIcon field="vehiclePlate"></p-sortIcon></th>
+                 <th pSortableColumn="vehicleFleet">Frota<p-sortIcon field="vehicleFleet"></p-sortIcon></th>
+                <th pSortableColumn="authExitStatus">Lib.<p-sortIcon field="authExitStatus"></p-sortIcon></th>
                 <th>Editar</th>
                 <th>Liberar</th>
             </tr>
@@ -174,26 +148,22 @@
         <ng-template pTemplate="body" let-vehicle>
             <tr>
                 <td>
-                    @if(vehicle.placa == "NOVO"){
+                    @if(vehicle.vehiclePlate == "NOVO"){
                     <div class="flex align-items-center justify-content-center bg-blue-100 border-round"
                         [ngStyle]="{width: '3.5rem', height: '2.5rem'}">
                         <span class="text-500">NOVO</span>
                     </div>
                     }@else {
-                    <span class="text-500">{{vehicle.placa | uppercase}}</span>
+                    <span class="text-500">{{vehicle.vehiclePlate | uppercase}}</span>
                     }
                 </td>
+                <td>{{vehicle.vehicleFleet | uppercase}}</td>
                 <td>
                     <i class="pi " [ngClass]="{
-                        'pi-times-circle text-red-500':vehicle.statusAuthExit == notAuth,
-                        'pi-check-circle text-green-500':vehicle.statusAuthExit == firstAuth,
-                        'pi-thumbs-up-fill text-green-600':vehicle.statusAuthExit == authorized}">
+                        'pi-times-circle text-red-500':vehicle.authExitStatus == notAuth,
+                        'pi-check-circle text-green-500':vehicle.authExitStatus == firstAuth,
+                        'pi-thumbs-up-fill text-green-600':vehicle.authExitStatus == authorized}">
                     </i>
-                </td>
-                <td>
-                    <div class="flex align-items-center justify-content-center bg-blue-100 border-round" [ngStyle]="{width: '2.5rem', height: '2.5rem'}">
-                        <span class="text-500"> {{vehicle.days}}</span>
-                    </div>
                 </td>
                 <td>
                     <p-button type="button" icon="pi pi-pencil" text="true" size="small" severity="secondary-custom" (onClick)="editVeiculo(vehicle.id)"></p-button>

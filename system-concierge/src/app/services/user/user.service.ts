@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import { Observable } from 'rxjs';
-import { HttpClient, HttpHeaders, HttpResponse } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpResponse, HttpResponseBase } from '@angular/common/http';
 import { StorageService } from '../storage/storage.service';
 import { User } from '../../models/user/user';
 import { MessageResponse } from '../../models/message/message-response';
@@ -20,8 +20,8 @@ export class UserService {
   updateUser(user: User): Observable<HttpResponse<MessageResponse>> {
     return this.http.post<MessageResponse>(environment.apiuUrl + "/user/update", user, { headers: this.myHeaders(), observe: 'response' });
   }
-  listAll(): Observable<User[]> {
-    return this.http.get<User[]>(environment.apiuUrl + "/user/" + this.companyResale + "/all", { headers: this.myHeaders() });
+  listAll(): Observable<HttpResponse<MessageResponse>> {
+    return this.http.get<MessageResponse>(environment.apiuUrl + "/user/" + this.companyResale + "/all", { headers: this.myHeaders(), observe: 'response' });
   }
   filterId(id: number): Observable<HttpResponse<User>> {
     return this.http.get<User>(environment.apiuUrl + "/user/" + this.companyResale + "/filter/id/" + id, { headers: this.myHeaders(), observe: 'response' });
@@ -31,8 +31,8 @@ export class UserService {
     return this.http.get<MessageResponse>(environment.apiuUrl + "/user/" + this.companyResale + "/filter/email/" + email, { headers: this.myHeaders(), observe: 'response' });
   }
 
-  filterRoleId(roleId: number): Observable<HttpResponse<MessageResponse>> {
-    return this.http.get<MessageResponse>(environment.apiuUrl + "/user/" + this.companyResale + "/filter/roleId/" + roleId, { headers: this.myHeaders(), observe: 'response' });
+  filterRoleId(id: number): Observable<HttpResponse<MessageResponse>> {
+    return this.http.get<MessageResponse>(environment.apiuUrl + "/user/" + this.companyResale + "/filter/role/" + id, { headers: this.myHeaders(), observe: 'response' });
   }
 
   uploadImage(data: FormData): Observable<HttpResponse<MessageResponse>> {

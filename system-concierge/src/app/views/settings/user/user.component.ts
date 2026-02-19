@@ -41,6 +41,7 @@ import { NgxImageCompressService } from 'ngx-image-compress';
 import { StorageService } from '../../../services/storage/storage.service';
 import { SuccessError } from '../../../models/enum/success-error';
 import { StatusEnum } from '../../../models/enum/status-enum';
+import { BusyService } from '../../../components/loading/busy.service';
 
 @Component({
   selector: 'app-user',
@@ -93,6 +94,7 @@ export default class UserComponent implements OnInit {
   menuSelect: TreeNode[] = [];
 
   constructor(
+    private busyService: BusyService,
     private userService: UserService,
     private storageService: StorageService,
     private userRoleService: UserRoleService,
@@ -155,10 +157,11 @@ export default class UserComponent implements OnInit {
       {
         key: '4_0', label: 'Faturamento', children: [
           { key: '4_1', label: 'Manutenção Clientes' },
-          { key: '4_99', label: 'Cadastros',children:[
-             { key: '4_99_0', label: 'Categoria de Clientes' }
-          ] 
-        },
+          {
+            key: '4_99', label: 'Cadastros', children: [
+              { key: '4_99_0', label: 'Categoria de Clientes' }
+            ]
+          },
         ]
       },
       {
@@ -206,13 +209,27 @@ export default class UserComponent implements OnInit {
     this.formUser.controls['passwordValid'].removeValidators([Validators.minLength(8), Validators.required]);
     this.formUser.controls['passwordValid'].updateValueAndValidity();
   }
-  getUsers() {
-    this.userService.listAll().subscribe(data => {
-      this.users = data;
-    });
+  async getUsers() {
+    this.busyService.busy();
+    const result = await this.listAllUsers();
+    this.busyService.idle();
+    if (result.status == 200 && result.body.status == SuccessError.succes) {
+      //this.messageService.add({ severity: 'success', summary: result.body.header, detail: result.body.message, icon: 'pi pi-check' });
+      this.users = result.body.data;
+    } else if (result.status == 200 && result.body.status == SuccessError.error) {
+      this.messageService.add({ severity: 'info', summary: result.body.header, detail: result.body.message, icon: 'pi pi-info-circle' });
+    }
+  }
+  private async listAllUsers(): Promise<HttpResponse<MessageResponse>> {
+    try {
+      return await lastValueFrom(this.userService.listAll());
+    } catch (error) {
+      this.messageService.add({ severity: 'error', summary: 'Erro', detail: error.error.message, icon: 'pi pi-times' });
+      return error;
+    }
   }
   private getRoles() {
-    this.userRoleService.getAllEnabled$().subscribe(data => {
+    this.userRoleService.listAllEnabled().subscribe(data => {
       this.roles = data;
     })
   }

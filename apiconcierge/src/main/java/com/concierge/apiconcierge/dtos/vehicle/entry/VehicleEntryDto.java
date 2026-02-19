@@ -39,6 +39,7 @@ public record VehicleEntryDto(
         String attendantPhoto2Url,
         String attendantPhoto3Url,
         String attendantPhoto4Url,
+        String attendantInformation,
 
         StatusAuthExitEnum authExitStatus,
 
@@ -63,7 +64,7 @@ public record VehicleEntryDto(
         String driverExitName,
 
         String vehiclePlate,
-        String vehiclePlateTogether,
+        Integer vehiclePlateTogether,
         String vehicleFleet,
         ColorVehicleEnum vehicleColor,
         String vehicleKmEntry,

@@ -262,7 +262,7 @@ export default class VehicleExitComponent implements OnInit, OnDestroy {
   }
   private async allAuthorized(): Promise<VehicleEntry[]> {
     try {
-      return await lastValueFrom(this.vehicleService.allAuthorized());
+      return await lastValueFrom(this.vehicleService.listAllAuthorized());
     } catch (error) {
       return [];
     }

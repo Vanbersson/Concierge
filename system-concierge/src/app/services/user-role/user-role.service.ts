@@ -16,16 +16,13 @@ export class UserRoleService {
 
   constructor(private http: HttpClient, private storage: StorageService) { }
 
-  getAll$(): Observable<UserRole[]> {
+  listAll(): Observable<UserRole[]> {
     return this.http.get<UserRole[]>(environment.apiuUrl + "/user/role/" + this.companyResale + "/all", { headers: this.myHeaders() });
   }
-  getAllEnabled$(): Observable<UserRole[]> {
+  listAllEnabled(): Observable<UserRole[]> {
     return this.http.get<UserRole[]>(environment.apiuUrl + "/user/role/" + this.companyResale + "/all/enabled", { headers: this.myHeaders() });
   }
-  getFilterId$(id: number): Observable<HttpResponse<UserRole>> {
-    return this.http.get<UserRole>(environment.apiuUrl + "/user/role/" + this.companyResale + "/filter/code/" + id, { headers: this.myHeaders(), observe: 'response' });
-  }
-
+  
   private myHeaders(): HttpHeaders {
     const httpOptions = new HttpHeaders({
       'Content-Type': 'application/json',

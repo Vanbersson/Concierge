@@ -38,6 +38,7 @@ export class VehicleEntry {
     attendantPhoto2Url: string = '';
     attendantPhoto3Url: string = '';
     attendantPhoto4Url: string = '';
+    attendantInformation: string = '';
 
     authExitStatus: StatusAuthExit = StatusAuthExit.NOT;
 
@@ -49,7 +50,7 @@ export class VehicleEntry {
     auth2ExitUserName: string = '';
     auth2ExitDate: Date | string = '';
 
-    modelId: number | null= null;
+    modelId: number | null = null;
     modelDescription: string = '';
 
     clientCompanyId: number | null = null;
@@ -62,9 +63,9 @@ export class VehicleEntry {
     driverExitName: string = '';
 
     vehiclePlate: string = '';
-    vehiclePlateTogether: string = '';
+    vehiclePlateTogether: number = null;
     vehicleFleet: string = '';
-    vehicleColor: string = '';
+    vehicleColor: string | null = null;
     vehicleKmEntry: string = '';
     vehicleKmExit: string = '';
     vehicleNew: string = '';

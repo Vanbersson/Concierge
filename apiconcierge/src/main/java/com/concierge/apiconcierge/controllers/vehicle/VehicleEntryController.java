@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
 
@@ -140,6 +141,20 @@ public class VehicleEntryController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
         }
     }
+
+    @PostMapping("/{companyId}/{resaleId}/save/image")
+    public ResponseEntity<Object> saveImage(@PathVariable(name = "companyId") Integer companyId,
+                                            @PathVariable(name = "resaleId") Integer resaleId,
+                                            @RequestParam("file") MultipartFile file,
+                                            @RequestParam("local") String local) {
+        try {
+            MessageResponse response = this.service.saveImage(file, local);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
+        }
+    }
+
 
     private String getEmail(HttpServletRequest request) {
         String token = request.getHeader("Authorization").replace("Bearer ", "");

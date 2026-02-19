@@ -140,7 +140,7 @@ export class NotificationComponent implements OnInit, OnDestroy {
     this.busyService.busy();
     const result = await this.getVehicleEntry(vehicleId);
     if (result.status == 200) {
-      this.shareNotification(result.body);
+      this.shareNotification(result.body.data);
     }
     //Close load
     this.busyService.idle();
@@ -174,7 +174,7 @@ export class NotificationComponent implements OnInit, OnDestroy {
       this.messageService.add({ severity: 'info', summary: result.body.header, detail: result.body.message, icon: 'pi pi-info-circle' });
     }
   }
-  private async getVehicleEntry(vehicleId: number): Promise<HttpResponse<VehicleEntry>> {
+  private async getVehicleEntry(vehicleId: number): Promise<HttpResponse<MessageResponse>> {
     try {
       return await lastValueFrom(this.vehicleService.entryFilterId(vehicleId));
     } catch (error) {

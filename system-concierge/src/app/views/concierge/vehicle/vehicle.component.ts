@@ -36,13 +36,13 @@ import { PermissionService } from '../../../services/permission/permission.servi
 @Component({
   selector: 'app-veiculos',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, ToastModule, DropdownModule, TableModule, InputIconModule, IconFieldModule, 
+  imports: [CommonModule, FormsModule, RouterModule, ToastModule, DropdownModule, TableModule, InputIconModule, IconFieldModule,
     TagModule, MultiSelectModule, ButtonModule, InputTextModule],
   templateUrl: './vehicle.component.html',
   styleUrl: './vehicle.component.scss',
   providers: [MessageService, DatePipe]
 })
-export default class VeiculosComponent implements OnInit, OnDestroy {
+export default class VeiculosComponent implements OnInit {
 
   notAuth = STATUS_VEHICLE_ENTRY_NOTAUTH;
   firstAuth = STATUS_VEHICLE_ENTRY_FIRSTAUTH;
@@ -86,33 +86,37 @@ export default class VeiculosComponent implements OnInit, OnDestroy {
       { label: '1ª Liberação', value: this.firstAuth },
       { label: 'Liberado', value: this.authorized }
     ];
-    this.listVehicles();
-    this.taskService.startTask(() => this.listTaskVehicle(), 120000);
+    this.init();
   }
-  ngOnDestroy(): void {
-    this.taskService.stopTask();
+
+  async init() {
+    this.busyService.busy();
+    var result = await this.listAll();
+    this.busyService.idle();
+
+    for (let index = 0; index < result.length; index++) {
+      result[index] = this.preList(result[index]);
+    }
+    this.listVehicleEntry = result;
   }
-  private listTaskVehicle() {
-    this.vehicleService.allPendingAuthorization().subscribe({
-      next: (data) => {
-        for (let index = 0; index < data.length; index++) {
-          data[index] = this.preList(data[index]);
-        }
-        this.listVehicleEntry = data;
-      },
-      error: (data) => { },
-      complete: () => { }
-    });
+
+  private async listAll(): Promise<VehicleEntry[]> {
+    try {
+      return await lastValueFrom(this.vehicleService.listAll());
+    } catch (error) {
+      return [];
+    }
   }
+
   private preList(vehicle: VehicleEntry): VehicleEntry {
     //Format Date
     const datePipe = new DatePipe('pt-BR');
-   /*  vehicle.dateEntry = datePipe.transform(this.formatDateTime(new Date(vehicle.dateEntry)), 'dd/MM/yyyy HH:mm');
+    vehicle.entryDate = datePipe.transform(this.formatDateTime(new Date(vehicle.entryDate)), 'dd/MM/yyyy HH:mm');
     if (vehicle.vehicleNew == "yes") {
-      vehicle.placa = "NOVO";
+      vehicle.vehiclePlate = "NOVO";
     }
-    if (vehicle.nameUserAttendant == "") {
-      vehicle.nameUserAttendant = "FALTA";
+    if (vehicle.attendantUserName == "") {
+      vehicle.attendantUserName = "FALTA";
     }
     if (vehicle.clientCompanyName == "") {
       vehicle.clientCompanyName = "FALTA";
@@ -120,44 +124,9 @@ export default class VeiculosComponent implements OnInit, OnDestroy {
       var nome = vehicle.clientCompanyName.split(' ');
       vehicle.clientCompanyName = nome[0] + " " + nome[1];
     }
-    switch (vehicle.budgetStatus) {
-      case 'PendingApproval':
-        vehicle.budgetStatus = 'Pendente Aprovação';
-        break;
-      case 'OpenBudget':
-        vehicle.budgetStatus = 'Não Enviado';
-        break;
-      case 'CompleteBudget':
-        vehicle.budgetStatus = 'Não Enviado';
-        break;
-      case 'NotSended':
-        vehicle.budgetStatus = 'Não Enviado';
-        break;
-      case 'NotBudget':
-        vehicle.budgetStatus = 'Sem Orçamento';
-        break;
-      case 'Approved':
-        vehicle.budgetStatus = 'Aprovado';
-        break;
-      case 'NotApproved':
-        vehicle.budgetStatus = 'Não Aprovado';
-        break;
-    } */
     return vehicle;
   }
-  public listVehicles() {
-    this.busyService.busy();
-    this.vehicleService.allPendingAuthorization().subscribe((data) => {
-      for (let index = 0; index < data.length; index++) {
-        data[index] = this.preList(data[index]);
-      }
-      this.listVehicleEntry = data;
-      this.busyService.idle();
-    }, error => {
-      this.busyService.idle();
-      this.messageService.add({ severity: 'error', summary: 'Servidor', detail: "Não disponível", icon: 'pi pi-times' });
-    });
-  }
+
   getSeverity(value: string): any {
     switch (value) {
       case 'Pendente Aprovação':
@@ -178,7 +147,7 @@ export default class VeiculosComponent implements OnInit, OnDestroy {
     /* EDITAR ENTRADA DO VEÍCULO */
     const permission = await this.searchPermission(100);
     if (!permission) { return; }
-    this.router.navigateByUrl('portaria/mannutencao-entrada-veiculo/' + id);
+    this.router.navigateByUrl('portaria/manutencao-entrada-veiculo/' + id);
   }
   //Authorization exit
   public addAuthorizationAll() {
@@ -188,28 +157,28 @@ export default class VeiculosComponent implements OnInit, OnDestroy {
     }
   }
   public async authExit(vehicle: VehicleEntry) {
-   /*  if (vehicle.statusAuthExit != this.authorized) {
-      const result = await this.addAuthExit(vehicle);
-      if (result.status == 200 && result.body.status == SuccessError.succes) {
-        if (vehicle.statusAuthExit == this.notAuth) {
-          vehicle.statusAuthExit = this.firstAuth;
-        } else if (vehicle.statusAuthExit == this.firstAuth) {
-          vehicle.statusAuthExit = this.authorized;
-        }
-        //Autorização de saída
-        if (vehicle.statusAuthExit == this.firstAuth) {
-          this.messageService.add({ severity: 'success', summary: result.body.header, detail: result.body.message, icon: 'pi pi-check-circle' });
-        }
-        //Saída liberada
-        if (vehicle.statusAuthExit == this.authorized) {
-          this.messageService.add({ severity: 'success', summary: result.body.header, detail: result.body.message, icon: 'pi pi-thumbs-up-fill' });
-        }
-      } else if (result.status == 200 && result.body.status == SuccessError.error) {
-        this.messageService.add({ severity: 'info', summary: result.body.header, detail: result.body.message, icon: 'pi pi-info-circle' });
-      }
-    } else {
-      this.messageService.add({ severity: 'info', summary: 'Veículo', detail: "Já liberado", icon: 'pi pi-info-circle' });
-    } */
+    /*  if (vehicle.statusAuthExit != this.authorized) {
+       const result = await this.addAuthExit(vehicle);
+       if (result.status == 200 && result.body.status == SuccessError.succes) {
+         if (vehicle.statusAuthExit == this.notAuth) {
+           vehicle.statusAuthExit = this.firstAuth;
+         } else if (vehicle.statusAuthExit == this.firstAuth) {
+           vehicle.statusAuthExit = this.authorized;
+         }
+         //Autorização de saída
+         if (vehicle.statusAuthExit == this.firstAuth) {
+           this.messageService.add({ severity: 'success', summary: result.body.header, detail: result.body.message, icon: 'pi pi-check-circle' });
+         }
+         //Saída liberada
+         if (vehicle.statusAuthExit == this.authorized) {
+           this.messageService.add({ severity: 'success', summary: result.body.header, detail: result.body.message, icon: 'pi pi-thumbs-up-fill' });
+         }
+       } else if (result.status == 200 && result.body.status == SuccessError.error) {
+         this.messageService.add({ severity: 'info', summary: result.body.header, detail: result.body.message, icon: 'pi pi-info-circle' });
+       }
+     } else {
+       this.messageService.add({ severity: 'info', summary: 'Veículo', detail: "Já liberado", icon: 'pi pi-info-circle' });
+     } */
   }
   formatDateTime(date: Date): string {
     const datePipe = new DatePipe('en-US');

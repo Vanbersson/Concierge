@@ -63,7 +63,7 @@ export const routes: Routes = [
                         canActivate: [DriverMenuGuard]
                     },
                     {
-                        path: 'mannutencao-entrada-veiculo/:id',
+                        path: 'manutencao-entrada-veiculo/:id',
                         title: 'Manutenção Entrada',
                         loadComponent: () => import('./views/concierge/manutencao/manutencao.component')
                     },

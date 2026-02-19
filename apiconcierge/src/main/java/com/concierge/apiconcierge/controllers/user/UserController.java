@@ -96,12 +96,12 @@ public class UserController {
         }
     }
 
-    @GetMapping("/{companyId}/{resaleId}/filter/roleId/{roleId}")
+    @GetMapping("/{companyId}/{resaleId}/filter/role/{id}")
     public ResponseEntity<Object> filterRoleId(@PathVariable(name = "companyId") Integer companyId,
                                                @PathVariable(name = "resaleId") Integer resaleId,
-                                               @PathVariable(name = "roleId") Integer roleId) {
+                                               @PathVariable(name = "id") Integer id) {
         try {
-            MessageResponse response = this.service.filterRoleId(companyId, resaleId, roleId);
+            MessageResponse response = this.service.filterRoleId(companyId, resaleId, id);
             return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));

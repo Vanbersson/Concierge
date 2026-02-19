@@ -188,6 +188,7 @@
                             <label for="vehiclecolorid">Cor</label>
                             <p-dropdown 
                             formControlName="vehicleColor"
+                            [showClear]="true"
                             [options]="colors"
                             optionLabel="color"
                             [style]="{'text-transform':'uppercase'}"/>
@@ -218,12 +219,12 @@
                         </div>
                         <div class="col-12 md:col-2">
                             <label for="consultorid">Consultor</label>
-                             <p-dropdown 
+                            <p-dropdown 
                             formControlName="attendant"
+                            [showClear]="true"
                             [options]="attendants"
                             optionLabel="name"
-                            [style]="{'text-transform':'capitalize'}"/>
-                            <!-- <p-multiSelect id="consultorid" [options]="attendants" [selectionLimit]="1"  optionLabel="name" placeholder="Selecione"  formControlName="UserAttendant" /> -->
+                            [style]="{'text-transform':'uppercase'}"/>
                         </div>
                         <div class="col-12 md:col-3">
                             <label for="">Veículo novo</label>

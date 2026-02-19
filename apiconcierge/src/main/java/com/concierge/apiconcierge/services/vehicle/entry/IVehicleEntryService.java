@@ -5,6 +5,7 @@ import com.concierge.apiconcierge.dtos.vehicle.entry.ExistsVehiclePlateDto;
 import com.concierge.apiconcierge.dtos.vehicle.entry.VehicleExitDto;
 import com.concierge.apiconcierge.models.message.MessageResponse;
 import com.concierge.apiconcierge.models.vehicle.entry.VehicleEntry;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Map;
@@ -30,4 +31,7 @@ public interface IVehicleEntryService {
     public MessageResponse deleteAuthExit1(AuthExitDto authExitDto, String userEmail);
 
     public MessageResponse deleteAuthExit2(AuthExitDto authExitDto, String userEmail);
+
+    public MessageResponse saveImage(MultipartFile file, String local);
+
 }

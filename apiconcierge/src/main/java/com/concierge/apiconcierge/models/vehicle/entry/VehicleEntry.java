@@ -100,6 +100,8 @@ public class VehicleEntry implements Serializable {
     private String attendantPhoto3Url;
     @Column(name = "attendant_photo4_url")
     private String attendantPhoto4Url;
+    @Column(name = "attendant_information")
+    private String attendantInformation;
 
     @Column(name = "auth_exit_status")
     private StatusAuthExitEnum authExitStatus;
@@ -147,7 +149,7 @@ public class VehicleEntry implements Serializable {
     @Column(name = "vehicle_plate")
     private String vehiclePlate;
     @Column(name = "vehicle_plate_together")
-    private String vehiclePlateTogether;
+    private Integer vehiclePlateTogether;
     @Column(name = "vehicle_fleet")
     private String vehicleFleet;
     @Column(name = "vehicle_color")

@@ -169,7 +169,7 @@ public class UserValidation implements IUserValidation {
             return response;
         }
         response.setStatus(ConstantsMessage.SUCCESS);
-        response.setHeader("Usuário");
+        response.setHeader("Usuários");
         response.setMessage("Encontrado com sucesso.");
         return response;
     }

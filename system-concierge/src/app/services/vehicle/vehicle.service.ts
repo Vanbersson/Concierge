@@ -18,8 +18,8 @@ export class VehicleService {
 
   constructor(private http: HttpClient, private storage: StorageService) { }
 
-  entrySave(vehicle: VehicleEntry): Observable<HttpResponse<VehicleEntry>> {
-    return this.http.post<VehicleEntry>(environment.apiuUrl + "/vehicle/entry/save", vehicle, { headers: this.myHeaders(), observe: 'response' });
+  entrySave(vehicle: VehicleEntry): Observable<HttpResponse<MessageResponse>> {
+    return this.http.post<MessageResponse>(environment.apiuUrl + "/vehicle/entry/save", vehicle, { headers: this.myHeaders(), observe: 'response' });
   }
 
   entryUpdate(vehicle: VehicleEntry): Observable<HttpResponse<MessageResponse>> {
@@ -30,23 +30,23 @@ export class VehicleService {
     return this.http.post<MessageResponse>(environment.apiuUrl + "/vehicle/entry/exit", vehicle, { headers: this.myHeaders(), observe: 'response' });
   }
 
-  allAuthorized(): Observable<VehicleEntry[]> {
+  listAllAuthorized(): Observable<VehicleEntry[]> {
     return this.http.get<VehicleEntry[]>(environment.apiuUrl + "/vehicle/entry/" + this.companyResale + "/allAuthorized", { headers: this.myHeaders() });
   }
 
-  allPendingAuthorization(): Observable<VehicleEntry[]> {
-    return this.http.get<VehicleEntry[]>(environment.apiuUrl + "/vehicle/entry/" + this.companyResale + "/allPendingAuthorization", { headers: this.myHeaders() });
+  listAll(): Observable<VehicleEntry[]> {
+    return this.http.get<VehicleEntry[]>(environment.apiuUrl + "/vehicle/entry/" + this.companyResale + "/all", { headers: this.myHeaders() });
   }
 
-  entryFilterId(id: number): Observable<HttpResponse<VehicleEntry>> {
-    return this.http.get<VehicleEntry>(environment.apiuUrl + "/vehicle/entry/" + this.companyResale + "/filter/id/" + id, { headers: this.myHeaders(), observe: 'response' });
+  entryFilterId(id: number): Observable<HttpResponse<MessageResponse>> {
+    return this.http.get<MessageResponse>(environment.apiuUrl + "/vehicle/entry/" + this.companyResale + "/filter/id/" + id, { headers: this.myHeaders(), observe: 'response' });
   }
 
   filterPlate(plate: string): Observable<HttpResponse<MessageResponse>> {
     return this.http.get<MessageResponse>(environment.apiuUrl + "/vehicle/entry/" + this.companyResale + "/filter/plate/" + plate, { headers: this.myHeaders(), observe: 'response' });
   }
 
- 
+
   entryAddAuth(auth: VehicleEntryAuth): Observable<HttpResponse<MessageResponse>> {
     return this.http.post<MessageResponse>(environment.apiuUrl + "/vehicle/entry/authorization/add", auth, { headers: this.myHeaders(), observe: 'response' });
   }
@@ -58,10 +58,12 @@ export class VehicleService {
   entryDeleteAuth2(auth: VehicleEntryAuth): Observable<HttpResponse<MessageResponse>> {
     return this.http.post<MessageResponse>(environment.apiuUrl + "/vehicle/entry/authorization/delete2", auth, { headers: this.myHeaders(), observe: 'response' });
   }
+  saveImage(data: FormData): Observable<HttpResponse<MessageResponse>> {
+    return this.http.post<MessageResponse>(environment.apiuUrl + "/vehicle/entry/" + this.companyResale + "/save/image", data, { headers: this.myHeaders(), observe: 'response' });
+  }
 
   private myHeaders(): HttpHeaders {
     const httpOptions = new HttpHeaders({
-      'Content-Type': 'application/json',
       'Authorization': 'Bearer ' + this.storage.token,
     });
     return httpOptions;

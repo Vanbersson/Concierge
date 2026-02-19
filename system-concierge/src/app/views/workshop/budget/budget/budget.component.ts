@@ -245,7 +245,7 @@ export default class BudgetComponent implements OnInit, OnDestroy, DoCheck {
       //Vehicle
       const resultVehicle = await this.getVehicleEntry(this.budget.vehicleEntryId);
       if (resultVehicle.status == 200) {
-        this.vehicleEntry = resultVehicle.body;
+        this.vehicleEntry = resultVehicle.body.data;
       }
 
       //Limit discount user 
@@ -358,7 +358,7 @@ export default class BudgetComponent implements OnInit, OnDestroy, DoCheck {
       return error;
     }
   }
-  private async getVehicleEntry(id: number): Promise<HttpResponse<VehicleEntry>> {
+  private async getVehicleEntry(id: number): Promise<HttpResponse<MessageResponse>> {
     try {
       return await lastValueFrom(this.vehicleService.entryFilterId(id));
     } catch (error) {
