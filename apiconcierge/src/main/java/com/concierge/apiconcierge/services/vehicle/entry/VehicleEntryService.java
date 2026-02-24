@@ -86,7 +86,7 @@ public class VehicleEntryService implements IVehicleEntryService {
                 VehicleEntry result = this.repository.save(vehicle);
 
                 Map<String, Object> map = new HashMap<>();
-                map.put("id",result.getId());
+                map.put("id", result.getId());
                 response.setData(map);
 
                 //Notification
@@ -197,48 +197,12 @@ public class VehicleEntryService implements IVehicleEntryService {
         return list;
     }
 
-//    @SneakyThrows
-//    @Override
-//    public List<Map<String, Object>> listAllAuthorized(Integer companyId, Integer resaleId) {
-//        List<Object> list = new ArrayList();
-//
-
-    /// /        try {
-    /// /            List<VehicleEntry> vehicles = this.repository.allPendingAuthorization(companyId, resaleId);
-    /// /
-    /// /            for (VehicleEntry item : vehicles) {
-    /// /                long differenceMilliseconds = new Date().getTime() - item.getDateEntry().getTime();
-    /// /                String placa = "";
-    /// /                if (!item.getPlaca().isBlank())
-    /// /                    placa = item.getPlaca().substring(0, 3) + "-" + item.getPlaca().substring(3, 7);
-    /// /
-    /// /                Map<String, Object> map = new HashMap<>();
-    /// /                map.put("id", item.getId());
-    /// /                map.put("placa", placa);
-    /// /                map.put("frota", item.getFrota());
-    /// /                map.put("vehicleNew", item.getVehicleNew());
-    /// /                map.put("modelDescription", item.getModelDescription());
-    /// /                map.put("dateEntry", item.getDateEntry());
-    /// /                map.put("days", TimeUnit.DAYS.convert(differenceMilliseconds, TimeUnit.MILLISECONDS));
-    /// /                map.put("nameUserAttendant", item.getNameUserAttendant());
-    /// /                map.put("clientCompanyName", item.getClientCompanyName());
-    /// /                map.put("budgetStatus", item.getBudgetStatus());
-    /// /                map.put("statusAuthExit", item.getStatusAuthExit());
-    /// /                map.put("numServiceOrder", item.getNumServiceOrder());
-    /// /                list.add(map);
-    /// /            }
-    /// /        } catch (Exception ex) {
-    /// /            throw new VehicleEntryException(ex.getMessage());
-    /// /        }
-///
-////        return list;
-////    }
     @SneakyThrows
     @Override
     public List<Map<String, Object>> listAll(Integer companyId, Integer resaleId) {
-        List<Map<String, Object>> list = new ArrayList<>();
         try {
-            List<VehicleEntry> vehicles = this.repository.findAll();
+            List<VehicleEntry> vehicles = this.repository.all(companyId, resaleId, StatusVehicleEnum.Entered);
+            List<Map<String, Object>> list = new ArrayList<>();
             for (VehicleEntry item : vehicles) {
                 String plate = "";
                 if (!item.getVehiclePlate().isBlank())
@@ -253,15 +217,13 @@ public class VehicleEntryService implements IVehicleEntryService {
                 map.put("attendantUserName", item.getAttendantUserName());
                 map.put("clientCompanyName", item.getClientCompanyName());
                 map.put("authExitStatus", item.getAuthExitStatus());
-                map.put("numServiceOrder",item.getNumServiceOrder());
+                map.put("numServiceOrder", item.getNumServiceOrder());
                 list.add(map);
             }
             return list;
         } catch (Exception ex) {
             throw new VehicleEntryException(ex.getMessage());
         }
-
-
     }
 
     @SneakyThrows
@@ -293,6 +255,43 @@ public class VehicleEntryService implements IVehicleEntryService {
                     throw new VehicleEntryException("Veículo não encontrado.");
                 }
                 response.setData(vehicle);
+            }
+            return response;
+        } catch (Exception ex) {
+            throw new VehicleEntryException(ex.getMessage());
+        }
+    }
+
+    @SneakyThrows
+    @Override
+    public MessageResponse filterTogether(Integer companyId, Integer resaleId, String together) {
+        try {
+            MessageResponse response = this.validation.filterPlate(companyId, resaleId, together);
+            if (ConstantsMessage.SUCCESS.equals(response.getStatus())) {
+                List<VehicleEntry> vehicles = repository.filterTogether(companyId, resaleId, together);
+                if (vehicles.isEmpty()) {
+                    throw new VehicleEntryException("Veículos não encontrado.");
+                }
+                List<Map<String, Object>> list = new ArrayList<>();
+                for (VehicleEntry item : vehicles) {
+                    String plate = "";
+                    if (!item.getVehiclePlate().isBlank())
+                        plate = item.getVehiclePlate().substring(0, 3) + "-" + item.getVehiclePlate().substring(3, 7);
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("id", item.getId());
+                    map.put("status", item.getStatus());
+                    map.put("vehiclePlate", plate);
+                    map.put("vehicleFleet", item.getVehicleFleet());
+                    map.put("vehicleNew", item.getVehicleNew());
+                    map.put("modelDescription", item.getModelDescription());
+                    map.put("entryDate", item.getEntryDate());
+                    map.put("exitDate", item.getExitDate());
+                    map.put("attendantUserName", item.getAttendantUserName());
+                    map.put("clientCompanyName", item.getClientCompanyName());
+                    map.put("numServiceOrder", item.getNumServiceOrder());
+                    list.add(map);
+                }
+                response.setData(list);
             }
             return response;
         } catch (Exception ex) {
@@ -335,7 +334,7 @@ public class VehicleEntryService implements IVehicleEntryService {
     public MessageResponse deleteAuthExit1(AuthExitDto authExitDto, String userEmail) {
         try {
             VehicleEntry vehicle = this.repository.filterId(authExitDto.companyId(), authExitDto.resaleId(), authExitDto.vehicleId());
-            if (vehicle == null) {
+            if (vehicle == null || vehicle.getStatus() == StatusVehicleEnum.Exited) {
                 throw new VehicleEntryException("Veículo não encontrado.");
             }
             MessageResponse response = this.validation.deleteAuthExit1(vehicle, authExitDto, userEmail);
@@ -357,7 +356,7 @@ public class VehicleEntryService implements IVehicleEntryService {
     public MessageResponse deleteAuthExit2(AuthExitDto authExitDto, String userEmail) {
         try {
             VehicleEntry vehicle = this.repository.filterId(authExitDto.companyId(), authExitDto.resaleId(), authExitDto.vehicleId());
-            if (vehicle == null) {
+            if (vehicle == null || vehicle.getStatus() == StatusVehicleEnum.Exited) {
                 throw new VehicleEntryException("Veículo não encontrado.");
             }
             MessageResponse response = this.validation.deleteAuthExit2(vehicle, authExitDto, userEmail);
@@ -384,14 +383,14 @@ public class VehicleEntryService implements IVehicleEntryService {
             response.setMessage("Salvo com sucesso.");
 
             // Segurança básica
-            if (local.contains("..")) {
+            if (local.contains("..") || local.isBlank()) {
                 response.setStatus(ConstantsMessage.ERROR);
                 response.setMessage("Caminho inválido.");
                 return response;
             }
 
             // Nome do arquivo
-            Path filePath = Paths.get(UPLOAD_DIR + local );
+            Path filePath = Paths.get(UPLOAD_DIR + local);
 
             // Cria diretórios se necessário
             Files.createDirectories(filePath.getParent());
@@ -408,6 +407,39 @@ public class VehicleEntryService implements IVehicleEntryService {
 
             response.setData(map);
 
+            return response;
+        } catch (Exception e) {
+            throw new Exception(e.getMessage());
+        }
+    }
+
+    @SneakyThrows
+    @Override
+    public MessageResponse deleteImage(String local) {
+        try {
+            MessageResponse response = new MessageResponse();
+            response.setStatus(ConstantsMessage.SUCCESS);
+            response.setHeader("Imagem");
+            response.setMessage("Excluído com sucesso.");
+
+            Path basePath = Paths.get(UPLOAD_DIR).toAbsolutePath().normalize();
+
+            Path filePath = basePath.resolve(local).normalize();
+
+            // Proteção contra path traversal
+            if (!filePath.startsWith(basePath) || local.isBlank()) {
+                response.setStatus(ConstantsMessage.ERROR);
+                response.setMessage("Caminho inválido.");
+                return response;
+            }
+
+            if (!Files.exists(filePath) || !Files.isRegularFile(filePath)) {
+                response.setStatus(ConstantsMessage.ERROR);
+                response.setMessage("Imagem não encontrada.");
+                return response;
+            }
+
+            Files.delete(filePath);
             return response;
         } catch (Exception e) {
             throw new Exception(e.getMessage());

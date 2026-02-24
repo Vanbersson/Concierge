@@ -162,35 +162,68 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
             return response;
         }
 
+        VehicleEntry internalVehicle = this.repository.filterId(vehicle.getCompanyId(), vehicle.getResaleId(), vehicle.getId());
+
         if (vehicle.getVehicleServiceOrder() == YesNot.yes) {
             //Verifica autorização de saída
-//            if (vehicle.getStatusAuthExit() != StatusAuthExitEnum.NotAuth) {
-//                if (vehicle.getIdUserAttendant() == null || vehicle.getIdUserAttendant() == 0 || vehicle.getNameUserAttendant().isBlank()) {
-//                    response.setStatus(ConstantsMessage.ERROR);
-//                    response.setHeader("Consultor");
-//                    response.setMessage(ConstantsMessage.NOT_INFORMED);
-//                    return response;
-//                }
-//                if (vehicle.getNumServiceOrder().isBlank()) {
-//                    response.setStatus(ConstantsMessage.ERROR);
-//                    response.setHeader("Número O.S.");
-//                    response.setMessage(ConstantsMessage.NOT_INFORMED);
-//                    return response;
-//                }
-//                if (vehicle.getClientCompanyId() == null || vehicle.getClientCompanyId() == 0 || vehicle.getClientCompanyName().isBlank()) {
-//                    response.setStatus(ConstantsMessage.ERROR);
-//                    response.setHeader("Proprietário");
-//                    response.setMessage(ConstantsMessage.NOT_INFORMED);
-//                    return response;
-//                }
-//                if (vehicle.getDriverExitId() == null || vehicle.getDriverExitId() == 0) {
-//                    response.setStatus(ConstantsMessage.ERROR);
-//                    response.setHeader("Motorista Saída");
-//                    response.setMessage(ConstantsMessage.NOT_INFORMED);
-//                    return response;
-//                }
-//            }
+            if (vehicle.getAuthExitStatus() != StatusAuthExitEnum.NotAuth) {
+                if (vehicle.getAttendantUserId() == null || vehicle.getAttendantUserId() == 0 || vehicle.getAttendantUserName().isBlank()) {
+                    response.setStatus(ConstantsMessage.ERROR);
+                    response.setHeader("Consultor");
+                    response.setMessage(ConstantsMessage.NOT_INFORMED);
+                    return response;
+                }
+                if (vehicle.getNumServiceOrder().isBlank()) {
+                    response.setStatus(ConstantsMessage.ERROR);
+                    response.setHeader("Número O.S.");
+                    response.setMessage(ConstantsMessage.NOT_INFORMED);
+                    return response;
+                }
+                if (vehicle.getClientCompanyId() == null || vehicle.getClientCompanyId() == 0 || vehicle.getClientCompanyName().isBlank()) {
+                    response.setStatus(ConstantsMessage.ERROR);
+                    response.setHeader("Proprietário");
+                    response.setMessage(ConstantsMessage.NOT_INFORMED);
+                    return response;
+                }
+                if (vehicle.getDriverExitId() == null || vehicle.getDriverExitId() == 0) {
+                    response.setStatus(ConstantsMessage.ERROR);
+                    response.setHeader("Motorista Saída");
+                    response.setMessage(ConstantsMessage.NOT_INFORMED);
+                    return response;
+                }
+                if (internalVehicle.getVehicleServiceOrder() != vehicle.getVehicleServiceOrder()) {
+                    response.setStatus(ConstantsMessage.ERROR);
+                    response.setHeader("Ordem de serviço");
+                    response.setMessage("Não pode ser alterado para (Sim).");
+                    return response;
+                }
+            }
         }
+
+        if (vehicle.getVehicleServiceOrder() == YesNot.not) {
+            if (vehicle.getAuthExitStatus() != StatusAuthExitEnum.NotAuth) {
+                if (vehicle.getClientCompanyId() == null || vehicle.getClientCompanyId() == 0 || vehicle.getClientCompanyName().isBlank()) {
+                    response.setStatus(ConstantsMessage.ERROR);
+                    response.setHeader("Proprietário");
+                    response.setMessage(ConstantsMessage.NOT_INFORMED);
+                    return response;
+                }
+                if (vehicle.getDriverExitId() == null || vehicle.getDriverExitId() == 0) {
+                    response.setStatus(ConstantsMessage.ERROR);
+                    response.setHeader("Motorista Saída");
+                    response.setMessage(ConstantsMessage.NOT_INFORMED);
+                    return response;
+                }
+                if (internalVehicle.getVehicleServiceOrder() != vehicle.getVehicleServiceOrder()) {
+                    response.setStatus(ConstantsMessage.ERROR);
+                    response.setHeader("Ordem de serviço");
+                    response.setMessage("Não pode ser alterado para (Não).");
+                    return response;
+                }
+            }
+        }
+
+
         //Já existe orçamento
 //        if (vehicle.getBudgetStatus() != StatusBudgetEnum.NotBudget) {
 //            if (vehicle.getIdUserAttendant() == null || vehicle.getIdUserAttendant() == 0 || vehicle.getNameUserAttendant().isBlank()) {
@@ -220,37 +253,7 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
 //
 //        }
 
-        if (vehicle.getVehicleServiceOrder() == YesNot.not) {
-//            if (vehicle.getBudgetStatus() != StatusBudgetEnum.NotBudget) {
-//                response.setStatus(ConstantsMessage.ERROR);
-//                response.setHeader("Ordem de serviço");
-//                response.setMessage("Existe orçamento para esse veículo.");
-//                return response;
-//            }
-            if (vehicle.getAuthExitStatus() != StatusAuthExitEnum.NotAuth) {
-                if (vehicle.getClientCompanyId() == null || vehicle.getClientCompanyId() == 0 || vehicle.getClientCompanyName().isBlank()) {
-                    response.setStatus(ConstantsMessage.ERROR);
-                    response.setHeader("Proprietário");
-                    response.setMessage(ConstantsMessage.NOT_INFORMED);
-                    return response;
-                }
-                if (vehicle.getDriverExitId() == null || vehicle.getDriverExitId() == 0) {
-                    response.setStatus(ConstantsMessage.ERROR);
-                    response.setHeader("Motorista Saída");
-                    response.setMessage(ConstantsMessage.NOT_INFORMED);
-                    return response;
-                }
-            }
-        }
 
-//        if (vehicle.getServiceOrder().equals(VehicleYesNotEnum.yes)) {
-//            Optional<VehicleEntry> resultVehicle = this.repository.findById(vehicle.getId());
-//            VehicleEntry ve = resultVehicle.get();
-//            if (ve.getServiceOrder() == VehicleYesNotEnum.not) {
-//                if (ve.getStatusAuthExit() != StatusAuthExitEnum.NotAuth)
-//                    return ConstantsMessage.ERROR_AUTH_EXIT;
-//            }
-//        }
         response.setStatus(ConstantsMessage.SUCCESS);
         response.setHeader("Veículo");
         response.setMessage("Atualizado com sucesso.");
@@ -325,7 +328,7 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
     }
 
     @Override
-    public MessageResponse filterId(Integer companyId, Integer resaleId,Integer id) {
+    public MessageResponse filterId(Integer companyId, Integer resaleId, Integer id) {
         MessageResponse response = new MessageResponse();
         if (companyId == null || companyId == 0) {
             response.setStatus(ConstantsMessage.ERROR);

@@ -64,7 +64,7 @@ public record VehicleEntryDto(
         String driverExitName,
 
         String vehiclePlate,
-        Integer vehiclePlateTogether,
+        String vehiclePlateTogether,
         String vehicleFleet,
         ColorVehicleEnum vehicleColor,
         String vehicleKmEntry,

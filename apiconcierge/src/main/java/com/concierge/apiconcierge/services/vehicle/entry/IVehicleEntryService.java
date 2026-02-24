@@ -26,6 +26,8 @@ public interface IVehicleEntryService {
 
     public MessageResponse filterPlate(Integer companyId, Integer resaleId, String plate);
 
+    public MessageResponse filterTogether(Integer companyId, Integer resaleId, String together);
+
     public MessageResponse addAuthExit(AuthExitDto authExitDto, String userEmail);
 
     public MessageResponse deleteAuthExit1(AuthExitDto authExitDto, String userEmail);
@@ -33,5 +35,6 @@ public interface IVehicleEntryService {
     public MessageResponse deleteAuthExit2(AuthExitDto authExitDto, String userEmail);
 
     public MessageResponse saveImage(MultipartFile file, String local);
+    public MessageResponse deleteImage(String local);
 
 }

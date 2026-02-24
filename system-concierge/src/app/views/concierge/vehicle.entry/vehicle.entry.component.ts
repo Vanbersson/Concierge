@@ -78,7 +78,7 @@ import { YesNot } from '../../../models/enum/yes-not';
 export default class VehicleEntryComponent implements OnInit, DoCheck {
 
   private vehicleEntry: VehicleEntry;
-  private vehiclePlateFisrt!: number;
+  private vehiclePlateTogether: string = "";
 
   activeStepper: number | undefined = 0;
   private upperCasePipe = new UpperCasePipe();
@@ -578,16 +578,32 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
     }
     return name;
   }
+  private generateSecureId(): string {
+    const timestamp = Date.now();
+    const array = new Uint8Array(6);
+    crypto.getRandomValues(array);
+
+    const random = Array.from(array, b =>
+      (b % 36).toString(36)
+    ).join('');
+
+    return `${timestamp}_${random}`;
+  }
   public async save() {
     this.busyService.busy();
+
+    //Gerar ID 
+    if (this.listVehicleEntry.length > 1) {
+      this.vehiclePlateTogether = this.generateSecureId();
+    }
+
+
     //Save vehicles
     for (let index = 0; index < this.listVehicleEntry.length; index++) {
       const vehicle = this.listVehicleEntry[index];
 
-      //veículos que entrou juntos
-      if (index != 0) {
-        vehicle.vehiclePlateTogether = this.vehiclePlateFisrt;
-      }
+      vehicle.vehiclePlateTogether = this.vehiclePlateTogether;
+
       const img1Temp = vehicle.entryPhoto1Url;
       const img2Temp = vehicle.entryPhoto2Url;
       const img3Temp = vehicle.entryPhoto3Url;
@@ -602,10 +618,6 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
 
       if (result.status == 201 && result.body.status == SuccessError.succes) {
         vehicle.id = result.body.data.id;
-        //primeiro veículo
-        if (index == 0) {
-          this.vehiclePlateFisrt = vehicle.id;
-        }
 
         let isUpdatePhoto: boolean = false;
         //Image save

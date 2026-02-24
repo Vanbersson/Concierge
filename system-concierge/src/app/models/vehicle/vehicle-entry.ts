@@ -63,7 +63,7 @@ export class VehicleEntry {
     driverExitName: string = '';
 
     vehiclePlate: string = '';
-    vehiclePlateTogether: number = null;
+    vehiclePlateTogether: string = '';
     vehicleFleet: string = '';
     vehicleColor: string | null = null;
     vehicleKmEntry: string = '';

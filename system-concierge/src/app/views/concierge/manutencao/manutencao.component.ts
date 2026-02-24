@@ -28,6 +28,7 @@ import { StepsModule } from 'primeng/steps';
 import { DividerModule } from 'primeng/divider';
 import { MessagesModule } from 'primeng/messages';
 import { DropdownModule } from 'primeng/dropdown';
+
 //Service
 import { VehicleService } from '../../../services/vehicle/vehicle.service';
 import { UserService } from '../../../services/user/user.service';
@@ -36,13 +37,7 @@ import { VehicleModelService } from '../../../services/vehicle-model/vehicle-mod
 import { IBudgetNew } from '../../../interfaces/budget/ibudget-new';
 import { IColor } from '../../../interfaces/icolor';
 //Constants
-import {
-  STATUS_VEHICLE_ENTRY_NOTAUTH, STATUS_VEHICLE_ENTRY_FIRSTAUTH,
-  STATUS_VEHICLE_ENTRY_AUTHORIZED, MESSAGE_RESPONSE_NOT_CLIENT,
-  MESSAGE_RESPONSE_NOT_ATTENDANT,
-  IMAGE_MAX_SIZE_LABEL,
-  IMAGE_MAX_SIZE
-} from '../../../util/constants';
+import { IMAGE_MAX_SIZE_LABEL } from '../../../util/constants';
 //Class
 import { User } from '../../../models/user/user';
 import { ClientCompany } from '../../../models/clientcompany/client-company';
@@ -60,7 +55,6 @@ import { HttpResponse } from '@angular/common/http';
 import { IBudget } from '../../../interfaces/budget/ibudget';
 //Components
 import { FilterClientComponent } from '../../../components/filter.client/filter.client.component';
-import { StatusBudgetEnum } from '../../../models/budget/status-budget-enum';
 import { StatusVehicle } from '../../../models/enum/status-vehicle';
 import { FilterDriverComponent } from '../../../components/filter.driver/filter.driver.component';
 import { DriverService } from '../../../services/driver/driver.service';
@@ -69,7 +63,6 @@ import { SuccessError } from '../../../models/enum/success-error';
 import { PermissionService } from '../../../services/permission/permission.service';
 import { ShareWhatsAppService } from '../../../services/share/share-whatsapp.service';
 import { FileService } from '../../../services/file/file.service';
-import { NgxImageCompressService } from 'ngx-image-compress';
 import { YesNot } from '../../../models/enum/yes-not';
 import { StatusAuthExit } from '../../../models/enum/status-auth-exit';
 import { PhotoResult } from '../../../interfaces/photo-result';
@@ -103,9 +96,21 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
   modelVehicles: ModelVehicle[] = [];
   attendants: User[] = [];
   photoVehicle1!: string;
+  isPhotoNew1: boolean = false;
+  isPhotoDelete1: boolean = false;
+
   photoVehicle2!: string;
+  isPhotoNew2: boolean = false;
+  isPhotoDelete2: boolean = false;
+
   photoVehicle3!: string;
+  isPhotoNew3: boolean = false;
+  isPhotoDelete3: boolean = false;
+
   photoVehicle4!: string;
+  isPhotoNew4: boolean = false;
+  isPhotoDelete4: boolean = false;
+
   public dateExitAuth1 = signal<string>('');
   public dateExitAuth2 = signal<string>('');
   vehicleExit: boolean = false;
@@ -198,6 +203,11 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
   private budget: IBudgetNew;
   //exibi só os detalhe dos veículos
   detailsVehicle: boolean = false;
+
+  //dialog visibleVehiclePlateTogether
+  visibleVehiclePlateTogether: boolean = false;
+  vehiclesTogether: VehicleEntry[] = [];
+  isVehicleTogether: boolean = false;
 
   constructor(
     private shareWhatsAppService: ShareWhatsAppService,
@@ -384,6 +394,12 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
   private loadForms() {
     //Status do atendimento
     this.stepStatus(this.vehicleEntry.stepEntry);
+
+    //mostrar veículos justos
+    if (this.vehicleEntry.vehiclePlateTogether) {
+      this.isVehicleTogether = true;
+    }
+
     //Vehicle
     this.formVehicle.patchValue({
       id: this.vehicleEntry.id,
@@ -574,6 +590,47 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
     return datePipe.transform(date, "yyyy-MM-dd'T'HH:mm:ss.SSS") + timezone;
   }
   //Vehicle
+  private preList(vehicle: VehicleEntry): VehicleEntry {
+    //Format Date
+    const datePipe = new DatePipe('pt-BR');
+    vehicle.entryDate = datePipe.transform(this.formatDateTime(new Date(vehicle.entryDate)), 'dd/MM/yyyy HH:mm');
+
+    if (vehicle.status == StatusVehicle.EXITED) {
+      vehicle.exitDate = datePipe.transform(this.formatDateTime(new Date(vehicle.exitDate)), 'dd/MM/yyyy HH:mm');
+    }
+    if (vehicle.vehicleNew == YesNot.yes) {
+      vehicle.vehiclePlate = "NOVO";
+    }
+    if (vehicle.attendantUserName == "") {
+      vehicle.attendantUserName = "FALTA";
+    }
+    if (vehicle.clientCompanyName == "") {
+      vehicle.clientCompanyName = "FALTA";
+    } else {
+      var nome = vehicle.clientCompanyName.split(' ');
+      vehicle.clientCompanyName = nome[0] + " " + nome[1];
+    }
+    return vehicle;
+  }
+  async showVehicleTogether() {
+    if (this.vehicleEntry.vehiclePlateTogether) {
+      this.busyService.busy();
+      const result = await this.filterVehicleTogether(this.vehicleEntry.vehiclePlateTogether);
+      this.busyService.idle();
+      if (result.status == 200 && result.body.status == SuccessError.succes) {
+        this.visibleVehiclePlateTogether = true;
+        for (let index = 0; index < result.body.data.length; index++) {
+
+          result.body.data[index] = this.preList(result.body.data[index]);
+        }
+        this.vehiclesTogether = result.body.data
+      }
+    }
+  }
+  changerVehicle(id: number) {
+    this.router.navigateByUrl("/portaria/manutencao-entrada-veiculo/" + id);
+  }
+
   public placaRequiredAdd() {
     this.addRequirePlaca();
   }
@@ -632,6 +689,10 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
     if (photo.status == PhotoResultStatus.SUCCESS) {
       this.photoVehicle1 = photo.base64;
       this.vehicleEntry.attendantPhoto1Url = this.photoVehicle1;
+      //informa que foi selecionado uma imagem nova
+      this.isPhotoNew1 = true;
+      //informa que não exclua a imagem
+      this.isPhotoDelete1 = false;
     }
     if (photo.status == PhotoResultStatus.LIMIT) {
       this.messageService.add({ severity: 'info', summary: 'Imagem', detail: IMAGE_MAX_SIZE_LABEL, icon: 'pi pi-info-circle', life: 3000 });
@@ -645,6 +706,10 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
     if (photo.status == PhotoResultStatus.SUCCESS) {
       this.photoVehicle2 = photo.base64;
       this.vehicleEntry.attendantPhoto2Url = this.photoVehicle2;
+      //informa que foi selecionado uma imagem nova
+      this.isPhotoNew2 = true;
+      //informa que não exclua a imagem
+      this.isPhotoDelete2 = false;
     }
     if (photo.status == PhotoResultStatus.LIMIT) {
       this.messageService.add({ severity: 'info', summary: 'Imagem', detail: IMAGE_MAX_SIZE_LABEL, icon: 'pi pi-info-circle', life: 3000 });
@@ -658,6 +723,10 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
     if (photo.status == PhotoResultStatus.SUCCESS) {
       this.photoVehicle3 = photo.base64;
       this.vehicleEntry.attendantPhoto3Url = this.photoVehicle3;
+      //informa que foi selecionado uma imagem nova
+      this.isPhotoNew3 = true;
+      //informa que não exclua a imagem
+      this.isPhotoDelete3 = false;
     }
     if (photo.status == PhotoResultStatus.LIMIT) {
       this.messageService.add({ severity: 'info', summary: 'Imagem', detail: IMAGE_MAX_SIZE_LABEL, icon: 'pi pi-info-circle', life: 3000 });
@@ -671,6 +740,10 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
     if (photo.status == PhotoResultStatus.SUCCESS) {
       this.photoVehicle4 = photo.base64;
       this.vehicleEntry.attendantPhoto4Url = this.photoVehicle4;
+      //informa que foi selecionado uma imagem nova
+      this.isPhotoNew4 = true;
+      //informa que não exclua a imagem
+      this.isPhotoDelete4 = false;
     }
     if (photo.status == PhotoResultStatus.LIMIT) {
       this.messageService.add({ severity: 'info', summary: 'Imagem', detail: IMAGE_MAX_SIZE_LABEL, icon: 'pi pi-info-circle', life: 3000 });
@@ -683,18 +756,34 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
   public async deleteFileVehicle1() {
     this.photoVehicle1 = "";
     this.vehicleEntry.entryPhoto1Url = "";
+    //informa que a imagem não é nova
+    this.isPhotoNew1 = false;
+    //informa que exclua a imagem
+    this.isPhotoDelete1 = true;
   }
   public async deleteFileVehicle2() {
     this.photoVehicle2 = "";
     this.vehicleEntry.entryPhoto2Url = "";
+    //informa que a imagem não é nova
+    this.isPhotoNew2 = false;
+    //informa que exclua a imagem
+    this.isPhotoDelete2 = true;
   }
   public async deleteFileVehicle3() {
     this.photoVehicle3 = "";
     this.vehicleEntry.entryPhoto3Url = "";
+    //informa que a imagem não é nova
+    this.isPhotoNew3 = false;
+    //informa que exclua a imagem
+    this.isPhotoDelete3 = true;
   }
   public async deleteFileVehicle4() {
     this.photoVehicle4 = "";
     this.vehicleEntry.entryPhoto4Url = "";
+    //informa que a imagem não é nova
+    this.isPhotoNew4 = false;
+    //informa que exclua a imagem
+    this.isPhotoDelete4 = true;
   }
   private async savePhoto(ve: VehicleEntry, img: string, order: number): Promise<string> {
     if (img == "") {
@@ -761,21 +850,60 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
 
     return new File([ia], 'image.jpg', { type: mime });
   }
-  private async saveImage(data: FormData): Promise<HttpResponse<MessageResponse>> {
-    try {
-      return await lastValueFrom(this.vehicleService.saveImage(data));
-    } catch (error) {
-      this.messageService.add({ severity: 'error', summary: 'Erro', detail: error.error.message, icon: 'pi pi-times' });
-      return error;
-    }
+
+  private deleteRequireForms() {
+    this.deleteRequireAttendant();
   }
-  private async deleteImage(url: string): Promise<HttpResponse<MessageResponse>> {
-    try {
-      // return await lastValueFrom(this.fileService.deleteImage(url))
-      return null;
-    } catch (error) {
-      this.messageService.add({ severity: 'error', summary: 'Erro', detail: error.error.message, icon: 'pi pi-times' });
-      return error;
+  private addRequireForms() {
+    this.addRequireAttendant();
+  }
+  public async authExit() {
+    const uppercase = new UpperCasePipe();
+    if (this.vehicleEntry.authExitStatus != StatusAuthExit.AUTH) {
+      let auth = new VehicleEntryAuth();
+      auth.companyId = this.storageService.companyId;
+      auth.resaleId = this.storageService.resaleId;
+      auth.vehicleId = this.vehicleEntry.id;
+      auth.userId = this.storageService.id;
+      auth.userName = this.storageService.name;
+      auth.dateAuth = this.formatDateTime(new Date());
+      //Inicia loading
+      this.busyService.busy();
+      const permissionResult = await this.addAuthExit(auth);
+      //Fecha loading
+      this.busyService.idle();
+      if (permissionResult.status == 200 && permissionResult.body.status == SuccessError.succes) {
+        //Status auth exit
+        if (this.vehicleEntry.authExitStatus == StatusAuthExit.NOT) {
+          this.vehicleEntry.authExitStatus = StatusAuthExit.FIST;
+          this.messageService.add({ severity: 'success', summary: permissionResult.body.header, detail: permissionResult.body.message, icon: 'pi pi-check-circle' });
+        } else if (this.vehicleEntry.authExitStatus == StatusAuthExit.FIST) {
+          this.vehicleEntry.authExitStatus = StatusAuthExit.AUTH;
+          this.messageService.add({ severity: 'success', summary: permissionResult.body.header, detail: permissionResult.body.message, icon: 'pi pi-thumbs-up-fill' });
+        }
+
+        if (this.vehicleEntry.auth1ExitUserId == null) {
+          this.formVehicle.get('nameUserExitAuth1').setValue(auth.userName);
+          this.vehicleEntry.auth1ExitUserId = auth.userId;
+          this.vehicleEntry.auth1ExitUserName = auth.userName;
+          this.vehicleEntry.auth1ExitDate = auth.dateAuth;
+          this.dateExitAuth1.set(auth.dateAuth);
+
+        } else if (this.vehicleEntry.auth2ExitUserId == null) {
+          this.formVehicle.get('nameUserExitAuth2').setValue(auth.userName);
+          this.vehicleEntry.auth2ExitUserId = auth.userId;
+          this.vehicleEntry.auth2ExitUserName = auth.userName;
+          this.vehicleEntry.auth2ExitDate = auth.dateAuth;
+          this.dateExitAuth2.set(auth.dateAuth);
+        }
+        //Valid
+        this.addRequireForms();
+      } else if (permissionResult.status == 200 && permissionResult.body.status == SuccessError.error) {
+        this.messageService.add({ severity: 'info', summary: permissionResult.body.header, detail: permissionResult.body.message, icon: 'pi pi-info-circle' });
+      }
+
+    } else {
+      this.messageService.add({ severity: 'info', summary: 'Veículo Liberado', detail: "Placa " + uppercase.transform(this.formVehicle.value.vehiclePlate), icon: 'pi pi-thumbs-up-fill' });
     }
   }
 
@@ -787,80 +915,10 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
       this.vehicleEntry.authExitStatus = StatusAuthExit.FIST;
     }
   }
-  private deleteRequireForms() {
-    this.deleteRequireAttendant();
-  }
-  private addRequireForms() {
-    this.addRequireAttendant();
-  }
-  public async authExit() {
-    const uppercase = new UpperCasePipe();
-    /* if (this.vehicleEntry.statusAuthExit != this.authorized) {
-      //Inicia loading
-      this.busyService.busy();
-      var auth = new VehicleEntryAuth();
-      auth.companyId = this.storageService.companyId;
-      auth.resaleId = this.storageService.resaleId;
-      auth.vehicleId = this.vehicleEntry.id;
-      auth.userId = this.storageService.id;
-      auth.userName = this.storageService.name;
-      auth.dateAuth = this.formatDateTime(new Date());
 
-      const permissionResult = await this.addAuthExit(auth);
-      if (permissionResult.status == 200 && permissionResult.body.status == SuccessError.succes) {
-        //Status auth exit
-        if (this.vehicleEntry.statusAuthExit == this.notAuth) {
-          this.vehicleEntry.statusAuthExit = this.firstAuth;
-        } else if (this.vehicleEntry.statusAuthExit == this.firstAuth) {
-          this.vehicleEntry.statusAuthExit = this.authorized;
-        }
-        if (this.vehicleEntry.idUserExitAuth1 == 0) {
-          this.formVehicle.patchValue({
-            nameUserExitAuth1: permissionResult.body.data.userName,
-          });
-          this.vehicleEntry.idUserExitAuth1 = permissionResult.body.data.userId;
-          this.vehicleEntry.nameUserExitAuth1 = permissionResult.body.data.userName;
-          this.vehicleEntry.dateExitAuth1 = permissionResult.body.data.dateAuth;
-          this.dateExitAuth1.set(permissionResult.body.data.dateAuth.toString());
-        } else {
-          this.formVehicle.patchValue({
-            nameUserExitAuth2: permissionResult.body.data.userName,
-          });
-          this.vehicleEntry.idUserExitAuth2 = permissionResult.body.data.userId;
-          this.vehicleEntry.nameUserExitAuth2 = permissionResult.body.data.userName;
-          this.vehicleEntry.dateExitAuth2 = permissionResult.body.data.dateAuth;
-          this.dateExitAuth2.set(permissionResult.body.data.dateAuth.toString());
-        }
-        //Autorização de saída
-        if (this.vehicleEntry.statusAuthExit == this.firstAuth) {
-          this.messageService.add({ severity: 'success', summary: permissionResult.body.header, detail: permissionResult.body.message, icon: 'pi pi-check-circle' });
-        }
-        //Saída liberada
-        if (this.vehicleEntry.statusAuthExit == this.authorized) {
-          this.messageService.add({ severity: 'success', summary: permissionResult.body.header, detail: permissionResult.body.message, icon: 'pi pi-thumbs-up-fill' });
-        }
-        //Valid
-        this.addRequireForms();
-      } else if (permissionResult.status == 200 && permissionResult.body.status == SuccessError.error) {
-        this.messageService.add({ severity: 'info', summary: permissionResult.body.header, detail: permissionResult.body.message, icon: 'pi pi-info-circle' });
-      }
-      //Fecha loading
-      this.busyService.idle();
-    } else {
-      this.messageService.add({ severity: 'info', summary: 'Veículo Liberado', detail: "Placa " + uppercase.transform(this.formVehicle.value.placa), icon: 'pi pi-thumbs-up-fill' });
-    } */
-  }
-  private async addAuthExit(auth: VehicleEntryAuth): Promise<HttpResponse<MessageResponse>> {
-    try {
-      return await lastValueFrom(this.vehicleService.entryAddAuth(auth));
-    } catch (error) {
-      this.messageService.add({ severity: 'error', summary: 'Erro', detail: "Não catalogado.", icon: 'pi pi-times' });
-      return error;
-    }
-  }
   public async deleteAuth1() {
-    /* if (this.vehicleEntry.idUserExitAuth1 != 0) {
-      var auth = new VehicleEntryAuth();
+    if (this.vehicleEntry.auth1ExitUserId != null) {
+      let auth = new VehicleEntryAuth();
       auth.companyId = this.storageService.companyId;
       auth.resaleId = this.storageService.resaleId;
       auth.vehicleId = this.id;
@@ -870,18 +928,16 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
       const authResult = await this.delAuth1(auth);
       if (authResult.status == 200 && authResult.body.status == SuccessError.succes) {
         this.messageService.add({ severity: 'success', summary: authResult.body.header, detail: authResult.body.message, icon: 'pi pi-check' });
-        this.formVehicle.patchValue({
-          nameUserExitAuth1: '',
-        });
-        this.vehicleEntry.idUserExitAuth1 = 0;
-        this.vehicleEntry.nameUserExitAuth1 = '';
-        this.vehicleEntry.dateExitAuth1 = '';
+        this.formVehicle.get('nameUserExitAuth1').setValue('');
+        this.vehicleEntry.auth1ExitUserId = null;
+        this.vehicleEntry.auth1ExitUserName = '';
+        this.vehicleEntry.auth1ExitDate = '';
         this.dateExitAuth1.set('');
         this.updateAuthExitStatus();
       } else if (authResult.status == 200 && authResult.body.status == SuccessError.error) {
         this.messageService.add({ severity: 'info', summary: authResult.body.header, detail: authResult.body.message, icon: 'pi pi-info-circle' });
       }
-    } */
+    }
   }
   private async delAuth1(auth: VehicleEntryAuth): Promise<HttpResponse<MessageResponse>> {
     try {
@@ -892,30 +948,26 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
     }
   }
   public async deleteAuth2() {
-
-    /*  if (this.vehicleEntry.idUserExitAuth2 != 0) {
-       var auth = new VehicleEntryAuth();
-       auth.companyId = this.storageService.companyId;
-       auth.resaleId = this.storageService.resaleId;
-       auth.vehicleId = this.id;
-       auth.userId = this.storageService.id;
-       auth.userName = this.storageService.name;
- 
-       const authResult = await this.delAuth2(auth);
-       if (authResult.status == 200 && authResult.body.status == SuccessError.succes) {
-         this.messageService.add({ severity: 'success', summary: authResult.body.header, detail: authResult.body.message, icon: 'pi pi-check' });
-         this.formVehicle.patchValue({
-           nameUserExitAuth2: '',
-         });
-         this.vehicleEntry.idUserExitAuth2 = 0;
-         this.vehicleEntry.nameUserExitAuth2 = '';
-         this.vehicleEntry.dateExitAuth2 = '';
-         this.dateExitAuth2.set('');
-         this.updateAuthExitStatus();
-       } else if (authResult.status == 200 && authResult.body.status == SuccessError.error) {
-         this.messageService.add({ severity: 'info', summary: authResult.body.header, detail: authResult.body.message, icon: 'pi pi-info-circle' });
-       }
-     } */
+    if (this.vehicleEntry.auth2ExitUserId != null) {
+      let auth = new VehicleEntryAuth();
+      auth.companyId = this.storageService.companyId;
+      auth.resaleId = this.storageService.resaleId;
+      auth.vehicleId = this.id;
+      auth.userId = this.storageService.id;
+      auth.userName = this.storageService.name;
+      const authResult = await this.delAuth2(auth);
+      if (authResult.status == 200 && authResult.body.status == SuccessError.succes) {
+        this.messageService.add({ severity: 'success', summary: authResult.body.header, detail: authResult.body.message, icon: 'pi pi-check' });
+        this.formVehicle.get('nameUserExitAuth2').setValue('');
+        this.vehicleEntry.auth2ExitUserId = null;
+        this.vehicleEntry.auth2ExitUserName = '';
+        this.vehicleEntry.auth2ExitDate = '';
+        this.dateExitAuth2.set('');
+        this.updateAuthExitStatus();
+      } else if (authResult.status == 200 && authResult.body.status == SuccessError.error) {
+        this.messageService.add({ severity: 'info', summary: authResult.body.header, detail: authResult.body.message, icon: 'pi pi-info-circle' });
+      }
+    }
   }
   private async delAuth2(auth: VehicleEntryAuth): Promise<HttpResponse<MessageResponse>> {
     try {
@@ -950,7 +1002,9 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
     }
   }
   cleanDriverExit() {
-    this.driverExit = new Driver();
+    this.driverExit = null;
+    this.vehicleEntry.driverExitId = null,
+      this.vehicleEntry.driverExitName = "";
     this.formDriver.patchValue({
       driverExitId: null,
       driverExitName: '',
@@ -1142,6 +1196,9 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
       this.vehicleEntry.driverExitId = this.driverExit.id;
       this.vehicleEntry.driverExitName = this.driverExit.name;
     }
+
+
+
   }
   public async save() {
     /* PERMISSION - 100 */
@@ -1153,6 +1210,62 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
 
       //Loading data
       this.loadingVehicle();
+
+      //Atualizar as imagens
+      if (this.isPhotoNew1) {
+        this.isPhotoNew1 = false;
+        const img1 = await this.savePhoto(this.vehicleEntry, this.photoVehicle1, 1);
+        this.vehicleEntry.attendantPhoto1Url = img1;
+      }
+      if (this.isPhotoNew2) {
+        this.isPhotoNew2 = false;
+        const img2 = await this.savePhoto(this.vehicleEntry, this.photoVehicle2, 2);
+        this.vehicleEntry.attendantPhoto2Url = img2;
+      }
+      if (this.isPhotoNew3) {
+        this.isPhotoNew3 = false;
+        const img3 = await this.savePhoto(this.vehicleEntry, this.photoVehicle3, 3);
+        this.vehicleEntry.attendantPhoto3Url = img3;
+      }
+      if (this.isPhotoNew4) {
+        this.isPhotoNew4 = false;
+        const img4 = await this.savePhoto(this.vehicleEntry, this.photoVehicle4, 4);
+        this.vehicleEntry.attendantPhoto4Url = img4;
+      }
+
+      let path =
+        `${this.vehicleEntry.companyId}/` +
+        `${this.vehicleEntry.resaleId}/concierge/vehicle/` +
+        `${this.vehicleEntry.id}/attendant/`;
+
+      if (this.isPhotoDelete1) {
+        this.isPhotoDelete1 = false;
+        const formData = new FormData();
+        formData.append("local", path + "image1.jpg");
+        const del = await this.deleteImage(formData);
+        this.vehicleEntry.attendantPhoto1Url = "";
+      }
+      if (this.isPhotoDelete2) {
+        this.isPhotoDelete2 = false;
+        const formData = new FormData();
+        formData.append("local", path + "image2.jpg");
+        const del = await this.deleteImage(formData);
+        this.vehicleEntry.attendantPhoto2Url = "";
+      }
+      if (this.isPhotoDelete3) {
+        this.isPhotoDelete3 = false;
+        const formData = new FormData();
+        formData.append("local", path + "image3.jpg");
+        const del = await this.deleteImage(formData);
+        this.vehicleEntry.attendantPhoto3Url = "";
+      }
+      if (this.isPhotoDelete4) {
+        this.isPhotoDelete4 = false;
+        const formData = new FormData();
+        formData.append("local", path + "image4.jpg");
+        const del = await this.deleteImage(formData);
+        this.vehicleEntry.attendantPhoto4Url = "";
+      }
 
       //Inicia loading
       this.busyService.busy();
@@ -1196,12 +1309,43 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
   shareVehicle() {
     this.shareWhatsAppService.shareVehicle(this.vehicleEntry);
   }
-
   private async filterIdClient(id: number): Promise<HttpResponse<MessageResponse>> {
     try {
       return await lastValueFrom(this.clientService.filterId(id));
     } catch (error) {
       this.messageService.add({ severity: 'error', summary: 'Erro', detail: error.error.message, icon: 'pi pi-times' });
+      return error;
+    }
+  }
+  private async filterVehicleTogether(together: string): Promise<HttpResponse<MessageResponse>> {
+    try {
+      return await lastValueFrom(this.vehicleService.filterTogether(together));
+    } catch (error) {
+      this.messageService.add({ severity: 'error', summary: 'Erro', detail: error.error.message, icon: 'pi pi-times' });
+      return error;
+    }
+  }
+  private async saveImage(data: FormData): Promise<HttpResponse<MessageResponse>> {
+    try {
+      return await lastValueFrom(this.vehicleService.saveImage(data));
+    } catch (error) {
+      this.messageService.add({ severity: 'error', summary: 'Erro', detail: error.error.message, icon: 'pi pi-times' });
+      return error;
+    }
+  }
+  private async deleteImage(data: FormData): Promise<HttpResponse<MessageResponse>> {
+    try {
+      return await lastValueFrom(this.vehicleService.deleteImage(data))
+    } catch (error) {
+      this.messageService.add({ severity: 'error', summary: 'Erro', detail: error.error.message, icon: 'pi pi-times' });
+      return error;
+    }
+  }
+  private async addAuthExit(auth: VehicleEntryAuth): Promise<HttpResponse<MessageResponse>> {
+    try {
+      return await lastValueFrom(this.vehicleService.entryAddAuth(auth));
+    } catch (error) {
+      this.messageService.add({ severity: 'error', summary: 'Erro', detail: "Não catalogado.", icon: 'pi pi-times' });
       return error;
     }
   }

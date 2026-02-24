@@ -422,7 +422,7 @@
      driver_exit_name varchar(255),
 
      vehicle_plate varchar(7),
-     vehicle_plate_together int,
+     vehicle_plate_together varchar(100),
      vehicle_fleet varchar(10),
      vehicle_color tinyint,
      vehicle_km_entry varchar(10),

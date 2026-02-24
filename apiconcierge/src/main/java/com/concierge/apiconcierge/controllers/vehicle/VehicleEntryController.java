@@ -109,6 +109,18 @@ public class VehicleEntryController {
         }
     }
 
+    @GetMapping("/{companyId}/{resaleId}/filter/together/{together}")
+    public ResponseEntity<Object> filterTogether(@PathVariable(name = "companyId") Integer companyId,
+                                                 @PathVariable(name = "resaleId") Integer resaleId,
+                                                 @PathVariable(name = "together") String together) {
+        try {
+            MessageResponse response = this.service.filterTogether(companyId, resaleId, together);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
+        }
+    }
+
     @PostMapping("/authorization/add")
     public ResponseEntity<Object> addAuthorizationExit(@RequestBody AuthExitDto auth, HttpServletRequest request) {
         try {
@@ -135,20 +147,28 @@ public class VehicleEntryController {
     public ResponseEntity<Object> deleteAuthorizationExit2(@RequestBody AuthExitDto auth, HttpServletRequest request) {
         try {
             String userEmail = this.getEmail(request);
-            MessageResponse response = this.service.deleteAuthExit1(auth, userEmail);
+            MessageResponse response = this.service.deleteAuthExit2(auth, userEmail);
             return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
         }
     }
 
-    @PostMapping("/{companyId}/{resaleId}/save/image")
-    public ResponseEntity<Object> saveImage(@PathVariable(name = "companyId") Integer companyId,
-                                            @PathVariable(name = "resaleId") Integer resaleId,
-                                            @RequestParam("file") MultipartFile file,
+    @PostMapping("/save/image")
+    public ResponseEntity<Object> saveImage(@RequestParam("file") MultipartFile file,
                                             @RequestParam("local") String local) {
         try {
             MessageResponse response = this.service.saveImage(file, local);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
+        }
+    }
+
+    @PostMapping("/delete/image")
+    public ResponseEntity<Object> deleteImage(@RequestParam("local") String local) {
+        try {
+            MessageResponse response = this.service.deleteImage(local);
             return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));

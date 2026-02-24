@@ -21,7 +21,6 @@ import { LayoutService } from '../../../layouts/layout/service/layout.service';
 import { VehicleService } from '../../../services/vehicle/vehicle.service';
 
 //Constants
-import { STATUS_VEHICLE_ENTRY_NOTAUTH, STATUS_VEHICLE_ENTRY_FIRSTAUTH, STATUS_VEHICLE_ENTRY_AUTHORIZED } from '../../../util/constants';
 import { StorageService } from '../../../services/storage/storage.service';
 import { VehicleEntryAuth } from '../../../models/vehicle/vehicle-entry-auth';
 
@@ -32,6 +31,8 @@ import { TaskService } from '../../../services/task/task.service';
 import { MessageResponse } from '../../../models/message/message-response';
 import { SuccessError } from '../../../models/enum/success-error';
 import { PermissionService } from '../../../services/permission/permission.service';
+import { StatusAuthExit } from '../../../models/enum/status-auth-exit';
+import { YesNot } from '../../../models/enum/yes-not';
 
 @Component({
   selector: 'app-veiculos',
@@ -44,9 +45,9 @@ import { PermissionService } from '../../../services/permission/permission.servi
 })
 export default class VeiculosComponent implements OnInit {
 
-  notAuth = STATUS_VEHICLE_ENTRY_NOTAUTH;
-  firstAuth = STATUS_VEHICLE_ENTRY_FIRSTAUTH;
-  authorized = STATUS_VEHICLE_ENTRY_AUTHORIZED;
+  notAuth = StatusAuthExit.NOT;
+  firstAuth = StatusAuthExit.FIST;
+  authorized = StatusAuthExit.AUTH
 
   statusOrcamento!: any[];
   statusLiberacao!: any[];
@@ -112,7 +113,7 @@ export default class VeiculosComponent implements OnInit {
     //Format Date
     const datePipe = new DatePipe('pt-BR');
     vehicle.entryDate = datePipe.transform(this.formatDateTime(new Date(vehicle.entryDate)), 'dd/MM/yyyy HH:mm');
-    if (vehicle.vehicleNew == "yes") {
+    if (vehicle.vehicleNew == YesNot.yes) {
       vehicle.vehiclePlate = "NOVO";
     }
     if (vehicle.attendantUserName == "") {
@@ -157,28 +158,28 @@ export default class VeiculosComponent implements OnInit {
     }
   }
   public async authExit(vehicle: VehicleEntry) {
-    /*  if (vehicle.statusAuthExit != this.authorized) {
-       const result = await this.addAuthExit(vehicle);
-       if (result.status == 200 && result.body.status == SuccessError.succes) {
-         if (vehicle.statusAuthExit == this.notAuth) {
-           vehicle.statusAuthExit = this.firstAuth;
-         } else if (vehicle.statusAuthExit == this.firstAuth) {
-           vehicle.statusAuthExit = this.authorized;
-         }
-         //Autorização de saída
-         if (vehicle.statusAuthExit == this.firstAuth) {
-           this.messageService.add({ severity: 'success', summary: result.body.header, detail: result.body.message, icon: 'pi pi-check-circle' });
-         }
-         //Saída liberada
-         if (vehicle.statusAuthExit == this.authorized) {
-           this.messageService.add({ severity: 'success', summary: result.body.header, detail: result.body.message, icon: 'pi pi-thumbs-up-fill' });
-         }
-       } else if (result.status == 200 && result.body.status == SuccessError.error) {
-         this.messageService.add({ severity: 'info', summary: result.body.header, detail: result.body.message, icon: 'pi pi-info-circle' });
-       }
-     } else {
-       this.messageService.add({ severity: 'info', summary: 'Veículo', detail: "Já liberado", icon: 'pi pi-info-circle' });
-     } */
+    if (vehicle.authExitStatus != StatusAuthExit.AUTH) {
+      const result = await this.addAuthExit(vehicle);
+      if (result.status == 200 && result.body.status == SuccessError.succes) {
+        if (vehicle.authExitStatus == this.notAuth) {
+          vehicle.authExitStatus = this.firstAuth;
+        } else if (vehicle.authExitStatus == this.firstAuth) {
+          vehicle.authExitStatus = this.authorized;
+        }
+        //Autorização de saída
+        if (vehicle.authExitStatus == this.firstAuth) {
+          this.messageService.add({ severity: 'success', summary: result.body.header, detail: result.body.message, icon: 'pi pi-check-circle' });
+        }
+        //Saída liberada
+        if (vehicle.authExitStatus == this.authorized) {
+          this.messageService.add({ severity: 'success', summary: result.body.header, detail: result.body.message, icon: 'pi pi-thumbs-up-fill' });
+        }
+      } else if (result.status == 200 && result.body.status == SuccessError.error) {
+        this.messageService.add({ severity: 'info', summary: result.body.header, detail: result.body.message, icon: 'pi pi-info-circle' });
+      }
+    } else {
+      this.messageService.add({ severity: 'info', summary: 'Veículo', detail: "Já liberado", icon: 'pi pi-info-circle' });
+    }
   }
   formatDateTime(date: Date): string {
     const datePipe = new DatePipe('en-US');

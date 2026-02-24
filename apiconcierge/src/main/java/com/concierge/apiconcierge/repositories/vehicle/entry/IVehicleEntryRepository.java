@@ -21,9 +21,17 @@ public interface IVehicleEntryRepository extends JpaRepository<VehicleEntry, Int
             nativeQuery = true)
     VehicleEntry filterPlate(Integer companyId, Integer resaleId, String plate);
 
+    @Query(value = "SELECT * FROM `tb_vehicle_entry` WHERE company_id=?1 AND resale_id=?2 AND vehicle_plate_together=?3",
+            nativeQuery = true)
+    List<VehicleEntry> filterTogether(Integer companyId, Integer resaleId, String together);
+
     @Query(value = "select * from tb_vehicle_entry where company_id=?1 AND resale_id=?2 AND auth_exit_status=2 AND step_entry!=4;",
             nativeQuery = true)
     List<VehicleEntry> allAuthorized(Integer companyId, Integer resaleId);
+
+    @Query(value = "select * from tb_vehicle_entry where company_id=?1 AND resale_id=?2 AND status=?3",
+            nativeQuery = true)
+    List<VehicleEntry> all(Integer companyId, Integer resaleId, StatusVehicleEnum status);
 
     @Query(value = "select * from tb_vehicle_entry where company_id=?1 and resale_id=?2 and step_entry!=4",
             nativeQuery = true)

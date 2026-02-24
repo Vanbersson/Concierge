@@ -149,7 +149,7 @@ public class VehicleEntry implements Serializable {
     @Column(name = "vehicle_plate")
     private String vehiclePlate;
     @Column(name = "vehicle_plate_together")
-    private Integer vehiclePlateTogether;
+    private String vehiclePlateTogether;
     @Column(name = "vehicle_fleet")
     private String vehicleFleet;
     @Column(name = "vehicle_color")

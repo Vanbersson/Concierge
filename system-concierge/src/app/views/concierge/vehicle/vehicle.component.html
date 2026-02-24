@@ -53,11 +53,16 @@
                         <p-columnFilter type="text" field="attendantUserName"></p-columnFilter>
                     </th>
                     <th>
-                        <p-columnFilter field="budgetStatus" matchMode="equals" [showMenu]="false">
+                        <p-columnFilter field="authExitStatus" matchMode="equals" [showMenu]="false">
                             <ng-template pTemplate="filter" let-value let-filter="filterCallback">
-                                <p-dropdown [ngModel]="value" [options]="statusOrcamento" (onChange)="filter($event.value)" [showClear]="true">
+                                <p-dropdown [ngModel]="value" [options]="statusLiberacao" (onChange)="filter($event.value)"
+                                    [showClear]="true">
                                     <ng-template let-option pTemplate="item">
-                                        <p-tag [value]="option.value" [severity]="getSeverity(option.label)"></p-tag>
+                                        <i class="pi " [ngClass]="{
+                                            'pi-times-circle text-red-500':option.value == notAuth,
+                                            'pi-check-circle text-green-500':option.value == firstAuth,
+                                            'pi-thumbs-up-fill text-green-600':option.value == authorized}">
+                                        </i>
                                     </ng-template>
                                 </p-dropdown>
                             </ng-template>

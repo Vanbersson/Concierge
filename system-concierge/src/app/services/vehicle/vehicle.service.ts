@@ -46,6 +46,10 @@ export class VehicleService {
     return this.http.get<MessageResponse>(environment.apiuUrl + "/vehicle/entry/" + this.companyResale + "/filter/plate/" + plate, { headers: this.myHeaders(), observe: 'response' });
   }
 
+   filterTogether(together: string): Observable<HttpResponse<MessageResponse>> {
+    return this.http.get<MessageResponse>(environment.apiuUrl + "/vehicle/entry/" + this.companyResale + "/filter/together/" + together, { headers: this.myHeaders(), observe: 'response' });
+  }
+
 
   entryAddAuth(auth: VehicleEntryAuth): Observable<HttpResponse<MessageResponse>> {
     return this.http.post<MessageResponse>(environment.apiuUrl + "/vehicle/entry/authorization/add", auth, { headers: this.myHeaders(), observe: 'response' });
@@ -59,7 +63,11 @@ export class VehicleService {
     return this.http.post<MessageResponse>(environment.apiuUrl + "/vehicle/entry/authorization/delete2", auth, { headers: this.myHeaders(), observe: 'response' });
   }
   saveImage(data: FormData): Observable<HttpResponse<MessageResponse>> {
-    return this.http.post<MessageResponse>(environment.apiuUrl + "/vehicle/entry/" + this.companyResale + "/save/image", data, { headers: this.myHeaders(), observe: 'response' });
+    return this.http.post<MessageResponse>(environment.apiuUrl + "/vehicle/entry/save/image", data, { headers: this.myHeaders(), observe: 'response' });
+  }
+
+  deleteImage(data: FormData): Observable<HttpResponse<MessageResponse>> {
+    return this.http.post<MessageResponse>(environment.apiuUrl + "/vehicle/entry/delete/image",data, { headers: this.myHeaders(), observe: 'response' });
   }
 
   private myHeaders(): HttpHeaders {
