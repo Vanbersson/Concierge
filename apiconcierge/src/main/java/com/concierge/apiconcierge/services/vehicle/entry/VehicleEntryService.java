@@ -164,37 +164,32 @@ public class VehicleEntryService implements IVehicleEntryService {
     @SneakyThrows
     @Override
     public List<Map<String, Object>> listAllAuthorized(Integer companyId, Integer resaleId) {
-
-        List<Map<String, Object>> list = new ArrayList();
-
-//        try {
-//            List<VehicleEntry> vehicles = this.repository.allAuthorized(companyId, resaleId);
-//            for (VehicleEntry item : vehicles) {
-//                long differenceMilliseconds = new Date().getTime() - item.getDateEntry().getTime();
-//                String placa = "";
-//                if (!item.getPlaca().isBlank())
-//                    placa = item.getPlaca().substring(0, 3) + "-" + item.getPlaca().substring(3, 7);
-//
-//                Map<String, Object> map = new HashMap<>();
-//                map.put("id", item.getId());
-//                map.put("placa", placa);
-//                map.put("frota", item.getFrota());
-//                map.put("vehicleNew", item.getVehicleNew());
-//                map.put("modelDescription", item.getModelDescription());
-//                map.put("dateEntry", item.getDateEntry());
-//                map.put("days", TimeUnit.DAYS.convert(differenceMilliseconds, TimeUnit.MILLISECONDS));
-//                map.put("nameUserAttendant", item.getNameUserAttendant());
-//                map.put("clientCompanyName", item.getClientCompanyName());
-//                map.put("statusAuthExit", item.getStatusAuthExit());
-//                map.put("nameUserExitAuth1", item.getNameUserExitAuth1());
-//                map.put("nameUserExitAuth2", item.getNameUserExitAuth2());
-//                list.add(map);
-//            }
-//        } catch (Exception ex) {
-//            throw new VehicleEntryException(ex.getMessage());
-//        }
-
-        return list;
+        try {
+            List<VehicleEntry> vehicles = this.repository.allAuthorized(companyId, resaleId, StatusVehicleEnum.Entered, StatusAuthExitEnum.Authorized);
+            List<Map<String, Object>> list = new ArrayList<>();
+            for (VehicleEntry item : vehicles) {
+                String plate = "";
+                if (!item.getVehiclePlate().isBlank())
+                    plate = item.getVehiclePlate().substring(0, 3) + "-" + item.getVehiclePlate().substring(3, 7);
+                Map<String, Object> map = new HashMap<>();
+                map.put("id", item.getId());
+                map.put("vehiclePlate", plate);
+                map.put("vehicleFleet", item.getVehicleFleet());
+                map.put("vehicleNew", item.getVehicleNew());
+                map.put("modelDescription", item.getModelDescription());
+                map.put("entryDate", item.getEntryDate());
+                map.put("attendantUserName", item.getAttendantUserName());
+                map.put("clientCompanyName", item.getClientCompanyName());
+                map.put("authExitStatus", item.getAuthExitStatus());
+                map.put("numServiceOrder", item.getNumServiceOrder());
+                map.put("auth1ExitUserName", item.getAuth1ExitUserName());
+                map.put("auth2ExitUserName", item.getAuth2ExitUserName());
+                list.add(map);
+            }
+            return list;
+        } catch (Exception ex) {
+            throw new VehicleEntryException(ex.getMessage());
+        }
     }
 
     @SneakyThrows

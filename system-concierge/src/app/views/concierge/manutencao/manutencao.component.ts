@@ -1015,10 +1015,6 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
     this.driverExitPhotoDoc1 = '';
     this.driverExitPhotoDoc2 = '';
   }
-  /* showPlacaExist(placa: string) {
-    const uppercase = new UpperCasePipe();
-    this.messageService.add({ severity: 'error', summary: 'Placa ' + uppercase.transform(placa), detail: "Vaículo já se encontra na empresa", icon: 'pi pi-truck' });
-  } */
   //Budget
   public async confirmGerarOrcamento() {
     if (this.formVehicle.value.numServiceOrder == "" || this.formVehicle.value.numServiceOrder == null) {
@@ -1073,10 +1069,6 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
       return error;
     }
   }
-  //Permission Not
-  /* private permissionNot() {
-    this.messageService.add({ severity: 'error', summary: 'Permissão', detail: "Você não tem permissão", icon: 'pi pi-times' });
-  } */
   //Atualizar informações do veículo
   private validInformation(): boolean {
     const vehicleValue = this.formVehicle.value;
@@ -1095,12 +1087,12 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
       this.messageService.add({ severity: 'error', summary: 'Data Previsão Saída', detail: "Menor que data entrada", icon: 'pi pi-times' });
       return false;
     }
-    if (vehicleValue.vehicleNew == YesNot.not) {
+    /* if (vehicleValue.vehicleNew == YesNot.not) {
       if (vehicleValue.vehiclePlate == "") {
         this.messageService.add({ severity: 'error', summary: 'Placa', detail: "Não informada", icon: 'pi pi-times' });
         return false;
       }
-    }
+    } */
     if (vehicleValue.modelVehicle == null) {
       this.messageService.add({ severity: 'error', summary: 'Modelo', detail: "Não selecionado", icon: 'pi pi-times' });
       return false;

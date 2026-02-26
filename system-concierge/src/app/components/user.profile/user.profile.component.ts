@@ -110,10 +110,16 @@ export class UserProfileComponent {
   }
 
   private async photo() {
+    const path =
+      `${this.storageService.companyId}/` +
+      `${this.storageService.resaleId}/users/` +
+      `${this.storageService.id}/profile/`;
 
     //Remove a foto
     if (!this.userPhotoUrl && !this.user.photoUrl) {
-      const resultDel = await this.deleteImage();
+      const formdata = new FormData();
+      formdata.append("local", path + "image.jpg");
+      const resultDel = await this.deleteImage(formdata);
       if (resultDel.status == 200 && resultDel.body.status == SuccessError.succes) {
         // this.messageService.add({ severity: 'success', summary: resultDel.body.header, detail: resultDel.body.message, icon: 'pi pi-check' });
       }
@@ -125,11 +131,6 @@ export class UserProfileComponent {
       try {
         const { base64, mime } = this.cleanBase64(this.userPhotoUrl);
         const imageFile = this.base64ToFile(base64, mime);
-
-        const path =
-          `${this.storageService.companyId}/` +
-          `${this.storageService.resaleId}/users/` +
-          `${this.storageService.id}/profile/`;
 
         const formData = new FormData();
         formData.append('file', imageFile);
@@ -170,9 +171,9 @@ export class UserProfileComponent {
     return new File([ia], 'image.jpg', { type: mime });
   }
 
-  private async deleteImage(): Promise<HttpResponse<MessageResponse>> {
+  private async deleteImage(data: FormData): Promise<HttpResponse<MessageResponse>> {
     try {
-      return await lastValueFrom(this.userService.deleteImage())
+      return await lastValueFrom(this.userService.deleteImage(data));
     } catch (error) {
       this.messageService.add({ severity: 'error', summary: 'Erro', detail: error.error.message, icon: 'pi pi-times' });
       return error;

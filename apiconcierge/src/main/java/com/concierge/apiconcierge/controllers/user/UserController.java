@@ -1,41 +1,27 @@
 package com.concierge.apiconcierge.controllers.user;
 
-import com.concierge.apiconcierge.dtos.file.FileLocalDto;
 import com.concierge.apiconcierge.dtos.message.MessageResponseDto;
 import com.concierge.apiconcierge.dtos.user.UserDto;
 import com.concierge.apiconcierge.models.message.MessageResponse;
 import com.concierge.apiconcierge.models.user.User;
 import com.concierge.apiconcierge.services.auth.TokenService;
-import com.concierge.apiconcierge.services.user.UserService;
-import com.concierge.apiconcierge.util.ConstantsMessage;
+import com.concierge.apiconcierge.services.user.IUserService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/user")
 public class UserController {
 
     @Autowired
-    UserService service;
+    private IUserService service;
     @Autowired
     private TokenService tokenService;
-
 
     @PostMapping("/save")
     public ResponseEntity<Object> save(@RequestBody UserDto data) {
@@ -55,6 +41,19 @@ public class UserController {
             User user = new User();
             BeanUtils.copyProperties(data, user);
             MessageResponse response = this.service.update(user);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
+        }
+    }
+
+    @PostMapping("/update/password")
+    public ResponseEntity<Object> updatePass(@RequestParam(name = "companyId") Integer companyId,
+                                             @RequestParam(name = "resaleId") Integer resaleId,
+                                             @RequestParam(name = "id") Integer id,
+                                             @RequestParam("password") String password) {
+        try {
+            MessageResponse response = this.service.updatePass(companyId, resaleId, id, password);
             return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
@@ -120,10 +119,9 @@ public class UserController {
     }
 
     @PostMapping("/delete/image")
-    public ResponseEntity<Object> deleteImage(HttpServletRequest request) {
+    public ResponseEntity<Object> deleteImage(@RequestParam("local") String local) {
         try {
-            String userEmail = this.getEmail(request);
-            MessageResponse response = this.service.deleteImage(userEmail);
+            MessageResponse response = this.service.deleteImage(local);
             return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));

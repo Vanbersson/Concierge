@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule, UpperCasePipe } from '@angular/common';
+import { environment } from '../../../../environments/environment';
 import { FormControl, FormsModule, ReactiveFormsModule, FormGroup, Validators } from '@angular/forms';
 
 //PrimeNG
@@ -36,12 +37,15 @@ import { lastValueFrom } from 'rxjs';
 import { MenuUser } from '../../../models/menu/menu-user';
 import { HttpResponse } from '@angular/common/http';
 import { MessageResponse } from '../../../models/message/message-response';
-import { IMAGE_MAX_SIZE, MESSAGE_RESPONSE_SUCCESS } from '../../../util/constants';
+import { IMAGE_MAX_SIZE, IMAGE_MAX_SIZE_LABEL, MESSAGE_RESPONSE_SUCCESS } from '../../../util/constants';
 import { NgxImageCompressService } from 'ngx-image-compress';
 import { StorageService } from '../../../services/storage/storage.service';
 import { SuccessError } from '../../../models/enum/success-error';
 import { StatusEnum } from '../../../models/enum/status-enum';
 import { BusyService } from '../../../components/loading/busy.service';
+import { PhotoResult } from '../../../interfaces/photo-result';
+import { PhotoResultStatus } from '../../../models/enum/photo-result-status';
+import { PhotoService } from '../../../services/photo/photo.service';
 
 @Component({
   selector: 'app-user',
@@ -62,6 +66,8 @@ export default class UserComponent implements OnInit {
   visibleDialogUser: boolean = false;
   userName!: string;
   userPhoto!: string;
+  isPhotoNew: boolean = false;
+  isPhotoDelete: boolean = true;
   userEmail!: string;
   userRoleDescription!: string;
   isEditUser: boolean = false;
@@ -73,13 +79,13 @@ export default class UserComponent implements OnInit {
     id: new FormControl<number | null>(null),
     status: new FormControl<StatusEnum>({ value: StatusEnum.DISABLED, disabled: false }),
     name: new FormControl<string>('', Validators.required),
-    email: new FormControl<string>('', Validators.required),
-    password: new FormControl<string>(''),
-    passwordValid: new FormControl<string>(''),
+    email: new FormControl<string>('', [Validators.email, Validators.required]),
     cellphone: new FormControl<string>(''),
     roleDesc: new FormControl<UserRole[] | null>([], Validators.required),
     roleFunc: new FormControl<string>('USER', Validators.required),
     limitDiscount: new FormControl<number>(0),
+    password: new FormControl<string>(''),
+    passwordValid: new FormControl<string>(''),
   });
 
   //Dialog Func
@@ -93,6 +99,15 @@ export default class UserComponent implements OnInit {
   menus: TreeNode[] = [];
   menuSelect: TreeNode[] = [];
 
+  //Update password 
+  private userPass!: User;
+  visibleUpdatePass: boolean = false;
+  nameUserUpdatePass!: string;
+  formPassword = new FormGroup({
+    password: new FormControl<string>('', [Validators.minLength(8), Validators.maxLength(8), Validators.required]),
+    passwordValid: new FormControl<string>('', [Validators.minLength(8), Validators.maxLength(8), Validators.required]),
+  });
+
   constructor(
     private busyService: BusyService,
     private userService: UserService,
@@ -101,7 +116,7 @@ export default class UserComponent implements OnInit {
     private permissionService: PermissionService,
     private menuUserService: MenuUserService,
     private messageService: MessageService,
-    private ngxImageCompressService: NgxImageCompressService) { }
+    private photoService: PhotoService) { }
 
   ngOnInit(): void {
 
@@ -191,25 +206,55 @@ export default class UserComponent implements OnInit {
     this.getRoles();
     this.getPermissions();
   }
+
+  showUpdatePass(user: User) {
+    this.userPass = new User();
+    this.userPass = user;
+    this.visibleUpdatePass = true;
+    this.nameUserUpdatePass = user.name;
+  }
+  async saveUpdatePassword() {
+    try {
+      const formData = new FormData();
+      formData.append("companyId", this.userPass.companyId.toString());
+      formData.append("resaleId", this.userPass.resaleId.toString());
+      formData.append("id", this.userPass.id.toString());
+      formData.append("password", this.formPassword.get("password").value);
+
+      this.busyService.busy();
+      const resultUser = await this.updatePassword(formData);
+      this.busyService.idle();
+      if (resultUser.status == 200 && resultUser.body.status == SuccessError.succes) {
+        this.messageService.add({ severity: 'success', summary: resultUser.body.header, detail: resultUser.body.message, icon: 'pi pi-check' });
+      }
+      if (resultUser.status == 200 && resultUser.body.status == SuccessError.error) {
+        this.messageService.add({ severity: 'info', summary: resultUser.body.header, detail: resultUser.body.message, icon: 'pi pi-info-circle' });
+      }
+    } catch (error) {
+
+    }
+    this.visibleUpdatePass = false;
+    this.userPass = null;
+  }
   //Password
   private addRequirePass() {
-    this.formUser.controls['password'].addValidators([Validators.minLength(8), Validators.required]);
+    this.formUser.controls['password'].addValidators([Validators.minLength(8), Validators.maxLength(8), Validators.required]);
     this.formUser.controls['password'].updateValueAndValidity();
   }
   private deleteRequirePass() {
-    this.formUser.controls['password'].removeValidators([Validators.minLength(8), Validators.required]);
+    this.formUser.controls['password'].removeValidators([Validators.minLength(8), Validators.maxLength(8), Validators.required]);
     this.formUser.controls['password'].updateValueAndValidity();
   }
   //Password Valid
   private addRequirePassValid() {
-    this.formUser.controls['passwordValid'].addValidators([Validators.minLength(8), Validators.required]);
+    this.formUser.controls['passwordValid'].addValidators([Validators.minLength(8), Validators.maxLength(8), Validators.required]);
     this.formUser.controls['passwordValid'].updateValueAndValidity();
   }
   private deleteRequirePassValid() {
-    this.formUser.controls['passwordValid'].removeValidators([Validators.minLength(8), Validators.required]);
+    this.formUser.controls['passwordValid'].removeValidators([Validators.minLength(8), Validators.maxLength(8), Validators.required]);
     this.formUser.controls['passwordValid'].updateValueAndValidity();
   }
-  async getUsers() {
+  private async getUsers() {
     this.busyService.busy();
     const result = await this.listAllUsers();
     this.busyService.idle();
@@ -256,7 +301,6 @@ export default class UserComponent implements OnInit {
     this.formUser.get('password').enable();
     this.formUser.get('passwordValid').enable();
 
-
     this.userSelect = null;
     this.cleanForm();
     this.visibleDialogUser = true;
@@ -264,11 +308,25 @@ export default class UserComponent implements OnInit {
     this.addRequirePass();
     this.addRequirePassValid();
   }
-  editUser(user: User) {
-    this.isEditUser = true;
-    this.showDialogEdit(user);
+  async editUser(id: number) {
+    const resultUser = await this.filterUserId(id);
+    if (resultUser.status == 200 && resultUser.body.status == SuccessError.succes) {
+      this.isEditUser = true;
+      this.showDialogEdit(resultUser.body.data);
+    }
+    if (resultUser.status == 200 && resultUser.body.status == SuccessError.error) {
+      this.messageService.add({ severity: 'info', summary: resultUser.body.header, detail: resultUser.body.message, icon: 'pi pi-info-circle' });
+    }
+  }
+  private async filterUserId(id: number): Promise<HttpResponse<MessageResponse>> {
+    try {
+      return await lastValueFrom(this.userService.filterId(id));
+    } catch (error) {
+      return error;
+    }
   }
   private showDialogEdit(user: User) {
+    this.cleanForm();
     //show dialog
     this.visibleDialogUser = true;
     //disable ID
@@ -276,6 +334,9 @@ export default class UserComponent implements OnInit {
     //disable password
     this.formUser.get('password').disable();
     this.formUser.get('passwordValid').disable();
+    //remove a requisição
+    this.deleteRequirePass();
+    this.deleteRequirePassValid();
     //Data user
     this.userSelect = user;
 
@@ -296,9 +357,7 @@ export default class UserComponent implements OnInit {
       limitDiscount: user.limitDiscount,
       roleDesc: [roleSelect],
       roleFunc: user.roleFunc,
-      status: user.status,
-      password: '',
-      passwordValid: ''
+      status: user.status
     });
     //Menus
     this.getMenusUser();
@@ -312,7 +371,9 @@ export default class UserComponent implements OnInit {
     if (result.status == 200 && result.body.status == SuccessError.succes) {
       if (result.body.data.length > 0) {
         var perTemp: Permission[] = [];
+
         for (var item of result.body.data) {
+
           for (var per of this.permissions) {
             if (item.permissionId == per.id) {
               perTemp.push(per);
@@ -321,27 +382,7 @@ export default class UserComponent implements OnInit {
         }
         this.permissionsSelect = perTemp;
       }
-    } else if (result.status == 200 && result.body.status == SuccessError.error) {
-      this.messageService.add({ severity: 'info', summary: result.body.header, detail: result.body.message, icon: 'pi pi-info-circle' });
     }
-    //Permission user selected
-    /* this.permissionService.filterUser(this.userSelect.companyId, this.userSelect.resaleId, this.userSelect.id).subscribe(data => {
-
-      if (data.length > 0) {
-        var perTemp: Permission[] = [];
-
-        for (var item of data) {
-          for (var per of this.permissions) {
-
-            if (item.permissionId == per.id) {
-              perTemp.push(per);
-            }
-
-          }
-        }
-        this.permissionsSelect = perTemp;
-      }
-    }); */
   }
 
   private async permissionFilterUser(): Promise<HttpResponse<MessageResponse>> {
@@ -363,82 +404,49 @@ export default class UserComponent implements OnInit {
       email: '',
       cellphone: '',
       limitDiscount: 0,
-      password: '',
-      passwordValid: '',
       roleDesc: null,
       roleFunc: 'USER',
-      status: StatusEnum.ENABLED
+      status: StatusEnum.ENABLED,
+      password: '',
+      passwordValid: ''
     });
   }
   public async selectPhoto() {
-    this.ngxImageCompressService.uploadFile().then(({ image, orientation }) => {
-
-      if (this.ngxImageCompressService.byteCount(image) > IMAGE_MAX_SIZE) {
-        this.messageService.add({ severity: 'error', summary: 'Imagem', detail: 'Tamanha máximo 3MB', icon: 'pi pi-times', life: 3000 });
-      } else {
-        this.ngxImageCompressService.compressFile(image, orientation, 50, 40).then((compressedImage) => {
-
-          // Remover o prefixo "data:image/jpeg;base64," se existir
-          const base64Data = compressedImage.split(',')[1];
-          this.userPhoto = base64Data;
-
-        });
-      }
-    });
+    const photo: PhotoResult = await this.photoService.takePicture();
+    if (photo.status == PhotoResultStatus.SUCCESS) {
+      this.userPhoto = photo.base64;
+      //informa que foi selecionado uma imagem nova
+      this.isPhotoNew = true;
+      //informa que não excluida a imagem
+      this.isPhotoDelete = false;
+    }
+    if (photo.status == PhotoResultStatus.LIMIT) {
+      this.messageService.add({ severity: 'info', summary: 'Imagem', detail: IMAGE_MAX_SIZE_LABEL, icon: 'pi pi-info-circle', life: 3000 });
+    }
+    if (photo.status == PhotoResultStatus.ERROR) {
+      // this.messageService.add({ severity: 'error', summary: 'Erro', detail: "Ocorreu um problema.", icon: 'pi pi-times', life: 3000 });
+    }
   }
   public deletePhoto() {
     this.userPhoto = "";
-  }
-  private validationEdit(): boolean {
-    const { value } = this.formUser;
-
-    if (value.name.trim() == '') {
-      this.messageService.add({ severity: 'error', summary: 'Nome', detail: 'Campo inválido', icon: 'pi pi-times' });
-      return false
-    }
-    if (value.email.trim() == '') {
-      this.messageService.add({ severity: 'error', summary: 'Email', detail: 'Campo inválido', icon: 'pi pi-times' });
-      return false
-    }
-    if (value.roleDesc == null) {
-      this.messageService.add({ severity: 'error', summary: 'Cargo', detail: 'Não selecionado', icon: 'pi pi-times' });
-      return false
-    }
-    return true;
-  }
-  private validationSave(): boolean {
-    const { value } = this.formUser;
-
-    if (value.name.trim() == '') {
-      this.messageService.add({ severity: 'error', summary: 'Nome', detail: 'Campo inválido', icon: 'pi pi-times' });
-      return false
-    }
-    if (value.email.trim() == '') {
-      this.messageService.add({ severity: 'error', summary: 'Email', detail: 'Campo inválido', icon: 'pi pi-times' });
-      return false
-    }
-    if (value.password.trim() != value.passwordValid.trim()) {
-      this.messageService.add({ severity: 'error', summary: 'Senha', detail: 'Campo inválido', icon: 'pi pi-times' });
-      return false
-    }
-    if (value.roleDesc == null) {
-      this.messageService.add({ severity: 'error', summary: 'Cargo', detail: 'Não selecionado', icon: 'pi pi-times' });
-      return false
-    }
-    return true;
+    //informa que foi excluida a imagem
+    this.isPhotoDelete = true;
+    //informa que não foi selecionado uma imagem nova
+    this.isPhotoNew = false;
   }
   public saveData() {
+    const { valid } = this.formUser;
     if (this.isEditUser == false) {
-      if (this.validationSave()) {
+      if (valid) {
         this.saveUser();
       }
     } else {
-      if (this.validationEdit()) {
+      if (valid) {
         this.updateUser();
       }
     }
   }
-  private saveUser() {
+  private async saveUser() {
     const { value } = this.formUser;
     var userNew = new User();
 
@@ -455,44 +463,150 @@ export default class UserComponent implements OnInit {
     userNew.roleFunc = value.roleFunc;
     userNew.status = value.status;
 
-    this.userService.saveUser(userNew).subscribe(data => {
+    const resultSave = await this.saveNewUser(userNew);
+    if (resultSave.status == 201 && resultSave.body.status == SuccessError.succes) {
+      this.messageService.add({ severity: 'success', summary: resultSave.body.header, detail: resultSave.body.message, icon: 'pi pi-check' });
 
-      if (data.status == 201) {
-        this.formUser.get('id').setValue(data.body.data.id);
-        this.userSelect = userNew;
-        this.userSelect.id = data.body.data.id;
-        this.isEditUser = true;
-        this.getUsers();
-        this.alertUserSave();
-      }
-    });
+      this.formUser.get('id').setValue(resultSave.body.data.id);
+      this.userSelect = userNew;
+      this.userSelect.id = resultSave.body.data.id;
+      this.isEditUser = true;
+      this.getUsers();
+    }
+    if (resultSave.status == 201 && resultSave.body.status == SuccessError.error) {
+      this.messageService.add({ severity: 'info', summary: resultSave.body.header, detail: resultSave.body.message, icon: 'pi pi-info-circle' });
+    }
   }
-  private updateUser() {
 
-    if (this.isEditUser) {
+  private async saveNewUser(user: User): Promise<HttpResponse<MessageResponse>> {
+    try {
+      return await lastValueFrom(this.userService.saveUser(user));
+    } catch (error) {
+      this.messageService.add({ severity: 'error', summary: 'Erro', detail: "Não catalogado.", icon: 'pi pi-times' });
+      return error;
+    }
+  }
+  private async updateUser() {
+    const { value } = this.formUser;
+    if (this.isPhotoNew) {
+      this.isPhotoNew = false;
+      const img1 = await this.savePhoto(this.userSelect);
+      this.userSelect.photoUrl = img1;
+    }
 
-      const { value } = this.formUser;
+    if (this.isPhotoDelete) {
+      this.isPhotoDelete = false;
+      const path =
+        `${this.userSelect.companyId}/` +
+        `${this.userSelect.resaleId}/users/` +
+        `${this.userSelect.id}/profile/image.jpg`;
+      const formdata = new FormData();
+      formdata.append("local", path);
+      const result = await this.deleteImage(formdata);
+      this.userSelect.photoUrl = "";
+    }
 
-      this.userSelect.photoUrl = this.userPhoto;
-      this.userSelect.name = value.name;
-      this.userSelect.email = value.email;
-      this.userSelect.cellphone = value.cellphone;
-      this.userSelect.limitDiscount = value.limitDiscount;
-      this.userSelect.password = "";
-      this.userSelect.roleId = value.roleDesc.at(0).id;
-      this.userSelect.roleDesc = value.roleDesc.at(0).description;
-      this.userSelect.roleFunc = value.roleFunc;
-      this.userSelect.status = value.status;
+    this.userSelect.name = value.name;
+    this.userSelect.email = value.email;
+    this.userSelect.cellphone = value.cellphone;
+    this.userSelect.limitDiscount = value.limitDiscount;
+    this.userSelect.password = "";
+    this.userSelect.roleId = value.roleDesc.at(0).id;
+    this.userSelect.roleDesc = value.roleDesc.at(0).description;
+    this.userSelect.roleFunc = value.roleFunc;
+    this.userSelect.status = value.status;
+    this.busyService.busy();
+    const resultUpdate = await this.saveUpdateUser(this.userSelect);
+    this.busyService.idle();
+    if (resultUpdate.status == 200 && resultUpdate.body.status == SuccessError.succes) {
+      this.messageService.add({ severity: 'success', summary: resultUpdate.body.header, detail: resultUpdate.body.message, icon: 'pi pi-check' });
+      this.getUsers();
+    }
+    if (resultUpdate.status == 200 && resultUpdate.body.status == SuccessError.error) {
+      this.messageService.add({ severity: 'info', summary: resultUpdate.body.header, detail: resultUpdate.body.message, icon: 'pi pi-info-circle' });
+    }
+  }
+  private async saveUpdateUser(user: User): Promise<HttpResponse<MessageResponse>> {
+    try {
+      return await lastValueFrom(this.userService.updateUser(user));
+    } catch (error) {
+      this.messageService.add({ severity: 'error', summary: 'Erro', detail: "Não catalogado.", icon: 'pi pi-times' });
+      return error;
+    }
+  }
+  private async updatePassword(data: FormData): Promise<HttpResponse<MessageResponse>> {
+    try {
+      return await lastValueFrom(this.userService.updatePassword(data));
+    } catch (error) {
+      this.messageService.add({ severity: 'error', summary: 'Erro', detail: "Não catalogado.", icon: 'pi pi-times' });
+      return error;
+    }
+  }
 
-      this.userService.updateUser(this.userSelect).subscribe((data) => {
-        if (data.status == 200) {
-          this.alertUserUpdate();
-        }
-      }, (error) => {
-        if (error.status == 401) {
-          this.alertPasswordError();
-        }
-      });
+  //save image
+  private async savePhoto(user: User): Promise<string> {
+    if (this.userPhoto == "") {
+      return "";
+    }
+
+    //Tentar salvar a foto
+    try {
+      const { base64, mime } = this.cleanBase64(this.userPhoto);
+      const imageFile = this.base64ToFile(base64, mime);
+
+      const path =
+        `${user.companyId}/` +
+        `${user.resaleId}/users/` +
+        `${user.id}/profile/`;
+
+      const formData = new FormData();
+      formData.append('file', imageFile);
+      formData.append('local', path);
+
+      const resultSave = await this.saveImage(formData);
+      if (resultSave.status === 200 && resultSave.body.status === SuccessError.succes) {
+        return `${environment.apiuUrl}${resultSave.body.data["url"]}`;
+      }
+    } catch (error) {
+      this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Erro ao salvar imagem de perfil' });
+    }
+    return "";
+  }
+  private cleanBase64(base64: string): { base64: string; mime: string } {
+    if (!base64.includes(',')) {
+      return { base64, mime: 'image/jpeg' };
+    }
+
+    const [header, data] = base64.split(',');
+    const mime = header.match(/data:(.*);base64/)?.[1] || 'image/jpeg';
+
+    return { base64: data, mime };
+  }
+  private base64ToFile(base64: string, mime: string): File {
+    const byteString = atob(base64);
+    const ab = new ArrayBuffer(byteString.length);
+    const ia = new Uint8Array(ab);
+
+    for (let i = 0; i < byteString.length; i++) {
+      ia[i] = byteString.charCodeAt(i);
+    }
+
+    return new File([ia], 'image.jpg', { type: mime });
+  }
+  private async deleteImage(data: FormData): Promise<HttpResponse<MessageResponse>> {
+    try {
+      return await lastValueFrom(this.userService.deleteImage(data));
+    } catch (error) {
+      this.messageService.add({ severity: 'error', summary: 'Erro', detail: error.error.message, icon: 'pi pi-times' });
+      return error;
+    }
+  }
+  private async saveImage(data: FormData): Promise<HttpResponse<MessageResponse>> {
+    try {
+      return await lastValueFrom(this.userService.uploadImage(data))
+    } catch (error) {
+      this.messageService.add({ severity: 'error', summary: 'Erro', detail: error.error.message, icon: 'pi pi-times' });
+      return error;
     }
   }
 
@@ -572,7 +686,6 @@ export default class UserComponent implements OnInit {
     this.visibleDialogMenu = false;
   }
   public async saveMenus() {
-
     var menu: MenuUser = new MenuUser();
     menu.companyId = this.userSelect.companyId;
     menu.resaleId = this.userSelect.resaleId;
@@ -621,22 +734,11 @@ export default class UserComponent implements OnInit {
       return error;
     }
   }
-
   //Alert
-  private alertUserSave() {
-    this.messageService.add({ severity: 'success', summary: 'Usuário', detail: 'Salvo com sucesso', icon: 'pi pi-check', life: 3000 });
-  }
-  private alertUserUpdate() {
-    this.messageService.add({ severity: 'success', summary: 'Usuário', detail: 'Atualizado com sucesso', icon: 'pi pi-check', life: 3000 });
-  }
-  private alertPasswordError() {
-    this.messageService.add({ severity: 'error', summary: 'Senha', detail: 'Senha não conferir', icon: 'pi pi-times' });
-  }
   private alertPermisionSave() {
     this.messageService.add({ severity: 'success', summary: 'Permissões', detail: 'Salvo com sucesso', icon: 'pi pi-check', life: 3000 });
   }
   private alertMenusSave() {
     this.messageService.add({ severity: 'success', summary: 'Menus', detail: 'Salvo com sucesso', icon: 'pi pi-check', life: 3000 });
   }
-
 }

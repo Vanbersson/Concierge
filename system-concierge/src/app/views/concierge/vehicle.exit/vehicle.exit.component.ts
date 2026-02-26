@@ -79,14 +79,14 @@ export default class VehicleExitComponent implements OnInit, OnDestroy {
     this.busyService.idle();
     if (data.length > 0) {
       const datePipe = new DatePipe('pt-BR');
-    /*   for (let index = 0; index < data.length; index++) {
-        data[index].dateEntry = datePipe.transform(this.formatDateTime(new Date(data[index].dateEntry)), 'dd/MM/yyyy HH:mm');
+       for (let index = 0; index < data.length; index++) {
+        data[index].entryDate = datePipe.transform(this.formatDateTime(new Date(data[index].entryDate)), 'dd/MM/yyyy HH:mm');
         if (data[index].vehicleNew == "yes") {
-          data[index].placa = "NOVO";
+          data[index].vehiclePlate = "NOVO";
         }
         var nome = data[index].clientCompanyName.split(' ');
         data[index].clientCompanyName = nome[0] + " " + nome[1];
-      } */
+      } 
       this.listVehicleExit = data;
     }else{
       this.listVehicleExit = data;

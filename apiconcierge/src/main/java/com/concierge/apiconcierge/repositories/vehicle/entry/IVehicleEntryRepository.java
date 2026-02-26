@@ -4,6 +4,7 @@ import com.concierge.apiconcierge.controllers.dashboard.interfaces.IDashCountVeh
 import com.concierge.apiconcierge.controllers.dashboard.interfaces.IDashValueTotalBudget;
 import com.concierge.apiconcierge.models.enums.YesNot;
 import com.concierge.apiconcierge.models.vehicle.entry.VehicleEntry;
+import com.concierge.apiconcierge.models.vehicle.enums.StatusAuthExitEnum;
 import com.concierge.apiconcierge.models.vehicle.enums.StatusVehicleEnum;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -25,9 +26,9 @@ public interface IVehicleEntryRepository extends JpaRepository<VehicleEntry, Int
             nativeQuery = true)
     List<VehicleEntry> filterTogether(Integer companyId, Integer resaleId, String together);
 
-    @Query(value = "select * from tb_vehicle_entry where company_id=?1 AND resale_id=?2 AND auth_exit_status=2 AND step_entry!=4;",
+    @Query(value = "select * from tb_vehicle_entry where company_id=?1 AND resale_id=?2 AND status=?3 AND auth_exit_status=?4",
             nativeQuery = true)
-    List<VehicleEntry> allAuthorized(Integer companyId, Integer resaleId);
+    List<VehicleEntry> allAuthorized(Integer companyId, Integer resaleId, StatusVehicleEnum status, StatusAuthExitEnum auth);
 
     @Query(value = "select * from tb_vehicle_entry where company_id=?1 AND resale_id=?2 AND status=?3",
             nativeQuery = true)

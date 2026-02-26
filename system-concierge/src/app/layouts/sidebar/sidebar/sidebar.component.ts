@@ -38,7 +38,7 @@ export class SidebarComponent implements OnInit {
         items: [
           {
             key: '1_1',
-            label: 'Entrada Veículo',
+            label: 'Entrada de Veículo',
             visible: false,
             routerLink: 'portaria/atendimento-veiculo'
           },
@@ -50,7 +50,7 @@ export class SidebarComponent implements OnInit {
           },
           {
             key: '1_5',
-            label: 'Saída Veículo',
+            label: 'Saída de Veículo',
             visible: false,
             routerLink: 'portaria/saida-veiculo'
           },
@@ -61,19 +61,19 @@ export class SidebarComponent implements OnInit {
             routerLink: 'portaria/manutencao-motorista',
           },
           {
-            key: '1_4',
+            key: '1_99',
             label: 'Cadastros',
             visible: false,
             items: [
               {
-                key: '1_4_0',
+                key: '1_99_0',
                 label: 'Modelo',
                 visible: false,
                 routerLink: 'portaria/manutencao-modelo-veiculo'
               },
               {
                 id: '',
-                key: '1_4_1',
+                key: '1_99_1',
                 label: 'Veículo',
                 routerLink: 'portaria/manutencao-veiculo',
                 visible: false,

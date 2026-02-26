@@ -87,6 +87,25 @@ public class UserService implements IUserService {
 
     @SneakyThrows
     @Override
+    public MessageResponse updatePass(Integer companyId, Integer resaleId, Integer id, String pass) {
+        try {
+            User user = this.repository.filterId(companyId, resaleId, id);
+            String encryptedPass = this.security.passwordEncoder().encode(pass);
+            user.setPassword(encryptedPass);
+            this.repository.save(user);
+
+            MessageResponse response = new MessageResponse();
+            response.setStatus(ConstantsMessage.SUCCESS);
+            response.setHeader("Senha");
+            response.setMessage("Atualizado com sucesso.");
+            return response;
+        } catch (Exception ex) {
+            throw new UserException(ex.getMessage());
+        }
+    }
+
+    @SneakyThrows
+    @Override
     public MessageResponse listAll(Integer companyId, Integer resaleId) {
         try {
             MessageResponse response = this.validation.listAll(companyId, resaleId);
@@ -94,7 +113,16 @@ public class UserService implements IUserService {
                 List<User> usersResult = this.repository.listAll(companyId, resaleId);
                 List<Map<String, Object>> list = new ArrayList<>();
                 for (User user : usersResult) {
-                    list.add(this.loadUser(user));
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("companyId", user.getCompanyId());
+                    map.put("resaleId", user.getResaleId());
+                    map.put("id", user.getId());
+                    map.put("status", user.getStatus());
+                    map.put("name", user.getName());
+                    map.put("email", user.getEmail());
+                    map.put("roleDesc", user.getRoleDesc());
+                    map.put("photoUrl", user.getPhotoUrl());
+                    list.add(map);
                 }
                 response.setData(list);
             }
@@ -131,7 +159,7 @@ public class UserService implements IUserService {
         try {
             MessageResponse response = this.validation.filterRoleId(companyId, resaleId, roleId);
             if (ConstantsMessage.SUCCESS.equals(response.getStatus())) {
-                List<User> usersResult = this.repository.filterRoleId(companyId, resaleId, StatusEnableDisable.Habilitado ,roleId);
+                List<User> usersResult = this.repository.filterRoleId(companyId, resaleId, StatusEnableDisable.Habilitado, roleId);
                 List<Map<String, Object>> list = new ArrayList<>();
                 for (User user : usersResult) {
                     list.add(this.loadUser(user));
@@ -207,7 +235,7 @@ public class UserService implements IUserService {
 
     @SneakyThrows
     @Override
-    public MessageResponse deleteImage(String userEmail) {
+    public MessageResponse deleteImage(String local) {
         try {
             MessageResponse response = new MessageResponse();
             response.setStatus(ConstantsMessage.SUCCESS);
@@ -215,9 +243,7 @@ public class UserService implements IUserService {
             response.setMessage("Excluída com sucesso.");
 
             Path basePath = Paths.get(UPLOAD_DIR).toAbsolutePath().normalize();
-
-            User responseUser = this.repository.loginEmail(userEmail);
-            Path filePath = basePath.resolve(responseUser.getCompanyId() + "/" + responseUser.getResaleId() + "/users/" + responseUser.getId() + "/profile/image.jpg").normalize();
+            Path filePath = basePath.resolve(local).normalize();
 
             // Proteção contra path traversal
             if (!filePath.startsWith(basePath)) {
@@ -225,18 +251,12 @@ public class UserService implements IUserService {
                 response.setMessage("Caminho inválido.");
                 return response;
             }
-
             if (!Files.exists(filePath) || !Files.isRegularFile(filePath)) {
                 response.setStatus(ConstantsMessage.ERROR);
                 response.setMessage("Imagem não encontrada.");
                 return response;
             }
-
             Files.delete(filePath);
-
-
-            responseUser.setPhotoUrl("");
-            this.repository.save(responseUser);
 
             return response;
         } catch (Exception e) {

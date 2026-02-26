@@ -20,11 +20,14 @@ export class UserService {
   updateUser(user: User): Observable<HttpResponse<MessageResponse>> {
     return this.http.post<MessageResponse>(environment.apiuUrl + "/user/update", user, { headers: this.myHeaders(), observe: 'response' });
   }
+  updatePassword(data: FormData): Observable<HttpResponse<MessageResponse>> {
+    return this.http.post<MessageResponse>(environment.apiuUrl + "/user/update/password", data, { headers: this.myHeaders(), observe: 'response' });
+  }
   listAll(): Observable<HttpResponse<MessageResponse>> {
     return this.http.get<MessageResponse>(environment.apiuUrl + "/user/" + this.companyResale + "/all", { headers: this.myHeaders(), observe: 'response' });
   }
-  filterId(id: number): Observable<HttpResponse<User>> {
-    return this.http.get<User>(environment.apiuUrl + "/user/" + this.companyResale + "/filter/id/" + id, { headers: this.myHeaders(), observe: 'response' });
+  filterId(id: number): Observable<HttpResponse<MessageResponse>> {
+    return this.http.get<MessageResponse>(environment.apiuUrl + "/user/" + this.companyResale + "/filter/id/" + id, { headers: this.myHeaders(), observe: 'response' });
   }
 
   filterEmail(email: string): Observable<HttpResponse<MessageResponse>> {
@@ -39,8 +42,8 @@ export class UserService {
     return this.http.post<MessageResponse>(environment.apiuUrl + "/user/upload/image", data, { headers: this.myHeaders(), observe: 'response' });
   }
 
-  public deleteImage(): Observable<HttpResponse<MessageResponse>> {
-    return this.http.post<MessageResponse>(environment.apiuUrl + "/user/delete/image", {}, { headers: this.myHeaders(), observe: 'response' });
+  public deleteImage(data: FormData): Observable<HttpResponse<MessageResponse>> {
+    return this.http.post<MessageResponse>(environment.apiuUrl + "/user/delete/image", data, { headers: this.myHeaders(), observe: 'response' });
   }
 
   private myHeaders(): HttpHeaders {

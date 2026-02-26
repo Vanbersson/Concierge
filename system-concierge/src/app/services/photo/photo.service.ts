@@ -46,8 +46,6 @@ export class PhotoService {
                 50,   // qualidade
                 40    // proporção
             );
-
-            // retorna somente o base64 puro, sem o "data:image/jpeg;base64,"
             return {
                 status: PhotoResultStatus.SUCCESS,
                 base64: compressedImage

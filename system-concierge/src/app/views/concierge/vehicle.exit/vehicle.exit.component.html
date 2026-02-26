@@ -14,7 +14,7 @@
     </div>
     <p-table #tableFilter dataKey="id" [value]="listVehicleExit" [(selection)]="selectedVehicle" 
         currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords}" [showCurrentPageReport]="true"
-        [globalFilterFields]="['id','placa','modelDescription', 'frota','dateEntry','clientCompanyName','nameUserAttendant']"
+        [globalFilterFields]="['id','vehiclePlate','modelDescription', 'vehicleFleet','entryDate','clientCompanyName','attendantUserName']"
         [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 25, 50]"
         styleClass="p-datatable-sm">
         <ng-template pTemplate="caption">
@@ -33,12 +33,12 @@
                     Sel.
                 </th>
                 <th class="disabled-col" pSortableColumn="id">Código<p-sortIcon field="id"></p-sortIcon></th>
-                <th pSortableColumn="placa">Placa<p-sortIcon field="placa"></p-sortIcon></th>
+                <th pSortableColumn="vehiclePlate">Placa<p-sortIcon field="vehiclePlate"></p-sortIcon></th>
                 <th pSortableColumn="modelDescription">Modelo<p-sortIcon field="modelDescription"></p-sortIcon></th>
-                <th class="disabled-col" pSortableColumn="frota">Frota<p-sortIcon field="frota"></p-sortIcon></th>
-                <th class="disabled-col" pSortableColumn="dateEntry">Entrada<p-sortIcon field="dateEntry"></p-sortIcon></th>
+                <th class="disabled-col" pSortableColumn="vehicleFleet">Frota<p-sortIcon field="vehicleFleet"></p-sortIcon></th>
+                <th class="disabled-col" pSortableColumn="entryDate">Entrada<p-sortIcon field="entryDate"></p-sortIcon></th>
                 <th pSortableColumn="clientCompanyName">Empresa<p-sortIcon field="clientCompanyName"></p-sortIcon></th>
-                <th class="disabled-col" pSortableColumn="nameUserAttendant">Consultor<p-sortIcon field="nameUserAttendant"></p-sortIcon></th>
+                <th class="disabled-col" pSortableColumn="attendantUserName">Consultor<p-sortIcon field="attendantUserName"></p-sortIcon></th>
                 <th class="disabled-col" pSortableColumn="nameUserExitAuth1">1ª Auto<p-sortIcon field="nameUserExitAuth1"></p-sortIcon></th>
                 <th class="disabled-col" pSortableColumn="nameUserExitAuth2">2ª Auto<p-sortIcon field="nameUserExitAuth2"></p-sortIcon></th>
             </tr>
@@ -48,22 +48,22 @@
                 <td> <p-tableCheckbox [value]="vehicle" /></td>
                 <td class="disabled-col"><span class="text-500">{{ vehicle.id }}</span></td>
                 <td>
-                    @if(vehicle.placa == "NOVO"){
+                    @if(vehicle.vehiclePlate == "NOVO"){
                     <div class="flex align-items-center justify-content-center bg-blue-100 border-round"
                         [ngStyle]="{width: '3.5rem', height: '2.5rem'}">
                         <span class="text-500">NOVO</span>
                     </div>
                     }@else {
-                    <span class="text-500">{{vehicle.placa | uppercase}}</span>
+                    <span class="text-500">{{vehicle.vehiclePlate | uppercase}}</span>
                     }
                 </td>
                 <td><span class="text-500">{{ vehicle.modelDescription | uppercase }}</span></td>
-                <td class="disabled-col"><span class="text-500">{{ vehicle.frota | uppercase }}</span></td>
-                <td class="disabled-col"><span class="text-500">{{ vehicle.dateEntry }}</span></td>
+                <td class="disabled-col"><span class="text-500">{{ vehicle.vehicleFleet | uppercase }}</span></td>
+                <td class="disabled-col"><span class="text-500">{{ vehicle.entryDate }}</span></td>
                 <td><span class="text-500">{{ vehicle.clientCompanyName | uppercase }}</span></td>
-                <td class="disabled-col"><span class="text-500">{{ vehicle.nameUserAttendant | uppercase }}</span></td>
-                <td class="disabled-col"><span class="text-500">{{ vehicle.nameUserExitAuth1 | uppercase }}</span></td>
-                <td class="disabled-col"><span class="text-500">{{ vehicle.nameUserExitAuth2 | uppercase }}</span></td>
+                <td class="disabled-col"><span class="text-500">{{ vehicle.attendantUserName | uppercase }}</span></td>
+                <td class="disabled-col"><span class="text-500">{{ vehicle.auth1ExitUserName | uppercase }}</span></td>
+                <td class="disabled-col"><span class="text-500">{{ vehicle.auth2ExitUserName | uppercase }}</span></td>
             </tr>
         </ng-template>
     </p-table>

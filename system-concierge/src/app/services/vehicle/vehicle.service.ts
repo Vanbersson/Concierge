@@ -31,7 +31,7 @@ export class VehicleService {
   }
 
   listAllAuthorized(): Observable<VehicleEntry[]> {
-    return this.http.get<VehicleEntry[]>(environment.apiuUrl + "/vehicle/entry/" + this.companyResale + "/allAuthorized", { headers: this.myHeaders() });
+    return this.http.get<VehicleEntry[]>(environment.apiuUrl + "/vehicle/entry/" + this.companyResale + "/all/authorized", { headers: this.myHeaders() });
   }
 
   listAll(): Observable<VehicleEntry[]> {
