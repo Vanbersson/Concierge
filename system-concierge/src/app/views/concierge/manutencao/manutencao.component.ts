@@ -464,9 +464,9 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
       exitInformation: this.vehicleEntry.exitInformation
     });
     this.exitPhoto1 = this.vehicleEntry.exitPhoto1Url;
-    this.exitPhoto2 = this.vehicleEntry.exitPhoto1Url;
-    this.exitPhoto3 = this.vehicleEntry.exitPhoto1Url;
-    this.exitPhoto4 = this.vehicleEntry.exitPhoto1Url;
+    this.exitPhoto2 = this.vehicleEntry.exitPhoto2Url;
+    this.exitPhoto3 = this.vehicleEntry.exitPhoto3Url;
+    this.exitPhoto4 = this.vehicleEntry.exitPhoto4Url;
 
     //Form Proprietario
     if (this.vehicleEntry.clientCompanyId != null) {

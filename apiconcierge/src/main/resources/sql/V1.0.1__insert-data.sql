@@ -147,6 +147,7 @@ VALUES
 (105,'Remover autorização de saída de veículo - 2ª','Portaria'),
 (106,'Autorizar saída de veículo sem O.S.','Portaria'),
 (107,'Remover autorização de saída de veículo sem O.S.','Portaria'),
+(108,'Autorizar entrada de veículo','Portaria'),
 (150,'Gerar orçamento','Portaria'),
 (151,'Manutenção orçamento','Portaria'),
 (152,'Visualizar orçamento','Portaria'),

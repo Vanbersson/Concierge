@@ -129,31 +129,27 @@ public class VehicleEntryService implements IVehicleEntryService {
         try {
             MessageResponse response = this.validation.exit(dataExit, userEmail);
             if (ConstantsMessage.SUCCESS.equals(response.getStatus())) {
-
-//                VehicleEntry vehicleEntry = this.repository.filterVehicleId(dataExit.companyId(), dataExit.resaleId(), dataExit.vehicleId());
-//                if (vehicleEntry.getStatusAuthExit() != StatusAuthExitEnum.Authorized) {
-//                    response.setStatus(ConstantsMessage.ERROR);
-//                    response.setHeader(ConstantsMessage.ERROR);
-//                    response.setMessage("Veículo não autorizado.");
-//                    response.setData(null);
-//                }
-//                vehicleEntry.setStatus(StatusVehicleEnum.saidaAutorizada);
-                //              vehicleEntry.setStepEntry(StepVehicleEnum.Exit);
-//                vehicleEntry.setUserIdExit(dataExit.userId());
-//                vehicleEntry.setUserNameExit(dataExit.userName());
-//                vehicleEntry.setDateExit(dataExit.dateExit());
-//
-//                vehicleEntry.setExitPhoto1(dataExit.exitPhoto1());
-//                vehicleEntry.setExitPhoto2(dataExit.exitPhoto2());
-//                vehicleEntry.setExitPhoto3(dataExit.exitPhoto3());
-//                vehicleEntry.setExitPhoto4(dataExit.exitPhoto4());
-                //  vehicleEntry.setExitInformation(dataExit.exitInformation());
-
-                // VehicleEntry result = this.repository.save(vehicleEntry);
-                //Notification
+                VehicleEntry vehicleEntry = this.repository.filterId(dataExit.companyId(), dataExit.resaleId(), dataExit.vehicleId());
+                if (vehicleEntry.getAuthExitStatus() != StatusAuthExitEnum.Authorized && vehicleEntry.getStatus() == StatusVehicleEnum.Entered) {
+                    response.setStatus(ConstantsMessage.ERROR);
+                    response.setHeader(ConstantsMessage.ERROR);
+                    response.setMessage("Veículo não autorizado.");
+                    response.setData(null);
+                }
+                vehicleEntry.setStatus(StatusVehicleEnum.Exited);
+                vehicleEntry.setStepEntry(StepVehicleEnum.Exit);
+                vehicleEntry.setExitUserId(dataExit.exitUserId());
+                vehicleEntry.setExitUserName(dataExit.exitUserName());
+                vehicleEntry.setExitDate(dataExit.exitDate());
+                vehicleEntry.setExitInformation(dataExit.exitInformation());
+                vehicleEntry.setExitPhoto1Url(dataExit.exitPhoto1Url());
+                vehicleEntry.setExitPhoto2Url(dataExit.exitPhoto2Url());
+                vehicleEntry.setExitPhoto3Url(dataExit.exitPhoto3Url());
+                vehicleEntry.setExitPhoto4Url(dataExit.exitPhoto4Url());
+                VehicleEntry result = this.repository.save(vehicleEntry);
+//                Notification
 //                User userOrigem = this.userRepository.filterEmail(result.getCompanyId(), result.getResaleId(), userEmail);
 //                this.notification("Exit", result, RECEIVE_VEHICLE_EXIT_NOTIFICATIONS, userOrigem);
-
             }
             return response;
         } catch (Exception ex) {
@@ -165,28 +161,33 @@ public class VehicleEntryService implements IVehicleEntryService {
     @Override
     public List<Map<String, Object>> listAllAuthorized(Integer companyId, Integer resaleId) {
         try {
-            List<VehicleEntry> vehicles = this.repository.allAuthorized(companyId, resaleId, StatusVehicleEnum.Entered, StatusAuthExitEnum.Authorized);
-            List<Map<String, Object>> list = new ArrayList<>();
-            for (VehicleEntry item : vehicles) {
-                String plate = "";
-                if (!item.getVehiclePlate().isBlank())
-                    plate = item.getVehiclePlate().substring(0, 3) + "-" + item.getVehiclePlate().substring(3, 7);
-                Map<String, Object> map = new HashMap<>();
-                map.put("id", item.getId());
-                map.put("vehiclePlate", plate);
-                map.put("vehicleFleet", item.getVehicleFleet());
-                map.put("vehicleNew", item.getVehicleNew());
-                map.put("modelDescription", item.getModelDescription());
-                map.put("entryDate", item.getEntryDate());
-                map.put("attendantUserName", item.getAttendantUserName());
-                map.put("clientCompanyName", item.getClientCompanyName());
-                map.put("authExitStatus", item.getAuthExitStatus());
-                map.put("numServiceOrder", item.getNumServiceOrder());
-                map.put("auth1ExitUserName", item.getAuth1ExitUserName());
-                map.put("auth2ExitUserName", item.getAuth2ExitUserName());
-                list.add(map);
+            String response = this.validation.listAllAuthorized(companyId, resaleId);
+            if (ConstantsMessage.SUCCESS.equals(response)) {
+                List<VehicleEntry> vehicles = this.repository.allAuthorized(companyId, resaleId, StatusVehicleEnum.Entered, StatusAuthExitEnum.Authorized);
+                List<Map<String, Object>> list = new ArrayList<>();
+                for (VehicleEntry item : vehicles) {
+                    String plate = "";
+                    if (!item.getVehiclePlate().isBlank())
+                        plate = item.getVehiclePlate().substring(0, 3) + "-" + item.getVehiclePlate().substring(3, 7);
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("id", item.getId());
+                    map.put("vehiclePlate", plate);
+                    map.put("vehicleFleet", item.getVehicleFleet());
+                    map.put("vehicleNew", item.getVehicleNew());
+                    map.put("modelDescription", item.getModelDescription());
+                    map.put("entryDate", item.getEntryDate());
+                    map.put("attendantUserName", item.getAttendantUserName());
+                    map.put("clientCompanyName", item.getClientCompanyName());
+                    map.put("authExitStatus", item.getAuthExitStatus());
+                    map.put("numServiceOrder", item.getNumServiceOrder());
+                    map.put("auth1ExitUserName", item.getAuth1ExitUserName());
+                    map.put("auth2ExitUserName", item.getAuth2ExitUserName());
+                    list.add(map);
+                }
+                return list;
+            } else {
+                throw new VehicleEntryException(response);
             }
-            return list;
         } catch (Exception ex) {
             throw new VehicleEntryException(ex.getMessage());
         }
@@ -196,26 +197,31 @@ public class VehicleEntryService implements IVehicleEntryService {
     @Override
     public List<Map<String, Object>> listAll(Integer companyId, Integer resaleId) {
         try {
-            List<VehicleEntry> vehicles = this.repository.all(companyId, resaleId, StatusVehicleEnum.Entered);
-            List<Map<String, Object>> list = new ArrayList<>();
-            for (VehicleEntry item : vehicles) {
-                String plate = "";
-                if (!item.getVehiclePlate().isBlank())
-                    plate = item.getVehiclePlate().substring(0, 3) + "-" + item.getVehiclePlate().substring(3, 7);
-                Map<String, Object> map = new HashMap<>();
-                map.put("id", item.getId());
-                map.put("vehiclePlate", plate);
-                map.put("vehicleFleet", item.getVehicleFleet());
-                map.put("vehicleNew", item.getVehicleNew());
-                map.put("modelDescription", item.getModelDescription());
-                map.put("entryDate", item.getEntryDate());
-                map.put("attendantUserName", item.getAttendantUserName());
-                map.put("clientCompanyName", item.getClientCompanyName());
-                map.put("authExitStatus", item.getAuthExitStatus());
-                map.put("numServiceOrder", item.getNumServiceOrder());
-                list.add(map);
+            String response = this.validation.listAll(companyId, resaleId);
+            if (ConstantsMessage.SUCCESS.equals(response)) {
+                List<VehicleEntry> vehicles = this.repository.all(companyId, resaleId, StatusVehicleEnum.Entered);
+                List<Map<String, Object>> list = new ArrayList<>();
+                for (VehicleEntry item : vehicles) {
+                    String plate = "";
+                    if (!item.getVehiclePlate().isBlank())
+                        plate = item.getVehiclePlate().substring(0, 3) + "-" + item.getVehiclePlate().substring(3, 7);
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("id", item.getId());
+                    map.put("vehiclePlate", plate);
+                    map.put("vehicleFleet", item.getVehicleFleet());
+                    map.put("vehicleNew", item.getVehicleNew());
+                    map.put("modelDescription", item.getModelDescription());
+                    map.put("entryDate", item.getEntryDate());
+                    map.put("attendantUserName", item.getAttendantUserName());
+                    map.put("clientCompanyName", item.getClientCompanyName());
+                    map.put("authExitStatus", item.getAuthExitStatus());
+                    map.put("numServiceOrder", item.getNumServiceOrder());
+                    list.add(map);
+                }
+                return list;
+            } else {
+                throw new VehicleEntryException(response);
             }
-            return list;
         } catch (Exception ex) {
             throw new VehicleEntryException(ex.getMessage());
         }

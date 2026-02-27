@@ -1,22 +1,21 @@
 package com.concierge.apiconcierge.validation.vehicle.entry;
 
 import com.concierge.apiconcierge.dtos.vehicle.entry.AuthExitDto;
-import com.concierge.apiconcierge.dtos.vehicle.entry.ExistsVehiclePlateDto;
 import com.concierge.apiconcierge.dtos.vehicle.entry.VehicleExitDto;
-import com.concierge.apiconcierge.models.budget.enums.StatusBudgetEnum;
 import com.concierge.apiconcierge.models.enums.YesNot;
 import com.concierge.apiconcierge.models.message.MessageResponse;
 import com.concierge.apiconcierge.models.permission.PermissionUser;
+import com.concierge.apiconcierge.models.user.User;
 import com.concierge.apiconcierge.models.vehicle.entry.VehicleEntry;
 import com.concierge.apiconcierge.models.vehicle.enums.StatusAuthExitEnum;
 import com.concierge.apiconcierge.models.vehicle.enums.StatusVehicleEnum;
 import com.concierge.apiconcierge.models.vehicle.enums.StepVehicleEnum;
 import com.concierge.apiconcierge.repositories.permission.IPermissionUserRepository;
+import com.concierge.apiconcierge.repositories.user.IUserRepository;
 import com.concierge.apiconcierge.repositories.vehicle.entry.IVehicleEntryRepository;
 import com.concierge.apiconcierge.util.ConstantsMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 
 import static com.concierge.apiconcierge.util.ConstantsPermission.*;
 
@@ -27,11 +26,23 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
     private IVehicleEntryRepository repository;
 
     @Autowired
-    IPermissionUserRepository permissionUser;
+    private IPermissionUserRepository permissionUser;
+
+    @Autowired
+    private IUserRepository userRepository;
 
     @Override
     public MessageResponse save(VehicleEntry vehicle, String userEmail) {
         MessageResponse response = new MessageResponse();
+        //Verifica se o usuário tem permissão
+        User user = this.userRepository.loginEmail(userEmail);
+        PermissionUser permission = this.permissionUser.findPermissionId(user.getCompanyId(), user.getResaleId(), user.getId(), AUTH_ENTRY_VEHICLE);
+        if (permission == null) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Permissão - " + AUTH_ENTRY_VEHICLE);
+            response.setMessage(ConstantsMessage.NOT_PERMISSION);
+            return response;
+        }
         if (vehicle.getCompanyId() == null || vehicle.getCompanyId() == 0) {
             response.setStatus(ConstantsMessage.ERROR);
             response.setHeader("Empresa");
@@ -96,7 +107,7 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
 
         }
         response.setStatus(ConstantsMessage.SUCCESS);
-        response.setHeader("Entrada");
+        response.setHeader("Entrada de veículo");
         response.setMessage("Realizada com sucesso.");
         return response;
     }
@@ -104,6 +115,16 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
     @Override
     public MessageResponse update(VehicleEntry vehicle, String userEmail) {
         MessageResponse response = new MessageResponse();
+        //Verifica se o usuário tem permissão
+        User user = this.userRepository.loginEmail(userEmail);
+        PermissionUser permission = this.permissionUser.findPermissionId(user.getCompanyId(), user.getResaleId(), user.getId(), EDIT_ENTRY_VEHICLE);
+        if (permission == null) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Permissão - " + EDIT_ENTRY_VEHICLE);
+            response.setMessage(ConstantsMessage.NOT_PERMISSION);
+            return response;
+        }
+
         if (vehicle.getCompanyId() == null || vehicle.getCompanyId() == 0) {
             response.setStatus(ConstantsMessage.ERROR);
             response.setHeader("Empresa");
@@ -263,6 +284,16 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
     @Override
     public MessageResponse exit(VehicleExitDto dataExit, String userEmail) {
         MessageResponse response = new MessageResponse();
+        //Verifica se o usuário tem permissão
+        User user = this.userRepository.loginEmail(userEmail);
+        PermissionUser permission = this.permissionUser.findPermissionId(user.getCompanyId(), user.getResaleId(), user.getId(), AUTH_EXIT_VEHICLE);
+        if (permission == null) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Permissão - " + AUTH_EXIT_VEHICLE);
+            response.setMessage(ConstantsMessage.NOT_PERMISSION);
+            return response;
+        }
+
         if (dataExit.companyId() == null || dataExit.companyId() == 0) {
             response.setStatus(ConstantsMessage.ERROR);
             response.setHeader("Empresa");
@@ -293,19 +324,10 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
             response.setMessage(ConstantsMessage.NOT_INFORMED);
             return response;
         }
-        //Permissão
-        if (dataExit.exitUserId() != 1) {
-            PermissionUser permission = this.permissionUser.findPermissionId(dataExit.companyId(), dataExit.resaleId(), dataExit.exitUserId(), AUTH_EXIT_VEHICLE);
-            if (permission == null) {
-                response.setStatus(ConstantsMessage.ERROR);
-                response.setHeader("Permissão - " + AUTH_EXIT_VEHICLE);
-                response.setMessage(ConstantsMessage.NOT_PERMISSION);
-                return response;
-            }
-        }
+
         response.setStatus(ConstantsMessage.SUCCESS);
-        response.setHeader("Saída Veículo");
-        response.setMessage("Saída realizada com sucesso.");
+        response.setHeader("Saída de Veículo");
+        response.setMessage("Realizada com sucesso.");
         return response;
     }
 

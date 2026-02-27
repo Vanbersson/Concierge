@@ -1,9 +1,13 @@
 export class VehicleExit {
-    companyId: number = 0;
-    resaleId: number = 0;
-    vehicleId: number = 0;
-    userId: number = 0;
-    userName: string = '';
-    dateExit: string | Date = '';
+    companyId: number | null = null;
+    resaleId: number | null = null;
+    vehicleId: number | null = null;
+    exitUserId: number | null = null;
+    exitUserName: string = '';
+    exitDate: string | Date = '';
     exitInformation: string = '';
+    exitPhoto1Url: string = '';
+    exitPhoto2Url: string = '';
+    exitPhoto3Url: string = '';
+    exitPhoto4Url: string = '';
 }

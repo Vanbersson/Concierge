@@ -9,6 +9,7 @@ public class ConstantsPermission {
     public static final Integer DEL_AUTH_EXIT_VEHICLE_2 = 105;
     public static final Integer ADD_AUTH_EXIT_VEHICLE_WITHOUT_O_S = 106;
     public static final Integer DEL_AUTH_EXIT_VEHICLE_WITHOUT_O_S = 107;
+    public static final Integer AUTH_ENTRY_VEHICLE = 108;
 
     public static final Integer RECEIVE_VEHICLE_ENTRY_NOTIFICATIONS = 153;
     public static final Integer RECEIVE_VEHICLE_EXIT_NOTIFICATIONS = 154;
