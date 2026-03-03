@@ -430,7 +430,6 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
     if (this.vehicleEntry.vehiclePlateTogether) {
       this.isVehicleTogether = true;
     }
-
     //Vehicle
     this.formVehicle.patchValue({
       id: this.vehicleEntry.id,
@@ -485,18 +484,17 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
     } else {
       this.addRequirePlaca();
     }
-
     //Autorização de saída
     if (this.vehicleEntry.auth1ExitDate) {
       this.dateExitAuth1.set(this.vehicleEntry.auth1ExitDate!.toString());
+    } else {
+      this.dateExitAuth1.set('');
     }
     if (this.vehicleEntry.auth2ExitDate) {
       this.dateExitAuth2.set(this.vehicleEntry.auth2ExitDate!.toString());
+    } else {
+      this.dateExitAuth2.set('');
     }
-
-    //Checklist
-
-
     //porteiro entrada
     this.formConcierge.patchValue({
       entryId: this.vehicleEntry.entryUserId,
@@ -900,7 +898,6 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
 
     return new File([ia], 'image.jpg', { type: mime });
   }
-
   private deleteRequireForms() {
     this.deleteRequireAttendant();
   }
@@ -956,7 +953,6 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
       this.messageService.add({ severity: 'info', summary: 'Veículo Liberado', detail: "Placa " + uppercase.transform(this.formVehicle.value.vehiclePlate), icon: 'pi pi-thumbs-up-fill' });
     }
   }
-
   private updateAuthExitStatus() {
     if (this.vehicleEntry.authExitStatus == StatusAuthExit.FIST) {
       this.vehicleEntry.authExitStatus = StatusAuthExit.NOT;
@@ -965,7 +961,6 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
       this.vehicleEntry.authExitStatus = StatusAuthExit.FIST;
     }
   }
-
   public async deleteAuth1() {
     if (this.vehicleEntry.auth1ExitUserId != null) {
       let auth = new VehicleEntryAuth();
@@ -1137,17 +1132,10 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
       this.messageService.add({ severity: 'error', summary: 'Data Previsão Saída', detail: "Menor que data entrada", icon: 'pi pi-times' });
       return false;
     }
-    /* if (vehicleValue.vehicleNew == YesNot.not) {
-      if (vehicleValue.vehiclePlate == "") {
-        this.messageService.add({ severity: 'error', summary: 'Placa', detail: "Não informada", icon: 'pi pi-times' });
-        return false;
-      }
-    } */
     if (vehicleValue.modelVehicle == null) {
       this.messageService.add({ severity: 'error', summary: 'Modelo', detail: "Não selecionado", icon: 'pi pi-times' });
       return false;
     }
-
     if (vehicleValue.vehicleServiceOrder == YesNot.yes) {
       if (this.vehicleEntry.authExitStatus != StatusAuthExit.NOT) {
         if (vehicleValue.attendant == null) {
@@ -1210,11 +1198,7 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
     this.vehicleEntry.attendantUserName = vehicleValue.attendant?.name ?? "";
     this.vehicleEntry.vehicleKmEntry = vehicleValue?.kmEntry ?? "";
     this.vehicleEntry.vehicleKmExit = vehicleValue?.kmExit ?? "";
-    /* this.vehicleEntry.quantityTrafficCone = vehicleValue?.quantityTrafficCone ?? 0;
-    this.vehicleEntry.quantityExtinguisher = vehicleValue?.quantityExtinguisher ?? 0;
-    this.vehicleEntry.quantityTire = vehicleValue?.quantityTire ?? 0;
-    this.vehicleEntry.quantityTireComplete = vehicleValue?.quantityTireComplete ?? 0;
-    this.vehicleEntry.quantityToolBox = vehicleValue?.quantityToolBox ?? 0; */
+
     this.vehicleEntry.numServiceOrder = vehicleValue?.numServiceOrder ?? "";
     this.vehicleEntry.numNfe = vehicleValue?.numNfe ?? "";
     this.vehicleEntry.numNfse = vehicleValue?.numNfse ?? "";
@@ -1238,8 +1222,29 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
       this.vehicleEntry.driverExitId = this.driverExit.id;
       this.vehicleEntry.driverExitName = this.driverExit.name;
     }
-
-
+    //Checklist
+    if (this.modChecklist.id != null) {
+      this.modChecklist.checklist1Desc = vehicleValue.checklist1Desc;
+      this.modChecklist.checklist2Desc = vehicleValue.checklist2Desc;
+      this.modChecklist.checklist3Desc = vehicleValue.checklist3Desc;
+      this.modChecklist.checklist4Desc = vehicleValue.checklist4Desc;
+      this.modChecklist.checklist5Desc = vehicleValue.checklist5Desc;
+      this.modChecklist.checklist6Desc = vehicleValue.checklist6Desc;
+      this.modChecklist.checklist7Desc = vehicleValue.checklist7Desc;
+      this.modChecklist.checklist8Desc = vehicleValue.checklist8Desc;
+      this.modChecklist.checklist9Desc = vehicleValue.checklist9Desc;
+      this.modChecklist.checklist10Desc = vehicleValue.checklist10Desc;
+      this.modChecklist.checklist11Desc = vehicleValue.checklist11Desc;
+      this.modChecklist.checklist12Desc = vehicleValue.checklist12Desc;
+      this.modChecklist.checklist13Desc = vehicleValue.checklist13Desc;
+      this.modChecklist.checklist14Desc = vehicleValue.checklist14Desc;
+      this.modChecklist.checklist15Desc = vehicleValue.checklist15Desc;
+      this.modChecklist.checklist16Desc = vehicleValue.checklist16Desc;
+      this.modChecklist.checklist17Desc = vehicleValue.checklist17Desc;
+      this.modChecklist.checklist18Desc = vehicleValue.checklist18Desc;
+      this.modChecklist.checklist19Desc = vehicleValue.checklist19Desc;
+      this.modChecklist.checklist20Desc = vehicleValue.checklist20Desc;
+    }
 
   }
   public async save() {
@@ -1316,8 +1321,12 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
       this.busyService.idle();
 
       if (resultVehicle.status == 200 && resultVehicle.body.status == SuccessError.succes) {
+        //update checklist
+        if (this.modChecklist.id != null) {
+          const resultChecklist = await this.updateChecklist(this.modChecklist);
+        }
         this.messageService.add({ severity: 'success', summary: resultVehicle.body.header, detail: resultVehicle.body.message, icon: 'pi pi-check' });
-        this.loadDriver();
+        //this.loadDriver();
       } else if (resultVehicle.status == 200 && resultVehicle.body.status == SuccessError.error) {
         this.messageService.add({ severity: 'info', summary: resultVehicle.body.header, detail: resultVehicle.body.message, icon: 'pi pi-info-circle' });
       }
@@ -1394,6 +1403,14 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
   private async filterChecklist(id: number): Promise<HttpResponse<MessageResponse>> {
     try {
       return await lastValueFrom(this.vehicleService.filterChecklist(id));
+    } catch (error) {
+      this.messageService.add({ severity: 'error', summary: 'Erro', detail: error.error.message, icon: 'pi pi-times' });
+      return error;
+    }
+  }
+  private async updateChecklist(ch: VehicleEntryChecklist): Promise<HttpResponse<MessageResponse>> {
+    try {
+      return await lastValueFrom(this.vehicleService.updateChecklist(ch));
     } catch (error) {
       this.messageService.add({ severity: 'error', summary: 'Erro', detail: error.error.message, icon: 'pi pi-times' });
       return error;

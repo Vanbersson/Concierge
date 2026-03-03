@@ -46,6 +46,9 @@ export class VehicleService {
   saveChecklist(ch: VehicleEntryChecklist): Observable<HttpResponse<MessageResponse>> {
     return this.http.post<MessageResponse>(environment.apiuUrl + "/vehicle/entry/save/checklist", ch, { headers: this.myHeaders(), observe: 'response' });
   }
+  updateChecklist(ch: VehicleEntryChecklist): Observable<HttpResponse<MessageResponse>> {
+    return this.http.post<MessageResponse>(environment.apiuUrl + "/vehicle/entry/update/checklist", ch, { headers: this.myHeaders(), observe: 'response' });
+  }
 
    filterChecklist(id: number): Observable<HttpResponse<MessageResponse>> {
     return this.http.get<MessageResponse>(environment.apiuUrl + "/vehicle/entry/" + this.companyResale + "/filter/checklist/" + id, { headers: this.myHeaders(), observe: 'response' });

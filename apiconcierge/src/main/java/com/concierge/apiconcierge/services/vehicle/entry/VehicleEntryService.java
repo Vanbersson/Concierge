@@ -269,6 +269,22 @@ public class VehicleEntryService implements IVehicleEntryService {
 
     @SneakyThrows
     @Override
+    public MessageResponse updateChecklist(VehicleEntryChecklist ch) {
+        try {
+            VehicleEntryChecklist checklist = this.checklistRepository.save(ch);
+            MessageResponse response = new MessageResponse();
+            response.setStatus(ConstantsMessage.SUCCESS);
+            response.setHeader("Checklist");
+            response.setMessage("Atualizado com sucesso.");
+            response.setData(checklist);
+            return response;
+        } catch (Exception ex) {
+            throw new VehicleEntryException(ex.getMessage());
+        }
+    }
+
+    @SneakyThrows
+    @Override
     public MessageResponse filterChecklist(Integer companyId, Integer resaleId, Integer id) {
         try {
             MessageResponse response = this.validation.filterId(companyId, resaleId, id);

@@ -702,7 +702,6 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
 
   public async save() {
     this.busyService.busy();
-
     //Gerar ID 
     if (this.listVehicleEntry.length > 1) {
       this.vehiclePlateTogether = this.generateSecureId();

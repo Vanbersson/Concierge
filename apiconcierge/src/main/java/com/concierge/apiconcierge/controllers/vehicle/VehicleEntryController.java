@@ -110,6 +110,17 @@ public class VehicleEntryController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
         }
     }
+    @PostMapping("/update/checklist")
+    public ResponseEntity<Object> updateChecklist(@RequestBody VehicleEntryChecklistDto data) {
+        try {
+            VehicleEntryChecklist ch = new VehicleEntryChecklist();
+            BeanUtils.copyProperties(data, ch);
+            MessageResponse response = this.service.updateChecklist(ch);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
+        }
+    }
 
     @GetMapping("/{companyId}/{resaleId}/filter/checklist/{id}")
     public ResponseEntity<Object> filterChecklist(@PathVariable(name = "companyId") Integer companyId,
