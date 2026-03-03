@@ -13,6 +13,7 @@ import com.concierge.apiconcierge.models.notification.NotificationMenu;
 import com.concierge.apiconcierge.models.notification.NotificationUser;
 import com.concierge.apiconcierge.models.permission.PermissionUser;
 import com.concierge.apiconcierge.models.user.User;
+import com.concierge.apiconcierge.models.vehicle.checklist.VehicleEntryChecklist;
 import com.concierge.apiconcierge.models.vehicle.entry.VehicleEntry;
 import com.concierge.apiconcierge.models.vehicle.enums.StatusAuthExitEnum;
 import com.concierge.apiconcierge.models.vehicle.enums.StatusVehicleEnum;
@@ -20,6 +21,7 @@ import com.concierge.apiconcierge.models.vehicle.enums.StepVehicleEnum;
 import com.concierge.apiconcierge.repositories.budget.IBudgetRepository;
 import com.concierge.apiconcierge.repositories.permission.IPermissionUserRepository;
 import com.concierge.apiconcierge.repositories.user.IUserRepository;
+import com.concierge.apiconcierge.repositories.vehicle.checklist.IVehicleEntryChecklistRepository;
 import com.concierge.apiconcierge.repositories.vehicle.entry.IVehicleEntryRepository;
 import com.concierge.apiconcierge.services.notification.notification.INotificationService;
 import com.concierge.apiconcierge.services.notification.user.INotificationUserService;
@@ -52,6 +54,9 @@ public class VehicleEntryService implements IVehicleEntryService {
 
     @Autowired
     private IVehicleEntryValidation validation;
+
+    @Autowired
+    private IVehicleEntryChecklistRepository checklistRepository;
 
     @Autowired
     private IBudgetRepository repositoryBudget;
@@ -238,6 +243,41 @@ public class VehicleEntryService implements IVehicleEntryService {
                     throw new VehicleEntryException("Veículo não encontrado.");
                 }
                 response.setData(vehicle);
+            }
+            return response;
+        } catch (Exception ex) {
+            throw new VehicleEntryException(ex.getMessage());
+        }
+    }
+
+    @SneakyThrows
+    @Override
+    public MessageResponse saveChecklist(VehicleEntryChecklist ch) {
+        try {
+            ch.setId(null);
+            VehicleEntryChecklist checklist = this.checklistRepository.save(ch);
+            MessageResponse response = new MessageResponse();
+            response.setStatus(ConstantsMessage.SUCCESS);
+            response.setHeader("Checklist");
+            response.setMessage("Salvo com sucesso.");
+            response.setData(checklist);
+            return response;
+        } catch (Exception ex) {
+            throw new VehicleEntryException(ex.getMessage());
+        }
+    }
+
+    @SneakyThrows
+    @Override
+    public MessageResponse filterChecklist(Integer companyId, Integer resaleId, Integer id) {
+        try {
+            MessageResponse response = this.validation.filterId(companyId, resaleId, id);
+            if (ConstantsMessage.SUCCESS.equals(response.getStatus())) {
+                VehicleEntryChecklist checklist = this.checklistRepository.filterId(companyId, resaleId, id);
+                if (checklist == null) {
+                    throw new VehicleEntryException("Checklist não encontrado.");
+                }
+                response.setData(checklist);
             }
             return response;
         } catch (Exception ex) {

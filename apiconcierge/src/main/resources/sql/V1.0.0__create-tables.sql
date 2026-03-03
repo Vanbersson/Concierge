@@ -362,6 +362,141 @@
        PRIMARY KEY(id)
    );
 
+ CREATE TABLE IF NOT EXISTS tb_conf_vehicle_entry_checklist(
+   company_id int not null,
+   resale_id int not null,
+   id int not null AUTO_INCREMENT,
+   checklist1Enabled tinyint,
+   checklist1Desc varchar(50),
+   checklist2Enabled tinyint,
+   checklist2Desc varchar(50),
+   checklist3Enabled tinyint,
+   checklist3Desc varchar(50),
+   checklist4Enabled tinyint,
+   checklist4Desc varchar(50),
+   checklist5Enabled tinyint,
+   checklist5Desc varchar(50),
+   checklist6Enabled tinyint,
+   checklist6Desc varchar(50),
+   checklist7Enabled tinyint,
+   checklist7Desc varchar(50),
+   checklist8Enabled tinyint,
+   checklist8Desc varchar(50),
+   checklist9Enabled tinyint,
+   checklist9Desc varchar(50),
+   checklist10Enabled tinyint,
+   checklist10Desc varchar(50),
+   checklist11Enabled tinyint,
+   checklist11Desc varchar(50),
+   checklist12Enabled tinyint,
+   checklist12Desc varchar(50),
+   checklist13Enabled tinyint,
+   checklist13Desc varchar(50),
+   checklist14Enabled tinyint,
+   checklist14Desc varchar(50),
+   checklist15Enabled tinyint,
+   checklist15Desc varchar(50),
+   checklist16Enabled tinyint,
+   checklist16Desc varchar(50),
+   checklist17Enabled tinyint,
+   checklist17Desc varchar(50),
+   checklist18Enabled tinyint,
+   checklist18Desc varchar(50),
+   checklist19Enabled tinyint,
+   checklist19Desc varchar(50),
+   checklist20Enabled tinyint,
+   checklist20Desc varchar(50),
+   FOREIGN KEY(company_id) REFERENCES tb_company(id),
+   FOREIGN KEY(resale_id) REFERENCES tb_resale(id),
+   PRIMARY KEY(id)
+ );
+
+ CREATE TABLE IF NOT EXISTS tb_vehicle_entry_checklist(
+    company_id int not null,
+    resale_id int not null,
+     id int not null AUTO_INCREMENT,
+    checklist1Enabled tinyint,
+    checklist1Label varchar(50),
+    checklist1Desc varchar(50),
+
+    checklist2Enabled tinyint,
+    checklist2Label varchar(50),
+    checklist2Desc varchar(50),
+
+    checklist3Enabled tinyint,
+    checklist3Label varchar(50),
+    checklist3Desc varchar(50),
+
+    checklist4Enabled tinyint,
+    checklist4Label varchar(50),
+    checklist4Desc varchar(50),
+
+    checklist5Enabled tinyint,
+    checklist5Label varchar(50),
+    checklist5Desc varchar(50),
+
+    checklist6Enabled tinyint,
+    checklist6Label varchar(50),
+    checklist6Desc varchar(50),
+
+    checklist7Enabled tinyint,
+    checklist7Label varchar(50),
+    checklist7Desc varchar(50),
+
+    checklist8Enabled tinyint,
+    checklist8Label varchar(50),
+    checklist8Desc varchar(50),
+
+    checklist9Enabled tinyint,
+    checklist9Label varchar(50),
+    checklist9Desc varchar(50),
+
+    checklist10Enabled tinyint,
+    checklist10Label varchar(50),
+    checklist10Desc varchar(50),
+
+    checklist11Enabled tinyint,
+    checklist11Label varchar(50),
+    checklist11Desc varchar(50),
+
+    checklist12Enabled tinyint,
+    checklist12Label varchar(50),
+    checklist12Desc varchar(50),
+
+    checklist13Enabled tinyint,
+    checklist13Label varchar(50),
+    checklist13Desc varchar(50),
+
+    checklist14Enabled tinyint,
+    checklist14Label varchar(50),
+    checklist14Desc varchar(50),
+
+    checklist15Enabled tinyint,
+    checklist15Label varchar(50),
+    checklist15Desc varchar(50),
+
+    checklist16Enabled tinyint,
+    checklist16Label varchar(50),
+    checklist16Desc varchar(50),
+
+    checklist17Enabled tinyint,
+    checklist17Label varchar(50),
+    checklist17Desc varchar(50),
+
+    checklist18Enabled tinyint,
+    checklist18Label varchar(50),
+    checklist18Desc varchar(50),
+
+    checklist19Enabled tinyint,
+    checklist19Label varchar(50),
+    checklist19Desc varchar(50),
+
+    checklist20Enabled tinyint,
+    checklist20Label varchar(50),
+    checklist20Desc varchar(50),
+    PRIMARY KEY(id)
+ );
+
  CREATE TABLE IF NOT EXISTS tb_vehicle_entry(
      company_id int not null,
      resale_id int not null,
@@ -434,26 +569,8 @@
      num_nfe varchar(20),
      num_nfse varchar(20),
 
-     check_item1 varchar(100),
-     check_item2 varchar(100),
-     check_item3 varchar(100),
-     check_item4 varchar(100),
-     check_item5 varchar(100),
-     check_item6 varchar(100),
-     check_item7 varchar(100),
-     check_item8 varchar(100),
-     check_item9 varchar(100),
-     check_item10 varchar(100),
-     check_item11 varchar(100),
-     check_item12 varchar(100),
-     check_item13 varchar(100),
-     check_item14 varchar(100),
-     check_item15 varchar(100),
-     check_item16 varchar(100),
-     check_item17 varchar(100),
-     check_item18 varchar(100),
-     check_item19 varchar(100),
-     check_item20 varchar(100),
+     checklist_id int,
+
      FOREIGN KEY(company_id) REFERENCES tb_company(id),
      FOREIGN KEY(resale_id) REFERENCES tb_resale(id),
      FOREIGN KEY(budget_id) REFERENCES tb_budget(id),
@@ -466,6 +583,7 @@
      FOREIGN KEY(client_company_id) REFERENCES tb_client_company(id),
      FOREIGN KEY(driver_entry_id) REFERENCES tb_driver(id),
      FOREIGN KEY(driver_exit_id) REFERENCES tb_driver(id),
+     FOREIGN KEY(checklist_id) REFERENCES tb_vehicle_entry_checklist(id),
      PRIMARY KEY(id)
  );
 

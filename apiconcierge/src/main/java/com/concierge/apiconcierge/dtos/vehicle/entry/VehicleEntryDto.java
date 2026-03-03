@@ -75,26 +75,7 @@ public record VehicleEntryDto(
         String numServiceOrder,
         String numNfe,
         String numNfse,
+        Integer checklistId
 
-        String checkItem1,
-        String checkItem2,
-        String checkItem3,
-        String checkItem4,
-        String checkItem5,
-        String checkItem6,
-        String checkItem7,
-        String checkItem8,
-        String checkItem9,
-        String checkItem10,
-        String checkItem11,
-        String checkItem12,
-        String checkItem13,
-        String checkItem14,
-        String checkItem15,
-        String checkItem16,
-        String checkItem17,
-        String checkItem18,
-        String checkItem19,
-        String checkItem20
 ) {
 }

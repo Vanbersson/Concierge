@@ -4,6 +4,7 @@ import com.concierge.apiconcierge.dtos.vehicle.entry.AuthExitDto;
 import com.concierge.apiconcierge.dtos.vehicle.entry.ExistsVehiclePlateDto;
 import com.concierge.apiconcierge.dtos.vehicle.entry.VehicleExitDto;
 import com.concierge.apiconcierge.models.message.MessageResponse;
+import com.concierge.apiconcierge.models.vehicle.checklist.VehicleEntryChecklist;
 import com.concierge.apiconcierge.models.vehicle.entry.VehicleEntry;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -23,6 +24,10 @@ public interface IVehicleEntryService {
     public List<Map<String, Object>> listAll(Integer companyId, Integer resaleId);
 
     public MessageResponse filterId(Integer companyId, Integer resaleId, Integer id);
+
+    public MessageResponse saveChecklist(VehicleEntryChecklist ch);
+
+    public MessageResponse filterChecklist(Integer companyId, Integer resaleId, Integer id);
 
     public MessageResponse filterPlate(Integer companyId, Integer resaleId, String plate);
 

@@ -1,11 +1,13 @@
 package com.concierge.apiconcierge.controllers.vehicle;
 
 import com.concierge.apiconcierge.dtos.message.MessageResponseDto;
+import com.concierge.apiconcierge.dtos.vehicle.checklist.VehicleEntryChecklistDto;
 import com.concierge.apiconcierge.dtos.vehicle.entry.AuthExitDto;
 import com.concierge.apiconcierge.dtos.vehicle.entry.ExistsVehiclePlateDto;
 import com.concierge.apiconcierge.dtos.vehicle.entry.VehicleEntryDto;
 import com.concierge.apiconcierge.dtos.vehicle.entry.VehicleExitDto;
 import com.concierge.apiconcierge.models.message.MessageResponse;
+import com.concierge.apiconcierge.models.vehicle.checklist.VehicleEntryChecklist;
 import com.concierge.apiconcierge.models.vehicle.entry.VehicleEntry;
 import com.concierge.apiconcierge.services.auth.TokenService;
 import com.concierge.apiconcierge.services.vehicle.entry.IVehicleEntryService;
@@ -91,6 +93,30 @@ public class VehicleEntryController {
                                            @PathVariable(name = "id") Integer id) {
         try {
             MessageResponse response = this.service.filterId(companyId, resaleId, id);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
+        }
+    }
+
+    @PostMapping("/save/checklist")
+    public ResponseEntity<Object> saveChecklist(@RequestBody VehicleEntryChecklistDto data) {
+        try {
+            VehicleEntryChecklist ch = new VehicleEntryChecklist();
+            BeanUtils.copyProperties(data, ch);
+            MessageResponse response = this.service.saveChecklist(ch);
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
+        }
+    }
+
+    @GetMapping("/{companyId}/{resaleId}/filter/checklist/{id}")
+    public ResponseEntity<Object> filterChecklist(@PathVariable(name = "companyId") Integer companyId,
+                                                  @PathVariable(name = "resaleId") Integer resaleId,
+                                                  @PathVariable(name = "id") Integer id) {
+        try {
+            MessageResponse response = this.service.filterChecklist(companyId, resaleId, id);
             return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));

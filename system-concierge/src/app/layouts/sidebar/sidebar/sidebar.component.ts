@@ -80,6 +80,12 @@ export class SidebarComponent implements OnInit {
               }
             ]
           },
+          {
+            key:'1_100',
+            label:'Módulo',
+            visible:false,
+            routerLink:'portaria/module'
+          }
 
         ]
       },

@@ -62,13 +62,14 @@ import { MessageResponse } from '../../../models/message/message-response';
 import { SuccessError } from '../../../models/enum/success-error';
 import { PermissionService } from '../../../services/permission/permission.service';
 import { ShareWhatsAppService } from '../../../services/share/share-whatsapp.service';
-import { FileService } from '../../../services/file/file.service';
 import { YesNot } from '../../../models/enum/yes-not';
 import { StatusAuthExit } from '../../../models/enum/status-auth-exit';
 import { PhotoResult } from '../../../interfaces/photo-result';
 import { PhotoService } from '../../../services/photo/photo.service';
 import { PhotoResultStatus } from '../../../models/enum/photo-result-status';
 import { ClientCompanyService } from '../../../services/clientecompany/client-company.service';
+import { ModuleConciergeVehicleChecklist } from '../../../models/vehicle/module-concierge-vehicle-checklist';
+import { VehicleEntryChecklist } from '../../../models/vehicle/vehicle-entry-checklist';
 
 @Component({
   selector: 'app-manutencao',
@@ -142,8 +143,31 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
     numServiceOrder: new FormControl<string | null>(null),
     numNfe: new FormControl<string | null>(null),
     numNfse: new FormControl<string | null>(null),
-    information: new FormControl<string>('')
+    information: new FormControl<string>(''),
+
+    checklist1Desc: new FormControl<string>(''),
+    checklist2Desc: new FormControl<string>(''),
+    checklist3Desc: new FormControl<string>(''),
+    checklist4Desc: new FormControl<string>(''),
+    checklist5Desc: new FormControl<string>(''),
+    checklist6Desc: new FormControl<string>(''),
+    checklist7Desc: new FormControl<string>(''),
+    checklist8Desc: new FormControl<string>(''),
+    checklist9Desc: new FormControl<string>(''),
+    checklist10Desc: new FormControl<string>(''),
+    checklist11Desc: new FormControl<string>(''),
+    checklist12Desc: new FormControl<string>(''),
+    checklist13Desc: new FormControl<string>(''),
+    checklist14Desc: new FormControl<string>(''),
+    checklist15Desc: new FormControl<string>(''),
+    checklist16Desc: new FormControl<string>(''),
+    checklist17Desc: new FormControl<string>(''),
+    checklist18Desc: new FormControl<string>(''),
+    checklist19Desc: new FormControl<string>(''),
+    checklist20Desc: new FormControl<string>('')
   });
+
+  modChecklist: VehicleEntryChecklist = new VehicleEntryChecklist();
   //Porteiro
   entryPhoto1!: string;
   entryPhoto2!: string;
@@ -346,6 +370,13 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
     if (vehicleResult.status == 200 && vehicleResult.body.status == SuccessError.succes) {
       //Passa as informações para o objeto veículo de entrada
       this.vehicleEntry = vehicleResult.body.data;
+      //Checklist vehicle
+      if (this.vehicleEntry.checklistId) {
+        const resultChecklist = await this.filterChecklist(this.vehicleEntry.checklistId);
+        if (resultChecklist.status == 200 && resultChecklist.body.status == SuccessError.succes) {
+          this.modChecklist = resultChecklist.body.data;
+        }
+      }
       //Buscar o cliente
       if (this.vehicleEntry.clientCompanyId != null) {
         const resultClient = await this.filterIdClient(this.vehicleEntry.clientCompanyId);
@@ -417,15 +448,31 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
       vehicleNew: this.vehicleEntry.vehicleNew,
       nameUserExitAuth1: this.vehicleEntry.auth1ExitUserName,
       nameUserExitAuth2: this.vehicleEntry.auth2ExitUserName,
-      /* quantityExtinguisher: this.vehicleEntry.quantityExtinguisher == 0 ? null : this.vehicleEntry.quantityExtinguisher,
-      quantityTrafficCone: this.vehicleEntry.quantityTrafficCone == 0 ? null : this.vehicleEntry.quantityTrafficCone,
-      quantityTire: this.vehicleEntry.quantityTire == 0 ? null : this.vehicleEntry.quantityTire,
-      quantityTireComplete: this.vehicleEntry.quantityTireComplete == 0 ? null : this.vehicleEntry.quantityTireComplete,
-      quantityToolBox: this.vehicleEntry.quantityToolBox == 0 ? null : this.vehicleEntry.quantityToolBox, */
       numServiceOrder: this.vehicleEntry.numServiceOrder == "" ? null : this.vehicleEntry.numServiceOrder,
       numNfe: this.vehicleEntry.numNfe == "" ? null : this.vehicleEntry.numNfe,
       numNfse: this.vehicleEntry.numNfse == "" ? null : this.vehicleEntry.numNfse,
       information: this.vehicleEntry.attendantInformation,
+
+      checklist1Desc: this.modChecklist.checklist1Desc,
+      checklist2Desc: this.modChecklist.checklist2Desc,
+      checklist3Desc: this.modChecklist.checklist3Desc,
+      checklist4Desc: this.modChecklist.checklist4Desc,
+      checklist5Desc: this.modChecklist.checklist5Desc,
+      checklist6Desc: this.modChecklist.checklist6Desc,
+      checklist7Desc: this.modChecklist.checklist7Desc,
+      checklist8Desc: this.modChecklist.checklist8Desc,
+      checklist9Desc: this.modChecklist.checklist9Desc,
+      checklist10Desc: this.modChecklist.checklist10Desc,
+      checklist11Desc: this.modChecklist.checklist11Desc,
+      checklist12Desc: this.modChecklist.checklist12Desc,
+      checklist13Desc: this.modChecklist.checklist13Desc,
+      checklist14Desc: this.modChecklist.checklist14Desc,
+      checklist15Desc: this.modChecklist.checklist15Desc,
+      checklist16Desc: this.modChecklist.checklist16Desc,
+      checklist17Desc: this.modChecklist.checklist17Desc,
+      checklist18Desc: this.modChecklist.checklist18Desc,
+      checklist19Desc: this.modChecklist.checklist19Desc,
+      checklist20Desc: this.modChecklist.checklist20Desc,
     });
     //Imagem consultor
     this.photoVehicle1 = this.vehicleEntry.attendantPhoto1Url;
@@ -446,6 +493,9 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
     if (this.vehicleEntry.auth2ExitDate) {
       this.dateExitAuth2.set(this.vehicleEntry.auth2ExitDate!.toString());
     }
+
+    //Checklist
+
 
     //porteiro entrada
     this.formConcierge.patchValue({
@@ -1338,6 +1388,14 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
       return await lastValueFrom(this.vehicleService.entryAddAuth(auth));
     } catch (error) {
       this.messageService.add({ severity: 'error', summary: 'Erro', detail: "Não catalogado.", icon: 'pi pi-times' });
+      return error;
+    }
+  }
+  private async filterChecklist(id: number): Promise<HttpResponse<MessageResponse>> {
+    try {
+      return await lastValueFrom(this.vehicleService.filterChecklist(id));
+    } catch (error) {
+      this.messageService.add({ severity: 'error', summary: 'Erro', detail: error.error.message, icon: 'pi pi-times' });
       return error;
     }
   }

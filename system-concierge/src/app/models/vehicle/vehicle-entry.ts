@@ -75,25 +75,5 @@ export class VehicleEntry {
     numNfe: string = '';
     numNfse: string = '';
 
-    checkItem1: string = '';
-    checkItem2: string = '';
-    checkItem3: string = '';
-    checkItem4: string = '';
-    checkItem5: string = '';
-    checkItem6: string = '';
-    checkItem7: string = '';
-    checkItem8: string = '';
-    checkItem9: string = '';
-    checkItem10: string = '';
-    checkItem11: string = '';
-    checkItem12: string = '';
-    checkItem13: string = '';
-    checkItem14: string = '';
-    checkItem15: string = '';
-    checkItem16: string = '';
-    checkItem17: string = '';
-    checkItem18: string = '';
-    checkItem19: string = '';
-    checkItem20: string = '';
-
+   checklistId: number | null = null;
 }

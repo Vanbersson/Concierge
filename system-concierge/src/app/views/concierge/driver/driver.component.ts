@@ -22,7 +22,7 @@ import { RadioButtonModule } from 'primeng/radiobutton';
 import { DividerModule } from 'primeng/divider';
 
 //Constante
-import { IMAGE_MAX_SIZE, IMAGE_MAX_SIZE_LABEL } from '../../../util/constants';
+import { IMAGE_MAX_SIZE_LABEL } from '../../../util/constants';
 //Class
 import { Driver } from '../../../models/driver/driver';
 //Service

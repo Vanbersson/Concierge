@@ -134,6 +134,7 @@ export default class UserComponent implements OnInit {
               { key: '1_99_1', label: 'Veículo' },
             ]
           },
+          { key: '1_100', label: 'Módulo' }
         ]
       },
       {

@@ -101,6 +101,7 @@ VALUES
 ('1_99','Cadastros'),
 ('1_99_0','Modelo'),
 ('1_99_1','Veículo'),
+('1_100','Módulo'),
 
 ('2_0','Peças'),
 ('2_1','Atendimento Peças'),
@@ -134,6 +135,11 @@ VALUES
 ('999_0','Configurações'),
 ('999_1','Empresa'),
 ('999_2','Cadastro Usuários');
+
+INSERT INTO `tb_conf_vehicle_entry_checklist`
+(`company_id`, `resale_id`,`checklist1Enabled`, `checklist1Desc`, `checklist2Enabled`, `checklist2Desc`, `checklist3Enabled`, `checklist3Desc`, `checklist4Enabled`, `checklist4Desc`, `checklist5Enabled`, `checklist5Desc`, `checklist6Enabled`, `checklist6Desc`, `checklist7Enabled`, `checklist7Desc`, `checklist8Enabled`, `checklist8Desc`, `checklist9Enabled`, `checklist9Desc`, `checklist10Enabled`, `checklist10Desc`, `checklist11Enabled`, `checklist11Desc`, `checklist12Enabled`, `checklist12Desc`, `checklist13Enabled`, `checklist13Desc`, `checklist14Enabled`, `checklist14Desc`, `checklist15Enabled`, `checklist15Desc`, `checklist16Enabled`, `checklist16Desc`, `checklist17Enabled`, `checklist17Desc`, `checklist18Enabled`, `checklist18Desc`, `checklist19Enabled`, `checklist19Desc`, `checklist20Enabled`, `checklist20Desc`)
+VALUES
+(1,1,null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'');
 
 
 INSERT INTO tb_permission

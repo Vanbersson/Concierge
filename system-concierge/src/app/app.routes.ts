@@ -5,6 +5,7 @@ import { VehicleEntryMenuGuard } from './views/concierge/vehicle.entry/vehicle.e
 import { VehicleMenuGuard } from './views/concierge/vehicle/vehicle.menu.guard';
 import { UserGuard } from './views/settings/user/user.guard';
 import { CanDeactivateGuard } from './views/dashboard/can-deactivate.guard.ts';
+import { ModuleConciergeMenuGuard } from './views/concierge/module/module.concierge.menu.guard';
 
 export const routes: Routes = [
     {
@@ -26,18 +27,17 @@ export const routes: Routes = [
                 path: '',
                 title: 'Dashboard',
                 loadComponent: () => import('./views/dashboard/dashboard.component'),
-                 canDeactivate: [CanDeactivateGuard] 
+                canDeactivate: [CanDeactivateGuard]
             },
             {
                 path: 'dashboard',
                 title: 'Dashboard',
                 loadComponent: () => import('./views/dashboard/dashboard.component'),
-                canDeactivate: [CanDeactivateGuard] 
+                canDeactivate: [CanDeactivateGuard]
             },
             {
                 path: 'portaria',
                 children: [
-
                     {
                         path: 'atendimento-veiculo',
                         title: 'Entrada Veículo',
@@ -77,6 +77,12 @@ export const routes: Routes = [
                         title: 'Manutenção Veículo',
                         loadComponent: () => import('./views/concierge/register/vehicle.register/vehicle.register.component')
                     },
+                    {
+                        path: 'module',
+                        title: 'Módulo portaria',
+                        loadComponent: () => import('./views/concierge/module/module.component'),
+                        canActivate:[ModuleConciergeMenuGuard]
+                    }
                 ]
             },
             {
@@ -134,9 +140,9 @@ export const routes: Routes = [
                         loadComponent: () => import('./views/faturamento/client-company/client-company.component')
                     },
                     {
-                        path:'register-client-category',
-                        title:'Categoria',
-                        loadComponent:() => import('./views/faturamento/register/client-category/client-category.component'),
+                        path: 'register-client-category',
+                        title: 'Categoria',
+                        loadComponent: () => import('./views/faturamento/register/client-category/client-category.component'),
                     }
                 ]
             },

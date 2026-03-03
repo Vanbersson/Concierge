@@ -29,7 +29,6 @@ import { PhotoService } from '../../../services/photo/photo.service';
 import { IMAGE_MAX_SIZE_LABEL } from '../../../util/constants';
 import { PhotoResult } from '../../../interfaces/photo-result';
 import { PhotoResultStatus } from '../../../models/enum/photo-result-status';
-import { FileService } from '../../../services/file/file.service';
 import { YesNot } from '../../../models/enum/yes-not';
 
 @Component({

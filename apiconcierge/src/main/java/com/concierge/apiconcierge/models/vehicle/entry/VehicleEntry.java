@@ -22,6 +22,7 @@ import java.util.Date;
 @SecondaryTable(name = "tb_vehicle_model", pkJoinColumns = @PrimaryKeyJoinColumn(name = "id"))
 @SecondaryTable(name = "tb_driver", pkJoinColumns = @PrimaryKeyJoinColumn(name = "id"))
 @SecondaryTable(name = "tb_budget", pkJoinColumns = @PrimaryKeyJoinColumn(name = "id"))
+@SecondaryTable(name = "tb_vehicle_entry_checklist", pkJoinColumns = @PrimaryKeyJoinColumn(name = "id"))
 @Entity
 @Table(name = "tb_vehicle_entry")
 public class VehicleEntry implements Serializable {
@@ -170,45 +171,8 @@ public class VehicleEntry implements Serializable {
     @Column(name = "num_nfse")
     private String numNfse;
 
-    @Column(name = "check_item1")
-    private String checkItem1;
-    @Column(name = "check_item2")
-    private String checkItem2;
-    @Column(name = "check_item3")
-    private String checkItem3;
-    @Column(name = "check_item4")
-    private String checkItem4;
-    @Column(name = "check_item5")
-    private String checkItem5;
-    @Column(name = "check_item6")
-    private String checkItem6;
-    @Column(name = "check_item7")
-    private String checkItem7;
-    @Column(name = "check_item8")
-    private String checkItem8;
-    @Column(name = "check_item9")
-    private String checkItem9;
-    @Column(name = "check_item10")
-    private String checkItem10;
-    @Column(name = "check_item11")
-    private String checkItem11;
-    @Column(name = "check_item12")
-    private String checkItem12;
-    @Column(name = "check_item13")
-    private String checkItem13;
-    @Column(name = "check_item14")
-    private String checkItem14;
-    @Column(name = "check_item15")
-    private String checkItem15;
-    @Column(name = "check_item16")
-    private String checkItem16;
-    @Column(name = "check_item17")
-    private String checkItem17;
-    @Column(name = "check_item18")
-    private String checkItem18;
-    @Column(name = "check_item19")
-    private String checkItem19;
-    @Column(name = "check_item20")
-    private String checkItem20;
+    @JoinColumn(table = "tb_vehicle_entry_checklist", referencedColumnName = "id")
+    @Column(name = "checklist_id")
+    private Integer checklistId;
 
 }

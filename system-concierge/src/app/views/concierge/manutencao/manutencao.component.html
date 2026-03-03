@@ -153,26 +153,89 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-12 md:col-1">
-                            <label for="coneid">Cone</label>
-                            <p-inputNumber inputId="coneid" [useGrouping]="false" maxlength="8" formControlName="quantityTrafficCone" />
+                       
+                            <!-- Checklist -->
+                        <div *ngIf="modChecklist.checklist1Enabled == yes" class="col-12 md:col-2">
+                            <label for="coneid">{{modChecklist.checklist1Label}}</label>
+                            <input pInputText formControlName="checklist1Desc" maxlength="50"/>
                         </div>
-                        <div class="col-12 md:col-1">
-                            <label for="extintorid">Extintor</label>
-                            <p-inputNumber inputId="extintorid" [useGrouping]="false" maxlength="8" formControlName="quantityExtinguisher" />
+                        <div *ngIf="modChecklist.checklist2Enabled == yes" class="col-12 md:col-2">
+                            <label for="extintorid">{{modChecklist.checklist2Label}}</label>
+                            <input pInputText formControlName="checklist2Desc" maxlength="50"/>
                         </div>
-                        <div class="col-12 md:col-1">
-                            <label for="pneuid">Pneu</label>
-                            <p-inputNumber inputId="pneuid" [useGrouping]="false" maxlength="8" formControlName="quantityTire" />
+                        <div *ngIf="modChecklist.checklist3Enabled == yes" class="col-12 md:col-2">
+                            <label for="pneuid">{{modChecklist.checklist3Label}}</label>
+                            <input pInputText formControlName="checklist3Desc" maxlength="50"/>
                         </div>
-                        <div class="col-12 md:col-1">
-                            <label for="pneurodaid">P. c/roda</label>
-                            <p-inputNumber inputId="pneurodaid" [useGrouping]="false" maxlength="8" formControlName="quantityTireComplete" />
+                        <div *ngIf="modChecklist.checklist4Enabled == yes" class="col-12 md:col-2">
+                            <label for="pneurodaid">{{modChecklist.checklist4Label}}</label>
+                            <input pInputText formControlName="checklist4Desc" maxlength="50"/>
                         </div>
-                        <div class="col-12 md:col-1">
-                            <label for="cxferramentaid">Cx ferramenta</label>
-                            <p-inputNumber inputId="cxferramentaid" [useGrouping]="false" maxlength="8" formControlName="quantityToolBox" />
+                        <div *ngIf="modChecklist.checklist5Enabled == yes" class="col-12 md:col-2">
+                            <label for="cxferramentaid">{{modChecklist.checklist5Label}}</label>
+                            <input pInputText formControlName="checklist5Desc" maxlength="50"/>
                         </div>
+                        <div *ngIf="modChecklist.checklist6Enabled == yes" class="col-12 md:col-2">
+                            <label for="coneid">{{modChecklist.checklist6Label}}</label>
+                            <input pInputText formControlName="checklist6Desc" maxlength="50"/>
+                        </div>
+                        <div *ngIf="modChecklist.checklist7Enabled == yes" class="col-12 md:col-2">
+                            <label for="extintorid">{{modChecklist.checklist7Label}}</label>
+                              <input pInputText formControlName="checklist7Desc" maxlength="50"/>
+                        </div>
+                        <div *ngIf="modChecklist.checklist8Enabled == yes" class="col-12 md:col-2">
+                            <label for="pneuid">{{modChecklist.checklist8Label}}</label>
+                            <input pInputText formControlName="checklist8Desc" maxlength="50"/>
+                        </div>
+                        <div *ngIf="modChecklist.checklist9Enabled == yes" class="col-12 md:col-2">
+                            <label for="pneurodaid">{{modChecklist.checklist9Label}}</label>
+                            <input pInputText formControlName="checklist9Desc" maxlength="50"/>
+                        </div>
+                        <div *ngIf="modChecklist.checklist10Enabled == yes" class="col-12 md:col-2">
+                            <label for="cxferramentaid">{{modChecklist.checklist10Label}}</label>
+                            <input pInputText formControlName="checklist10Desc" maxlength="50"/>
+                        </div>
+                        <div *ngIf="modChecklist.checklist11Enabled == yes" class="col-12 md:col-2">
+                            <label for="pneurodaid">{{modChecklist.checklist11Label}}</label>
+                            <input pInputText formControlName="checklist11Desc" maxlength="50"/>
+                        </div>
+                        <div *ngIf="modChecklist.checklist12Enabled == yes" class="col-12 md:col-2">
+                            <label for="cxferramentaid">{{modChecklist.checklist12Label}}</label>
+                            <input pInputText formControlName="checklist12Desc" maxlength="50"/>
+                        </div>
+                         <div *ngIf="modChecklist.checklist13Enabled == yes" class="col-12 md:col-2">
+                            <label for="cxferramentaid">{{modChecklist.checklist13Label}}</label>
+                            <input pInputText formControlName="checklist13Desc" maxlength="50"/>
+                        </div>
+                        <div *ngIf="modChecklist.checklist14Enabled == yes" class="col-12 md:col-2">
+                            <label for="cxferramentaid">{{modChecklist.checklist14Label}}</label>
+                            <input pInputText formControlName="checklist14Desc" maxlength="50"/>
+                        </div>
+                        <div *ngIf="modChecklist.checklist15Enabled == yes" class="col-12 md:col-2">
+                            <label for="cxferramentaid">{{modChecklist.checklist15Label}}</label>
+                            <input pInputText formControlName="checklist15Desc" maxlength="50"/>
+                        </div>
+                        <div *ngIf="modChecklist.checklist16Enabled == yes" class="col-12 md:col-2">
+                            <label for="cxferramentaid">{{modChecklist.checklist16Label}}</label>
+                            <input pInputText formControlName="checklist16Desc" maxlength="50"/>
+                        </div>
+                        <div *ngIf="modChecklist.checklist17Enabled == yes" class="col-12 md:col-2">
+                            <label for="cxferramentaid">{{modChecklist.checklist17Label}}</label>
+                            <input pInputText formControlName="checklist17Desc" maxlength="50"/>
+                        </div>
+                        <div *ngIf="modChecklist.checklist18Enabled == yes" class="col-12 md:col-2">
+                            <label for="cxferramentaid">{{modChecklist.checklist18Label}}</label>
+                            <input pInputText formControlName="checklist18Desc" maxlength="50"/>
+                        </div>
+                        <div *ngIf="modChecklist.checklist19Enabled == yes" class="col-12 md:col-2">
+                            <label for="cxferramentaid">{{modChecklist.checklist19Label}}</label>
+                            <input pInputText formControlName="checklist19Desc" maxlength="50"/>
+                        </div>
+                        <div *ngIf="modChecklist.checklist20Enabled == yes" class="col-12 md:col-2">
+                            <label for="cxferramentaid">{{modChecklist.checklist20Label}}</label>
+                            <input pInputText formControlName="checklist20Desc" maxlength="50"/>
+                        </div> 
+                        <!-- Checklist -->
                         <div class="col-12">
                             <label for="informacao" class="ml-2">Informações</label>
                             <textarea pInputTextarea maxlength="255" id="informacao" rows="4" cols="30" formControlName="information"></textarea>
@@ -477,7 +540,6 @@
         <div *ngIf="!detailsVehicle" class="flex justify-content-between">
             <div class="flex gap-2">
                 <button pButton [disabled]="vehicleExit" type="button" label="Salvar" icon="pi pi-check" size="small" [raised]="true" severity="success-custom" (click)="save()"></button>
-                <!-- <button pButton [disabled]="vehicleExit" type="button" label="Orçamento" icon="pi pi-file" size="small" [raised]="true" severity="secondary-custom" (click)="confirmGerarOrcamento()"></button> -->
                 <button pButton [disabled]="vehicleExit" type="button" label="Liberar" icon="pi pi-car" size="small" [raised]="true" severity="secondary-custom" (click)="authExit()"></button>
             </div>
              <p-button icon="pi pi-share-alt" [rounded]="true" severity="info"  size="small" label="Compartilhar" (onClick)="shareVehicle()"/>
@@ -487,7 +549,6 @@
     <div *ngIf="!vehicleExit" class="mobile-visible"> 
         <div class="flex align-items-center justify-content-center w-full gap-3">
             <p-button icon="pi pi-check" [rounded]="true" severity="success-custom" label="Salvar" (onClick)="save()"/>
-            <!-- <p-button icon="pi pi-file" [rounded]="true" severity="secondary-custom" (onClick)="confirmGerarOrcamento()"/> -->
             <p-button icon="pi pi-car" [rounded]="true" severity="secondary-custom" (onClick)="authExit()"/>
             <p-button icon="pi pi-share-alt" [rounded]="true" severity="info" (onClick)="shareVehicle()" />
         </div>

@@ -57,6 +57,9 @@ import { SuccessError } from '../../../models/enum/success-error';
 import { BusyService } from '../../../components/loading/busy.service';
 import { ModelVehicle } from '../../../models/vehicle-model/model-vehicle';
 import { YesNot } from '../../../models/enum/yes-not';
+import { ModuleConciergeService } from '../../../services/module/module.concierge.service';
+import { ModuleConciergeVehicleChecklist } from '../../../models/vehicle/module-concierge-vehicle-checklist';
+import { VehicleEntryChecklist } from '../../../models/vehicle/vehicle-entry-checklist';
 
 
 @Component({
@@ -77,7 +80,7 @@ import { YesNot } from '../../../models/enum/yes-not';
 })
 export default class VehicleEntryComponent implements OnInit, DoCheck {
 
-  private vehicleEntry: VehicleEntry;
+  private vehicleEntry: VehicleEntry = new VehicleEntry();
   private vehiclePlateTogether: string = "";
 
   activeStepper: number | undefined = 0;
@@ -125,19 +128,36 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
     entryDate: new FormControl<Date | null>(new Date(), Validators.required),
     exitDatePrevision: new FormControl<Date | null>(null),
     vehicleColor: new FormControl<IColor | null>(null),
-    checkItem1: new FormControl<number | null>(null),
-    checkItem2: new FormControl<number | null>(null),
-    checkItem3: new FormControl<number | null>(null),
-    checkItem4: new FormControl<number | null>(null),
-    checkItem5: new FormControl<number | null>(null),
-
     attendant: new FormControl<User | null>(null),
     vehicleNew: new FormControl<YesNot>(YesNot.not),
     vehicleServiceOrder: new FormControl<YesNot>(YesNot.yes),
     entryInformation: new FormControl<string>(''),
+    checklist1Desc: new FormControl<string>(''),
+    checklist2Desc: new FormControl<string>(''),
+    checklist3Desc: new FormControl<string>(''),
+    checklist4Desc: new FormControl<string>(''),
+    checklist5Desc: new FormControl<string>(''),
+    checklist6Desc: new FormControl<string>(''),
+    checklist7Desc: new FormControl<string>(''),
+    checklist8Desc: new FormControl<string>(''),
+    checklist9Desc: new FormControl<string>(''),
+    checklist10Desc: new FormControl<string>(''),
+    checklist11Desc: new FormControl<string>(''),
+    checklist12Desc: new FormControl<string>(''),
+    checklist13Desc: new FormControl<string>(''),
+    checklist14Desc: new FormControl<string>(''),
+    checklist15Desc: new FormControl<string>(''),
+    checklist16Desc: new FormControl<string>(''),
+    checklist17Desc: new FormControl<string>(''),
+    checklist18Desc: new FormControl<string>(''),
+    checklist19Desc: new FormControl<string>(''),
+    checklist20Desc: new FormControl<string>('')
   });
   attendants: User[] = [];
   formCompanyIsEditable = false;
+
+  modChecklist: ModuleConciergeVehicleChecklist = new ModuleConciergeVehicleChecklist();
+  listChecklist: VehicleEntryChecklist[] = [];
 
   //Dialog Vehicle entry
   dialogVehicleVisible: boolean = false;
@@ -149,7 +169,8 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
     private vehicleService: VehicleService,
     private userService: UserService,
     private messageService: MessageService,
-    private photoService: PhotoService) { }
+    private photoService: PhotoService,
+    private modService: ModuleConciergeService) { }
 
   ngOnInit(): void {
     this.colors = [
@@ -197,7 +218,6 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
     }
   }
 
-
   //ClientCompany
   public validationClientCompany() {
     if (this.formClientCompany.get('clientCompanyNot').value.length == 0) {
@@ -237,6 +257,8 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
       this.activeStepper = 2;
       //Consulta os Attendants
       this.getAttendants();
+      //Consulta checklist ativo
+      this.getChecklist();
     } else {
       this.messageService.add({ severity: 'info', summary: 'Atenção', detail: 'Motorista não informado', icon: 'pi pi-info-circle' });
     }
@@ -292,6 +314,13 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
     }
   }
 
+  private async getChecklist() {
+    const result = await this.filterModeluChecklist();
+    if (result.status == 200 && result.body.status == SuccessError.succes) {
+      this.modChecklist = result.body.data;
+    }
+  }
+
   public stepperVehicle() {
     if (this.clientCompany != null) {
       if (this.driver != null) {
@@ -299,6 +328,8 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
         this.activeStepper = 2;
         //Consulta os Attendants
         this.getAttendants();
+        //Consulta checklist ativo
+        this.getChecklist();
       } else {
         this.messageService.add({ severity: 'info', summary: 'Atenção', detail: 'Motorista não informado', icon: 'pi pi-info-circle' });
       }
@@ -398,7 +429,27 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
       vehicleNew: YesNot.not,
       vehicleServiceOrder: YesNot.yes,
       attendant: null,
-      entryInformation: ""
+      entryInformation: "",
+      checklist1Desc: '',
+      checklist2Desc: '',
+      checklist3Desc: '',
+      checklist4Desc: '',
+      checklist5Desc: '',
+      checklist6Desc: '',
+      checklist7Desc: '',
+      checklist8Desc: '',
+      checklist9Desc: '',
+      checklist10Desc: '',
+      checklist11Desc: '',
+      checklist12Desc: '',
+      checklist13Desc: '',
+      checklist14Desc: '',
+      checklist15Desc: '',
+      checklist16Desc: '',
+      checklist17Desc: '',
+      checklist18Desc: '',
+      checklist19Desc: '',
+      checklist20Desc: '',
     });
     this.photoVehicle1 = "";
     this.photoVehicle2 = "";
@@ -411,53 +462,6 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
   public showDialogVehicle() {
     this.dialogVehicleVisible = true;
   }
-  //Valid
-  /*  private validVehicleEntry(): boolean {
- 
-     const { value, valid } = this.formVehicle;
- 
-    if ((value.placa == "" && value.vehicleNew == "not")) {
-        this.messageService.add({ severity: 'error', summary: 'Placa', detail: "Não informada", icon: 'pi pi-times' });
-        return false;
-      }
-        if ((value.placa != "" && value.vehicleNew == "not") && this.listVehicleEntry.length > 0) {
-         for (let item of this.listVehicleEntry) {
-           if (item.placa == value.placa) {
-             this.messageService.add({ severity: 'error', summary: 'Placa', detail: "Já adicionada", icon: 'pi pi-times' });
-             return false;
-           }
-         }
-       } 
-     if (value.modelVehicle.length == 0) {
-       this.messageService.add({ severity: 'error', summary: 'Modelo', detail: "Não selecionado", icon: 'pi pi-times' });
-       return false;
-     }
-     if (value.dateEntry == null) {
-        this.messageService.add({ severity: 'error', summary: 'Data Entrada', detail: "Não informada", icon: 'pi pi-times' });
-        return false;
-      }
-      if (value.dateEntry > new Date()) {
-        this.messageService.add({ severity: 'error', summary: 'Data Entrada', detail: "Maior que data atual", icon: 'pi pi-times' });
-        return false;
-      }
-      if (value.datePrevisionExit != null && value.datePrevisionExit < new Date()) {
-        this.messageService.add({ severity: 'error', summary: 'Data Previsão Saída', detail: "Menor que data atual", icon: 'pi pi-times' });
-        return false;
-      } 
-     if (value.color.length == 0) {
-       this.messageService.add({ severity: 'error', summary: 'Cor', detail: "Não seleciona", icon: 'pi pi-times' });
-       return false;
-     } 
- 
-     if (valid) {
-       return true;
-     } else {
-       return false;
-     }
- 
-   } */
-
-
   //adicionar o veículo a lista de entrada
   public async addVehicleEntry() {
     const { valid } = this.formVehicle;
@@ -479,9 +483,7 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
 
   }
   public deleteVehicleEntry(index: number) {
-
     var listTemp: any[] = [];
-
     for (let i = 0; i < this.listVehicleEntry.length; i++) {
       const element = this.listVehicleEntry[i];
       if (i != index) {
@@ -489,17 +491,25 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
       }
 
     }
-
     this.listVehicleEntry = [];
-
     for (let vehicle of listTemp) {
       this.listVehicleEntry.push(vehicle);
     }
-
+    //Checklist
+    var listTemp1: any[] = [];
+    for (let b = 0; b < this.listChecklist.length; b++) {
+      const element = this.listChecklist[b];
+      if (b != index) {
+        listTemp1.push(element);
+      }
+    }
+    this.listChecklist = [];
+    for (let ch of listTemp1) {
+      this.listChecklist.push(ch);
+    }
     if (this.listVehicleEntry.length == 0) {
       this.dialogVehicleVisible = false;
     }
-
   }
   formatDateTime(date: Date): string {
     const datePipe = new DatePipe('en-US');
@@ -517,7 +527,7 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
   //save
   private loadVehicleEntry() {
     const vehicleValue = this.formVehicle.value;
-    this.vehicleEntry = new VehicleEntry();
+
     this.vehicleEntry.companyId = this.storageService.companyId;
     this.vehicleEntry.resaleId = this.storageService.resaleId;
 
@@ -548,16 +558,116 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
     this.vehicleEntry.vehicleColor = vehicleValue.vehicleColor?.color ?? null;
     this.vehicleEntry.vehicleKmEntry = vehicleValue.vehicleKmEntry != null ? vehicleValue.vehicleKmEntry.toString() : "";
 
-    /* 
-    this.vehicleEntry.quantityTrafficCone = vehicleValue?.quantityTrafficCone ?? 0;
-    this.vehicleEntry.quantityExtinguisher = vehicleValue?.quantityExtinguisher ?? 0;
-    this.vehicleEntry.quantityTire = vehicleValue?.quantityTire ?? 0;
-    this.vehicleEntry.quantityTireComplete = vehicleValue?.quantityTireComplete ?? 0;
-    this.vehicleEntry.quantityToolBox = vehicleValue?.quantityToolBox ?? 0;
-    */
+    /* Checklist */
+    const checklist: VehicleEntryChecklist = new VehicleEntryChecklist();
+    checklist.companyId = this.vehicleEntry.companyId;
+    checklist.resaleId = this.vehicleEntry.resaleId;
 
+    if (this.modChecklist.checklist1Enabled == this.yes) {
+      checklist.checklist1Enabled = this.yes;
+      checklist.checklist1Label = this.modChecklist.checklist1Desc;
+      checklist.checklist1Desc = vehicleValue.checklist1Desc;
+    }
+    if (this.modChecklist.checklist2Enabled == this.yes) {
+      checklist.checklist2Enabled = this.yes;
+      checklist.checklist2Label = this.modChecklist.checklist2Desc;
+      checklist.checklist2Desc = vehicleValue.checklist2Desc;
+    }
+    if (this.modChecklist.checklist3Enabled == this.yes) {
+      checklist.checklist3Enabled = this.yes;
+      checklist.checklist3Label = this.modChecklist.checklist3Desc;
+      checklist.checklist3Desc = vehicleValue.checklist3Desc;
+    }
+    if (this.modChecklist.checklist4Enabled == this.yes) {
+      checklist.checklist4Enabled = this.yes;
+      checklist.checklist4Label = this.modChecklist.checklist4Desc;
+      checklist.checklist4Desc = vehicleValue.checklist4Desc;
+    }
+    if (this.modChecklist.checklist5Enabled == this.yes) {
+      checklist.checklist5Enabled = this.yes;
+      checklist.checklist5Label = this.modChecklist.checklist5Desc;
+      checklist.checklist5Desc = vehicleValue.checklist5Desc;
+    }
+    if (this.modChecklist.checklist6Enabled == this.yes) {
+      checklist.checklist6Enabled = this.yes;
+      checklist.checklist6Label = this.modChecklist.checklist6Desc;
+      checklist.checklist6Desc = vehicleValue.checklist6Desc;
+    }
+    if (this.modChecklist.checklist7Enabled == this.yes) {
+      checklist.checklist7Enabled = this.yes;
+      checklist.checklist7Label = this.modChecklist.checklist7Desc;
+      checklist.checklist7Desc = vehicleValue.checklist7Desc;
+    }
+    if (this.modChecklist.checklist8Enabled == this.yes) {
+      checklist.checklist8Enabled = this.yes;
+      checklist.checklist8Label = this.modChecklist.checklist8Desc;
+      checklist.checklist8Desc = vehicleValue.checklist8Desc;
+    }
+    if (this.modChecklist.checklist9Enabled == this.yes) {
+      checklist.checklist9Enabled = this.yes;
+      checklist.checklist9Label = this.modChecklist.checklist9Desc;
+      checklist.checklist9Desc = vehicleValue.checklist9Desc;
+    }
+    if (this.modChecklist.checklist10Enabled == this.yes) {
+      checklist.checklist10Enabled = this.yes;
+      checklist.checklist10Label = this.modChecklist.checklist10Desc;
+      checklist.checklist10Desc = vehicleValue.checklist10Desc;
+    }
+    if (this.modChecklist.checklist11Enabled == this.yes) {
+      checklist.checklist11Enabled = this.yes;
+      checklist.checklist11Label = this.modChecklist.checklist11Desc;
+      checklist.checklist11Desc = vehicleValue.checklist11Desc;
+    }
+    if (this.modChecklist.checklist12Enabled == this.yes) {
+      checklist.checklist12Enabled = this.yes;
+      checklist.checklist12Label = this.modChecklist.checklist12Desc;
+      checklist.checklist12Desc = vehicleValue.checklist12Desc;
+    }
+    if (this.modChecklist.checklist13Enabled == this.yes) {
+      checklist.checklist13Enabled = this.yes;
+      checklist.checklist13Label = this.modChecklist.checklist13Desc;
+      checklist.checklist13Desc = vehicleValue.checklist13Desc;
+    }
+    if (this.modChecklist.checklist14Enabled == this.yes) {
+      checklist.checklist14Enabled = this.yes;
+      checklist.checklist14Label = this.modChecklist.checklist14Desc;
+      checklist.checklist14Desc = vehicleValue.checklist14Desc;
+    }
+    if (this.modChecklist.checklist15Enabled == this.yes) {
+      checklist.checklist15Enabled = this.yes;
+      checklist.checklist15Label = this.modChecklist.checklist15Desc;
+      checklist.checklist15Desc = vehicleValue.checklist15Desc;
+    }
+    if (this.modChecklist.checklist16Enabled == this.yes) {
+      checklist.checklist16Enabled = this.yes;
+      checklist.checklist16Label = this.modChecklist.checklist16Desc;
+      checklist.checklist16Desc = vehicleValue.checklist16Desc;
+    }
+    if (this.modChecklist.checklist17Enabled == this.yes) {
+      checklist.checklist17Enabled = this.yes;
+      checklist.checklist17Label = this.modChecklist.checklist17Desc;
+      checklist.checklist17Desc = vehicleValue.checklist17Desc;
+    }
+    if (this.modChecklist.checklist18Enabled == this.yes) {
+      checklist.checklist18Enabled = this.yes;
+      checklist.checklist18Label = this.modChecklist.checklist18Desc;
+      checklist.checklist18Desc = vehicleValue.checklist18Desc;
+    }
+    if (this.modChecklist.checklist19Enabled == this.yes) {
+      checklist.checklist19Enabled = this.yes;
+      checklist.checklist19Label = this.modChecklist.checklist19Desc;
+      checklist.checklist19Desc = vehicleValue.checklist19Desc;
+    }
+    if (this.modChecklist.checklist20Enabled == this.yes) {
+      checklist.checklist20Enabled = this.yes;
+      checklist.checklist20Label = this.modChecklist.checklist20Desc;
+      checklist.checklist20Desc = vehicleValue.checklist20Desc;
+    }
+    //Add list of checklist
+    this.listChecklist.push(checklist);
     //Add list of vehicle
     this.listVehicleEntry.push(this.vehicleEntry);
+    this.vehicleEntry = new VehicleEntry();
     this.messageService.add({ severity: 'success', summary: 'Veículo adicionado', detail: this.vehicleEntry.modelDescription, icon: 'pi pi-car' });
     this.cleanFormVehicle();
     this.scrollTop();
@@ -589,6 +699,7 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
 
     return `${timestamp}_${random}`;
   }
+
   public async save() {
     this.busyService.busy();
 
@@ -596,7 +707,6 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
     if (this.listVehicleEntry.length > 1) {
       this.vehiclePlateTogether = this.generateSecureId();
     }
-
 
     //Save vehicles
     for (let index = 0; index < this.listVehicleEntry.length; index++) {
@@ -613,6 +723,9 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
       vehicle.entryPhoto2Url = "";
       vehicle.entryPhoto3Url = "";
       vehicle.entryPhoto4Url = "";
+
+      //Save checklist
+      vehicle.checklistId = await this.saveChecklistVehicle(index);
 
       const result = await this.saveVehicle(vehicle);
 
@@ -647,7 +760,10 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
         this.messageService.add({ severity: 'success', summary: vehicle.modelDescription, detail: "Salvo com sucesso", icon: 'pi pi-check' });
         if (index == (this.listVehicleEntry.length - 1)) {
           this.dialogVehicleVisible = false;
+          //Clean list vehicle
           this.listVehicleEntry = [];
+          //Clean list checklist
+          this.listChecklist = [];
 
           this.cleanFormDriver();
           this.driver = null;
@@ -663,7 +779,13 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
     }
     this.busyService.idle();
   }
-
+  private async saveChecklistVehicle(index: number): Promise<number> {
+    const resultChecklist = await this.saveChecklist(this.listChecklist.at(index));
+    if (resultChecklist.status == 201 && resultChecklist.body.status == SuccessError.succes) {
+      return resultChecklist.body.data["id"];
+    }
+    return null;
+  }
   private async savePhoto(ve: VehicleEntry, img: string, order: number): Promise<string> {
 
     if (img == "") {
@@ -767,6 +889,22 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
   private async filterUserRoleId(): Promise<HttpResponse<MessageResponse>> {
     try {
       return await lastValueFrom(this.userService.filterRoleId(2));
+    } catch (error) {
+      this.messageService.add({ severity: 'error', summary: 'Erro', detail: error.error.message, icon: 'pi pi-times' });
+      return error;
+    }
+  }
+  private async filterModeluChecklist(): Promise<HttpResponse<MessageResponse>> {
+    try {
+      return await lastValueFrom(this.modService.filterCompanyResale());
+    } catch (error) {
+      this.messageService.add({ severity: 'error', summary: 'Erro', detail: error.error.message, icon: 'pi pi-times' });
+      return error;
+    }
+  }
+  private async saveChecklist(ch: VehicleEntryChecklist): Promise<HttpResponse<MessageResponse>> {
+    try {
+      return await lastValueFrom(this.vehicleService.saveChecklist(ch));
     } catch (error) {
       this.messageService.add({ severity: 'error', summary: 'Erro', detail: error.error.message, icon: 'pi pi-times' });
       return error;

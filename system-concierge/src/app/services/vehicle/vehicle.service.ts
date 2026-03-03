@@ -8,6 +8,7 @@ import { VehicleEntry } from '../../models/vehicle/vehicle-entry';
 import { VehicleEntryAuth } from '../../models/vehicle/vehicle-entry-auth';
 import { VehicleExit } from '../../models/vehicle/vehicle-exit';
 import { MessageResponse } from '../../models/message/message-response';
+import { VehicleEntryChecklist } from '../../models/vehicle/vehicle-entry-checklist';
 
 @Injectable({
   providedIn: 'root'
@@ -40,6 +41,14 @@ export class VehicleService {
 
   entryFilterId(id: number): Observable<HttpResponse<MessageResponse>> {
     return this.http.get<MessageResponse>(environment.apiuUrl + "/vehicle/entry/" + this.companyResale + "/filter/id/" + id, { headers: this.myHeaders(), observe: 'response' });
+  }
+
+  saveChecklist(ch: VehicleEntryChecklist): Observable<HttpResponse<MessageResponse>> {
+    return this.http.post<MessageResponse>(environment.apiuUrl + "/vehicle/entry/save/checklist", ch, { headers: this.myHeaders(), observe: 'response' });
+  }
+
+   filterChecklist(id: number): Observable<HttpResponse<MessageResponse>> {
+    return this.http.get<MessageResponse>(environment.apiuUrl + "/vehicle/entry/" + this.companyResale + "/filter/checklist/" + id, { headers: this.myHeaders(), observe: 'response' });
   }
 
   filterPlate(plate: string): Observable<HttpResponse<MessageResponse>> {
