@@ -1,7 +1,7 @@
 package com.concierge.apiconcierge.controllers.dashboard.interfaces;
 
 public interface IDashCountVehiclePenAuthBud {
-    Integer getPending();
+    Integer getVehicle();
     Integer getAuthorized();
     Integer getBudget();
 }

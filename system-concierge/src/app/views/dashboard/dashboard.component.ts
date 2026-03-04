@@ -20,6 +20,7 @@ import { FilterClientComponent } from '../../components/filter.client/filter.cli
 import { CanComponentDeactivate } from './can-deactivate.guard.ts';
 //Class
 import { ClientCompany } from '../../models/clientcompany/client-company';
+import { BusyService } from '../../components/loading/busy.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -43,8 +44,12 @@ export default class DashboardComponent implements OnInit, CanComponentDeactivat
 
   btnBack = false; // controle para saber se o usuário clicou no button voltar
 
+  yearNow = signal<number>(Number.parseInt(new Date().getFullYear().toString()));
+  isSearchClient: boolean = false;
+
   constructor(private confirmationService: ConfirmationService,
     private messageService: MessageService,
+    private busyService: BusyService,
     private storageService: StorageService,
     private primeNGConfig: PrimeNGConfig,
     private dashboardService: DashboardService
@@ -52,7 +57,7 @@ export default class DashboardComponent implements OnInit, CanComponentDeactivat
   }
   ngDoCheck(): void {
     //Client
-    if (this.selectClientCompany().id != 0) {
+    if (this.selectClientCompany().id != null) {
       this.clientCompany = this.selectClientCompany();
       this.clientName = this.clientCompany.name;
       //Search client
@@ -88,15 +93,13 @@ export default class DashboardComponent implements OnInit, CanComponentDeactivat
       labels: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'],
       datasets: [
         {
-          label: 'Ano: 2024',
-          //data: [540, 325, 402, 320, 540, 325, 702, 620, 540, 325, 702, 920],
+          label: `Ano: ${this.yearNow() - 1}`,
           backgroundColor: ['rgba(255, 159, 64, 0.2)'],
           borderColor: ['rgb(255, 159, 64)'],
           borderWidth: 1
         },
         {
-          label: 'Ano: 2025',
-          // data: [240, 325, 702, 620, 50, 325, 702, 620, 140, 425, 102, 220],
+          label: `Ano: ${this.yearNow()}`,
           backgroundColor: ['rgba(54, 162, 235, 0.2)'],
           borderColor: ['rgb(54, 162, 235)'],
           borderWidth: 1
@@ -139,7 +142,7 @@ export default class DashboardComponent implements OnInit, CanComponentDeactivat
       labels: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'],
       datasets: [
         {
-          label: 'Ano: 2024',
+          label: `Ano: ${this.yearNow() - 1}`,
           fill: false,
           borderColor: documentStyle.getPropertyValue('--orange-500'),
           backgroundColor: documentStyle.getPropertyValue('--orange-100'),
@@ -147,7 +150,7 @@ export default class DashboardComponent implements OnInit, CanComponentDeactivat
           tension: 0.4
         },
         {
-          label: 'Ano: 2025',
+          label: `Ano: ${this.yearNow()}`,
           fill: false,
           borderColor: documentStyle.getPropertyValue('--blue-500'),
           backgroundColor: documentStyle.getPropertyValue('--blue-100'),
@@ -193,7 +196,7 @@ export default class DashboardComponent implements OnInit, CanComponentDeactivat
   canDeactivate(nextState?: RouterStateSnapshot): Promise<boolean> | boolean {
     // Apenas confirmar se for sair para o login
     const nextUrl = nextState?.url || '';
-    
+
     if (nextUrl.includes('/login')) {
       return new Promise<boolean>((resolve) => {
         this.confirmationService.confirm({
@@ -217,20 +220,29 @@ export default class DashboardComponent implements OnInit, CanComponentDeactivat
   onChange() {
     this.btnBack = true;
   }
-
   async init() {
-    const responseVehicle = await this.countVehiclePenAuthBud();
+    //pesquisa de cliente
+    this.isSearchClient = false;
+    //Clean Name
+    this.clientName = "";
+    //Clear data
+    this.clientData1.datasets[0].data = [];
+    this.clientData1.datasets[1].data = [];
+    //Clear data
+    this.clientData2.datasets[0].data = [];
+    this.clientData2.datasets[1].data = [];
+    //total de veículos na empresa e autorizados
+    const responseVehicle = await this.countVehiclePenAuth();
     if (responseVehicle.status == 200) {
       this.countVehicle = responseVehicle.body;
     }
-
-    const responseClientData1 = await this.countVehicleFilterYear(2024);
+    const responseClientData1 = await this.countVehicleFilterYear(this.yearNow() - 1);
     if (responseClientData1.status == 200) {
       for (const d of responseClientData1.body) {
         this.clientData1.datasets[0].data.push(d);
       }
     }
-    const responseClientData2 = await this.countVehicleFilterYear(2025);
+    const responseClientData2 = await this.countVehicleFilterYear(this.yearNow());
     if (responseClientData2.status == 200) {
       for (const d of responseClientData2.body) {
         this.clientData1.datasets[1].data.push(d);
@@ -239,13 +251,13 @@ export default class DashboardComponent implements OnInit, CanComponentDeactivat
     //Update graphic
     this.clientData1 = { ... this.clientData1 };
 
-    const resultClientData1 = await this.countYesServiceFilterYear(2024);
+    const resultClientData1 = await this.countYesServiceFilterYear(this.yearNow() - 1);
     if (resultClientData1.status == 200) {
       for (const d of resultClientData1.body) {
         this.clientData2.datasets[0].data.push(d);
       }
     }
-    const resultClientData2 = await this.countYesServiceFilterYear(2025);
+    const resultClientData2 = await this.countYesServiceFilterYear(this.yearNow());
     if (resultClientData2.status == 200) {
       for (const d of resultClientData2.body) {
         this.clientData2.datasets[1].data.push(d);
@@ -254,17 +266,23 @@ export default class DashboardComponent implements OnInit, CanComponentDeactivat
     //Update graphic
     this.clientData2 = { ...this.clientData2 };
   }
-  async searchClient(clientId: number) {
+  private async searchClient(clientId: number) {
+    //Inicia o load
+    this.busyService.busy();
     this.clientData1.datasets[0].data = [];
     this.clientData1.datasets[1].data = [];
-    const responseClientData1 = await this.countVehicleFilterYearClient(2024, clientId);
+    const responseClientData1 = await this.countVehicleFilterYearClient(this.yearNow() - 1, clientId);
     if (responseClientData1.status == 200) {
+      //Cliente encontrado
+      this.isSearchClient = true;
       for (const d of responseClientData1.body) {
         this.clientData1.datasets[0].data.push(d);
       }
     }
-    const responseClientData2 = await this.countVehicleFilterYearClient(2025, clientId);
+    const responseClientData2 = await this.countVehicleFilterYearClient(this.yearNow(), clientId);
     if (responseClientData2.status == 200) {
+      //Cliente encontrado
+      this.isSearchClient = true;
       for (const d of responseClientData2.body) {
         this.clientData1.datasets[1].data.push(d);
       }
@@ -274,24 +292,29 @@ export default class DashboardComponent implements OnInit, CanComponentDeactivat
     //Clear data
     this.clientData2.datasets[0].data = [];
     this.clientData2.datasets[1].data = [];
-    const resultClientData1 = await this.countYesServiceFilterYearClient(2024, clientId);
+    const resultClientData1 = await this.countYesServiceFilterYearClient(this.yearNow() - 1, clientId);
     if (resultClientData1.status == 200) {
+      //Cliente encontrado
+      this.isSearchClient = true;
       for (const d of resultClientData1.body) {
         this.clientData2.datasets[0].data.push(d);
       }
     }
-    const resultClientData2 = await this.countYesServiceFilterYearClient(2025, clientId);
+    const resultClientData2 = await this.countYesServiceFilterYearClient(this.yearNow(), clientId);
     if (resultClientData2.status == 200) {
+      //Cliente encontrado
+      this.isSearchClient = true;
       for (const d of resultClientData2.body) {
         this.clientData2.datasets[1].data.push(d);
       }
     }
-    this.clientData2 = { ...this.clientData2 }
+    //Fecha o load
+    this.busyService.idle();
+    this.clientData2 = { ...this.clientData2 };
   }
-
-  private async countVehiclePenAuthBud(): Promise<HttpResponse<any[]>> {
+  private async countVehiclePenAuth(): Promise<HttpResponse<any[]>> {
     try {
-      return await lastValueFrom(this.dashboardService.countVehiclePenAuthBud());
+      return await lastValueFrom(this.dashboardService.countVehiclePenAuth());
     } catch (error) {
       return error;
     }

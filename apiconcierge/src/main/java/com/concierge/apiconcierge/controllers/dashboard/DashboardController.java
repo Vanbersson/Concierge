@@ -4,6 +4,7 @@ import com.concierge.apiconcierge.controllers.dashboard.interfaces.IDashCountVeh
 import com.concierge.apiconcierge.controllers.dashboard.interfaces.IDashValueTotalBudget;
 import com.concierge.apiconcierge.dtos.message.MessageResponseDto;
 import com.concierge.apiconcierge.models.enums.YesNot;
+import com.concierge.apiconcierge.models.vehicle.enums.StatusVehicleEnum;
 import com.concierge.apiconcierge.repositories.vehicle.entry.IVehicleEntryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,21 +24,14 @@ public class DashboardController {
     @Autowired
     IVehicleEntryRepository repository;
 
-    @GetMapping("/{companyId}/{resaleId}/filter/vehicle/pen/auth/bud")
-    public ResponseEntity<Object> filterVehiclePenAuthBud(@PathVariable(name = "companyId") Integer companyId,
-                                                          @PathVariable(name = "resaleId") Integer resaleId) {
+    @GetMapping("/{companyId}/{resaleId}/count/vehicle")
+    public ResponseEntity<Object> countVehicle(@PathVariable(name = "companyId") Integer companyId,
+                                                @PathVariable(name = "resaleId") Integer resaleId) {
         try {
-           IDashCountVehiclePenAuthBud  countVehicle = this.repository.countVehiclePenAuthBud(companyId, resaleId);
-            List<IDashValueTotalBudget> budges = this.repository.valueTotalBudget(companyId, resaleId);
-            float total=0;
-            for (var item : budges) {
-                total += item.getPart() +item.getService();
-            }
+            IDashCountVehiclePenAuthBud countVehicle = this.repository.countVehicles(companyId, resaleId, StatusVehicleEnum.Entered);
             List<Object> listVehicle = new ArrayList<>();
-            listVehicle.add(countVehicle.getPending());
+            listVehicle.add(countVehicle.getVehicle());
             listVehicle.add(countVehicle.getAuthorized());
-            listVehicle.add(countVehicle.getBudget());
-            listVehicle.add(total);
             return ResponseEntity.status(HttpStatus.OK).body(listVehicle);
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));

@@ -314,7 +314,7 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
   }
   ngDoCheck(): void {
     //proprietário
-    if (this.selectClientCompany().id != 0) {
+    if (this.selectClientCompany().id != null) {
       this.formClientCompany.patchValue({
         clientCompanyNot: [],
         clientCompanyId: this.selectClientCompany().id,
@@ -327,7 +327,7 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
       this.selectClientCompany.set(new ClientCompany());
     }
     //Motorista entrada
-    if (this.selectDriverEntry().id != 0) {
+    if (this.selectDriverEntry().id != null) {
       this.driverEntry = this.selectDriverEntry();
       this.formDriver.patchValue({
         driverEntryId: this.driverEntry.id,
@@ -341,7 +341,7 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
       this.selectDriverEntry.set(new Driver());
     }
     //Motorista saída
-    if (this.selectDriverExit().id != 0) {
+    if (this.selectDriverExit().id != null) {
       this.driverExit = this.selectDriverExit();
       this.formDriver.patchValue({
         driverExitId: this.driverExit.id == 0 ? null : this.driverExit.id,

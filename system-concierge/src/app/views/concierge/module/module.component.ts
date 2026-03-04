@@ -30,9 +30,7 @@ import { BusyService } from '../../../components/loading/busy.service';
 export default class ModuleComponent implements OnInit {
   yes = YesNot.yes;
   not = YesNot.not;
-
   modChecklist!: ModuleConciergeVehicleChecklist;
-
   //Checklist Entrada
   formChecklist = new FormGroup({
     checklist1Enabled: new FormControl<string[]>([]),
@@ -76,7 +74,6 @@ export default class ModuleComponent implements OnInit {
     checklist20Enabled: new FormControl<string[]>([]),
     checklist20Desc: new FormControl<string>(''),
   });
-
   constructor(private busyService: BusyService,
     private modService: ModuleConciergeService,
     private messageService: MessageService) { }
@@ -176,9 +173,7 @@ export default class ModuleComponent implements OnInit {
   }
 
   async save() {
-
     const { value } = this.formChecklist;
-
     this.modChecklist.checklist1Desc = value.checklist1Desc;
     this.modChecklist.checklist1Enabled = value.checklist1Enabled.at(0) ?? null;
     this.modChecklist.checklist2Desc = value.checklist2Desc;
@@ -226,7 +221,6 @@ export default class ModuleComponent implements OnInit {
       this.init();
     }
   }
-
 
   private async update(mod: ModuleConciergeVehicleChecklist): Promise<HttpResponse<MessageResponse>> {
     try {

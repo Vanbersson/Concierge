@@ -4,13 +4,6 @@ import { Observable } from 'rxjs';
 import { HttpClient, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { StorageService } from '../storage/storage.service';
 
-//class
-import { VehicleEntry } from '../../models/vehicle/vehicle-entry';
-import { VehicleEntryAuth } from '../../models/vehicle/vehicle-entry-auth';
-import { VehicleExit } from '../../models/vehicle/vehicle-exit';
-import { MessageResponse } from '../../models/message/message-response';
-
-
 @Injectable({
     providedIn: 'root'
 })
@@ -19,8 +12,8 @@ export class DashboardService {
 
     constructor(private http: HttpClient, private storage: StorageService) { }
 
-     countVehiclePenAuthBud(): Observable<HttpResponse<any>> {
-        return this.http.get<any>(environment.apiuUrl + "/dashboard/" + this.companyResale + "/filter/vehicle/pen/auth/bud", { headers: this.myHeaders(), observe: 'response' });
+     countVehiclePenAuth(): Observable<HttpResponse<any>> {
+        return this.http.get<any>(environment.apiuUrl + "/dashboard/" + this.companyResale + "/count/vehicle", { headers: this.myHeaders(), observe: 'response' });
     }
 
     countYesServiceFilterYear(year: number): Observable<HttpResponse<any>> {

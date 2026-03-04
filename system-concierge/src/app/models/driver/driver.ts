@@ -1,10 +1,10 @@
 import { StatusEnum } from "../enum/status-enum";
 
 export class Driver {
-    companyId: number = 0;
-    resaleId: number = 0;
+    companyId: number | null = null;
+    resaleId: number | null = null;
     dateRegister: Date | string = "";
-    id: number = 0;
+    id: number | null = null;
     status: StatusEnum = StatusEnum.DISABLED;
     name: string = "";
     cpf: string = "";

@@ -3,14 +3,14 @@ import { CliForEnum } from "./clifor-enum";
 import { FisJurEnum } from "./fisjur-enum";
 
 export class ClientCompany {
-    companyId: number = 0;
-    resaleId: number = 0;
+    companyId: number | null = null;
+    resaleId: number | null = null;
     dateRegister: Date | string = '';
-    id: number = 0;
+    id: number | null = null;
     status: StatusEnum = StatusEnum.DISABLED;
     name: string = '';
     fantasia: string = '';
-    categoryId: number = 0;
+    categoryId: number | null = null;
     clifor: CliForEnum = CliForEnum.AMBOS;
     fisjur: FisJurEnum = FisJurEnum.OUTRAS;
     cnpj: string = '';

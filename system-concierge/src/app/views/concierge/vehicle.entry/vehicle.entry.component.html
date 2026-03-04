@@ -170,7 +170,7 @@
                             <label for="vehiclemodelid">Modelos</label>
                             <p-dropdown 
                             formControlName="modelVehicle"
-                            [options]="vehicleModels$ | async"
+                            [options]="vehicleModels"
                             optionLabel="description"
                             [style]="{'text-transform':'uppercase'}"/>
                             <small class="p-error block" *ngIf="formVehicle.get('modelVehicle')?.invalid">Campo obrigatório</small>

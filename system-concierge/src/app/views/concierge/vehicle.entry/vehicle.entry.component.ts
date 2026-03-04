@@ -79,13 +79,10 @@ import { VehicleEntryChecklist } from '../../../models/vehicle/vehicle-entry-che
   styleUrl: './vehicle.entry.component.scss'
 })
 export default class VehicleEntryComponent implements OnInit, DoCheck {
-
   private vehicleEntry: VehicleEntry = new VehicleEntry();
   private vehiclePlateTogether: string = "";
-
   activeStepper: number | undefined = 0;
   private upperCasePipe = new UpperCasePipe();
-
   //ClientCompany
   selectClientCompany = signal<ClientCompany>(new ClientCompany());
   clientCompany!: ClientCompany;
@@ -97,7 +94,6 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
     clientCompanyCpf: new FormControl<string>({ value: '', disabled: true }),
     clientCompanyRg: new FormControl<string | null>({ value: null, disabled: true }),
   });
-
   //Driver
   driverEntryPhoto!: string;
   driverEntryPhotoDoc1!: string;
@@ -110,14 +106,13 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
     driverEntryCpf: new FormControl<string>({ value: '', disabled: true }),
     driverEntryRg: new FormControl<string | null>({ value: null, disabled: true })
   });
-
   //Vehicle
   colors: IColor[] = []
   photoVehicle1!: string;
   photoVehicle2!: string;
   photoVehicle3!: string;
   photoVehicle4!: string;
-  vehicleModels$ = this.vehicleModelService.getAllEnabled();
+  vehicleModels: ModelVehicle[] = [];
   yes = YesNot.yes;
   not = YesNot.not;
   formVehicle = new FormGroup({
@@ -186,11 +181,17 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
       { color: 'Outro' }
     ];
     this.addRequirePlaca();
+    //Consulta os Attendants
+    this.getAttendants();
+    //Consulta checklist ativo
+    this.getChecklist();
+    //Modelos de veículos
+    this.getModelVehicles();
   }
 
   ngDoCheck(): void {
     //Client
-    if (this.selectClientCompany().id != 0) {
+    if (this.selectClientCompany().id != null) {
       this.clientCompany = this.selectClientCompany();
       this.formClientCompany.patchValue({
         clientCompanyNot: [],
@@ -203,7 +204,7 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
       this.selectClientCompany.set(new ClientCompany());
     }
     //Driver
-    if (this.selectDriver().id != 0) {
+    if (this.selectDriver().id != null) {
       this.formDriver.patchValue({
         driverEntryId: this.selectDriver().id,
         driverEntryName: this.selectDriver().name,
@@ -255,10 +256,6 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
     if (this.driver != null) {
       //Aba veículo
       this.activeStepper = 2;
-      //Consulta os Attendants
-      this.getAttendants();
-      //Consulta checklist ativo
-      this.getChecklist();
     } else {
       this.messageService.add({ severity: 'info', summary: 'Atenção', detail: 'Motorista não informado', icon: 'pi pi-info-circle' });
     }
@@ -306,30 +303,30 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
   private async getAttendants() {
     const result = await this.filterUserRoleId();
     if (result.status == 200 && result.body.status == SuccessError.succes) {
-      //this.messageService.add({ severity: 'success', summary: result.body.header, detail: result.body.message, icon: 'pi pi-check' });
       this.attendants = result.body.data;
     }
     if (result.status == 200 && result.body.status == SuccessError.error) {
       this.messageService.add({ severity: 'info', summary: result.body.header, detail: result.body.message, icon: 'pi pi-info-circle' });
     }
   }
-
   private async getChecklist() {
     const result = await this.filterModeluChecklist();
     if (result.status == 200 && result.body.status == SuccessError.succes) {
       this.modChecklist = result.body.data;
     }
+    if (result.status == 200 && result.body.status == SuccessError.error) {
+      this.messageService.add({ severity: 'info', summary: result.body.header, detail: result.body.message, icon: 'pi pi-info-circle' });
+    }
   }
 
+  private async getModelVehicles() {
+    this.vehicleModels = await this.modelVehicles();
+  }
   public stepperVehicle() {
     if (this.clientCompany != null) {
       if (this.driver != null) {
         //Aba veículo
         this.activeStepper = 2;
-        //Consulta os Attendants
-        this.getAttendants();
-        //Consulta checklist ativo
-        this.getChecklist();
       } else {
         this.messageService.add({ severity: 'info', summary: 'Atenção', detail: 'Motorista não informado', icon: 'pi pi-info-circle' });
       }
@@ -699,7 +696,6 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
 
     return `${timestamp}_${random}`;
   }
-
   public async save() {
     this.busyService.busy();
     //Gerar ID 
@@ -830,7 +826,6 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
     return "";
 
   }
-
   private cleanBase64(base64: string): { base64: string; mime: string } {
     if (!base64.includes(',')) {
       return { base64, mime: 'image/jpeg' };
@@ -852,7 +847,6 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
 
     return new File([ia], 'image.jpg', { type: mime });
   }
-
   private async saveVehicle(vehicle: VehicleEntry): Promise<HttpResponse<MessageResponse>> {
     try {
       return await lastValueFrom(this.vehicleService.entrySave(vehicle));
@@ -910,4 +904,12 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
     }
   }
 
+  private async modelVehicles(): Promise<ModelVehicle[]> {
+    try {
+      return await lastValueFrom(this.vehicleModelService.getAllEnabled());
+    } catch (error) {
+      this.messageService.add({ severity: 'error', summary: 'Erro', detail: error.error.message, icon: 'pi pi-times' });
+      return error;
+    }
+  }
 }
