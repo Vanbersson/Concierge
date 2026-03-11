@@ -1,4 +1,4 @@
-package com.concierge.apiconcierge.models.status;
+package com.concierge.apiconcierge.models.enums;
 
 public enum StatusEnableDisable {
     Habilitado, Desabilitado;

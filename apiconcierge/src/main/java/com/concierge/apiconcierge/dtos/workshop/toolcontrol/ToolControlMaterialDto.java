@@ -1,6 +1,6 @@
 package com.concierge.apiconcierge.dtos.workshop.toolcontrol;
 
-import com.concierge.apiconcierge.models.status.StatusEnableDisable;
+import com.concierge.apiconcierge.models.enums.StatusEnableDisable;
 import com.concierge.apiconcierge.models.workshop.toolcontrol.enums.TypeRequest;
 
 public record ToolControlMaterialDto(Integer companyId,

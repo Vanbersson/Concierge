@@ -1,7 +1,7 @@
 package com.concierge.apiconcierge.repositories.clientcompany;
 
 import com.concierge.apiconcierge.models.clientcompany.ClientCategory;
-import com.concierge.apiconcierge.models.status.StatusEnableDisable;
+import com.concierge.apiconcierge.models.enums.StatusEnableDisable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;

@@ -46,6 +46,7 @@ import { BusyService } from '../../../components/loading/busy.service';
 import { PhotoResult } from '../../../interfaces/photo-result';
 import { PhotoResultStatus } from '../../../models/enum/photo-result-status';
 import { PhotoService } from '../../../services/photo/photo.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-user',
@@ -104,8 +105,8 @@ export default class UserComponent implements OnInit {
   visibleUpdatePass: boolean = false;
   nameUserUpdatePass!: string;
   formPassword = new FormGroup({
-    password: new FormControl<string>('', [Validators.minLength(8), Validators.maxLength(8), Validators.required]),
-    passwordValid: new FormControl<string>('', [Validators.minLength(8), Validators.maxLength(8), Validators.required]),
+    password: new FormControl<string>('', [Validators.minLength(8), Validators.required]),
+    passwordValid: new FormControl<string>('', [Validators.minLength(8), Validators.required]),
   });
 
   constructor(
@@ -139,13 +140,27 @@ export default class UserComponent implements OnInit {
       },
       {
         key: '2_0', label: 'Peças', children: [
-          { key: '2_1', label: 'Atendimento peças' },
-          { key: '2_2', label: 'Pedidos de compras' },
+          { key: '2_1', label: 'Atendimento' },
+          {
+            key: '2_2', label: 'Consultas', children: [
+              { key: '2_2_0', label: 'Orçamentos' },
+            ]
+
+          },
+          {
+            key: '2_3', label: 'Compras', children: [
+              { key: '2_3_0', label: 'Pedidos de Compras' },
+            ]
+          },
           {
             key: '2_99', label: 'Cadastros', children: [
               { key: '2_99_0', label: 'Peças' },
+              { key: '2_99_1', label: 'Grupo de Peças' },
+              { key: '2_99_2', label: 'Categoria de Peças' },
+              { key: '2_99_3', label: 'Unidades de Medida' },
             ]
-          }
+          },
+          { key: '2_100', label: 'Módulo' },
         ]
       },
       {
@@ -196,8 +211,14 @@ export default class UserComponent implements OnInit {
       },
       {
         key: '999_0', label: 'Configurações', children: [
-          { key: '999_1', label: 'Empresa', icon: 'pi pi-building' },
-          { key: '999_2', label: 'Cadastro Usuários', icon: 'pi pi-users' },
+          {
+            key: '999_2', label: 'Cadastros', children: [
+              { key: '999_2_0', label: 'Empresa', icon: 'pi pi-building' },
+              { key: '999_2_1', label: 'Usuários', icon: 'pi pi-users' },
+              { key: '999_2_2', label: 'Marcas' },
+            ]
+          },
+
         ]
       },
 
@@ -239,20 +260,20 @@ export default class UserComponent implements OnInit {
   }
   //Password
   private addRequirePass() {
-    this.formUser.controls['password'].addValidators([Validators.minLength(8), Validators.maxLength(8), Validators.required]);
+    this.formUser.controls['password'].addValidators([Validators.minLength(8), Validators.required]);
     this.formUser.controls['password'].updateValueAndValidity();
   }
   private deleteRequirePass() {
-    this.formUser.controls['password'].removeValidators([Validators.minLength(8), Validators.maxLength(8), Validators.required]);
+    this.formUser.controls['password'].removeValidators([Validators.minLength(8), Validators.required]);
     this.formUser.controls['password'].updateValueAndValidity();
   }
   //Password Valid
   private addRequirePassValid() {
-    this.formUser.controls['passwordValid'].addValidators([Validators.minLength(8), Validators.maxLength(8), Validators.required]);
+    this.formUser.controls['passwordValid'].addValidators([Validators.minLength(8), Validators.required]);
     this.formUser.controls['passwordValid'].updateValueAndValidity();
   }
   private deleteRequirePassValid() {
-    this.formUser.controls['passwordValid'].removeValidators([Validators.minLength(8), Validators.maxLength(8), Validators.required]);
+    this.formUser.controls['passwordValid'].removeValidators([Validators.minLength(8), Validators.required]);
     this.formUser.controls['passwordValid'].updateValueAndValidity();
   }
   private async getUsers() {
@@ -735,6 +756,7 @@ export default class UserComponent implements OnInit {
       return error;
     }
   }
+  
   //Alert
   private alertPermisionSave() {
     this.messageService.add({ severity: 'success', summary: 'Permissões', detail: 'Salvo com sucesso', icon: 'pi pi-check', life: 3000 });

@@ -1,10 +1,9 @@
 package com.concierge.apiconcierge.repositories.user;
 
-import com.concierge.apiconcierge.models.status.StatusEnableDisable;
+import com.concierge.apiconcierge.models.enums.StatusEnableDisable;
 import com.concierge.apiconcierge.models.user.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;

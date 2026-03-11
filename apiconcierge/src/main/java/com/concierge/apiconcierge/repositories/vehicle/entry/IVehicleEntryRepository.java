@@ -1,7 +1,6 @@
 package com.concierge.apiconcierge.repositories.vehicle.entry;
 
 import com.concierge.apiconcierge.controllers.dashboard.interfaces.IDashCountVehiclePenAuthBud;
-import com.concierge.apiconcierge.controllers.dashboard.interfaces.IDashValueTotalBudget;
 import com.concierge.apiconcierge.models.enums.YesNot;
 import com.concierge.apiconcierge.models.vehicle.entry.VehicleEntry;
 import com.concierge.apiconcierge.models.vehicle.enums.StatusAuthExitEnum;

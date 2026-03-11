@@ -1,6 +1,6 @@
 package com.concierge.apiconcierge.dtos.workshop.mechanic;
 
-import com.concierge.apiconcierge.models.status.StatusEnableDisable;
+import com.concierge.apiconcierge.models.enums.StatusEnableDisable;
 
 public record MechanicDto(Integer companyId,
                           Integer resaleId,

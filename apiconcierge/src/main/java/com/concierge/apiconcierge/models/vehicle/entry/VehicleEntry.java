@@ -1,8 +1,6 @@
 package com.concierge.apiconcierge.models.vehicle.entry;
 
-import com.concierge.apiconcierge.models.budget.enums.StatusBudgetEnum;
 import com.concierge.apiconcierge.models.enums.YesNot;
-import com.concierge.apiconcierge.models.status.StatusEnableDisable;
 import com.concierge.apiconcierge.models.vehicle.enums.*;
 import jakarta.persistence.*;
 import lombok.*;

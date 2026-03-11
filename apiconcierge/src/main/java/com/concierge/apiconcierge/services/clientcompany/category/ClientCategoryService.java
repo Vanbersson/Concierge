@@ -3,7 +3,7 @@ package com.concierge.apiconcierge.services.clientcompany.category;
 import com.concierge.apiconcierge.exceptions.clientcompany.ClientCompanyException;
 import com.concierge.apiconcierge.models.clientcompany.ClientCategory;
 import com.concierge.apiconcierge.models.message.MessageResponse;
-import com.concierge.apiconcierge.models.status.StatusEnableDisable;
+import com.concierge.apiconcierge.models.enums.StatusEnableDisable;
 import com.concierge.apiconcierge.repositories.clientcompany.IClientCategoryRepository;
 import com.concierge.apiconcierge.util.ConstantsMessage;
 import com.concierge.apiconcierge.validation.clientcompany.category.IClientCategoryValidation;

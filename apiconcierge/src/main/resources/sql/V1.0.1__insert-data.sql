@@ -4,6 +4,125 @@ INSERT INTO `tb_address`
 VALUES
 ('54590000','PE','Cabo de Santo Agostinho','Distrito DIPER','Via pedro rossi');
 
+INSERT INTO tb_brand
+ (status,name)
+ VALUE
+ (0,'randon'),
+ (0,'librelato'),
+ (0,'facchini'),
+ (0,'fiat'),
+ (0,'ford'),
+ (0,'volkswagem'),
+ (0,'toyota'),
+ (0,'yamaha'),
+ (0,'honda'),
+ (0,'guerra'),
+ (0,'byd'),
+ (0,'general motors'),
+ (0,'hyundai'),
+ (0,'hyva'),
+ (0,'iveco');
+
+ INSERT INTO tb_unit_measure
+ (unit_measure,description)
+ VALUES
+ ('cj','conjunto'),
+ ('cx','caixa'),
+ ('gl','galão'),
+ ('jg','jogo'),
+ ('kg','kilograma'),
+ ('mt','metro'),
+ ('pa','par'),
+ ('pc','peça'),
+ ('un','unidade'),
+ ('lt','litro');
+
+INSERT INTO tb_permission
+(id,description,menu)
+VALUES
+(100,'Editar entrada de veículo','Portaria'),
+(101,'Autorizar saída de veículo','Portaria'),
+(102,'Autorizar saída de veículo - 1ª','Portaria'),
+(103,'Autorizar saída de veículo - 2ª','Portaria'),
+(104,'Remover autorização de saída de veículo - 1ª','Portaria'),
+(105,'Remover autorização de saída de veículo - 2ª','Portaria'),
+(106,'Autorizar saída de veículo sem O.S.','Portaria'),
+(107,'Remover autorização de saída de veículo sem O.S.','Portaria'),
+(108,'Autorizar entrada de veículo','Portaria'),
+(150,'Gerar orçamento','Portaria'),
+(151,'Manutenção orçamento','Portaria'),
+(152,'Visualizar orçamento','Portaria'),
+(153,'Receber notificações de entrada veículo','Portaria'),
+(154,'Receber notificações de saída veículo','Portaria'),
+(300,'Alterar quantidade material','Oficina');
+
+INSERT INTO `tb_menu`
+(`id`, `description`)
+VALUES
+('0_0','Dashboard'),
+
+('1_0','Portaria'),
+('1_1','Entrada de Veículo'),
+('1_2','Veículos'),
+('1_5','Saída de Veiculo'),
+('1_3','Motorista'),
+('1_99','Cadastros'),
+('1_99_0','Modelo'),
+('1_99_1','Veículo'),
+('1_100','Módulo'),
+
+('2_0','Peças'),
+('2_1','Atendimento'),
+
+('2_2','Consultas'),
+('2_2_0','Orçamentos'),
+
+('2_3','Compras'),
+('2_3_0','Pedidos de Compras'),
+
+('2_99','Cadastros'),
+('2_99_0','Peças'),
+('2_99_1','Grupo de Peças'),
+('2_99_2','Categoria de Peças'),
+('2_99_3','Unidades de Medida'),
+('2_100','Módulo'),
+
+('3_0','Oficina'),
+('3_1','Atendimento Oficina'),
+
+('3_2','Controle de equipamentos'),
+('3_2_0','Requisições'),
+('3_2_1','Cadastros'),
+('3_2_1_0','Categoria'),
+('3_2_1_1','Material'),
+('3_3','Orçamentos'),
+('3_99','Cadastros'),
+('3_99_0','Mecânico'),
+
+('4_0','Faturamento'),
+('4_1','Manutenção Clientes'),
+('4_99','Cadastros'),
+('4_99_0','Categoria de Clientes'),
+
+('100_0','Relatório'),
+('100_1','Portaria'),
+('100_1_0','Veículos'),
+('100_2','Peças'),
+('100_2_0','Pedidos de compras'),
+
+('999_0','Configuração'),
+('999_2','Cadastros'),
+('999_2_0','Empresa'),
+('999_2_1','Usuários'),
+('999_2_2','Marcas');
+
+
+
+
+
+
+
+
 INSERT INTO `tb_company`
 (`status`, `name`, `cnpj`, `email`, `cellphone`, `phone`, `zip_code`, `state`, `city`, `neighborhood`, `address`, `address_number`)
 VALUES
@@ -89,52 +208,6 @@ VALUE
 (1,1,0,'Faturamento 30/60/90/120/150 dias'),
 (1,1,0,'Faturamento 30/60/90/120/150/180 dias');
 
-INSERT INTO `tb_menu`
-(`id`, `description`)
-VALUES
-('0_0','Dashboard'),
-('1_0','Portaria'),
-('1_1','Entrada de Veículo'),
-('1_2','Veículos'),
-('1_5','Saída de Veiculo'),
-('1_3','Motorista'),
-('1_99','Cadastros'),
-('1_99_0','Modelo'),
-('1_99_1','Veículo'),
-('1_100','Módulo'),
-
-('2_0','Peças'),
-('2_1','Atendimento Peças'),
-('2_2','Pedidos de compras'),
-('2_99','Cadastros'),
-('2_99_0','Peças'),
-
-('3_0','Oficina'),
-('3_1','Atendimento Oficina'),
-
-('3_2','Controle de equipamentos'),
-('3_2_0','Requisições'),
-('3_2_1','Cadastros'),
-('3_2_1_0','Categoria'),
-('3_2_1_1','Material'),
-('3_3','Orçamentos'),
-('3_99','Cadastros'),
-('3_99_0','Mecânico'),
-
-('4_0','Faturamento'),
-('4_1','Manutenção Clientes'),
-('4_99','Cadastros'),
-('4_99_0','Categoria de Clientes'),
-
-('100_0','Relatório'),
-('100_1','Portaria'),
-('100_1_0','Veículos'),
-('100_2','Peças'),
-('100_2_0','Pedidos de compras'),
-
-('999_0','Configurações'),
-('999_1','Empresa'),
-('999_2','Cadastro Usuários');
 
 INSERT INTO `tb_conf_vehicle_entry_checklist`
 (`company_id`, `resale_id`,`checklist1Enabled`, `checklist1Desc`, `checklist2Enabled`, `checklist2Desc`, `checklist3Enabled`, `checklist3Desc`, `checklist4Enabled`, `checklist4Desc`, `checklist5Enabled`, `checklist5Desc`, `checklist6Enabled`, `checklist6Desc`, `checklist7Enabled`, `checklist7Desc`, `checklist8Enabled`, `checklist8Desc`, `checklist9Enabled`, `checklist9Desc`, `checklist10Enabled`, `checklist10Desc`, `checklist11Enabled`, `checklist11Desc`, `checklist12Enabled`, `checklist12Desc`, `checklist13Enabled`, `checklist13Desc`, `checklist14Enabled`, `checklist14Desc`, `checklist15Enabled`, `checklist15Desc`, `checklist16Enabled`, `checklist16Desc`, `checklist17Enabled`, `checklist17Desc`, `checklist18Enabled`, `checklist18Desc`, `checklist19Enabled`, `checklist19Desc`, `checklist20Enabled`, `checklist20Desc`)
@@ -142,24 +215,6 @@ VALUES
 (1,1,null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'',null,'');
 
 
-INSERT INTO tb_permission
-(id,description,menu)
-VALUES
-(100,'Editar entrada de veículo','Portaria'),
-(101,'Autorizar saída de veículo','Portaria'),
-(102,'Autorizar saída de veículo - 1ª','Portaria'),
-(103,'Autorizar saída de veículo - 2ª','Portaria'),
-(104,'Remover autorização de saída de veículo - 1ª','Portaria'),
-(105,'Remover autorização de saída de veículo - 2ª','Portaria'),
-(106,'Autorizar saída de veículo sem O.S.','Portaria'),
-(107,'Remover autorização de saída de veículo sem O.S.','Portaria'),
-(108,'Autorizar entrada de veículo','Portaria'),
-(150,'Gerar orçamento','Portaria'),
-(151,'Manutenção orçamento','Portaria'),
-(152,'Visualizar orçamento','Portaria'),
-(153,'Receber notificações de entrada veículo','Portaria'),
-(154,'Receber notificações de saída veículo','Portaria'),
-(300,'Alterar quantidade material','Oficina');
 
 
 

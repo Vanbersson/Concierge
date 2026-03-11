@@ -3,19 +3,14 @@ package com.concierge.apiconcierge.controllers.clientcompany;
 import com.concierge.apiconcierge.dtos.clientcompany.ClientCategoryDto;
 import com.concierge.apiconcierge.dtos.message.MessageResponseDto;
 import com.concierge.apiconcierge.models.clientcompany.ClientCategory;
-import com.concierge.apiconcierge.models.clientcompany.ClientCompany;
 import com.concierge.apiconcierge.models.message.MessageResponse;
-import com.concierge.apiconcierge.models.status.StatusEnableDisable;
-import com.concierge.apiconcierge.repositories.clientcompany.IClientCategoryRepository;
+import com.concierge.apiconcierge.models.enums.StatusEnableDisable;
 import com.concierge.apiconcierge.services.clientcompany.category.IClientCategoryService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/clientcompany/category")

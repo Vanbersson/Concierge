@@ -1,7 +1,7 @@
 package com.concierge.apiconcierge.dtos.driver;
 
 import com.concierge.apiconcierge.models.enums.MaleFemale;
-import com.concierge.apiconcierge.models.status.StatusEnableDisable;
+import com.concierge.apiconcierge.models.enums.StatusEnableDisable;
 
 import java.util.Date;
 

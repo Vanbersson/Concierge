@@ -1,6 +1,6 @@
 package com.concierge.apiconcierge.models.vehicle.model;
 
-import com.concierge.apiconcierge.models.status.StatusEnableDisable;
+import com.concierge.apiconcierge.models.enums.StatusEnableDisable;
 import jakarta.persistence.*;
 import lombok.*;
 

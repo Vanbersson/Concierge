@@ -1,11 +1,9 @@
 package com.concierge.apiconcierge.services.user;
 
 import com.concierge.apiconcierge.config.security.WebSecurityConfig;
-import com.concierge.apiconcierge.dtos.file.FileLocalDto;
-import com.concierge.apiconcierge.dtos.message.MessageResponseDto;
 import com.concierge.apiconcierge.exceptions.user.UserException;
 import com.concierge.apiconcierge.models.message.MessageResponse;
-import com.concierge.apiconcierge.models.status.StatusEnableDisable;
+import com.concierge.apiconcierge.models.enums.StatusEnableDisable;
 import com.concierge.apiconcierge.models.user.User;
 import com.concierge.apiconcierge.repositories.user.IUserRepository;
 import com.concierge.apiconcierge.util.ConstantsMessage;
@@ -13,12 +11,9 @@ import com.concierge.apiconcierge.validation.user.UserValidation;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;

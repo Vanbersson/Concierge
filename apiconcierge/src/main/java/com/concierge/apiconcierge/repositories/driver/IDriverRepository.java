@@ -1,7 +1,6 @@
 package com.concierge.apiconcierge.repositories.driver;
 
 import com.concierge.apiconcierge.models.driver.Driver;
-import com.concierge.apiconcierge.models.status.StatusEnableDisable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;

@@ -1,6 +1,6 @@
 package com.concierge.apiconcierge.dtos.parts;
 
-import com.concierge.apiconcierge.models.status.StatusEnableDisable;
+import com.concierge.apiconcierge.models.enums.StatusEnableDisable;
 
 import java.util.Date;
 

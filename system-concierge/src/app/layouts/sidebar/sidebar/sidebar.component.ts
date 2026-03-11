@@ -7,6 +7,7 @@ import { MenuItem } from 'primeng/api';
 //Service
 import { LayoutService } from '../../layout/service/layout.service';
 import { StorageService } from '../../../services/storage/storage.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-sidebar',
@@ -19,8 +20,11 @@ import { StorageService } from '../../../services/storage/storage.service';
 export class SidebarComponent implements OnInit {
 
   menuItem!: MenuItem[];
- 
-  constructor(private storageService: StorageService, public layoutService: LayoutService, public el: ElementRef) { }
+
+  constructor(private storageService: StorageService,
+    public layoutService: LayoutService,
+    public el: ElementRef,
+    private router: Router) { }
 
   ngOnInit(): void {
     this.menuItem = [
@@ -81,10 +85,10 @@ export class SidebarComponent implements OnInit {
             ]
           },
           {
-            key:'1_100',
-            label:'Módulo',
-            visible:false,
-            routerLink:'portaria/module'
+            key: '1_100',
+            label: 'Módulo',
+            visible: false,
+            routerLink: 'portaria/module'
           }
 
         ]
@@ -96,29 +100,66 @@ export class SidebarComponent implements OnInit {
         items: [
           {
             key: '2_1',
-            label: 'Consulta peças',
+            label: 'Atendimento',
             visible: false,
           },
           {
             key: '2_2',
-            label: 'Pedidos de compras',
+            label: 'Consultas',
             visible: false,
             items: [
               {
                 key: '2_2_0',
-                label: 'Pedidos',
-                routerLink: 'pecas/pedido/compra',
+                label: 'Orçamentos',
+                visible: false,
+              }
+            ]
+          },
+          {
+            key: '2_3',
+            label: 'Compras',
+            visible: false,
+            items: [
+              {
+                key: '2_3_0',
+                label: 'Pedidos de compras',
+                routerLink: 'pecas/compras/pedido/compra',
                 visible: false,
               }
             ]
           },
           {
             key: '2_99',
-            label: 'Cadastro',
+            label: 'Cadastros',
             visible: false,
             items: [
-
+              {
+                key: '2_99_0',
+                label: 'Peças',
+                routerLink: 'pecas/cadastros/pecas',
+                visible: false,
+              },
+              {
+                key: '2_99_1',
+                label: 'Grupo de Peças',
+                visible: false,
+              },
+              {
+                key: '2_99_2',
+                label: 'Categoria de Peças',
+                visible: false,
+              },
+              {
+                key: '2_99_3',
+                label: 'Unidades de Medida',
+                visible: false,
+              }
             ]
+          },
+          {
+            key: '2_100',
+            label: 'Módulo',
+            visible: false,
           }
         ]
       },
@@ -140,7 +181,7 @@ export class SidebarComponent implements OnInit {
               {
                 key: '3_2_0',
                 label: 'Requisições',
-                routerLink:'oficina/controle-equipamento',
+                routerLink: 'oficina/controle-equipamento',
                 visible: false,
               },
               {
@@ -151,13 +192,13 @@ export class SidebarComponent implements OnInit {
                   {
                     key: '3_2_1_0',
                     label: 'Categoria',
-                    routerLink:'oficina/controle-equipamento/cadastro/categoria',
+                    routerLink: 'oficina/controle-equipamento/cadastro/categoria',
                     visible: false,
                   },
                   {
                     key: '3_2_1_1',
                     label: 'Material',
-                    routerLink:"oficina/controle-equipamento/cadastro/material",
+                    routerLink: "oficina/controle-equipamento/cadastro/material",
                     visible: false,
                   }
                 ]
@@ -172,7 +213,7 @@ export class SidebarComponent implements OnInit {
               {
                 key: '3_99_0',
                 label: 'Mecânico',
-                routerLink:'oficina/cadastro/mecanico',
+                routerLink: 'oficina/cadastro/mecanico',
                 visible: false
               }
             ]
@@ -199,7 +240,7 @@ export class SidebarComponent implements OnInit {
                 key: '4_99_0',
                 label: 'Categoria de Clientes',
                 visible: false,
-                routerLink:'faturamento/register-client-category'
+                routerLink: 'faturamento/register-client-category'
               }
             ]
           }
@@ -243,22 +284,39 @@ export class SidebarComponent implements OnInit {
       },
       {
         key: '999_0',
-        label: 'Configurações',
+        label: 'Configuração',
         visible: false,
         items: [
           {
-            key: '999_1',
-            label: 'Empresa',
-            visible: false,
-            icon: 'pi pi-building',
-            routerLink: 'configuracao/empresa'
+            key: '999_2',
+            label: 'Cadastros',
+            items: [
+              {
+                key: '999_2_0',
+                label: 'Empresa',
+                visible: false,
+                icon: 'pi pi-building',
+                routerLink: 'configuracao/cadastros/empresa'
+              },
+              {
+                key: '999_2_1',
+                label: 'Usuários',
+                visible: false,
+                icon: 'pi pi-users',
+                routerLink: 'configuracao/cadastros/usuarios'
+              },
+              {
+                key: '999_2_2',
+                label: 'Marcas',
+                visible: false,
+                routerLink:'configuracao/cadastros/marcas'
+              }
+            ]
           },
           {
-            key: '999_2',
-            label: 'Cadastro Usuários',
-            visible: false,
-            icon: 'pi pi-users',
-            routerLink: 'configuracao/usuario'
+            label: 'Sair',
+            icon: 'pi pi-sign-out',
+            command: () => this.closeSession()
           }
         ]
       }
@@ -279,5 +337,12 @@ export class SidebarComponent implements OnInit {
       item.items = item.items.map(subItem => this.updateVisibility(subItem, keys));
     }
     return item;
+  }
+  closeSession() {
+    this.navigatorLogin();
+  }
+
+  private navigatorLogin() {
+    this.router.navigateByUrl("/login");
   }
 }

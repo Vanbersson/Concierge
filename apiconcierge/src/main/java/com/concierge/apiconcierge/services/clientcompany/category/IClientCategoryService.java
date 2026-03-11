@@ -2,7 +2,7 @@ package com.concierge.apiconcierge.services.clientcompany.category;
 
 import com.concierge.apiconcierge.models.clientcompany.ClientCategory;
 import com.concierge.apiconcierge.models.message.MessageResponse;
-import com.concierge.apiconcierge.models.status.StatusEnableDisable;
+import com.concierge.apiconcierge.models.enums.StatusEnableDisable;
 
 public interface IClientCategoryService {
     public MessageResponse save(ClientCategory cat);

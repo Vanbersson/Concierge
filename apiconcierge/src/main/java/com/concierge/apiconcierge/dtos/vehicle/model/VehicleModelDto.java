@@ -1,6 +1,6 @@
 package com.concierge.apiconcierge.dtos.vehicle.model;
 
-import com.concierge.apiconcierge.models.status.StatusEnableDisable;
+import com.concierge.apiconcierge.models.enums.StatusEnableDisable;
 
 public record VehicleModelDto(
         Integer companyId,

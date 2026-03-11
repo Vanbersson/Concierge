@@ -2,7 +2,6 @@ package com.concierge.apiconcierge.services.parts;
 
 import com.concierge.apiconcierge.exceptions.parts.PartsException;
 import com.concierge.apiconcierge.models.part.Part;
-import com.concierge.apiconcierge.models.status.StatusEnableDisable;
 import com.concierge.apiconcierge.repositories.parts.IPartRepository;
 import com.concierge.apiconcierge.util.ConstantsMessage;
 import com.concierge.apiconcierge.validation.parts.PartValidation;

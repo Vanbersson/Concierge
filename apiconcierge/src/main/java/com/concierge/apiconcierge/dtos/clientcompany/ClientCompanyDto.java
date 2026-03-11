@@ -2,7 +2,7 @@ package com.concierge.apiconcierge.dtos.clientcompany;
 
 import com.concierge.apiconcierge.models.clientcompany.CliFor;
 import com.concierge.apiconcierge.models.clientcompany.FisJur;
-import com.concierge.apiconcierge.models.status.StatusEnableDisable;
+import com.concierge.apiconcierge.models.enums.StatusEnableDisable;
 
 import java.util.Date;
 

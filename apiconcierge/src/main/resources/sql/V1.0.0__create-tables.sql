@@ -31,6 +31,23 @@
       PRIMARY KEY(id)
   );
 
+ CREATE TABLE IF NOT EXISTS tb_brand(
+    id int not null AUTO_INCREMENT,
+    status tinyint not null,
+    name varchar(100) not null,
+    PRIMARY KEY(id)
+ );
+
+ CREATE TABLE IF NOT EXISTS tb_unit_measure(
+     id int not null AUTO_INCREMENT,
+     status tinyint not null,
+     unit_measure varchar(2) not null,
+     description varchar(100) not null,
+     PRIMARY KEY(id)
+  );
+
+
+
  CREATE TABLE IF NOT EXISTS tb_company(
     id int not null AUTO_INCREMENT,
     status tinyint not null,
@@ -222,24 +239,77 @@
      PRIMARY KEY(id)
  );
 
+ CREATE TABLE IF NOT EXISTS tb_part_group(
+    company_id int not null,
+    resale_id int not null,
+    id int not null AUTO_INCREMENT,
+    status tinyint not null,
+    description varchar(100),
+    FOREIGN KEY(company_id) REFERENCES tb_company(id),
+    FOREIGN KEY(resale_id) REFERENCES tb_resale(id),
+    PRIMARY KEY(id)
+ );
+
+  CREATE TABLE IF NOT EXISTS tb_part_category(
+     company_id int not null,
+     resale_id int not null,
+     id int not null AUTO_INCREMENT,
+     status tinyint not null,
+     description varchar(100),
+     FOREIGN KEY(company_id) REFERENCES tb_company(id),
+     FOREIGN KEY(resale_id) REFERENCES tb_resale(id),
+     PRIMARY KEY(id)
+  );
+
  CREATE TABLE IF NOT EXISTS tb_part(
     company_id int not null,
     resale_id int not null,
-    id int not null,
+    id int not null AUTO_INCREMENT,
     status tinyint not null,
-    code varchar(20) not null,
+    date_register datetime not null,
+    code varchar(50) not null,
     description varchar(100),
-    qtd_available float,
-    qtd_accounting float,
-    unit_measure varchar(2) not null,
-    price float not null,
-    location_street varchar(2),
-    location_bookcase varchar(2),
-    location_shelf varchar(2),
-    date_last_entry datetime,
-    photo_url varchar(255),
+    unit_measure_id int not null,
+    price_now float not null,
+    price_old float not null,
+    addition_discount tinyint not null,
+    brand_id int not null,
+    group_id int not null,
+    category_id int not null,
+    location_pri_street varchar(2),
+    location_pri_bookcase varchar(2),
+    location_pri_shelf varchar(2),
+    location_pri_position varchar(2),
+    location_sec_street varchar(2),
+    location_sec_bookcase varchar(2),
+    location_sec_shelf varchar(2),
+    location_sec_position varchar(2),
+    photo_url_front varchar(255),
+    photo_url_verse varchar(255),
+    FOREIGN KEY(company_id) REFERENCES tb_company(id),
+    FOREIGN KEY(resale_id) REFERENCES tb_resale(id),
+    FOREIGN KEY(unit_measure_id) REFERENCES tb_unit_measure(id),
+    FOREIGN KEY(brand_id) REFERENCES tb_brand(id),
+    FOREIGN KEY(group_id) REFERENCES tb_part_group(id),
+    FOREIGN KEY(category_id) REFERENCES tb_part_category(id),
     primary key(id)
  );
+
+//falta
+ CREATE TABLE IF NOT EXISTS tb_part_history(
+     company_id int not null,
+     resale_id int not null,
+     id int not null,
+     part_id int not null,
+     date_last_entry datetime,
+     date_last_exit datetime,
+     client_id int not null,
+     qtd_available float,
+     qtd_available float,
+     qtd_accounting float,
+     price float not null,
+     primary key(id)
+  );
 
  CREATE TABLE IF NOT EXISTS tb_budget(
        company_id int not null,

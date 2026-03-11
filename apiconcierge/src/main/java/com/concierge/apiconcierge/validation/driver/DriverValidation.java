@@ -2,7 +2,6 @@ package com.concierge.apiconcierge.validation.driver;
 
 import com.concierge.apiconcierge.models.driver.Driver;
 import com.concierge.apiconcierge.models.message.MessageResponse;
-import com.concierge.apiconcierge.models.status.StatusEnableDisable;
 import com.concierge.apiconcierge.repositories.driver.IDriverRepository;
 import com.concierge.apiconcierge.util.ConstantsMessage;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -6,6 +6,7 @@ import { VehicleMenuGuard } from './views/concierge/vehicle/vehicle.menu.guard';
 import { UserGuard } from './views/settings/user/user.guard';
 import { CanDeactivateGuard } from './views/dashboard/can-deactivate.guard.ts';
 import { ModuleConciergeMenuGuard } from './views/concierge/module/module.concierge.menu.guard';
+import { PartsMenuGuard } from './views/parts/register/parts/parts.menu.guard';
 
 export const routes: Routes = [
     {
@@ -81,7 +82,7 @@ export const routes: Routes = [
                         path: 'module',
                         title: 'Módulo portaria',
                         loadComponent: () => import('./views/concierge/module/module.component'),
-                        canActivate:[ModuleConciergeMenuGuard]
+                        canActivate: [ModuleConciergeMenuGuard]
                     }
                 ]
             },
@@ -89,15 +90,20 @@ export const routes: Routes = [
                 path: 'pecas',
                 children: [
                     {
-                        path: 'pedido/compra',
-                        title: 'Pedido de compra',
-                        loadComponent: () => import('./views/parts/purchase.order/purchase.order.component')
+                        path: 'compras',
+                        children: [
+                            {
+                                path: 'pedido/compra',
+                                title: 'Pedidos de compras',
+                                loadComponent: () => import('./views/parts/purchase.order/purchase.order.component')
+                            }
+                        ]
                     },
-
                     {
-                        path: 'cadastro/pecas',
+                        path: 'cadastros/pecas',
                         title: 'Peças',
-                        loadComponent: () => import('./views/parts/register/parts/parts.component')
+                        loadComponent: () => import('./views/parts/register/parts/parts.component'),
+                        canActivate: [PartsMenuGuard]
                     },
                 ]
             },
@@ -150,17 +156,26 @@ export const routes: Routes = [
                 path: 'configuracao',
                 children: [
                     {
-                        path: 'empresa',
-                        title: 'Empresa',
-                        loadComponent: () => import('./views/settings/company/company.component')
+                        path: 'cadastros',
+                        children: [
+                            {
+                                path: 'empresa',
+                                title: 'Empresa',
+                                loadComponent: () => import('./views/settings/company/company.component')
 
-                    },
-                    {
-                        path: 'usuario',
-                        title: 'Usuário',
-                        loadComponent: () => import('./views/settings/user/user.component'),
-                        canActivate: [UserGuard]
-
+                            },
+                            {
+                                path: 'usuarios',
+                                title: 'Usuário',
+                                loadComponent: () => import('./views/settings/user/user.component'),
+                                canActivate: [UserGuard]
+                            },
+                            {
+                                path: 'marcas',
+                                title: 'Marca',
+                                loadComponent: () => import('./views/settings/register/brand/brand.component')
+                            }
+                        ]
                     }
                 ]
             },

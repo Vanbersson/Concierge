@@ -1,6 +1,6 @@
 package com.concierge.apiconcierge.models.workshop.toolcontrol;
 
-import com.concierge.apiconcierge.models.status.StatusEnableDisable;
+import com.concierge.apiconcierge.models.enums.StatusEnableDisable;
 import com.concierge.apiconcierge.models.workshop.toolcontrol.enums.TypeRequest;
 import jakarta.persistence.*;
 import lombok.*;

@@ -1,8 +1,6 @@
 package com.concierge.apiconcierge.dtos;
 
-import com.concierge.apiconcierge.models.status.StatusEnableDisable;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import com.concierge.apiconcierge.models.enums.StatusEnableDisable;
 
 public record UserRoleDto(
 

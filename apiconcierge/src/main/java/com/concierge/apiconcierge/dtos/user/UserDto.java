@@ -1,13 +1,7 @@
 package com.concierge.apiconcierge.dtos.user;
 
-import com.concierge.apiconcierge.models.role.UserRole;
-import com.concierge.apiconcierge.models.status.StatusEnableDisable;
+import com.concierge.apiconcierge.models.enums.StatusEnableDisable;
 import com.concierge.apiconcierge.models.user.UserRoleEnum;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-
-import java.util.Date;
-import java.util.UUID;
 
 public record UserDto(
         Integer companyId,

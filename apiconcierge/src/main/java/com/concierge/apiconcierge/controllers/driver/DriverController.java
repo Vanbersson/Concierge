@@ -45,7 +45,7 @@ public class DriverController {
     }
 
     @GetMapping("/{companyId}/{resaleId}/filter/all")
-    public ResponseEntity<Object> filterId(@PathVariable(name = "companyId") Integer companyId,
+    public ResponseEntity<Object> listAll(@PathVariable(name = "companyId") Integer companyId,
                                            @PathVariable(name = "resaleId") Integer resaleId) {
         try {
             MessageResponse response = this.service.listAll(companyId, resaleId);
