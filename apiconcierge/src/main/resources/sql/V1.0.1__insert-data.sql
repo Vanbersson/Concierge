@@ -24,18 +24,18 @@ INSERT INTO tb_brand
  (0,'iveco');
 
  INSERT INTO tb_unit_measure
- (unit_measure,description)
+ (status,unit_measure,description)
  VALUES
- ('cj','conjunto'),
- ('cx','caixa'),
- ('gl','galão'),
- ('jg','jogo'),
- ('kg','kilograma'),
- ('mt','metro'),
- ('pa','par'),
- ('pc','peça'),
- ('un','unidade'),
- ('lt','litro');
+ (0,'cj','conjunto'),
+ (0,'cx','caixa'),
+ (0,'gl','galão'),
+ (0,'jg','jogo'),
+ (0,'kg','kilograma'),
+ (0,'mt','metro'),
+ (0,'pa','par'),
+ (0,'pc','peça'),
+ (0,'un','unidade'),
+ (0,'lt','litro');
 
 INSERT INTO tb_permission
 (id,description,menu)
@@ -179,7 +179,6 @@ VALUES
 (1,1,0,'P.F. Consumidor'),
 (1,1,0,'P.J. C/Insc. Est.'),
 (1,1,0,'P.J. S/Insc. Est.');
-
 
 INSERT INTO tb_payment_type
 (`company_id`, `resale_id`, `status`, `description`)

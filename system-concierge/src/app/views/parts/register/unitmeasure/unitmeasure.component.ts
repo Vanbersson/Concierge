@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+import { UnitMeasure } from '../../../../models/parts/unit/unit.measure';
 import { CommonModule } from '@angular/common';
 import { FormGroup, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
-import { BrandService } from '../../../../services/brand/brand.service';
 import { lastValueFrom } from 'rxjs';
 import { MessageResponse } from '../../../../models/message/message-response';
 import { HttpResponse } from '@angular/common/http';
@@ -14,39 +14,41 @@ import { InputNumberModule } from 'primeng/inputnumber';
 import { TableModule } from 'primeng/table';
 import { ToastModule } from 'primeng/toast';
 import { DialogModule } from 'primeng/dialog';
-import { Brand } from '../../../../models/brand/brand';
 import { ButtonModule } from 'primeng/button';
 import { StatusEnum } from '../../../../models/enum/status-enum';
 import { RadioButtonModule } from 'primeng/radiobutton';
 import { BusyService } from '../../../../components/loading/busy.service';
 import { SuccessError } from '../../../../models/enum/success-error';
+import { UnitMeasureService } from '../../../../services/parts/unit/unit.measure.service';
 
 @Component({
-  selector: 'app-brand',
+  selector: 'app-unitmeasure',
   standalone: true,
-  imports: [CommonModule, InputTextModule, IconFieldModule, RadioButtonModule, InputIconModule, 
+  imports: [CommonModule, InputTextModule, IconFieldModule, RadioButtonModule, InputIconModule,
     ButtonModule, InputNumberModule, ReactiveFormsModule, TableModule, ToastModule, DialogModule],
-  templateUrl: './brand.component.html',
-  styleUrl: './brand.component.scss',
+  templateUrl: './unitmeasure.component.html',
+  styleUrl: './unitmeasure.component.scss',
   providers: [MessageService]
 })
-export default class BrandComponent implements OnInit {
-  private isNewBrand: boolean = true;
-  private brand!: Brand;
+export default class UnitmeasureComponent implements OnInit {
+
+  private isNewUnit: boolean = true;
+  private unit!: UnitMeasure;
   enabled = StatusEnum.ENABLED;
   disabled = StatusEnum.DISABLED;
 
-  formBrand = new FormGroup({
+  formUnit = new FormGroup({
     id: new FormControl<number | null>(null),
     status: new FormControl<StatusEnum>(this.enabled),
-    name: new FormControl<string>('', [Validators.required, Validators.maxLength(100)])
+    unitMeasure: new FormControl<string>('', [Validators.required, Validators.maxLength(2)]),
+    description: new FormControl<string>('', [Validators.required, Validators.maxLength(100)])
   });
 
-  listBrands: Brand[] = [];
+  listUnit: UnitMeasure[] = [];
   dialogVisible: boolean = false;
 
   constructor(
-    private brandService: BrandService,
+    private unitService: UnitMeasureService,
     private messageService: MessageService,
     private busyService: BusyService) { }
 
@@ -55,12 +57,12 @@ export default class BrandComponent implements OnInit {
   }
   private async init() {
     this.busyService.busy();
-    this.listBrands = await this.listAll();
+    this.listUnit = await this.listAll();
     this.busyService.idle();
   }
   showNewBrand() {
-    this.isNewBrand = true;
-    this.brand = new Brand();
+    this.isNewUnit = true;
+    this.unit = new UnitMeasure();
     this.cleanForm();
     this.showDialog();
   }
@@ -71,24 +73,26 @@ export default class BrandComponent implements OnInit {
     this.dialogVisible = false;
   }
   cleanForm() {
-    this.formBrand.patchValue({
-      name: '',
+    this.formUnit.patchValue({
+      unitMeasure: '',
+      description: '',
       status: this.enabled
     });
   }
-  edit(b: Brand) {
-    this.isNewBrand = false;
-    this.brand = b;
+  edit(un: UnitMeasure) {
+    this.isNewUnit = false;
+    this.unit = un;
     this.cleanForm();
     this.showDialog();
 
-    this.formBrand.patchValue({
-      name: this.brand.name,
-      status: this.brand.status
+    this.formUnit.patchValue({
+      unitMeasure: this.unit.unitMeasure,
+      description: this.unit.description,
+      status: this.unit.status
     });
   }
   save() {
-    if (this.isNewBrand) {
+    if (this.isNewUnit) {
       this.saveNewBrand();
     } else {
       this.saveUpdateBrand();
@@ -96,15 +100,16 @@ export default class BrandComponent implements OnInit {
   }
 
   private async saveNewBrand() {
-    const { value, valid } = this.formBrand;
+    const { value, valid } = this.formUnit;
     if (!valid) {
       return;
     }
-    this.brand.name = value.name;
-    this.brand.status = value.status;
+    this.unit.unitMeasure = value.unitMeasure;
+    this.unit.description = value.description;
+    this.unit.status = value.status;
 
     this.busyService.busy();
-    const result = await this.saveNew(this.brand);
+    const result = await this.saveNew(this.unit);
     this.busyService.idle();
     if (result.status == 201 && result.body.status == SuccessError.succes) {
       this.messageService.add({ severity: 'success', summary: result.body.header, detail: result.body.message, icon: 'pi pi-check' });
@@ -116,15 +121,16 @@ export default class BrandComponent implements OnInit {
     }
   }
   private async saveUpdateBrand() {
-    const { value, valid } = this.formBrand;
+    const { value, valid } = this.formUnit;
     if (!valid) {
       return;
     }
-    this.brand.name = value.name;
-    this.brand.status = value.status;
+    this.unit.unitMeasure = value.unitMeasure;
+    this.unit.description = value.description;
+    this.unit.status = value.status;
 
     this.busyService.busy();
-    const result = await this.saveUpdate(this.brand);
+    const result = await this.saveUpdate(this.unit);
     this.busyService.idle();
     if (result.status == 200 && result.body.status == SuccessError.succes) {
       this.messageService.add({ severity: 'success', summary: result.body.header, detail: result.body.message, icon: 'pi pi-check' });
@@ -136,29 +142,30 @@ export default class BrandComponent implements OnInit {
     }
   }
 
-  private async saveNew(b: Brand): Promise<HttpResponse<MessageResponse>> {
+  private async saveNew(un: UnitMeasure): Promise<HttpResponse<MessageResponse>> {
     try {
-      return await lastValueFrom(this.brandService.save(b));
+      return await lastValueFrom(this.unitService.save(un));
     } catch (error) {
       this.messageService.add({ severity: 'error', summary: 'Erro', detail: error.error.message, icon: 'pi pi-times' });
       return error;
     }
   }
-  private async saveUpdate(b: Brand): Promise<HttpResponse<MessageResponse>> {
+  private async saveUpdate(un: UnitMeasure): Promise<HttpResponse<MessageResponse>> {
     try {
-      return await lastValueFrom(this.brandService.update(b));
+      return await lastValueFrom(this.unitService.update(un));
     } catch (error) {
       this.messageService.add({ severity: 'error', summary: 'Erro', detail: error.error.message, icon: 'pi pi-times' });
       return error;
     }
   }
-  private async listAll(): Promise<Brand[]> {
+  private async listAll(): Promise<UnitMeasure[]> {
     try {
-      return await lastValueFrom(this.brandService.listAll());
+      return await lastValueFrom(this.unitService.listAll());
     } catch (error) {
       this.messageService.add({ severity: 'error', summary: 'Erro', detail: error.error.message, icon: 'pi pi-times' });
       return [];
     }
   }
+
 
 }

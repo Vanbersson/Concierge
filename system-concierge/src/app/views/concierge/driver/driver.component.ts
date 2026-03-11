@@ -101,7 +101,6 @@ export default class DriverComponent implements OnInit {
   });
 
   constructor(private primeNGConfig: PrimeNGConfig,
-    private ngxImageCompressService: NgxImageCompressService,
     private storageService: StorageService,
     private messageService: MessageService,
     private driverService: DriverService,

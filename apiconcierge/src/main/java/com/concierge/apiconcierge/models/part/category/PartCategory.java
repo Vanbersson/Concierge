@@ -29,4 +29,5 @@ public class PartCategory {
     private StatusEnableDisable status;
 
     private String description;
+
 }

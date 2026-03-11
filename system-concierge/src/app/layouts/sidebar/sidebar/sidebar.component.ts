@@ -152,6 +152,7 @@ export class SidebarComponent implements OnInit {
               {
                 key: '2_99_3',
                 label: 'Unidades de Medida',
+                routerLink:'pecas/cadastros/unit',
                 visible: false,
               }
             ]

@@ -100,11 +100,21 @@ export const routes: Routes = [
                         ]
                     },
                     {
-                        path: 'cadastros/pecas',
-                        title: 'Peças',
-                        loadComponent: () => import('./views/parts/register/parts/parts.component'),
-                        canActivate: [PartsMenuGuard]
-                    },
+                        path: 'cadastros',
+                        children: [
+                            {
+                                path: 'pecas',
+                                title: 'Peças',
+                                loadComponent: () => import('./views/parts/register/parts/parts.component'),
+                                canActivate: [PartsMenuGuard]
+                            },
+                             {
+                                path: 'unit',
+                                title: 'Unidade de Medida',
+                                loadComponent: () => import('./views/parts/register/unitmeasure/unitmeasure.component'),
+                            }
+                        ]
+                    }
                 ]
             },
             {
