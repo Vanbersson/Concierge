@@ -31,14 +31,12 @@ import { UnitMeasureService } from '../../../../services/parts/unit/unit.measure
   providers: [MessageService]
 })
 export default class UnitmeasureComponent implements OnInit {
-
   private isNewUnit: boolean = true;
   private unit!: UnitMeasure;
   enabled = StatusEnum.ENABLED;
   disabled = StatusEnum.DISABLED;
 
   formUnit = new FormGroup({
-    id: new FormControl<number | null>(null),
     status: new FormControl<StatusEnum>(this.enabled),
     unitMeasure: new FormControl<string>('', [Validators.required, Validators.maxLength(2)]),
     description: new FormControl<string>('', [Validators.required, Validators.maxLength(100)])
@@ -72,7 +70,7 @@ export default class UnitmeasureComponent implements OnInit {
   hideDialog() {
     this.dialogVisible = false;
   }
-  cleanForm() {
+  private cleanForm() {
     this.formUnit.patchValue({
       unitMeasure: '',
       description: '',
@@ -93,13 +91,13 @@ export default class UnitmeasureComponent implements OnInit {
   }
   save() {
     if (this.isNewUnit) {
-      this.saveNewBrand();
+      this.saveNewUnit();
     } else {
-      this.saveUpdateBrand();
+      this.saveUpdateUnit();
     }
   }
 
-  private async saveNewBrand() {
+  private async saveNewUnit() {
     const { value, valid } = this.formUnit;
     if (!valid) {
       return;
@@ -120,7 +118,7 @@ export default class UnitmeasureComponent implements OnInit {
       this.messageService.add({ severity: 'info', summary: result.body.header, detail: result.body.message, icon: 'pi pi-info-circle' });
     }
   }
-  private async saveUpdateBrand() {
+  private async saveUpdateUnit() {
     const { value, valid } = this.formUnit;
     if (!valid) {
       return;
@@ -166,6 +164,5 @@ export default class UnitmeasureComponent implements OnInit {
       return [];
     }
   }
-
 
 }

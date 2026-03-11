@@ -37,7 +37,6 @@ export default class BrandComponent implements OnInit {
   disabled = StatusEnum.DISABLED;
 
   formBrand = new FormGroup({
-    id: new FormControl<number | null>(null),
     status: new FormControl<StatusEnum>(this.enabled),
     name: new FormControl<string>('', [Validators.required, Validators.maxLength(100)])
   });
