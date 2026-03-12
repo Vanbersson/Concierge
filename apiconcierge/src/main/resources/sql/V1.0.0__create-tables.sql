@@ -244,9 +244,12 @@
     resale_id int not null,
     id int not null AUTO_INCREMENT,
     status tinyint not null,
+    type tinyint not null,
     description varchar(100),
+    brand_id int not null,
     FOREIGN KEY(company_id) REFERENCES tb_company(id),
     FOREIGN KEY(resale_id) REFERENCES tb_resale(id),
+    FOREIGN KEY(brand_id) REFERENCES tb_brand(id),
     PRIMARY KEY(id)
  );
 

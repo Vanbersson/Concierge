@@ -8,7 +8,7 @@ import java.util.List;
 public interface IBrandService {
     public MessageResponse save(Brand b);
 
-    public MessageResponse update(Brand b);
+    public MessageResponse update(Brand b, String userEmail);
 
     public List<Brand> listAll();
 

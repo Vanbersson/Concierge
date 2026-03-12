@@ -33,9 +33,9 @@ public class BrandService implements IBrandService {
     }
 
     @Override
-    public MessageResponse update(Brand b) {
+    public MessageResponse update(Brand b, String userEmail) {
         try {
-            MessageResponse response = this.validation.update(b);
+            MessageResponse response = this.validation.update(b,userEmail);
             if (ConstantsMessage.SUCCESS.equals(response.getStatus())) {
                 this.repository.save(b);
             }

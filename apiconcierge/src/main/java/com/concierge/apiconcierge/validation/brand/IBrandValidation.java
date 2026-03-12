@@ -7,6 +7,6 @@ public interface IBrandValidation {
 
     public MessageResponse save(Brand b);
 
-    public MessageResponse update(Brand b);
+    public MessageResponse update(Brand b, String userEmail);
 
 }

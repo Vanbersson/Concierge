@@ -4,7 +4,7 @@
     <p-toast />
     <div class="layout-card-title">
         <span>Peças</span>
-        <p-button icon="pi pi-plus" [text]="true" label="Peças" (onClick)="showDialog()" />
+        <p-button icon="pi pi-plus" [text]="true" label="Peças" (onClick)="showNewPart()" />
     </div>
 
     <p-table #dtParts dataKey="id" [value]="parts" [globalFilterFields]="['id', 'code','description']"
@@ -35,7 +35,7 @@
     </p-table>
 </div>
 
-<p-dialog [(visible)]="visibleDialogNew" header="Cadastro do Peças" [modal]="true" [maximizable]="true"
+<p-dialog [(visible)]="visibleDialog" header="Cadastro do Peças" [modal]="true" [maximizable]="true"
     [style]="{ width: '70rem',height:'60rem' }" [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }">
     <div [formGroup]="formPart">
         <div class="p-fluid p-formgrid grid">
@@ -83,22 +83,27 @@
                 <div class="col-12 flex p-0">
                     <div class="col-6">
                         <label for="">Valor Atual</label>
-                        <p-inputNumber mode="currency" currency="BRL" locale="pt-BR" [useGrouping]="false" />
+                        <p-inputNumber mode="currency" currency="BRL" locale="pt-BR" [useGrouping]="false" formControlName="priceNow"/>
+                        <small class="p-error block" *ngIf="formPart.get('priceNow')?.invalid">Campo obrigatório</small>
                     </div>
                     <div class="col-6">
                         <label for="">Valor Anterior</label>
-                        <p-inputNumber mode="currency" currency="BRL" locale="pt-BR" [useGrouping]="false" />
+                        <p-inputNumber mode="currency" currency="BRL" locale="pt-BR" [useGrouping]="false" formControlName="priceOld"/>
+                        <small class="p-error block" *ngIf="formPart.get('priceOld')?.invalid">Campo obrigatório</small>
                     </div>
                 </div>
                 <div class="col-12">
                     <label for="">Valor Garantia</label>
-                    <p-inputNumber mode="currency" currency="BRL" locale="pt-BR" [useGrouping]="false" />
+                    <p-inputNumber mode="currency" currency="BRL" locale="pt-BR" [useGrouping]="false"formControlName="priceWarranty" />
+                    <small class="p-error block" *ngIf="formPart.get('priceWarranty')?.invalid">Campo obrigatório</small>
                 </div>
                 <div class="col-12">
                         <label for="partgroupsId">Acréscimo/Desconto</label>
-                        <p-dropdown [options]="partGroups" optionLabel="description"
-                            [style]="{'text-transform':'uppercase'}" />
-                        <!-- <small class="p-error block" *ngIf="formVehicle.get('modelVehicle')?.invalid">Campo obrigatório</small> -->
+                        <p-dropdown 
+                        [options]="additionDiscount" 
+                        optionLabel="discount"
+                        [style]="{'text-transform':'uppercase'}" formControlName="additionDiscount"/>
+                        <small class="p-error block" *ngIf="formPart.get('additionDiscount')?.invalid">Campo obrigatório</small> 
                     </div>
             </div>
         </div>
@@ -111,39 +116,34 @@
                         <label for="">Código</label>
                         <p-inputNumber mode="decimal" [useGrouping]="false" formControlName="id" />
                     </div>
-                    <div class="col-12 md:col-6">
+                    <div class="col-12 md:col-7">
                         <label for="">Código Fabricante</label>
-                        <input pInputText maxlength="50" [style]="{'text-transform':'uppercase'}"
-                            formControlName="code" />
-                        <!-- <small class="p-error block" *ngIf="formDriver.get('name')?.invalid">Campo obrigatório</small> -->
+                        <input pInputText maxlength="50" [style]="{'text-transform':'uppercase'}" formControlName="code" />
+                         <small class="p-error block" *ngIf="formPart.get('code')?.invalid">Campo obrigatório</small> 
                     </div>
-                    <div class="col-12 md:col-2">
-                        <label for="vehiclemodelid">Marca</label>
-                        <p-dropdown formControlName="brand" [options]="brands" optionLabel="description"
-                            [style]="{'text-transform':'uppercase'}" />
-                        <!--  <small class="p-error block" *ngIf="formVehicle.get('modelVehicle')?.invalid">Campo obrigatório</small> -->
-                    </div>
-                    <div class="col-12 md:col-2">
-                        <label for="partgroupsId">Grupo</label>
-                        <p-dropdown formControlName="group" [options]="partGroups" optionLabel="description"
-                            [style]="{'text-transform':'uppercase'}" />
-                        <!-- <small class="p-error block" *ngIf="formVehicle.get('modelVehicle')?.invalid">Campo obrigatório</small> -->
+                    <div class="col-12 md:col-3">
+                        <label for="partgroupsId">Unidades de Medida</label>
+                        <p-dropdown [options]="partUnits" optionLabel="description" [style]="{'text-transform':'uppercase'}" formControlName="unit"/>
+                        <small class="p-error block" *ngIf="formPart.get('unit')?.invalid">Campo obrigatório</small> 
                     </div>
                     <div class="col-12">
                         <label for="">Descrição</label>
-                        <input pInputText maxlength="100" [style]="{'text-transform':'uppercase'}" />
-                        <!-- <small class="p-error block" *ngIf="formDriver.get('name')?.invalid">Campo obrigatório</small> -->
+                        <input pInputText maxlength="100" [style]="{'text-transform':'uppercase'}" formControlName="description"/>
+                        <small class="p-error block" *ngIf="formPart.get('description')?.invalid">Campo obrigatório</small>
                     </div>
-                    <div class="col-12 md:col-2">
-                        <label for="partgroupsId">Unidade</label>
-                        <p-dropdown [options]="partGroups" optionLabel="description"
-                            [style]="{'text-transform':'uppercase'}" />
-                        <!-- <small class="p-error block" *ngIf="formVehicle.get('modelVehicle')?.invalid">Campo obrigatório</small> -->
+                    <div class="col-12 md:col-3">
+                        <label for="brandId">Marca</label>
+                        <p-dropdown [options]="partBrands" optionLabel="name" [style]="{'text-transform':'uppercase'}" (onChange)="onBrandSelected($event)" formControlName="brand"/>
+                        <small class="p-error block" *ngIf="formPart.get('brand')?.invalid">Campo obrigatório</small> 
                     </div>
-                    <div class="col-12 md:col-2">
+                    <div class="col-12 md:col-3">
+                        <label for="partgroupsId">Grupo</label>
+                        <p-dropdown [options]="partGroups" optionLabel="description" [style]="{'text-transform':'uppercase'}" [loading]="isLoadingGroup" formControlName="group"/>
+                        <small class="p-error block" *ngIf="formPart.get('group')?.invalid">Campo obrigatório</small>
+                    </div>
+                    <div class="col-12 md:col-3">
                         <label for="partgroupsId">Categoria</label>
-                        <p-dropdown [options]="partGroups" optionLabel="description"
-                            [style]="{'text-transform':'uppercase'}" />
+                        <p-dropdown [options]="partCategories" optionLabel="description" [style]="{'text-transform':'uppercase'}" />
                         <!-- <small class="p-error block" *ngIf="formVehicle.get('modelVehicle')?.invalid">Campo obrigatório</small> -->
                     </div>
                 </div>
@@ -212,7 +212,7 @@
     </p-tabView>
     <p-divider type="solid" />
     <div class="flex justify-content-end gap-2 mt-3">
-        <button pButton type="button" pRipple label="Fechar" icon="pi pi-times" class="p-button-text"></button>
+        <button pButton type="button" pRipple label="Fechar" icon="pi pi-times" class="p-button-text" (click)="hideDialog()"></button>
         <button pButton type="button" pRipple label="Salvar" icon="pi pi-check" class="p-button-text"></button>
     </div>
 </p-dialog>

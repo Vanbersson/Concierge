@@ -24,7 +24,7 @@ import { SuccessError } from '../../../../models/enum/success-error';
 @Component({
   selector: 'app-brand',
   standalone: true,
-  imports: [CommonModule, InputTextModule, IconFieldModule, RadioButtonModule, InputIconModule, 
+  imports: [CommonModule, InputTextModule, IconFieldModule, RadioButtonModule, InputIconModule,
     ButtonModule, InputNumberModule, ReactiveFormsModule, TableModule, ToastModule, DialogModule],
   templateUrl: './brand.component.html',
   styleUrl: './brand.component.scss',
@@ -132,6 +132,8 @@ export default class BrandComponent implements OnInit {
     }
     if (result.status == 200 && result.body.status == SuccessError.error) {
       this.messageService.add({ severity: 'info', summary: result.body.header, detail: result.body.message, icon: 'pi pi-info-circle' });
+      this.hideDialog();
+      this.init();
     }
   }
 

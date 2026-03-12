@@ -108,7 +108,12 @@ export const routes: Routes = [
                                 loadComponent: () => import('./views/parts/register/parts/parts.component'),
                                 canActivate: [PartsMenuGuard]
                             },
-                             {
+                            {
+                                path: 'group',
+                                title: 'Grupo',
+                                loadComponent: () => import('./views/parts/register/grouppart/grouppart.component'),
+                            },
+                            {
                                 path: 'unit',
                                 title: 'Unidade de Medida',
                                 loadComponent: () => import('./views/parts/register/unitmeasure/unitmeasure.component'),

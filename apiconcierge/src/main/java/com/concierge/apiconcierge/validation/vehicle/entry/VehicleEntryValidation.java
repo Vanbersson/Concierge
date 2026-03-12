@@ -24,10 +24,8 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
 
     @Autowired
     private IVehicleEntryRepository repository;
-
     @Autowired
     private IPermissionUserRepository permissionUser;
-
     @Autowired
     private IUserRepository userRepository;
 

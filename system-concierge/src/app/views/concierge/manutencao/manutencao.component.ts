@@ -132,11 +132,11 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
     exitDatePrevision: new FormControl<Date | null>(null),
     nameUserExitAuth1: new FormControl<string>({ value: "", disabled: true }),
     nameUserExitAuth2: new FormControl<string>({ value: "", disabled: true }),
-    quantityExtinguisher: new FormControl<number | null>(null),
+    /* quantityExtinguisher: new FormControl<number | null>(null),
     quantityTrafficCone: new FormControl<number | null>(null),
     quantityTire: new FormControl<number | null>(null),
     quantityTireComplete: new FormControl<number | null>(null),
-    quantityToolBox: new FormControl<number | null>(null),
+    quantityToolBox: new FormControl<number | null>(null), */
     attendant: new FormControl<User | null>(null),
     vehicleNew: new FormControl<string>(YesNot.not, Validators.required),
     vehicleServiceOrder: new FormControl<string>(YesNot.yes, Validators.required),

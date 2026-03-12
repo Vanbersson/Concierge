@@ -1,7 +1,7 @@
 <div class="layout-card">
     <p-toast />
     <div class="layout-card-title">
-        <span>Unidade de Medida</span>
+        <span>Unidades de Medida</span>
         <p-button icon="pi pi-plus" [text]="true" label="Novo" (onClick)="showNewBrand()" />
     </div>
     <p-table #tableModel [value]="listUnit"
@@ -46,7 +46,7 @@
     </p-table>
 </div>
 
- <p-dialog header="Cadastro da Unidade de Medida" [(visible)]="dialogVisible" [modal]="true" [style]="{width: '450px'}" [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }">
+ <p-dialog header="Cadastro da Unidades de Medida" [(visible)]="dialogVisible" [modal]="true" [style]="{width: '450px'}" [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }">
     <form [formGroup]="formUnit" (ngSubmit)="save()">
         <div class="p-fluid p-formgrid grid">
             <div class="field col-2">

@@ -4,7 +4,9 @@ import com.concierge.apiconcierge.dtos.brand.BrandDto;
 import com.concierge.apiconcierge.dtos.message.MessageResponseDto;
 import com.concierge.apiconcierge.models.brand.Brand;
 import com.concierge.apiconcierge.models.message.MessageResponse;
+import com.concierge.apiconcierge.services.auth.TokenService;
 import com.concierge.apiconcierge.services.brand.IBrandService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,6 +21,8 @@ public class BrandController {
 
     @Autowired
     private IBrandService service;
+    @Autowired
+    private TokenService tokenService;
 
     @PostMapping("/save")
     public ResponseEntity<Object> save(@RequestBody BrandDto data) {
@@ -33,11 +37,12 @@ public class BrandController {
     }
 
     @PostMapping("/update")
-    public ResponseEntity<Object> update(@RequestBody BrandDto data) {
+    public ResponseEntity<Object> update(@RequestBody BrandDto data, HttpServletRequest request) {
         try {
+            String userEmail = this.getEmail(request);
             Brand b = new Brand();
             BeanUtils.copyProperties(data, b);
-            MessageResponse response = this.service.update(b);
+            MessageResponse response = this.service.update(b,userEmail);
             return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
@@ -61,6 +66,10 @@ public class BrandController {
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
         }
+    }
+    private String getEmail(HttpServletRequest request) {
+        String token = request.getHeader("Authorization").replace("Bearer ", "");
+        return this.tokenService.validToken(token);
     }
 
 }
