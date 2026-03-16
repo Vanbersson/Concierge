@@ -71,9 +71,9 @@ export class FilterPartsComponent {
       this.selectedParts.resaleId = this.storageService.resaleId;
       this.selectedParts.status = StatusEnum.ENABLED;
       this.selectedParts.description = value.selecDesc;
-      this.selectedParts.qtdAvailable = value.selecQtdAvailable;
+     /*  this.selectedParts.qtdAvailable = value.selecQtdAvailable;
       this.selectedParts.discount = value.selecDiscount;
-      this.selectedParts.price = value.selecPrice;
+      this.selectedParts.price = value.selecPrice; */
 
       const resultPart = await this.savePart(this.selectedParts);
 
@@ -143,7 +143,7 @@ export class FilterPartsComponent {
       selecDesc: this.selectedParts.description,
       selecQtdAvailable: 0,
       selecDiscount: 0,
-      selecPrice: this.selectedParts.price,
+      //selecPrice: this.selectedParts.price,
     });
     this.partsDisabledButton = false;
     this.enableFormSelected();

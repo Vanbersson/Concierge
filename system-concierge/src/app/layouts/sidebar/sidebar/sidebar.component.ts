@@ -148,6 +148,7 @@ export class SidebarComponent implements OnInit {
               {
                 key: '2_99_2',
                 label: 'Categoria de Peças',
+                  routerLink:'pecas/cadastros/category',
                 visible: false,
               },
               {

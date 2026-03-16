@@ -1170,7 +1170,7 @@ export default class BudgetComponent implements OnInit, OnDestroy, DoCheck {
       this.messageService.add({ severity: 'error', summary: 'Peças', detail: 'Descrição não informada', icon: 'pi pi-times' });
       return false;
     }
-    if (p.qtdAvailable <= 0) {
+   /*  if (p.qtdAvailable <= 0) {
       this.messageService.add({ severity: 'error', summary: 'Peças', detail: 'Quantidade inválida', icon: 'pi pi-times' });
       return false;
     }
@@ -1185,7 +1185,7 @@ export default class BudgetComponent implements OnInit, OnDestroy, DoCheck {
     if (p.discount > (p.price * p.qtdAvailable)) {
       this.messageService.add({ severity: 'error', summary: 'Peças', detail: 'Desconto inválido', icon: 'pi pi-times' });
       return false;
-    }
+    } */
 
     return true;
   }
@@ -1205,9 +1205,9 @@ export default class BudgetComponent implements OnInit, OnDestroy, DoCheck {
       budgetItem.ordem = this.listBudgetItem.length + 1;
       budgetItem.code = p.code;
       budgetItem.description = p.description;
-      budgetItem.quantity = p.qtdAvailable;
+      /* budgetItem.quantity = p.qtdAvailable;
       budgetItem.discount = p.discount;
-      budgetItem.price = p.price;
+      budgetItem.price = p.price; */
 
       if (budgetItem.discount > 0) {
         const resultDiscount = this.calcDiscountSaveParts(budgetItem);

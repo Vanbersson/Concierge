@@ -25,8 +25,7 @@
                 <th pSortableColumn="status" style="width:10%">Status <p-sortIcon field="status"></p-sortIcon></th>
                 <th pSortableColumn="type" style="width:10%">Tipo<p-sortIcon field="type"></p-sortIcon></th>
                 <th pSortableColumn="description" style="width:10%">Grupo<p-sortIcon field="description"></p-sortIcon>
-                    <th pSortableColumn="brandId" style="width:60%">Marca<p-sortIcon field="brandId"></p-sortIcon>
-                </th>
+                <th pSortableColumn="brandId" style="width:60%">Marca<p-sortIcon field="brandId"></p-sortIcon></th>
                 <th></th>
             </tr>
         </ng-template>
@@ -43,8 +42,7 @@
                 <td>{{group.description | uppercase}}</td>
                  <td>{{ searchBrand(group.brandId) | uppercase}}</td>
                 <td>
-                    <p-button icon="pi pi-pencil" label="Editar" [text]="true" severity="secondary-custom" size="small"
-                        (onClick)="edit(group)" />
+                    <p-button icon="pi pi-pencil" label="Editar" [text]="true" severity="secondary-custom" size="small" (onClick)="edit(group)" />
                 </td>
             </tr>
         </ng-template>

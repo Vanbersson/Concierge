@@ -16,6 +16,8 @@ import { DropdownModule } from 'primeng/dropdown';
 import { RadioButtonModule } from 'primeng/radiobutton';
 import { TabViewModule } from 'primeng/tabview';
 import { DividerModule } from 'primeng/divider';
+import { InputGroupModule } from 'primeng/inputgroup';
+import { InputGroupAddonModule } from 'primeng/inputgroupaddon';
 
 
 import { YesNot } from '../../../../models/enum/yes-not';
@@ -28,6 +30,8 @@ import { BrandService } from '../../../../services/brand/brand.service';
 import { Brand } from '../../../../models/brand/brand';
 import { GroupPart } from '../../../../models/parts/group/group.part';
 import { GroupPartService } from '../../../../services/parts/group/group.part.service';
+import { CategoryPart } from '../../../../models/parts/category/category.part';
+import { CategoryPartService } from '../../../../services/parts/category/category.part.service';
 
 interface IAdditionDiscount {
   discount: string;
@@ -37,7 +41,7 @@ interface IAdditionDiscount {
 @Component({
   selector: 'app-parts',
   standalone: true,
-  imports: [CommonModule, InputTextModule, ButtonModule, TabViewModule, TableModule, RadioButtonModule, DividerModule,
+  imports: [CommonModule, InputTextModule, ButtonModule, TabViewModule, TableModule, RadioButtonModule, DividerModule, InputGroupModule, InputGroupAddonModule,
     ReactiveFormsModule, IconFieldModule, DropdownModule, InputIconModule, InputNumberModule, DialogModule, ToastModule],
   templateUrl: './parts.component.html',
   styleUrl: './parts.component.scss',
@@ -49,11 +53,12 @@ export default class PartsComponent implements OnInit {
   private isNewPart: boolean = false;
   isLoadingGroup: boolean = false;
   private part!: Part;
-  parts: Part[] = [];
+  parts: Part[] = [new Part()];
   partBrands: Brand[] = [];
   partGroups: GroupPart[] = [];
-  partCategories: any[]=[];
+  partCategories: CategoryPart[] = [];
   partUnits: UnitMeasure[] = [];
+  siglaUnit: string = '';
   additionDiscount: IAdditionDiscount[] = [];
 
   yes = YesNot.yes;
@@ -72,13 +77,14 @@ export default class PartsComponent implements OnInit {
     code: new FormControl<string>('', [Validators.required, Validators.maxLength(50)]),
     unit: new FormControl<UnitMeasure | null>(null, Validators.required),
     description: new FormControl<string>('', [Validators.required, Validators.maxLength(100)]),
-
     brand: new FormControl<Brand | null>(null, Validators.required),
-    group: new FormControl<any>(null, Validators.required),
+    group: new FormControl<GroupPart | null>(null, Validators.required),
+    category: new FormControl<CategoryPart | null>(null, Validators.required)
   });
 
   constructor(
     private groupService: GroupPartService,
+    private categoryService: CategoryPartService,
     private brandService: BrandService,
     private unitService: UnitMeasureService,
     private messageService: MessageService,
@@ -92,6 +98,7 @@ export default class PartsComponent implements OnInit {
     this.busyService.busy();
     this.partUnits = await this.unitListAllEnabled();
     this.partBrands = await this.brandListAllEnabled();
+    this.partCategories = await this.categoriesListAllEnabled();
     this.busyService.idle();
 
     this.additionDiscount = [{ discount: 'Acrécimo' }, { discount: 'Desconto' }, { discount: 'Ambos' }, { discount: 'Nenhum' }];;
@@ -126,7 +133,11 @@ export default class PartsComponent implements OnInit {
 
     });
 
+    this.siglaUnit = '';
     this.isLoadingGroup = false;
+  }
+  onUnitSelected(event: any) {
+    this.siglaUnit = event.value.unitMeasure;
   }
   async onBrandSelected(event: any) {
     this.isLoadingGroup = true;
@@ -154,6 +165,15 @@ export default class PartsComponent implements OnInit {
   private async filterGroupBrand(brandId: number): Promise<GroupPart[]> {
     try {
       return await lastValueFrom(this.groupService.filterBrand(brandId));
+    } catch (error) {
+      this.messageService.add({ severity: 'error', summary: 'Erro', detail: error.error.message, icon: 'pi pi-times' });
+      return [];
+    }
+  }
+
+  private async categoriesListAllEnabled(): Promise<CategoryPart[]> {
+    try {
+      return await lastValueFrom(this.categoryService.listAllEnabled());
     } catch (error) {
       this.messageService.add({ severity: 'error', summary: 'Erro', detail: error.error.message, icon: 'pi pi-times' });
       return [];

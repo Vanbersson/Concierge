@@ -13,12 +13,19 @@
     }
   }
 
-  .part-img{
+  .part-img {
     width: 180px;
     height: 140px;
     background-color: var(--color-grey-200);
     border-radius: 8px;
   }
 
+  ::ng-deep {
+    .p-inputgroup-addon {
+      padding: 0.5rem 0.75rem;
+    }
+
+
+  }
 
 }

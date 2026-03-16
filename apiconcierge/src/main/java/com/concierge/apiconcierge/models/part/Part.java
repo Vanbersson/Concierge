@@ -14,6 +14,10 @@ import java.util.Date;
 @EqualsAndHashCode(of = "id")
 @SecondaryTable(name = "tb_company", pkJoinColumns = @PrimaryKeyJoinColumn(name = "id"))
 @SecondaryTable(name = "tb_resale", pkJoinColumns = @PrimaryKeyJoinColumn(name = "id"))
+@SecondaryTable(name = "tb_unit_measure", pkJoinColumns = @PrimaryKeyJoinColumn(name = "id"))
+@SecondaryTable(name = "tb_brand", pkJoinColumns = @PrimaryKeyJoinColumn(name = "id"))
+@SecondaryTable(name = "tb_part_group", pkJoinColumns = @PrimaryKeyJoinColumn(name = "id"))
+@SecondaryTable(name = "tb_part_category", pkJoinColumns = @PrimaryKeyJoinColumn(name = "id"))
 @Entity
 @Table(name = "tb_part")
 public class Part {
@@ -39,6 +43,7 @@ public class Part {
 
     private String description;
 
+    @JoinColumn(table = "tb_unit_measure", referencedColumnName = "id")
     @Column(name = "unit_measure_id")
     private Integer unitMeasureId;
 
@@ -48,17 +53,26 @@ public class Part {
     @Column(name = "price_old")
     private float priceOld;
 
+    @Column(name = "price_warranty")
+    private float priceWarranty;
+
     @Column(name = "addition_discount")
     private AdditionDiscount additionDiscount;
 
+    @JoinColumn(table = "tb_brand", referencedColumnName = "id")
     @Column(name = "brand_id")
     private Integer brandId;
 
+    @JoinColumn(table = "tb_part_group", referencedColumnName = "id")
     @Column(name = "group_id")
     private Integer groupId;
 
+    @JoinColumn(table = "tb_part_category", referencedColumnName = "id")
     @Column(name = "category_id")
     private Integer categoryId;
+
+    @Column(name = "location_pri_area")
+    private String locationPriArea;
 
     @Column(name = "location_pri_street")
     private String locationPriStreet;
@@ -71,6 +85,9 @@ public class Part {
 
     @Column(name = "location_pri_position")
     private String locationPriPosition;
+
+    @Column(name = "location_sec_area")
+    private String locationSecArea;
 
     @Column(name = "location_sec_street")
     private String locationSecStreet;
@@ -89,35 +106,5 @@ public class Part {
 
     @Column(name = "photo_url_verse")
     private String photoUrlVerse;
-
-
-
-
-
-
-
-
-    @Column(name = "qtd_available")
-    private float qtdAvailable;
-
-    @Column(name = "qtd_accounting")
-    private float qtdAccounting;
-
-    @Column(name = "unit_measure")
-    private String unitMeasure;
-
-    private float price;
-
-    @Column(name = "location_street")
-    private String locationStreet;
-
-    @Column(name = "location_bookcase")
-    private String locationBookcase;
-
-    @Column(name = "location_shelf")
-    private String locationShelf;
-
-    @Column(name = "date_last_entry")
-    private Date dateLastEntry;
 
 }

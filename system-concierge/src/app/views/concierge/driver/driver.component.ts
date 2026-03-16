@@ -265,9 +265,7 @@ export default class DriverComponent implements OnInit {
     if (!valid) {
       return;
     }
-
     //Save
-    this.driver.photoDriverUrl = this.driverPhotoUrl;
     this.driver.companyId = this.storageService.companyId;
     this.driver.resaleId = this.storageService.resaleId;
     this.driver.status = value.status;
@@ -291,8 +289,6 @@ export default class DriverComponent implements OnInit {
     this.driver.city = value.city;
     this.driver.neighborhood = value.neighborhood;
     this.driver.addressComplement = value.addressComplement;
-    this.driver.photoDoc1Url = this.driverPhotoDoc1Url;
-    this.driver.photoDoc2Url = this.driverPhotoDoc2Url;
     //Inicia load
     this.busyService.busy();
     const resultSave = await this.saveDriver(this.driver);
@@ -303,8 +299,7 @@ export default class DriverComponent implements OnInit {
       this.driver = resultSave.body.data;
       this.formDriver.get('id').setValue(this.driver.id);
       this.isNewDriver = false;
-
-      /* //save photo
+      //save photo
       if (this.driverPhotoUrl != "" && this.driver.photoDriverUrl == "") {
         this.driver.photoDriverUrl = await this.savePhoto(this.driverPhotoUrl, this.driver.id.toString());
       }
@@ -313,8 +308,8 @@ export default class DriverComponent implements OnInit {
       }
       if (this.driverPhotoDoc2Url != "" && this.driver.photoDoc2Url == "") {
         this.driver.photoDoc2Url = await this.saveDoc2(this.driverPhotoDoc2Url, this.driver.id.toString());
-      } */
-
+      }
+      const resultUpdate = await this.updateDriver(this.driver);
       //Lista motoristas
       this.listDrivers();
     } else if (resultSave.status == 201 && resultSave.body.status == SuccessError.error) {

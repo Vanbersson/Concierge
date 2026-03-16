@@ -508,10 +508,10 @@ export default class PurchaseOrderComponent implements OnInit, DoCheck {
     puItem.partId = part.id;
     puItem.partCode = part.code;
     puItem.partDescription = part.description;
-    puItem.quantity = part.qtdAvailable;
+/*     puItem.quantity = part.qtdAvailable;
     puItem.price = part.price;
     puItem.discount = part.discount;
-
+ */
     const resultItem = await this.savePurchaseOrderItem(puItem);
     if (resultItem.status == 201) {
 
