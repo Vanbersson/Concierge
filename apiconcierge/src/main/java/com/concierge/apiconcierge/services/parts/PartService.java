@@ -1,36 +1,38 @@
 package com.concierge.apiconcierge.services.parts;
 
 import com.concierge.apiconcierge.exceptions.parts.PartsException;
+import com.concierge.apiconcierge.models.enums.StatusEnableDisable;
+import com.concierge.apiconcierge.models.message.MessageResponse;
 import com.concierge.apiconcierge.models.part.Part;
 import com.concierge.apiconcierge.repositories.parts.IPartRepository;
+import com.concierge.apiconcierge.services.parts.interfaces.IPartListAll;
 import com.concierge.apiconcierge.util.ConstantsMessage;
-import com.concierge.apiconcierge.validation.parts.PartValidation;
+import com.concierge.apiconcierge.validation.parts.IPartValidation;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.util.*;
 
 @Service
 public class PartService implements IPartService {
-    private static final String SUCCESS = "Success.";
     @Autowired
     private IPartRepository repository;
-
     @Autowired
-    private PartValidation validation;
+    private IPartValidation validation;
 
     @SneakyThrows
     @Override
-    public Integer save(Part part) {
+    public MessageResponse save(Part part) {
         try {
-            String message = this.validation.save(part);
-            if (message.equals(SUCCESS)) {
+            MessageResponse response = this.validation.save(part);
+            if (ConstantsMessage.SUCCESS.equals(response.getStatus())) {
+                part.setId(null);
+                part.setDateRegister(new Date());
                 Part resultPart = this.repository.save(part);
-                return resultPart.getId();
-            } else {
-                throw new PartsException(message);
+                response.setData(resultPart);
             }
+            return response;
         } catch (Exception ex) {
             throw new PartsException(ex.getMessage());
         }
@@ -38,29 +40,40 @@ public class PartService implements IPartService {
 
     @SneakyThrows
     @Override
-    public String update(Part part) {
+    public MessageResponse update(Part part) {
         try {
-            String message = this.validation.update(part);
-            if (message.equals(SUCCESS)) {
-                this.repository.save(part);
-                return ConstantsMessage.SUCCESS;
-            } else {
-                throw new PartsException(message);
+            MessageResponse response = this.validation.update(part);
+            if (ConstantsMessage.SUCCESS.equals(response.getStatus())) {
+                Part resultPart = this.repository.save(part);
+                response.setData(resultPart);
             }
+            return response;
         } catch (Exception ex) {
             throw new PartsException(ex.getMessage());
         }
     }
 
     @SneakyThrows
-    public List<Part> listAll(Integer companyId, Integer resaleId) {
+    public List<Map<String, Object>> listAll(Integer companyId, Integer resaleId) {
         try {
-            String message = this.validation.listAll(companyId, resaleId);
-            if (ConstantsMessage.SUCCESS.equals(message)) {
-                return this.repository.listParts(companyId, resaleId);
-            } else {
-                throw new PartsException(message);
+            MessageResponse response = this.validation.listAll(companyId, resaleId);
+            if (ConstantsMessage.SUCCESS.equals(response.getStatus())) {
+                List<IPartListAll> list = this.repository.listAll(companyId, resaleId);
+                List<Map<String, Object>> maps = new ArrayList<>();
+                for (IPartListAll i : list) {
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("id", i.getId());
+                    map.put("status", i.getStatus() == 0 ? StatusEnableDisable.Habilitado : StatusEnableDisable.Desabilitado);
+                    map.put("code",i.getCode());
+                    map.put("description", i.getDescription());
+                    map.put("brand",i.getBrand());
+                    map.put("group",i.getGroup());
+                    map.put("category",i.getCategory());
+                    maps.add(map);
+                }
+                return  maps;
             }
+            return List.of();
         } catch (Exception ex) {
             throw new PartsException(ex.getMessage());
         }

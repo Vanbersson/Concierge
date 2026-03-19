@@ -71,8 +71,7 @@ export class TopbarComponent implements OnInit, OnDestroy, DoCheck {
 
   }
   ngDoCheck(): void {
-
-    if (this.updateUser().id != 0) {
+    if (this.updateUser().id != null) {
       this.showUserPhoto = this.updateUser().photoUrl;
       this.showUserName = this.updateUser().name.split(' ')[0];
 

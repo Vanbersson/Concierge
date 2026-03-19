@@ -1,9 +1,10 @@
 import { IResale } from "../../interfaces/iresale";
+import { StatusEnum } from "../enum/status-enum";
 
 export class Resale implements IResale {
-    companyId: number = 0;
-    id: number = 0;
-    status: string = '';
+    companyId: number | null = null;
+    id: number | null = null;
+    status: StatusEnum = StatusEnum.DISABLED;
     name: string = '';
     cnpj: string = '';
     email: string = '';

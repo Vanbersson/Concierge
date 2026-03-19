@@ -1,9 +1,9 @@
 import { StatusEnum } from "../enum/status-enum";
 
 export class User {
-    companyId: number = 0;
-    resaleId: number = 0;
-    id: number = 0;
+    companyId: number | null = null;
+    resaleId: number | null = null;
+    id: number | null = null;
     status: StatusEnum = StatusEnum.DISABLED;
     name: string = '';
     password: string = '';
@@ -11,7 +11,7 @@ export class User {
     cellphone: string = '';
     limitDiscount: number = 0;
     photoUrl: string = '';
-    roleId: number = 0;
+    roleId: number | null = null;
     roleDesc: string = '';
     roleFunc: string = '';
     token: string = '';

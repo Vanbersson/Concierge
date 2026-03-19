@@ -2,9 +2,11 @@ package com.concierge.apiconcierge.controllers.auth;
 
 import com.concierge.apiconcierge.dtos.auth.AuthenticationDto;
 import com.concierge.apiconcierge.dtos.message.MessageResponseDto;
+import com.concierge.apiconcierge.models.message.MessageResponse;
 import com.concierge.apiconcierge.models.user.User;
 import com.concierge.apiconcierge.repositories.user.IUserRepository;
 import com.concierge.apiconcierge.services.auth.TokenService;
+import com.concierge.apiconcierge.util.ConstantsMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -38,14 +40,22 @@ public class AutheticationController {
             Map<String, Object> map = new HashMap<>();
             map.put("companyId", user.getCompanyId());
             map.put("resaleId", user.getResaleId());
+            map.put("status",user.getStatus());
             map.put("id", user.getId());
             map.put("name", user.getName());
+            map.put("email",user.getEmail());
             map.put("roleDesc", user.getRoleDesc());
             map.put("cellphone", user.getCellphone());
             map.put("limitDiscount", user.getLimitDiscount());
             map.put("token", token);
             map.put("photoUrl", user.getPhotoUrl());
-            return ResponseEntity.status(HttpStatus.OK).body(map);
+
+            MessageResponse response = new MessageResponse();
+            response.setStatus(ConstantsMessage.SUCCESS);
+            response.setHeader("Bem-vindo");
+            response.setMessage(user.getName());
+            response.setData(map);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
         }

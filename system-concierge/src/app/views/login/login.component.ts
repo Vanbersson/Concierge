@@ -21,6 +21,8 @@ import { MenuUserService } from '../../services/menu/menu-user.service';
 import { IAuth } from '../../interfaces/auth/iauth';
 //Class
 import { User } from '../../models/user/user';
+import { MessageResponse } from '../../models/message/message-response';
+import { SuccessError } from '../../models/enum/success-error';
 
 @Component({
   selector: 'app-login',
@@ -31,7 +33,7 @@ import { User } from '../../models/user/user';
   styleUrl: './login.component.scss'
 })
 export default class LoginComponent {
-
+  private user: User;
   loginForm = new FormGroup({
     email: new FormControl('', [Validators.email, Validators.required]),
     password: new FormControl('', [Validators.minLength(8), Validators.required]),
@@ -55,35 +57,35 @@ export default class LoginComponent {
 
     if (valid) {
       const login: IAuth = { email: value.email, password: value.password };
-
       this.busyService.busy();
-
-      const resultLogin = await this.login(login);
-      if (resultLogin.status == 200) {
-        this.messageService.add({ severity: 'success', summary: 'Bem-vindo', detail: resultLogin.body.name, icon: 'pi pi-lock-open', life: 3000 });
-        this.storageService.companyId = resultLogin.body.companyId.toString();
-        this.storageService.resaleId = resultLogin.body.resaleId.toString();
-        this.storageService.photo = resultLogin.body.photoUrl;
-        this.storageService.id = resultLogin.body.id.toString();
-        this.storageService.name = resultLogin.body.name;
-        this.storageService.email = login.email;
-        this.storageService.cellphone = resultLogin.body.cellphone;
-        this.storageService.roleDesc = resultLogin.body.roleDesc;
-        this.storageService.limitDiscount = resultLogin.body.limitDiscount.toString();
-        this.storageService.token = resultLogin.body.token;
-
-        const resultMenus = await this.menusUser(resultLogin.body.companyId, resultLogin.body.resaleId, resultLogin.body.id);
+      const result = await this.login(login);
+      this.busyService.idle();
+      if (result.status == 200 && result.body.status == SuccessError.succes) {
+        this.messageService.add({ severity: 'success', summary: result.body.header, detail: result.body.message, icon: 'pi pi-check' });
+        this.user = result.body.data;
+        this.storageService.companyId = this.user.companyId.toString();
+        this.storageService.resaleId = this.user.resaleId.toString();
+        this.storageService.photo = this.user.photoUrl;
+        this.storageService.id = this.user.id.toString();
+        this.storageService.name = this.user.name;
+         this.storageService.email = this.user.email;
+        this.storageService.cellphone = this.user.cellphone;
+        this.storageService.roleDesc = this.user.roleDesc;
+        this.storageService.limitDiscount = this.user.limitDiscount.toString(); 
+        this.storageService.token = this.user.token;
+        const resultMenus = await this.menusUser(this.user.companyId, this.user.resaleId, this.user.id);
         var keys = "";
         for (let a = 0; a < resultMenus.length; a++) {
           const element = resultMenus[a];
           keys += element.key + ",";
         }
         this.storageService.menus = keys;
-        setTimeout(() => {
-          this.router.navigateByUrl('/dashboard');
-        }, 1000);
+        this.router.navigateByUrl('/dashboard');
       }
-      this.busyService.idle();
+      if (result.status == 200 && result.body.status == SuccessError.error) {
+        this.messageService.add({ severity: 'info', summary: result.body.header, detail: result.body.message, icon: 'pi pi-info-circle' });
+      }
+
     }
   }
   forgetPass() {
@@ -94,7 +96,7 @@ export default class LoginComponent {
       }
     });
   }
-  private async login(login: IAuth): Promise<HttpResponse<User>> {
+  private async login(login: IAuth): Promise<HttpResponse<MessageResponse>> {
     try {
       return await lastValueFrom(this.auth.login(login));
     } catch (error) {

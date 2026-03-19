@@ -1,7 +1,7 @@
 import { StatusEnum } from "../enum/status-enum";
 
 export class Brand {
-    id: number = 0;
+    id: number | null= null;
     status: StatusEnum = StatusEnum.DISABLED;
     name: string = '';
 }

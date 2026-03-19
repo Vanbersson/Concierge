@@ -14,7 +14,7 @@ import { HttpResponse } from '@angular/common/http';
 import { lastValueFrom } from 'rxjs';
 //Service
 import { BusyService } from '../loading/busy.service';
-import { PartsService } from '../../services/parts/parts.service';
+import { PartService } from '../../services/parts/part.service';
 import { StorageService } from '../../services/storage/storage.service';
 import { StatusEnum } from '../../models/enum/status-enum';
 
@@ -43,7 +43,7 @@ export class FilterPartsComponent {
     selecDiscount: new FormControl<number>(0),
     selecQtdAvailable: new FormControl<number>(0)
   });
-  constructor(private partsService: PartsService, private busyService: BusyService, private storageService: StorageService) { }
+  constructor(private partsService: PartService, private busyService: BusyService, private storageService: StorageService) { }
   showDialogParts() {
     this.visibleParts = true;
     this.clearFormFilter();
@@ -75,19 +75,19 @@ export class FilterPartsComponent {
       this.selectedParts.discount = value.selecDiscount;
       this.selectedParts.price = value.selecPrice; */
 
-      const resultPart = await this.savePart(this.selectedParts);
+      /* const resultPart = await this.savePart(this.selectedParts);
 
       this.outputPart.emit(this.selectedParts);
-      this.visibleParts = false;
+      this.visibleParts = false; */
     }
   }
-  private async savePart(part: Part): Promise<HttpResponse<Part>> {
+ /*  private async savePart(part: Part): Promise<HttpResponse<Part>> {
     try {
       return await lastValueFrom(this.partsService.save(part))
     } catch (error) {
       return error;
     }
-  }
+  } */
   public async filterParts() {
     this.busyService.busy();
     //clear selection
@@ -99,20 +99,20 @@ export class FilterPartsComponent {
 
     if (value.filterCode != '') {
       this.formFilterParts.get('filterDesc').setValue("");
-      const partsResult = await this.getPartsFilterCode(value.filterCode);
+     /*  const partsResult = await this.getPartsFilterCode(value.filterCode);
       if (partsResult.status == 200) {
         this.listParts = partsResult.body;
-      }
+      } */
 
     } else if (value.filterDesc != '') {
-      const partsResult = await this.getPartsFilterDesc(value.filterDesc);
+    /*   const partsResult = await this.getPartsFilterDesc(value.filterDesc);
       if (partsResult.status == 200) {
         this.listParts = partsResult.body;
-      }
+      } */
     }
     this.busyService.idle();
   }
-  private async getPartsFilterCode(code: string): Promise<HttpResponse<Part[]>> {
+ /*  private async getPartsFilterCode(code: string): Promise<HttpResponse<Part[]>> {
     try {
       return await lastValueFrom(this.partsService.getExternalFilterCode$(code));
     } catch (error) {
@@ -125,7 +125,7 @@ export class FilterPartsComponent {
     } catch (error) {
       return error;
     }
-  }
+  } */
   private disableFormSelected() {
     this.formSelectPart.get('selecDesc').disable();
     this.formSelectPart.get('selecQtdAvailable').disable();

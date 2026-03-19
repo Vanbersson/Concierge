@@ -20,7 +20,6 @@ public record PartDto(Integer companyId,
                       Integer brandId,
                       Integer groupId,
                       Integer categoryId,
-
                       String locationPriArea,
                       String locationPriStreet,
                       String locationPriBookcase,
@@ -30,6 +29,5 @@ public record PartDto(Integer companyId,
                       String locationSecStreet,
                       String locationSecBookcase,
                       String locationSecShelf,
-                      String locationSecPosition
-) {
+                      String locationSecPosition) {
 }

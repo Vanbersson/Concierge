@@ -1,7 +1,7 @@
 import { ICompany } from "../../interfaces/icompany";
 
 export class Company implements ICompany {
-    id: number = 0;
+    id: number | null= null;
     status: string = '';
     name: string = '';
     cnpj: string = '';

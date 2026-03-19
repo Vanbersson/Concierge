@@ -1,15 +1,18 @@
 package com.concierge.apiconcierge.services.parts;
 
+import com.concierge.apiconcierge.models.message.MessageResponse;
 import com.concierge.apiconcierge.models.part.Part;
+import com.concierge.apiconcierge.services.parts.interfaces.IPartListAll;
 
 import java.util.List;
+import java.util.Map;
 
 public interface IPartService {
 
-    public Integer save(Part parts);
+    public MessageResponse save(Part part);
 
-    public String update(Part parts);
+    public MessageResponse update(Part part);
 
-    public List<Part> listAll(Integer companyId,Integer resaleId);
+    public List<Map<String, Object>> listAll(Integer companyId, Integer resaleId);
 
 }
