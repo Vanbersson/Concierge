@@ -64,16 +64,31 @@ public class PartService implements IPartService {
                     Map<String, Object> map = new HashMap<>();
                     map.put("id", i.getId());
                     map.put("status", i.getStatus() == 0 ? StatusEnableDisable.Habilitado : StatusEnableDisable.Desabilitado);
-                    map.put("code",i.getCode());
+                    map.put("code", i.getCode());
                     map.put("description", i.getDescription());
-                    map.put("brand",i.getBrand());
-                    map.put("group",i.getGroup());
-                    map.put("category",i.getCategory());
+                    map.put("brand", i.getBrand());
+                    map.put("group", i.getGroup());
+                    map.put("category", i.getCategory());
                     maps.add(map);
                 }
-                return  maps;
+                return maps;
             }
             return List.of();
+        } catch (Exception ex) {
+            throw new PartsException(ex.getMessage());
+        }
+    }
+
+    @SneakyThrows
+    @Override
+    public MessageResponse filterId(Integer companyId, Integer resaleId, Integer id) {
+        try {
+            MessageResponse response = this.validation.filterId(companyId, resaleId, id);
+            if (ConstantsMessage.SUCCESS.equals(response.getStatus())) {
+                Part result = this.repository.filterId(companyId, resaleId, id);
+                response.setData(result);
+            }
+            return response;
         } catch (Exception ex) {
             throw new PartsException(ex.getMessage());
         }

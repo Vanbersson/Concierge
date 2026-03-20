@@ -1,12 +1,18 @@
 package com.concierge.apiconcierge.validation.parts.group;
 
+import com.concierge.apiconcierge.models.enums.StatusEnableDisable;
 import com.concierge.apiconcierge.models.message.MessageResponse;
 import com.concierge.apiconcierge.models.part.group.GroupPart;
+import com.concierge.apiconcierge.repositories.parts.group.IGroupPartRepository;
 import com.concierge.apiconcierge.util.ConstantsMessage;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class GroupPartValidation implements IGroupPartValidation {
+    @Autowired
+    private IGroupPartRepository repository;
+
     @Override
     public MessageResponse save(GroupPart g) {
         MessageResponse response = new MessageResponse();
@@ -96,6 +102,15 @@ public class GroupPartValidation implements IGroupPartValidation {
             response.setHeader("Marca");
             response.setMessage(ConstantsMessage.NOT_INFORMED);
             return response;
+        }
+        if (g.getStatus() == StatusEnableDisable.Desabilitado) {
+            Integer total = this.repository.filterIsUsed(g.getCompanyId(), g.getResaleId(), g.getId());
+            if(total > 0){
+                response.setStatus(ConstantsMessage.ERROR);
+                response.setHeader("Grupo");
+                response.setMessage("Não pode ser desabilitado.");
+                return response;
+            }
         }
         response.setStatus(ConstantsMessage.SUCCESS);
         response.setHeader("Grupo");

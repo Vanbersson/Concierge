@@ -55,7 +55,7 @@ interface IAdditionDiscount {
   providers: [MessageService]
 })
 export default class PartsComponent implements OnInit {
- tabViewIndex: number | undefined = 0;
+  tabViewIndex: number | undefined = 0;
   visibleDialog: boolean = false;
   private isNewPart: boolean = false;
   isLoadingGroup: boolean = false;
@@ -198,7 +198,6 @@ export default class PartsComponent implements OnInit {
     if (!valid) {
       return;
     }
-
     this.part.companyId = this.storageService.companyId;
     this.part.resaleId = this.storageService.resaleId;
     //Tab dados
@@ -242,14 +241,13 @@ export default class PartsComponent implements OnInit {
     if (!valid) {
       return;
     }
-
     //Tab dados
     this.part.status = value.status;
     this.part.priceNow = value.priceNow;
     this.part.priceOld = value.priceOld;
     this.part.priceWarranty = value.priceWarranty;
     this.part.additionDiscount = value.additionDiscount['discount'];
-    this.part.code = value.code;
+   // this.part.code = value.code;
     this.part.description = value.description;
     this.part.unitMeasureId = value.unit.id;
     this.part.brandId = value.brand.id;
@@ -278,44 +276,52 @@ export default class PartsComponent implements OnInit {
     }
   }
 
-  async edit(p: Part) {
-    this.part = p;
-    this.isNewPart = false;
-    this.cleanForm();
-    //Grupos
-    this.partGroups = await this.filterGroupBrand(this.part.brandId);
-    //Unidade de Medida
-    const unit = this.partUnits.find(u => u.id == this.part.unitMeasureId);
-    this.siglaUnit = unit.unitMeasure;
-    //Form
-    this.formPart.patchValue({
-      status: this.part.status,
-      priceNow: this.part.priceNow,
-      priceOld: this.part.priceOld,
-      priceWarranty: this.part.priceWarranty,
-      additionDiscount: this.listAdditionDiscount.find(a => a.discount == this.part.additionDiscount),
-      id: this.part.id,
-      code: this.part.code,
-      description: this.part.description,
-      unit: unit,
-      brand: this.partBrands.find(b => b.id == this.part.brandId),
-      group: this.partGroups.find(g => g.id == this.part.groupId),
-      category: this.partCategories.find(c => c.id == this.part.categoryId),
-    });
-    //Tab Location
-    this.formPart.patchValue({
-      locationPriArea: this.part.locationPriArea,
-      locationPriStreet: this.part.locationPriStreet,
-      locationPriBookcase: this.part.locationPriBookcase,
-      locationPriShelf: this.part.locationPriShelf,
-      locationPriPosition: this.part.locationPriPosition,
-      locationSecArea: this.part.locationSecArea,
-      locationSecStreet: this.part.locationSecStreet,
-      locationSecBookcase: this.part.locationSecBookcase,
-      locationSecShelf: this.part.locationSecShelf,
-      locationSecPosition: this.part.locationSecPosition,
-    });
-    this.showDialog();
+  async edit(id: number) {
+    this.busyService.busy();
+    const result = await this.filterId(id);
+    this.busyService.idle();
+    if (result.status == 200 && result.body.status == SuccessError.succes) {
+      this.part = result.body.data;
+      this.isNewPart = false;
+      this.cleanForm();
+      //Grupos
+      this.partGroups = await this.filterGroupBrand(this.part.brandId);
+      //Unidade de Medida
+      const unit = this.partUnits.find(u => u.id == this.part.unitMeasureId);
+      this.siglaUnit = unit.unitMeasure;
+      //Form
+      this.formPart.patchValue({
+        status: this.part.status,
+        priceNow: this.part.priceNow,
+        priceOld: this.part.priceOld,
+        priceWarranty: this.part.priceWarranty,
+        additionDiscount: this.listAdditionDiscount.find(a => a.discount == this.part.additionDiscount),
+        id: this.part.id,
+        code: this.part.code,
+        description: this.part.description,
+        unit: unit,
+        brand: this.partBrands.find(b => b.id == this.part.brandId),
+        group: this.partGroups.find(g => g.id == this.part.groupId),
+        category: this.partCategories.find(c => c.id == this.part.categoryId),
+      });
+      //Tab Location
+      this.formPart.patchValue({
+        locationPriArea: this.part.locationPriArea,
+        locationPriStreet: this.part.locationPriStreet,
+        locationPriBookcase: this.part.locationPriBookcase,
+        locationPriShelf: this.part.locationPriShelf,
+        locationPriPosition: this.part.locationPriPosition,
+        locationSecArea: this.part.locationSecArea,
+        locationSecStreet: this.part.locationSecStreet,
+        locationSecBookcase: this.part.locationSecBookcase,
+        locationSecShelf: this.part.locationSecShelf,
+        locationSecPosition: this.part.locationSecPosition,
+      });
+      this.showDialog();
+    }
+    if (result.status == 200 && result.body.status == SuccessError.error) {
+      this.messageService.add({ severity: 'info', summary: result.body.header, detail: result.body.message, icon: 'pi pi-info-circle' });
+    }
   }
 
   private async saveNewP(p: Part): Promise<HttpResponse<MessageResponse>> {
@@ -337,6 +343,14 @@ export default class PartsComponent implements OnInit {
   private async listAll(): Promise<IPartListAll[]> {
     try {
       return await lastValueFrom(this.partService.listAll());
+    } catch (error) {
+      this.messageService.add({ severity: 'error', summary: 'Erro', detail: error.error.message, icon: 'pi pi-times' });
+      return error;
+    }
+  }
+  private async filterId(id: number): Promise<HttpResponse<MessageResponse>> {
+    try {
+      return await lastValueFrom(this.partService.filterId(id));
     } catch (error) {
       this.messageService.add({ severity: 'error', summary: 'Erro', detail: error.error.message, icon: 'pi pi-times' });
       return error;

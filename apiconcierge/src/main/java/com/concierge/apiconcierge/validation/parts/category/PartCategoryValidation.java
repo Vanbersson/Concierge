@@ -3,11 +3,16 @@ package com.concierge.apiconcierge.validation.parts.category;
 import com.concierge.apiconcierge.models.enums.StatusEnableDisable;
 import com.concierge.apiconcierge.models.message.MessageResponse;
 import com.concierge.apiconcierge.models.part.category.PartCategory;
+import com.concierge.apiconcierge.repositories.parts.category.IPartCategoryRepository;
 import com.concierge.apiconcierge.util.ConstantsMessage;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class PartCategoryValidation implements IPartCategoryValidation {
+    @Autowired
+    private IPartCategoryRepository repository;
+
     @Override
     public MessageResponse save(PartCategory cat) {
         MessageResponse response = new MessageResponse();
@@ -75,7 +80,13 @@ public class PartCategoryValidation implements IPartCategoryValidation {
             return response;
         }
         if (cat.getStatus() == StatusEnableDisable.Desabilitado) {
-
+            Integer total = this.repository.filterIsUsed(cat.getCompanyId(), cat.getResaleId(), cat.getId());
+            if (total > 0) {
+                response.setStatus(ConstantsMessage.ERROR);
+                response.setHeader("Categoria");
+                response.setMessage("Não pode ser desabilitado.");
+                return response;
+            }
         }
         response.setStatus(ConstantsMessage.SUCCESS);
         response.setHeader("Categoria");

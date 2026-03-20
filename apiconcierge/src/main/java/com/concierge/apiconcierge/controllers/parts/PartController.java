@@ -57,5 +57,17 @@ public class PartController {
         }
     }
 
+    @GetMapping("/{companyId}/{resaleId}/filter/id/{id}")
+    public ResponseEntity<Object> filterId(@PathVariable(name = "companyId") Integer companyId,
+                                           @PathVariable(name = "resaleId") Integer resaleId,
+                                           @PathVariable(name = "id") Integer id) {
+        try {
+            MessageResponse response = this.service.filterId(companyId, resaleId, id);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
+        }
+    }
+
 
 }

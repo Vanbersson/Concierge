@@ -18,5 +18,10 @@ public interface IGroupPartRepository extends JpaRepository<GroupPart, Integer> 
     List<GroupPart> filterBrand(Integer companyId, Integer resaleId, StatusEnableDisable status, Integer brandId);
 
     @Query(value = "SELECT * FROM `tb_part_group` WHERE brand_id=?1", nativeQuery = true)
-    List<GroupPart> filterBrand( Integer brandId);
+    List<GroupPart> filterBrand(Integer brandId);
+
+    @Query(value = "SELECT COUNT(p.id) AS total FROM tb_part_group AS g\n" +
+            "INNER JOIN tb_part AS p ON(g.company_id= p.company_id) AND g.resale_id=p.resale_id AND g.id=p.group_id\n" +
+            "WHERE g.company_id=?1 AND g.resale_id=?2 AND p.group_id=?3;",nativeQuery = true)
+    Integer filterIsUsed(Integer companyId, Integer resaleId, Integer id);
 }

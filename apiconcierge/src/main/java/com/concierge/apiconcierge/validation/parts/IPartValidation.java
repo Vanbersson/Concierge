@@ -12,4 +12,6 @@ public interface IPartValidation {
     public MessageResponse update(Part part);
 
     public MessageResponse listAll(Integer companyId, Integer resaleId);
+
+    public MessageResponse filterId(Integer companyId, Integer resaleId, Integer id);
 }

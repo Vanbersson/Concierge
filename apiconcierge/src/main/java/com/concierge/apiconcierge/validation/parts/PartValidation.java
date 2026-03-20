@@ -203,4 +203,30 @@ public class PartValidation implements IPartValidation {
         response.setMessage("Encontrada com sucesso.");
         return response;
     }
+
+    public MessageResponse filterId(Integer companyId, Integer resaleId, Integer id){
+        MessageResponse response = new MessageResponse();
+        if (companyId == null || companyId == 0) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Empresa");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (resaleId == null || resaleId == 0) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Revenda");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (id == null || id == 0) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Código");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        response.setStatus(ConstantsMessage.SUCCESS);
+        response.setHeader("Peça");
+        response.setMessage("Encontrada com sucesso.");
+        return response;
+    }
 }

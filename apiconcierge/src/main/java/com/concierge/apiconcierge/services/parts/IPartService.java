@@ -15,4 +15,6 @@ public interface IPartService {
 
     public List<Map<String, Object>> listAll(Integer companyId, Integer resaleId);
 
+    public MessageResponse filterId(Integer companyId, Integer resaleId, Integer id);
+
 }

@@ -163,11 +163,11 @@ export default class GrouppartComponent implements OnInit {
     if (result.status == 200 && result.body.status == SuccessError.succes) {
       this.messageService.add({ severity: 'success', summary: result.body.header, detail: result.body.message, icon: 'pi pi-check' });
       this.hideDialog();
-      this.init();
     }
     if (result.status == 200 && result.body.status == SuccessError.error) {
       this.messageService.add({ severity: 'info', summary: result.body.header, detail: result.body.message, icon: 'pi pi-info-circle' });
     }
+     this.init();
   }
 
   private async saveNew(group: GroupPart): Promise<HttpResponse<MessageResponse>> {

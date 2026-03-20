@@ -16,4 +16,9 @@ public interface IPartCategoryRepository extends JpaRepository<PartCategory, Int
 
     @Query(value = "SELECT * FROM `tb_part_category` WHERE company_id=?1 AND resale_id=?2 AND status=?3 ", nativeQuery = true)
     List<PartCategory> listAllEnabled(Integer companyId, Integer resaleId, StatusEnableDisable status);
+
+    @Query(value = "SELECT COUNT(p.id) AS total FROM tb_part_category AS g\n" +
+            "INNER JOIN tb_part AS p ON(g.company_id= p.company_id) AND g.resale_id=p.resale_id AND g.id=p.category_id\n" +
+            "WHERE g.company_id=?1 AND g.resale_id=?2 AND p.category_id=?3;",nativeQuery = true)
+    Integer filterIsUsed(Integer companyId, Integer resaleId, Integer id);
 }
