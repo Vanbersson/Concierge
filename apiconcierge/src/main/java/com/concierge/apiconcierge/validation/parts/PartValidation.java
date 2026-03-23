@@ -2,15 +2,21 @@ package com.concierge.apiconcierge.validation.parts;
 
 import com.concierge.apiconcierge.models.message.MessageResponse;
 import com.concierge.apiconcierge.models.part.Part;
+import com.concierge.apiconcierge.repositories.parts.IPartRepository;
 import com.concierge.apiconcierge.util.ConstantsMessage;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class PartValidation implements IPartValidation {
 
+    @Autowired
+    private IPartRepository repository;
 
     @Override
     public MessageResponse save(Part part) {
+
+
         MessageResponse response = new MessageResponse();
         if (part.getCompanyId() == null || part.getCompanyId() == 0) {
             response.setStatus(ConstantsMessage.ERROR);
@@ -82,6 +88,13 @@ public class PartValidation implements IPartValidation {
             response.setStatus(ConstantsMessage.ERROR);
             response.setHeader("Categoria");
             response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        Part resultPart = this.repository.filterCode(part.getCompanyId(), part.getResaleId(), part.getCode());
+        if(resultPart != null){
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Código da Peça");
+            response.setMessage("Já Cadastrado - "+resultPart.getId());
             return response;
         }
         response.setStatus(ConstantsMessage.SUCCESS);
@@ -204,7 +217,7 @@ public class PartValidation implements IPartValidation {
         return response;
     }
 
-    public MessageResponse filterId(Integer companyId, Integer resaleId, Integer id){
+    public MessageResponse filterId(Integer companyId, Integer resaleId, Integer id) {
         MessageResponse response = new MessageResponse();
         if (companyId == null || companyId == 0) {
             response.setStatus(ConstantsMessage.ERROR);

@@ -70,6 +70,7 @@ import { PhotoResultStatus } from '../../../models/enum/photo-result-status';
 import { ClientCompanyService } from '../../../services/clientecompany/client-company.service';
 import { ModuleConciergeVehicleChecklist } from '../../../models/vehicle/module-concierge-vehicle-checklist';
 import { VehicleEntryChecklist } from '../../../models/vehicle/vehicle-entry-checklist';
+import { RoleFuncEnum } from '../../../models/user/role.func.enum';
 
 @Component({
   selector: 'app-manutencao',
@@ -1248,16 +1249,16 @@ export default class ManutencaoComponent implements OnInit, DoCheck {
 
   }
   public async save() {
-    /* PERMISSION - 100 */
-    /* EDITAR ENTRADA DO VEÍCULO */
-    const permission = await this.searchPermission(100);
-    if (!permission) { return; }
+    if (RoleFuncEnum.USER == this.storageService.roleFunc) {
+      /* PERMISSION - 100 */
+      /* EDITAR ENTRADA DO VEÍCULO */
+      const permission = await this.searchPermission(100);
+      if (!permission) { return; }
+    }
 
     if (this.validInformation()) {
-
       //Loading data
       this.loadingVehicle();
-
       //Atualizar as imagens
       if (this.isPhotoNew1) {
         this.isPhotoNew1 = false;

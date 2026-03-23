@@ -47,6 +47,7 @@ import { PhotoResult } from '../../../interfaces/photo-result';
 import { PhotoResultStatus } from '../../../models/enum/photo-result-status';
 import { PhotoService } from '../../../services/photo/photo.service';
 import { Router } from '@angular/router';
+import { RoleFuncEnum } from '../../../models/user/role.func.enum';
 
 @Component({
   selector: 'app-user',
@@ -76,6 +77,9 @@ export default class UserComponent implements OnInit {
   enabled = StatusEnum.ENABLED;
   disabled = StatusEnum.DISABLED;
 
+  admin = RoleFuncEnum.ADMIN;
+  user = RoleFuncEnum.USER;
+
   formUser = new FormGroup({
     id: new FormControl<number | null>(null),
     status: new FormControl<StatusEnum>({ value: StatusEnum.DISABLED, disabled: false }),
@@ -83,7 +87,7 @@ export default class UserComponent implements OnInit {
     email: new FormControl<string>('', [Validators.email, Validators.required]),
     cellphone: new FormControl<string>(''),
     roleDesc: new FormControl<UserRole[] | null>([], Validators.required),
-    roleFunc: new FormControl<string>('USER', Validators.required),
+    roleFunc: new FormControl<RoleFuncEnum>(RoleFuncEnum.USER, Validators.required),
     limitDiscount: new FormControl<number>(0),
     password: new FormControl<string>(''),
     passwordValid: new FormControl<string>(''),
@@ -236,6 +240,10 @@ export default class UserComponent implements OnInit {
     this.nameUserUpdatePass = user.name;
   }
   async saveUpdatePassword() {
+    const { valid } = this.formPassword;
+    if (!valid) {
+      return;
+    }
     try {
       const formData = new FormData();
       formData.append("companyId", this.userPass.companyId.toString());
@@ -427,7 +435,7 @@ export default class UserComponent implements OnInit {
       cellphone: '',
       limitDiscount: 0,
       roleDesc: null,
-      roleFunc: 'USER',
+      roleFunc: RoleFuncEnum.USER,
       status: StatusEnum.ENABLED,
       password: '',
       passwordValid: ''
@@ -756,7 +764,7 @@ export default class UserComponent implements OnInit {
       return error;
     }
   }
-  
+
   //Alert
   private alertPermisionSave() {
     this.messageService.add({ severity: 'success', summary: 'Permissões', detail: 'Salvo com sucesso', icon: 'pi pi-check', life: 3000 });

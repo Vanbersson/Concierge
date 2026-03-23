@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Map;
@@ -63,6 +64,17 @@ public class PartController {
                                            @PathVariable(name = "id") Integer id) {
         try {
             MessageResponse response = this.service.filterId(companyId, resaleId, id);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
+        }
+    }
+
+    @PostMapping("/save/image")
+    public ResponseEntity<Object> saveImage(@RequestParam("file") MultipartFile file,
+                                            @RequestParam("local") String local) {
+        try {
+            MessageResponse response = this.service.saveImage(file, local);
             return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));

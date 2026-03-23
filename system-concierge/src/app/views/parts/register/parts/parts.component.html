@@ -59,27 +59,27 @@
 
                 <div class="flex flex-column border-1 border-round border-300 p-3 m-2">
                     <div class="part-img">
-
+                        <img *ngIf="photoPartFront" [src]="photoPartFront" alt="">
                     </div>
                     <div class="mb-3 font-medium">
                         Frente
                     </div>
-                    <span>
-                        <p-button icon="pi pi-times" severity="danger" [outlined]="true" />
-                        <p-button icon="pi pi-plus" styleClass="ml-2" />
-                    </span>
+                    <div class="flex gap-1">
+                        <p-button icon="pi pi-plus" styleClass="ml-2" (onClick)="onFileSelectedFront()"/>
+                        <p-button icon="pi pi-times" severity="danger" [outlined]="true"  (onClick)="onFileDeleteFront()"/>
+                    </div>
                 </div>
                 <div class="flex flex-column border-1 border-round border-300 p-3 m-2">
                     <div class="part-img">
-
+                        <img *ngIf="photoPartVerse" [src]="photoPartVerse" alt="">
                     </div>
                     <div class="mb-3 font-medium">
                         Verso
                     </div>
-                    <span>
-                        <p-button icon="pi pi-times" severity="danger" [outlined]="true" />
-                        <p-button icon="pi pi-plus" styleClass="ml-2" />
-                    </span>
+                    <div class="flex gap-1">
+                        <p-button icon="pi pi-plus" styleClass="ml-2" (onClick)="onFileSelectedVerse()"/>
+                        <p-button icon="pi pi-times" severity="danger" [outlined]="true" (onClick)="onFileDeleteVerse()" />
+                    </div>
                 </div>
             </div>
             <div class="col-12 md:col-4 p-0">

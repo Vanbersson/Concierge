@@ -33,6 +33,7 @@ import { SuccessError } from '../../../models/enum/success-error';
 import { PermissionService } from '../../../services/permission/permission.service';
 import { StatusAuthExit } from '../../../models/enum/status-auth-exit';
 import { YesNot } from '../../../models/enum/yes-not';
+import { RoleFuncEnum } from '../../../models/user/role.func.enum';
 
 @Component({
   selector: 'app-veiculos',
@@ -144,11 +145,15 @@ export default class VeiculosComponent implements OnInit {
     return 'warning';
   }
   async editVeiculo(id: number) {
-    /* PERMISSION - 100 */
-    /* EDITAR ENTRADA DO VEÍCULO */
-    const permission = await this.searchPermission(100);
-    if (!permission) { return; }
-    this.router.navigateByUrl('portaria/manutencao-entrada-veiculo/' + id);
+    if (RoleFuncEnum.USER == this.storageService.roleFunc) {
+      /* PERMISSION - 100 */
+      /* EDITAR ENTRADA DO VEÍCULO */
+      const permission = await this.searchPermission(100);
+      if (!permission) { return; }
+      this.router.navigateByUrl('portaria/manutencao-entrada-veiculo/' + id);
+    }else{
+       this.router.navigateByUrl('portaria/manutencao-entrada-veiculo/' + id);
+    }
   }
   //Authorization exit
   public addAuthorizationAll() {

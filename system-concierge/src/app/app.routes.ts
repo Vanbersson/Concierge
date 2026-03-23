@@ -7,12 +7,14 @@ import { UserGuard } from './views/settings/user/user.guard';
 import { CanDeactivateGuard } from './views/dashboard/can-deactivate.guard.ts';
 import { ModuleConciergeMenuGuard } from './views/concierge/module/module.concierge.menu.guard';
 import { PartsMenuGuard } from './views/parts/register/parts/parts.menu.guard';
+import { LoginMenuGuard } from './views/login/login.menu.guard';
 
 export const routes: Routes = [
     {
         path: 'login',
         title: 'Login',
         loadComponent: () => import('./views/login/login.component'),
+        canActivate:[LoginMenuGuard]
     },
     {
         path: 'orcamento/aprovacao',

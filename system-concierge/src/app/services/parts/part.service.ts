@@ -28,6 +28,18 @@ export class PartService {
     return this.http.get<MessageResponse>(environment.apiuUrl + "/part/" + this.companyResale + "/filter/id/" + id, { headers: this.myHeaders(), observe: 'response' });
   }
 
+  filterCode(id: number): Observable<HttpResponse<MessageResponse>> {
+    return this.http.get<MessageResponse>(environment.apiuUrl + "/part/" + this.companyResale + "/filter/id/" + id, { headers: this.myHeaders(), observe: 'response' });
+  }
+
+  saveImage(data: FormData): Observable<HttpResponse<MessageResponse>> {
+    return this.http.post<MessageResponse>(environment.apiuUrl + "/part/save/image", data, { headers: this.myHeaders(), observe: 'response' });
+  }
+
+  deleteImage(data: FormData): Observable<HttpResponse<MessageResponse>> {
+    return this.http.post<MessageResponse>(environment.apiuUrl + "/part/delete/image", data, { headers: this.myHeaders(), observe: 'response' });
+  }
+
   private myHeaders(): HttpHeaders {
     const httpOptions = new HttpHeaders({
       'Authorization': 'Bearer ' + this.storage.token,

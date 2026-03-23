@@ -1,6 +1,7 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { environment } from '../../../../../environments/environment';
 
 import { InputTextModule } from 'primeng/inputtext';
 import { ButtonModule } from 'primeng/button';
@@ -18,7 +19,6 @@ import { TabViewModule } from 'primeng/tabview';
 import { DividerModule } from 'primeng/divider';
 import { InputGroupModule } from 'primeng/inputgroup';
 import { InputGroupAddonModule } from 'primeng/inputgroupaddon';
-
 
 import { YesNot } from '../../../../models/enum/yes-not';
 import { StatusEnum } from '../../../../models/enum/status-enum';
@@ -39,11 +39,14 @@ import { HttpResponse } from '@angular/common/http';
 import { MessageResponse } from '../../../../models/message/message-response';
 import { SuccessError } from '../../../../models/enum/success-error';
 import { IPartListAll } from '../../../../interfaces/part/ipart.list.all';
+import { PhotoResult } from '../../../../interfaces/photo-result';
+import { PhotoService } from '../../../../services/photo/photo.service';
+import { PhotoResultStatus } from '../../../../models/enum/photo-result-status';
+import { IMAGE_MAX_SIZE_LABEL } from '../../../../util/constants';
 
 interface IAdditionDiscount {
   discount: AdditionDiscount;
 }
-
 
 @Component({
   selector: 'app-parts',
@@ -87,7 +90,6 @@ export default class PartsComponent implements OnInit {
     brand: new FormControl<Brand | null>(null, Validators.required),
     group: new FormControl<GroupPart | null>(null, Validators.required),
     category: new FormControl<CategoryPart | null>(null, Validators.required),
-
     locationPriArea: new FormControl<string>(''),
     locationPriStreet: new FormControl<string>(''),
     locationPriBookcase: new FormControl<string>(''),
@@ -100,7 +102,17 @@ export default class PartsComponent implements OnInit {
     locationSecPosition: new FormControl<string>(''),
   });
 
+  photoPartFront: string = '';
+  photoPartVerse: string = '';
+  isPhotoNewFront: boolean = false;
+  isPhotoNewVerse: boolean = false;
+
+  isPhotoDeleteFront: boolean = false;
+  isPhotoDeleteVerse: boolean = false;
+
+
   constructor(
+    private photoService: PhotoService,
     private partService: PartService,
     private storageService: StorageService,
     private groupService: GroupPartService,
@@ -133,6 +145,8 @@ export default class PartsComponent implements OnInit {
     this.isNewPart = true;
     this.part = new Part();
     this.cleanForm();
+    //Habilita código peça
+    this.formPart.get('code').enable();
     this.showDialog();
   }
 
@@ -184,6 +198,53 @@ export default class PartsComponent implements OnInit {
     this.partGroups = await this.filterGroupBrand(event.value.id);
     this.isLoadingGroup = false;
   }
+  async onFileSelectedFront() {
+    const photo: PhotoResult = await this.photoService.takePicture();
+    if (photo.status == PhotoResultStatus.SUCCESS) {
+      this.photoPartFront = photo.base64;
+      //informa que foi selecionado uma imagem nova
+      this.isPhotoNewFront = true;
+      //informa que não exclua a imagem
+      this.isPhotoDeleteFront = false;
+    }
+    if (photo.status == PhotoResultStatus.LIMIT) {
+      this.messageService.add({ severity: 'info', summary: 'Imagem', detail: IMAGE_MAX_SIZE_LABEL, icon: 'pi pi-info-circle', life: 3000 });
+    }
+    if (photo.status == PhotoResultStatus.ERROR) {
+      // this.messageService.add({ severity: 'error', summary: 'Erro', detail: "Ocorreu um problema.", icon: 'pi pi-times', life: 3000 });
+    }
+  }
+  async onFileSelectedVerse() {
+    const photo: PhotoResult = await this.photoService.takePicture();
+    if (photo.status == PhotoResultStatus.SUCCESS) {
+      this.photoPartVerse = photo.base64;
+      //informa que foi selecionado uma imagem nova
+      this.isPhotoNewVerse = true;
+      //informa que não exclua a imagem
+      this.isPhotoDeleteVerse = false;
+    }
+    if (photo.status == PhotoResultStatus.LIMIT) {
+      this.messageService.add({ severity: 'info', summary: 'Imagem', detail: IMAGE_MAX_SIZE_LABEL, icon: 'pi pi-info-circle', life: 3000 });
+    }
+    if (photo.status == PhotoResultStatus.ERROR) {
+      // this.messageService.add({ severity: 'error', summary: 'Erro', detail: "Ocorreu um problema.", icon: 'pi pi-times', life: 3000 });
+    }
+  }
+
+  public async onFileDeleteFront() {
+    this.photoPartFront = "";
+    //informa que a imagem não é nova
+    this.isPhotoNewFront = false;
+    //informa que exclua a imagem
+    this.isPhotoDeleteFront = true;
+  }
+  public async onFileDeleteVerse() {
+    this.photoPartVerse = "";
+    //informa que a imagem não é nova
+    this.isPhotoNewVerse = false;
+    //informa que exclua a imagem
+    this.isPhotoDeleteVerse = true;
+  }
 
   save() {
     if (this.isNewPart) {
@@ -200,6 +261,9 @@ export default class PartsComponent implements OnInit {
     }
     this.part.companyId = this.storageService.companyId;
     this.part.resaleId = this.storageService.resaleId;
+
+    this.part.photoUrlFront = "";
+    this.part.photoUrlVerse = "";
     //Tab dados
     this.part.status = value.status;
     this.part.priceNow = value.priceNow;
@@ -247,7 +311,20 @@ export default class PartsComponent implements OnInit {
     this.part.priceOld = value.priceOld;
     this.part.priceWarranty = value.priceWarranty;
     this.part.additionDiscount = value.additionDiscount['discount'];
-   // this.part.code = value.code;
+
+    //Atualizar as imagens
+    if (this.isPhotoNewFront == true && this.isPhotoDeleteFront == false) {
+      this.isPhotoNewFront = false;
+      const img1 = await this.savePhoto(this.part.id, this.photoPartFront, "image1");
+      this.part.photoUrlFront = img1;
+    }
+    if (this.isPhotoNewVerse == true && this.isPhotoDeleteVerse == false) {
+      this.isPhotoNewVerse = false;
+      const img2 = await this.savePhoto(this.part.id, this.photoPartVerse, "image2");
+      this.part.photoUrlVerse = img2;
+    }
+
+    // this.part.code = value.code;
     this.part.description = value.description;
     this.part.unitMeasureId = value.unit.id;
     this.part.brandId = value.brand.id;
@@ -284,6 +361,8 @@ export default class PartsComponent implements OnInit {
       this.part = result.body.data;
       this.isNewPart = false;
       this.cleanForm();
+      //Desabilita código
+      this.formPart.get('code').disable();
       //Grupos
       this.partGroups = await this.filterGroupBrand(this.part.brandId);
       //Unidade de Medida
@@ -304,6 +383,8 @@ export default class PartsComponent implements OnInit {
         group: this.partGroups.find(g => g.id == this.part.groupId),
         category: this.partCategories.find(c => c.id == this.part.categoryId),
       });
+      this.photoPartFront = this.part.photoUrlFront;
+      this.photoPartVerse = this.part.photoUrlVerse;
       //Tab Location
       this.formPart.patchValue({
         locationPriArea: this.part.locationPriArea,
@@ -323,6 +404,55 @@ export default class PartsComponent implements OnInit {
       this.messageService.add({ severity: 'info', summary: result.body.header, detail: result.body.message, icon: 'pi pi-info-circle' });
     }
   }
+
+
+  private async savePhoto(id: number, img: string, name: string): Promise<string> {
+    try {
+      let path =
+        `${this.storageService.companyId}/` +
+        `${this.storageService.resaleId}/parts/` +
+        `${id}/` +
+        `${name}.jpg`;
+
+      const { base64, mime } = this.cleanBase64(img);
+      const file = this.base64ToFile(base64, mime);
+
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('local', path);
+
+      const resultSave = await this.saveImage(formData);
+      if (resultSave.status == 200 && resultSave.body.status == SuccessError.succes) {
+        return `${environment.apiuUrl}${resultSave.body.data["url"]}`;
+      }
+    } catch (error) {
+      return "";
+    }
+    return "";
+
+  }
+  private cleanBase64(base64: string): { base64: string; mime: string } {
+    if (!base64.includes(',')) {
+      return { base64, mime: 'image/jpeg' };
+    }
+
+    const [header, data] = base64.split(',');
+    const mime = header.match(/data:(.*);base64/)?.[1] || 'image/jpeg';
+
+    return { base64: data, mime };
+  }
+  private base64ToFile(base64: string, mime: string): File {
+    const byteString = atob(base64);
+    const ab = new ArrayBuffer(byteString.length);
+    const ia = new Uint8Array(ab);
+
+    for (let i = 0; i < byteString.length; i++) {
+      ia[i] = byteString.charCodeAt(i);
+    }
+
+    return new File([ia], 'image.jpg', { type: mime });
+  }
+
 
   private async saveNewP(p: Part): Promise<HttpResponse<MessageResponse>> {
     try {
@@ -351,6 +481,23 @@ export default class PartsComponent implements OnInit {
   private async filterId(id: number): Promise<HttpResponse<MessageResponse>> {
     try {
       return await lastValueFrom(this.partService.filterId(id));
+    } catch (error) {
+      this.messageService.add({ severity: 'error', summary: 'Erro', detail: error.error.message, icon: 'pi pi-times' });
+      return error;
+    }
+  }
+
+  private async saveImage(data: FormData): Promise<HttpResponse<MessageResponse>> {
+    try {
+      return await lastValueFrom(this.partService.saveImage(data));
+    } catch (error) {
+      this.messageService.add({ severity: 'error', summary: 'Erro', detail: error.error.message, icon: 'pi pi-times' });
+      return error;
+    }
+  }
+  private async deleteImage(data: FormData): Promise<HttpResponse<MessageResponse>> {
+    try {
+      return await lastValueFrom(this.partService.deleteImage(data))
     } catch (error) {
       this.messageService.add({ severity: 'error', summary: 'Erro', detail: error.error.message, icon: 'pi pi-times' });
       return error;

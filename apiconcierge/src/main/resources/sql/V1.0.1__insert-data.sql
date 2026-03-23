@@ -116,13 +116,6 @@ VALUES
 ('999_2_1','Usuários'),
 ('999_2_2','Marcas');
 
-
-
-
-
-
-
-
 INSERT INTO `tb_company`
 (`status`, `name`, `cnpj`, `email`, `cellphone`, `phone`, `zip_code`, `state`, `city`, `neighborhood`, `address`, `address_number`)
 VALUES

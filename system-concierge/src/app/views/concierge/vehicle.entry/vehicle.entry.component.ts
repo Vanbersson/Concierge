@@ -720,10 +720,15 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
       vehicle.entryPhoto4Url = "";
 
       //Save checklist
-      vehicle.checklistId = await this.saveChecklistVehicle(index);
+      const resultSaveCheckList = await this.saveChecklist(this.listChecklist.at(index));
+      if (resultSaveCheckList.status == 201 && resultSaveCheckList.body.status == SuccessError.succes) {
+        vehicle.checklistId = resultSaveCheckList.body["id"];
+      } else if (resultSaveCheckList.status == 201 && resultSaveCheckList.body.status == SuccessError.error) {
+        this.messageService.add({ severity: 'info', summary: resultSaveCheckList.body.header, detail: resultSaveCheckList.body.message, icon: 'pi pi-info-circle' });
+        return;
+      }
 
       const result = await this.saveVehicle(vehicle);
-
       if (result.status == 201 && result.body.status == SuccessError.succes) {
         vehicle.id = result.body.data.id;
 
@@ -774,13 +779,7 @@ export default class VehicleEntryComponent implements OnInit, DoCheck {
     }
     this.busyService.idle();
   }
-  private async saveChecklistVehicle(index: number): Promise<number> {
-    const resultChecklist = await this.saveChecklist(this.listChecklist.at(index));
-    if (resultChecklist.status == 201 && resultChecklist.body.status == SuccessError.succes) {
-      return resultChecklist.body.data["id"];
-    }
-    return null;
-  }
+
   private async savePhoto(ve: VehicleEntry, img: string, order: number): Promise<string> {
 
     if (img == "") {

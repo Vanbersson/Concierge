@@ -49,7 +49,7 @@ export default class LoginComponent {
     private busyService: BusyService,
     private menuUserService: MenuUserService
   ) {
-    this.storageService.deleteStorage();
+    
   }
 
   async loginUser() {
@@ -71,6 +71,7 @@ export default class LoginComponent {
          this.storageService.email = this.user.email;
         this.storageService.cellphone = this.user.cellphone;
         this.storageService.roleDesc = this.user.roleDesc;
+        this.storageService.roleFunc = this.user.roleFunc;
         this.storageService.limitDiscount = this.user.limitDiscount.toString(); 
         this.storageService.token = this.user.token;
         const resultMenus = await this.menusUser(this.user.companyId, this.user.resaleId, this.user.id);

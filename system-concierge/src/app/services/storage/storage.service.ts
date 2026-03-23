@@ -9,87 +9,94 @@ export class StorageService {
   constructor() { }
 
   set companyId(companyId: string) {
-    sessionStorage.setItem('companyId', companyId);
+    localStorage.setItem('companyId', companyId);
   }
   get companyId(): number {
-    return Number.parseInt(sessionStorage.getItem("companyId"));
+    return Number.parseInt(localStorage.getItem("companyId"));
   }
 
   set resaleId(resaleId: string) {
-    sessionStorage.setItem('resaleId', resaleId);
+    localStorage.setItem('resaleId', resaleId);
   }
   get resaleId(): number {
-    return Number.parseInt(sessionStorage.getItem("resaleId"));
+    return Number.parseInt(localStorage.getItem("resaleId"));
   }
 
   set id(id: string) {
-    sessionStorage.setItem('id', id);
+    localStorage.setItem('id', id);
   }
   get id(): number {
-    return Number.parseInt(sessionStorage.getItem("id"));
+    return Number.parseInt(localStorage.getItem("id"));
   }
 
   set name(name: string) {
-    sessionStorage.setItem('name', name);
+    localStorage.setItem('name', name);
   }
   get name(): string {
-    return sessionStorage.getItem("name");
+    return localStorage.getItem("name");
   }
 
   set email(email: string) {
-    sessionStorage.setItem('email', email);
+    localStorage.setItem('email', email);
   }
   get email(): string {
-    return sessionStorage.getItem("email");
+    return localStorage.getItem("email");
   }
 
   set cellphone(cellphone: string) {
-    sessionStorage.setItem('cellphone', cellphone);
+    localStorage.setItem('cellphone', cellphone);
   }
   get cellphone(): string {
-    return sessionStorage.getItem("cellphone");
+    return localStorage.getItem("cellphone");
   }
 
   set limitDiscount(limitDiscount: string) {
-    sessionStorage.setItem('limitDiscount', limitDiscount);
+    localStorage.setItem('limitDiscount', limitDiscount);
   }
   get limitDiscount(): number {
-    return Number.parseInt(sessionStorage.getItem("limitDiscount"));
+    return Number.parseInt(localStorage.getItem("limitDiscount"));
   }
 
   set photo(photo: string) {
-    sessionStorage.setItem('photo', photo);
+    localStorage.setItem('photo', photo);
   }
   get photo(): string {
-    return sessionStorage.getItem("photo");
+    return localStorage.getItem("photo");
   }
 
   set roleDesc(roleDesc: string) {
-    sessionStorage.setItem('roleDesc', roleDesc);
+    localStorage.setItem('roleDesc', roleDesc);
   }
   get roleDesc(): string {
-    return sessionStorage.getItem("roleDesc");
+    return localStorage.getItem("roleDesc");
+  }
+
+  set roleFunc(roleFunc: string) {
+    localStorage.setItem('roleFunc', roleFunc);
+  }
+  get roleFunc(): string {
+    return localStorage.getItem("roleFunc");
   }
 
   set token(token: string) {
-    sessionStorage.setItem('token', token);
+    localStorage.setItem('token', token);
   }
   get token(): string {
-    return sessionStorage.getItem("token");
+    return localStorage.getItem("token");
   }
 
   set menus(menus: string) {
-    sessionStorage.setItem('menus', menus);
+    localStorage.setItem('menus', menus);
   }
   get menus(): string {
-    return sessionStorage.getItem("menus");
+    return localStorage.getItem("menus");
   }
 
   set permissions(per: string) {
-    sessionStorage.setItem('permission', per);
+    localStorage.setItem('permission', per);
   }
   get permissions(): string {
-    return sessionStorage.getItem("permission");
+    return localStorage.getItem("permission");
   }
 
   isLogged() {
@@ -103,7 +110,7 @@ export class StorageService {
   }
 
   public deleteStorage() {
-    sessionStorage.clear();
+    localStorage.clear();
   }
 
 }

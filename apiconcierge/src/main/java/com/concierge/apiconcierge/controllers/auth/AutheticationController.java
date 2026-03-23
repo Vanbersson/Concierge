@@ -45,6 +45,7 @@ public class AutheticationController {
             map.put("name", user.getName());
             map.put("email",user.getEmail());
             map.put("roleDesc", user.getRoleDesc());
+            map.put("roleFunc", user.getRoleFunc());
             map.put("cellphone", user.getCellphone());
             map.put("limitDiscount", user.getLimitDiscount());
             map.put("token", token);

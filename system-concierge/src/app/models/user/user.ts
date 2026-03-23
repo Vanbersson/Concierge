@@ -1,4 +1,5 @@
 import { StatusEnum } from "../enum/status-enum";
+import { RoleFuncEnum } from "./role.func.enum";
 
 export class User {
     companyId: number | null = null;
@@ -13,6 +14,6 @@ export class User {
     photoUrl: string = '';
     roleId: number | null = null;
     roleDesc: string = '';
-    roleFunc: string = '';
+    roleFunc: RoleFuncEnum = RoleFuncEnum.USER;
     token: string = '';
 }

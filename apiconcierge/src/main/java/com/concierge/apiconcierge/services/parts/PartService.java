@@ -10,8 +10,14 @@ import com.concierge.apiconcierge.util.ConstantsMessage;
 import com.concierge.apiconcierge.validation.parts.IPartValidation;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.*;
 
 @Service
@@ -20,6 +26,8 @@ public class PartService implements IPartService {
     private IPartRepository repository;
     @Autowired
     private IPartValidation validation;
+    @Value("${local.image.upload}")
+    private String UPLOAD_DIR;
 
     @SneakyThrows
     @Override
@@ -91,6 +99,44 @@ public class PartService implements IPartService {
             return response;
         } catch (Exception ex) {
             throw new PartsException(ex.getMessage());
+        }
+    }
+
+    @SneakyThrows
+    @Override
+    public MessageResponse saveImage(MultipartFile file, String local) {
+        try {
+            MessageResponse response = new MessageResponse();
+            response.setStatus(ConstantsMessage.SUCCESS);
+            response.setHeader("Imagem");
+            response.setMessage("Salvo com sucesso.");
+
+            // Segurança básica
+            if (local.contains("..")) {
+                response.setStatus(ConstantsMessage.ERROR);
+                response.setMessage("Caminho inválido.");
+                return response;
+            }
+
+            // Nome do arquivo
+            Path filePath = Paths.get(UPLOAD_DIR + local);
+
+            // Cria diretórios se necessário
+            Files.createDirectories(filePath.getParent());
+
+            // Salva ou substitui se existir)
+            Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+            // URL pública
+            String url = "/images/" + local;
+
+            // Retornar o caminho do arquivo salvo
+            Map<String, String> map = new HashMap<>();
+            map.put("url", url);
+            response.setData(map);
+            return response;
+        } catch (Exception e) {
+            throw new Exception(e.getMessage());
         }
     }
 

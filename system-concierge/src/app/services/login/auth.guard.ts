@@ -9,7 +9,7 @@ export const AuthGuard: CanActivateFn = (route, state) => {
 
   if (!storage.isLogged()) {
     storage.deleteStorage();
-    return router.parseUrl('/login'); 
+    return router.parseUrl('/login');
   }
   return true;
 };

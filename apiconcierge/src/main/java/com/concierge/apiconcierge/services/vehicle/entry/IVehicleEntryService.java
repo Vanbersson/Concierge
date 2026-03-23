@@ -25,7 +25,7 @@ public interface IVehicleEntryService {
 
     public MessageResponse filterId(Integer companyId, Integer resaleId, Integer id);
 
-    public MessageResponse saveChecklist(VehicleEntryChecklist ch);
+    public MessageResponse saveChecklist(VehicleEntryChecklist ch, String userEmail);
 
     public MessageResponse updateChecklist(VehicleEntryChecklist ch);
 

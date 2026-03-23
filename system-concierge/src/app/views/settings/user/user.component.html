@@ -109,11 +109,11 @@
                 <div class="layout-card-status">
                     <span>Perfil</span>
                     <div class="flex align-items-center">
-                        <p-radioButton inputId="ADMIN" value="ADMIN" formControlName="roleFunc"></p-radioButton>
+                        <p-radioButton inputId="ADMIN" [value]="admin" formControlName="roleFunc"></p-radioButton>
                         <label for="ADMIN" class="ml-2">Administrador</label>
                     </div>
                     <div class="flex align-items-center">
-                        <p-radioButton inputId="USER" value="USER" formControlName="roleFunc"></p-radioButton>
+                        <p-radioButton inputId="USER" [value]="user" formControlName="roleFunc"></p-radioButton>
                         <label for="USER" class="ml-2">Usuário</label>
                     </div>
                 </div>

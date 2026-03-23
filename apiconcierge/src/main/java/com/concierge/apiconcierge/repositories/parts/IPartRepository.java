@@ -25,4 +25,7 @@ public interface IPartRepository extends JpaRepository<Part, Integer> {
 
     @Query(value = "SELECT * FROM tb_part WHERE company_id=?1 AND resale_id=?2 AND id=?3",nativeQuery = true)
     Part filterId(Integer companyId, Integer resaleId, Integer id);
+
+    @Query(value = "SELECT * FROM tb_part WHERE company_id=?1 AND resale_id=?2 AND code=?3",nativeQuery = true)
+    Part filterCode(Integer companyId, Integer resaleId, String code);
 }

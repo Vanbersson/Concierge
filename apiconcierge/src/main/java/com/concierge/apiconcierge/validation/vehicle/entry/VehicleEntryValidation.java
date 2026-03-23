@@ -6,6 +6,7 @@ import com.concierge.apiconcierge.models.enums.YesNot;
 import com.concierge.apiconcierge.models.message.MessageResponse;
 import com.concierge.apiconcierge.models.permission.PermissionUser;
 import com.concierge.apiconcierge.models.user.User;
+import com.concierge.apiconcierge.models.user.UserRoleEnum;
 import com.concierge.apiconcierge.models.vehicle.entry.VehicleEntry;
 import com.concierge.apiconcierge.models.vehicle.enums.StatusAuthExitEnum;
 import com.concierge.apiconcierge.models.vehicle.enums.StatusVehicleEnum;
@@ -34,13 +35,16 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
         MessageResponse response = new MessageResponse();
         //Verifica se o usuário tem permissão
         User user = this.userRepository.loginEmail(userEmail);
-        PermissionUser permission = this.permissionUser.findPermissionId(user.getCompanyId(), user.getResaleId(), user.getId(), AUTH_ENTRY_VEHICLE);
-        if (permission == null) {
-            response.setStatus(ConstantsMessage.ERROR);
-            response.setHeader("Permissão - " + AUTH_ENTRY_VEHICLE);
-            response.setMessage(ConstantsMessage.NOT_PERMISSION);
-            return response;
+        if (user.getRoleFunc() != UserRoleEnum.ADMIN) {
+            PermissionUser permission = this.permissionUser.findPermissionId(user.getCompanyId(), user.getResaleId(), user.getId(), AUTH_ENTRY_VEHICLE);
+            if (permission == null) {
+                response.setStatus(ConstantsMessage.ERROR);
+                response.setHeader("Permissão - " + AUTH_ENTRY_VEHICLE);
+                response.setMessage(ConstantsMessage.NOT_PERMISSION);
+                return response;
+            }
         }
+
         if (vehicle.getCompanyId() == null || vehicle.getCompanyId() == 0) {
             response.setStatus(ConstantsMessage.ERROR);
             response.setHeader("Empresa");
@@ -115,14 +119,15 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
         MessageResponse response = new MessageResponse();
         //Verifica se o usuário tem permissão
         User user = this.userRepository.loginEmail(userEmail);
-        PermissionUser permission = this.permissionUser.findPermissionId(user.getCompanyId(), user.getResaleId(), user.getId(), EDIT_ENTRY_VEHICLE);
-        if (permission == null) {
-            response.setStatus(ConstantsMessage.ERROR);
-            response.setHeader("Permissão - " + EDIT_ENTRY_VEHICLE);
-            response.setMessage(ConstantsMessage.NOT_PERMISSION);
-            return response;
+        if (user.getRoleFunc() != UserRoleEnum.ADMIN) {
+            PermissionUser permission = this.permissionUser.findPermissionId(user.getCompanyId(), user.getResaleId(), user.getId(), EDIT_ENTRY_VEHICLE);
+            if (permission == null) {
+                response.setStatus(ConstantsMessage.ERROR);
+                response.setHeader("Permissão - " + EDIT_ENTRY_VEHICLE);
+                response.setMessage(ConstantsMessage.NOT_PERMISSION);
+                return response;
+            }
         }
-
         if (vehicle.getCompanyId() == null || vehicle.getCompanyId() == 0) {
             response.setStatus(ConstantsMessage.ERROR);
             response.setHeader("Empresa");

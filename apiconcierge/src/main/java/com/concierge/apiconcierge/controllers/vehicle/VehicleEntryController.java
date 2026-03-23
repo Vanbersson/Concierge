@@ -100,16 +100,18 @@ public class VehicleEntryController {
     }
 
     @PostMapping("/save/checklist")
-    public ResponseEntity<Object> saveChecklist(@RequestBody VehicleEntryChecklistDto data) {
+    public ResponseEntity<Object> saveChecklist(@RequestBody VehicleEntryChecklistDto data, HttpServletRequest request) {
         try {
+            String userEmail = this.getEmail(request);
             VehicleEntryChecklist ch = new VehicleEntryChecklist();
             BeanUtils.copyProperties(data, ch);
-            MessageResponse response = this.service.saveChecklist(ch);
+            MessageResponse response = this.service.saveChecklist(ch, userEmail);
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
         }
     }
+
     @PostMapping("/update/checklist")
     public ResponseEntity<Object> updateChecklist(@RequestBody VehicleEntryChecklistDto data) {
         try {

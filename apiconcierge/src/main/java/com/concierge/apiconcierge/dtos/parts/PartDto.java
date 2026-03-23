@@ -29,5 +29,7 @@ public record PartDto(Integer companyId,
                       String locationSecStreet,
                       String locationSecBookcase,
                       String locationSecShelf,
-                      String locationSecPosition) {
+                      String locationSecPosition,
+                      String photoUrlFront,
+                      String photoUrlVerse) {
 }

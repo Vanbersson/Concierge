@@ -57,14 +57,14 @@
                 <small class="p-error block" *ngIf="formModel.get('description')?.invalid">Campo obrigatório</small>
             </div>
             <div class="field col-12 layout-card-status">
-                <span>Situação</span>
+                <span>Status</span>
                 <div class="flex align-items-center">
                     <p-radioButton inputId="enabledId" [value]="enabled" formControlName="status"></p-radioButton>
-                    <label for="enabledId" class="ml-2">Ativado</label>
+                    <label for="enabledId" class="ml-2">{{enabled}}</label>
                 </div>
                 <div class="flex align-items-center">
                     <p-radioButton inputId="disabledId" [value]="disabled" formControlName="status"></p-radioButton>
-                    <label for="disabledId" class="ml-2">Desativado</label>
+                    <label for="disabledId" class="ml-2">{{disabled}}</label>
                 </div>
             </div>
         </div>

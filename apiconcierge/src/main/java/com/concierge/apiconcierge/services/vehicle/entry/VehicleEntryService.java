@@ -13,6 +13,7 @@ import com.concierge.apiconcierge.models.notification.NotificationMenu;
 import com.concierge.apiconcierge.models.notification.NotificationUser;
 import com.concierge.apiconcierge.models.permission.PermissionUser;
 import com.concierge.apiconcierge.models.user.User;
+import com.concierge.apiconcierge.models.user.UserRoleEnum;
 import com.concierge.apiconcierge.models.vehicle.checklist.VehicleEntryChecklist;
 import com.concierge.apiconcierge.models.vehicle.entry.VehicleEntry;
 import com.concierge.apiconcierge.models.vehicle.enums.StatusAuthExitEnum;
@@ -252,11 +253,23 @@ public class VehicleEntryService implements IVehicleEntryService {
 
     @SneakyThrows
     @Override
-    public MessageResponse saveChecklist(VehicleEntryChecklist ch) {
+    public MessageResponse saveChecklist(VehicleEntryChecklist ch, String userEmail) {
         try {
+            MessageResponse response = new MessageResponse();
+            //Verifica se o usuário tem permissão
+            User user = this.userRepository.loginEmail(userEmail);
+            if(user.getRoleFunc() != UserRoleEnum.ADMIN){
+                PermissionUser permission = this.permissionUser.findPermissionId(user.getCompanyId(), user.getResaleId(), user.getId(), AUTH_ENTRY_VEHICLE);
+                if (permission == null) {
+                    response.setStatus(ConstantsMessage.ERROR);
+                    response.setHeader("Permissão - " + AUTH_ENTRY_VEHICLE);
+                    response.setMessage(ConstantsMessage.NOT_PERMISSION);
+                    return response;
+                }
+            }
             ch.setId(null);
             VehicleEntryChecklist checklist = this.checklistRepository.save(ch);
-            MessageResponse response = new MessageResponse();
+
             response.setStatus(ConstantsMessage.SUCCESS);
             response.setHeader("Checklist");
             response.setMessage("Salvo com sucesso.");
