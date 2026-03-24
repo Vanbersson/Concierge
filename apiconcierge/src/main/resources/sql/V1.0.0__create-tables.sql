@@ -89,6 +89,8 @@ resale_id int not null,
 id int not null AUTO_INCREMENT,
 status tinyint not null,
 description varchar(100),
+FOREIGN KEY(company_id) REFERENCES tb_company(id),
+FOREIGN KEY(resale_id) REFERENCES tb_resale(id),
 primary key(id)
 );
 

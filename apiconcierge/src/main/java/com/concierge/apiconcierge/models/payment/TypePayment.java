@@ -12,7 +12,7 @@ import lombok.*;
 @SecondaryTable(name = "tb_company", pkJoinColumns = @PrimaryKeyJoinColumn(name = "id"))
 @SecondaryTable(name = "tb_resale", pkJoinColumns = @PrimaryKeyJoinColumn(name = "id"))
 @Entity
-@Table(name = "tb_type_payment")
+@Table(name = "tb_payment_type")
 public class TypePayment {
     @JoinColumn(table = "tb_company", referencedColumnName = "id")
     @Column(name = "company_id")

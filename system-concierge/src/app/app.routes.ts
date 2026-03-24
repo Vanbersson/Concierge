@@ -14,7 +14,7 @@ export const routes: Routes = [
         path: 'login',
         title: 'Login',
         loadComponent: () => import('./views/login/login.component'),
-        canActivate:[LoginMenuGuard]
+        canActivate: [LoginMenuGuard]
     },
     {
         path: 'orcamento/aprovacao',
@@ -167,11 +167,23 @@ export const routes: Routes = [
                         title: 'Cliente',
                         loadComponent: () => import('./views/faturamento/client-company/client-company.component')
                     },
+
                     {
-                        path: 'register-client-category',
-                        title: 'Categoria',
-                        loadComponent: () => import('./views/faturamento/register/client-category/client-category.component'),
+                        path: 'cadastros',
+                        children: [
+                            {
+                                path: 'client-category',
+                                title: 'Categoria de Cliente',
+                                loadComponent: () => import('./views/faturamento/register/client-category/client-category.component'),
+                            },
+                            {
+                                path: 'type-payment',
+                                title: 'Condição de Pagamento',
+                                loadComponent: () => import('./views/faturamento/register/type-payment/type-payment.component'),
+                            },
+                        ]
                     }
+
                 ]
             },
             {

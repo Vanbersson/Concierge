@@ -15,8 +15,6 @@ public class PartValidation implements IPartValidation {
 
     @Override
     public MessageResponse save(Part part) {
-
-
         MessageResponse response = new MessageResponse();
         if (part.getCompanyId() == null || part.getCompanyId() == 0) {
             response.setStatus(ConstantsMessage.ERROR);

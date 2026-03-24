@@ -194,7 +194,8 @@ export default class UserComponent implements OnInit {
           { key: '4_1', label: 'Manutenção Clientes' },
           {
             key: '4_99', label: 'Cadastros', children: [
-              { key: '4_99_0', label: 'Categoria de Clientes' }
+              { key: '4_99_0', label: 'Categoria de Clientes' },
+               { key: '4_99_1', label: 'Condição de pagamento' }
             ]
           },
         ]

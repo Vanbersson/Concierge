@@ -8,6 +8,7 @@ import { MenuItem } from 'primeng/api';
 import { LayoutService } from '../../layout/service/layout.service';
 import { StorageService } from '../../../services/storage/storage.service';
 import { Router } from '@angular/router';
+import { RoleFuncEnum } from '../../../models/user/role.func.enum';
 
 @Component({
   selector: 'app-sidebar',
@@ -243,7 +244,13 @@ export class SidebarComponent implements OnInit {
                 key: '4_99_0',
                 label: 'Categoria de Clientes',
                 visible: false,
-                routerLink: 'faturamento/register-client-category'
+                routerLink: 'faturamento/cadastros/client-category'
+              },
+              {
+                key:'4_99_1',
+                label:'Condição de pagamento',
+                visible:false,
+                routerLink:'faturamento/cadastros/type-payment'
               }
             ]
           }
@@ -330,7 +337,7 @@ export class SidebarComponent implements OnInit {
   }
 
   updateVisibility(item: MenuItem, keys: string[]): MenuItem {
-    if (this.storageService.id == 1) {
+    if (this.storageService.roleFunc == RoleFuncEnum.ADMIN) {
       item.visible = true;
     }
     if (keys.includes(item['key'])) {
