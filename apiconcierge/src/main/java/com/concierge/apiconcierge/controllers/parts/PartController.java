@@ -80,6 +80,15 @@ public class PartController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
         }
     }
+    @PostMapping("/delete/image")
+    public ResponseEntity<Object> deleteImage(@RequestParam("local") String local) {
+        try {
+            MessageResponse response = this.service.deleteImage(local);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
+        }
+    }
 
 
 }

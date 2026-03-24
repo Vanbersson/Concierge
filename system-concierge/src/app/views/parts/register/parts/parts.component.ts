@@ -261,9 +261,6 @@ export default class PartsComponent implements OnInit {
     }
     this.part.companyId = this.storageService.companyId;
     this.part.resaleId = this.storageService.resaleId;
-
-    this.part.photoUrlFront = "";
-    this.part.photoUrlVerse = "";
     //Tab dados
     this.part.status = value.status;
     this.part.priceNow = value.priceNow;
@@ -287,15 +284,30 @@ export default class PartsComponent implements OnInit {
     this.part.locationSecBookcase = value.locationSecBookcase;
     this.part.locationSecShelf = value.locationSecShelf;
     this.part.locationSecPosition = value.locationSecPosition;
-
+    this.busyService.busy();
     const result = await this.saveNewP(this.part);
     if (result.status == 201 && result.body.status == SuccessError.succes) {
       this.messageService.add({ severity: 'success', summary: result.body.header, detail: result.body.message, icon: 'pi pi-check' });
       this.part = result.body.data;
       this.formPart.get('id').setValue(this.part.id);
       this.isNewPart = false;
+      //Salvar as imagens
+      if (this.isPhotoNewFront == true) {
+        const img1 = await this.savePhoto(this.part.id, this.photoPartFront, "image1");
+        this.part.photoUrlFront = img1;
+      }
+      if (this.isPhotoNewVerse == true) {
+        const img2 = await this.savePhoto(this.part.id, this.photoPartVerse, "image2");
+        this.part.photoUrlVerse = img2;
+      }
+      if (this.isPhotoNewFront || this.isPhotoNewVerse) {
+        const resultSaveImage = await this.saveUpdateP(this.part);
+        this.isPhotoNewFront = false;
+        this.isPhotoNewVerse = false;
+      }
       this.parts = await this.listAll();
     }
+    this.busyService.idle();
     if (result.status == 201 && result.body.status == SuccessError.error) {
       this.messageService.add({ severity: 'info', summary: result.body.header, detail: result.body.message, icon: 'pi pi-info-circle' });
     }
@@ -305,14 +317,14 @@ export default class PartsComponent implements OnInit {
     if (!valid) {
       return;
     }
+    this.busyService.busy();
     //Tab dados
     this.part.status = value.status;
     this.part.priceNow = value.priceNow;
     this.part.priceOld = value.priceOld;
     this.part.priceWarranty = value.priceWarranty;
     this.part.additionDiscount = value.additionDiscount['discount'];
-
-    //Atualizar as imagens
+    //Salvar as imagens
     if (this.isPhotoNewFront == true && this.isPhotoDeleteFront == false) {
       this.isPhotoNewFront = false;
       const img1 = await this.savePhoto(this.part.id, this.photoPartFront, "image1");
@@ -323,7 +335,29 @@ export default class PartsComponent implements OnInit {
       const img2 = await this.savePhoto(this.part.id, this.photoPartVerse, "image2");
       this.part.photoUrlVerse = img2;
     }
-
+    //Excluir as imagens
+    if (this.isPhotoNewFront == false && this.isPhotoDeleteFront == true) {
+      this.isPhotoDeleteFront = false;
+      let path =
+        `${this.storageService.companyId}/` +
+        `${this.storageService.resaleId}/parts/` +
+        `${this.part.id}/image1.jpg`;
+      const formData = new FormData();
+      formData.append('local', path);
+      this.deleteImage(formData);
+      this.part.photoUrlFront = "";
+    }
+    if (this.isPhotoNewVerse == false && this.isPhotoDeleteVerse == true) {
+      this.isPhotoDeleteVerse = false;
+      let path =
+        `${this.storageService.companyId}/` +
+        `${this.storageService.resaleId}/parts/` +
+        `${this.part.id}/image2.jpg`;
+      const formData = new FormData();
+      formData.append('local', path);
+      this.deleteImage(formData);
+      this.part.photoUrlVerse = "";
+    }
     // this.part.code = value.code;
     this.part.description = value.description;
     this.part.unitMeasureId = value.unit.id;
@@ -343,6 +377,7 @@ export default class PartsComponent implements OnInit {
     this.part.locationSecPosition = value.locationSecPosition;
 
     const result = await this.saveUpdateP(this.part);
+    this.busyService.idle();
     if (result.status == 200 && result.body.status == SuccessError.succes) {
       this.messageService.add({ severity: 'success', summary: result.body.header, detail: result.body.message, icon: 'pi pi-check' });
       this.part = result.body.data;
@@ -404,7 +439,6 @@ export default class PartsComponent implements OnInit {
       this.messageService.add({ severity: 'info', summary: result.body.header, detail: result.body.message, icon: 'pi pi-info-circle' });
     }
   }
-
 
   private async savePhoto(id: number, img: string, name: string): Promise<string> {
     try {

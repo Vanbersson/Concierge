@@ -20,4 +20,6 @@ public interface IPartService {
 
     public MessageResponse saveImage(MultipartFile file, String local);
 
+    public MessageResponse deleteImage(String local);
+
 }

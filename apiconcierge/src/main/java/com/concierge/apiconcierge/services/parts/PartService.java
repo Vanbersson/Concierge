@@ -110,30 +110,53 @@ public class PartService implements IPartService {
             response.setStatus(ConstantsMessage.SUCCESS);
             response.setHeader("Imagem");
             response.setMessage("Salvo com sucesso.");
-
             // Segurança básica
             if (local.contains("..")) {
                 response.setStatus(ConstantsMessage.ERROR);
                 response.setMessage("Caminho inválido.");
                 return response;
             }
-
             // Nome do arquivo
             Path filePath = Paths.get(UPLOAD_DIR + local);
-
             // Cria diretórios se necessário
             Files.createDirectories(filePath.getParent());
-
             // Salva ou substitui se existir)
             Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-
             // URL pública
             String url = "/images/" + local;
-
             // Retornar o caminho do arquivo salvo
             Map<String, String> map = new HashMap<>();
             map.put("url", url);
             response.setData(map);
+            return response;
+        } catch (Exception e) {
+            throw new Exception(e.getMessage());
+        }
+    }
+
+    @SneakyThrows
+    @Override
+    public MessageResponse deleteImage(String local) {
+        try {
+            MessageResponse response = new MessageResponse();
+            response.setStatus(ConstantsMessage.SUCCESS);
+            response.setHeader("Imagem");
+            response.setMessage("Excluída com sucesso.");
+
+            Path basePath = Paths.get(UPLOAD_DIR).toAbsolutePath().normalize();
+            Path filePath = basePath.resolve(local).normalize();
+            // Proteção contra path traversal
+            if (!filePath.startsWith(basePath)) {
+                response.setStatus(ConstantsMessage.ERROR);
+                response.setMessage("Caminho inválido.");
+                return response;
+            }
+            if (!Files.exists(filePath) || !Files.isRegularFile(filePath)) {
+                response.setStatus(ConstantsMessage.ERROR);
+                response.setMessage("Imagem não encontrada.");
+                return response;
+            }
+            Files.delete(filePath);
             return response;
         } catch (Exception e) {
             throw new Exception(e.getMessage());
