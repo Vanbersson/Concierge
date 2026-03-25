@@ -23,9 +23,11 @@ import { TagModule } from 'primeng/tag';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { InputTextareaModule } from 'primeng/inputtextarea';
 import { DividerModule } from 'primeng/divider';
+import { DropdownModule } from 'primeng/dropdown';
+import { RadioButtonModule } from 'primeng/radiobutton';
 
 //Class
-import { PurchaseOrder } from '../../../models/purchase.order/puchase.order';
+import { PurchaseOrder } from '../../../models/purchase.order/purchase.order';
 import { ClientCompany } from '../../../models/clientcompany/client-company';
 import { PurchaseOrderItem } from '../../../models/purchase.order/purchase.order.item';
 import { Part } from '../../../models/parts/Part';
@@ -40,13 +42,21 @@ import { PurchaseOrderService } from '../../../services/purchase/purchase-order.
 import { StorageService } from '../../../services/storage/storage.service';
 import { BusyService } from '../../../components/loading/busy.service';
 import { PurchaseOrderItemService } from '../../../services/purchase/purchase-order-item.service';
+import { StatusEnum } from '../../../models/enum/status-enum';
+import { StatusPurchaseOrder } from '../../../models/purchase.order/enums/status.purchase.order';
+import { MessageResponse } from '../../../models/message/message-response';
+import { User } from '../../../models/user/user';
+import { UserService } from '../../../services/user/user.service';
+import { TypePayment } from '../../../models/payment/type-payment';
+import { TypePaymentService } from '../../../services/payment/type-payment.service';
+import { TypePurchaseOrder } from '../../../models/purchase.order/enums/type.purchase.order';
 
 @Component({
   selector: 'app-purchase.order',
   standalone: true,
   imports: [CommonModule, PrintPurchaseComponent, FilterClientComponent, FilterPartsComponent, InputTextareaModule,
-    ToastModule, ButtonModule, TableModule, InputTextModule, IconFieldModule,
-    InputIconModule, DialogModule, DividerModule,
+    ToastModule, ButtonModule, TableModule, InputTextModule, IconFieldModule, RadioButtonModule,
+    InputIconModule, DialogModule, DividerModule, DropdownModule,
     ReactiveFormsModule, FormsModule, InputGroupModule, InputNumberModule,
     MultiSelectModule, InputMaskModule, TagModule, ConfirmDialogModule,
     CalendarModule],
@@ -55,10 +65,16 @@ import { PurchaseOrderItemService } from '../../../services/purchase/purchase-or
   providers: [ConfirmationService, MessageService]
 })
 export default class PurchaseOrderComponent implements OnInit, DoCheck {
+  private purchaseOrder: PurchaseOrder;
+  private isNewPurchaseOrder: boolean = false;
+
+
 
   numPurchaseOrder = signal<number | null>(null);
   purchaseOrders: PurchaseOrder[] = [];
-  purchaseOrder: PurchaseOrder;
+  listResponsibles: User[] = [];
+  listPayments: TypePayment[] = [];
+
   printPurchaseOrder = signal<PurchaseOrder>(new PurchaseOrder());
 
   purcharOrderVisible: boolean = false;
@@ -66,6 +82,8 @@ export default class PurchaseOrderComponent implements OnInit, DoCheck {
   dateCloseVisible: boolean = false;
 
   selectClientCompany = signal<ClientCompany>(new ClientCompany());
+  clientCompany: ClientCompany;
+
   selectPart = signal<Part>(new Part());
 
   nfNum = signal<number | null>(null);
@@ -80,18 +98,26 @@ export default class PurchaseOrderComponent implements OnInit, DoCheck {
 
   clonedPurchaseOrderItem: { [s: string]: PurchaseOrderItem } = {};
 
+  estoque = TypePurchaseOrder.ESTOQUE;
+  consumo = TypePurchaseOrder.CONSUMO;
   formPurchase = new FormGroup({
+    type: new FormControl<TypePurchaseOrder>(TypePurchaseOrder.ESTOQUE),
+    responsible: new FormControl<User | null>(null, Validators.required),
+    typePayment: new FormControl<TypePayment | null>(null, Validators.required),
+
     dateDelivery: new FormControl<Date | string>("", Validators.required),
-    responsibleName: new FormControl<string>('', Validators.required),
-    clientCompanyId: new FormControl<number | null>(null),
-    clientCompanyName: new FormControl<string>(""),
+    dateReceived: new FormControl<Date | string>(""),
+
+    clientCompanyId: new FormControl<number | null>({ value: null, disabled: true }),
+    clientCompanyName: new FormControl<string>({ value: '', disabled: true }),
+
     attendantName: new FormControl<string>(''),
     attendantEmail: new FormControl<string>(''),
     attendantDddCellphone: new FormControl<number | null>(null),
     attendantCellphone: new FormControl<number | null>(null),
     attendantDddPhone: new FormControl<number | null>(null),
     attendantPhone: new FormControl<number | null>(null),
-    paymentType: new FormControl<string>('', Validators.required),
+
     nfNum: new FormControl<number | null>(null),
     nfNumSerie: new FormControl<string>(""),
     nfDate: new FormControl<Date | string>(""),
@@ -99,12 +125,12 @@ export default class PurchaseOrderComponent implements OnInit, DoCheck {
     information: new FormControl<string>("")
   });
 
-  formNF = new FormGroup({
+  /* formNF = new FormGroup({
     nfNum: new FormControl<number | null>(null, Validators.required),
     nfNumSerie: new FormControl<string>("", Validators.required),
     nfDate: new FormControl<Date | string>("", Validators.required),
     nfKey: new FormControl<string | null>(null)
-  });
+  }); */
 
   formDateClose = new FormGroup({
     dateClose: new FormControl<Date | string>(new Date(), Validators.required)
@@ -115,13 +141,14 @@ export default class PurchaseOrderComponent implements OnInit, DoCheck {
 
   constructor(
     private primeNGConfig: PrimeNGConfig,
+    private userService: UserService,
+    private paymentService: TypePaymentService,
     private busyService: BusyService,
     private storageService: StorageService,
     private messageService: MessageService,
     private confirmationService: ConfirmationService,
     private purchaseOrderService: PurchaseOrderService,
-    private purchaseOrderItemService: PurchaseOrderItemService,
-
+    private purchaseOrderItemService: PurchaseOrderItemService
   ) { }
 
   ngOnInit(): void {
@@ -139,34 +166,61 @@ export default class PurchaseOrderComponent implements OnInit, DoCheck {
       dateFormat: 'dd/mm/yy',
       weekHeader: 'Sm'
     });
-    this.listPurchaseOrders();
+
+    this.init();
+    //this.listPurchaseOrders();
     this.clientdisable();
   }
   ngDoCheck(): void {
-    if (this.selectClientCompany().id != 0) {
+    if (this.selectClientCompany().id != null) {
+      this.clientCompany = this.selectClientCompany();
       this.formPurchase.patchValue({
         clientCompanyId: this.selectClientCompany().id,
         clientCompanyName: this.selectClientCompany().name
       });
+      this.selectClientCompany.set(new ClientCompany());
     }
 
-    if (this.selectPart().code != "") {
+    if (this.selectPart().id != null) {
       //Salvar o item
       this.saveParts(this.selectPart());
       this.selectPart.set(new Part());
     }
   }
+
+  async init() {
+    const resultUserRole = await this.filterUserRoleId(3);
+    if (resultUserRole.status == 200) {
+      this.listResponsibles = resultUserRole.body.data;
+    }
+
+    this.listPayments = await this.listAllEnabledTypePayment();
+  }
+
+  applyDateMask(event: any) {
+    let value = event.target.value.replace(/\D/g, '');
+
+    if (value.length > 2) {
+      value = value.replace(/^(\d{2})(\d)/, '$1/$2');
+    }
+    if (value.length > 5) {
+      value = value.replace(/^(\d{2})\/(\d{2})(\d)/, '$1/$2/$3');
+    }
+
+    event.target.value = value;
+  }
+
   listPurchaseOrders() {
-    this.purchaseOrderService.filterOpen$(this.storageService.companyId, this.storageService.resaleId).subscribe(data => {
+    this.purchaseOrderService.filterOpen(this.storageService.companyId, this.storageService.resaleId).subscribe(data => {
       for (var item of data) {
         const data1 = this.formatDateTime(new Date());
         const data2 = new Date(item.dateDelivery);
-        item.status = this.compararDatas(new Date(data1), data2);
+        // item.status = this.compararDatas(new Date(data1), data2);
       }
       this.purchaseOrders = data;
     });
   }
-  showDialogPurchase() {
+  private showDialogPurchase() {
     this.purcharOrderVisible = true;
   }
   hideDialogPurchase() {
@@ -195,60 +249,79 @@ export default class PurchaseOrderComponent implements OnInit, DoCheck {
   //Save new
   newPurchaseOrder() {
     this.cleanForm();
-    this.formNF.patchValue({
-      nfNum: null,
-      nfNumSerie: "",
-      nfDate: null,
-      nfKey: null
-    });
-    //Clean list parts
-    this.purchaseOrderItems = [];
-    //Número NF
-    this.nfNum.set(null);
-    //Totais
-    this.totalItemsDiscount.set(0);
-    this.totalItemsPrice.set(0);
-    //Responsible
-    this.formPurchase.get('responsibleName').setValue(this.storageService.name);
-    //show dialog
+    this.isNewPurchaseOrder = true;
+    this.purchaseOrder = new PurchaseOrder();
     this.showDialogPurchase();
+
+    //Clean list parts
+    //this.purchaseOrderItems = [];
+    //Número NF
+    //this.nfNum.set(null);
+    //Totais
+    // this.totalItemsDiscount.set(0);
+    //this.totalItemsPrice.set(0);
+    //Responsible
+    //this.formPurchase.get('responsibleName').setValue(this.storageService.name);
+    //show dialog
   }
+
+  save() {
+    if (this.isNewPurchaseOrder) {
+      this.saveNewPurchaseOrder();
+    } else {
+      this.saveUpdatePurchaseOrder();
+    }
+  }
+
+  private async saveNewPurchaseOrder() {
+
+  }
+  private async saveUpdatePurchaseOrder() {
+
+  }
+
+
+
+
+
   async saveNew() {
     const { value, valid } = this.formPurchase;
-    if (valid) {
-      this.busyService.busy();
-      this.purchaseOrder = new PurchaseOrder();
-      this.purchaseOrder.companyId = this.storageService.companyId;
-      this.purchaseOrder.resaleId = this.storageService.resaleId;
-      this.purchaseOrder.status = "Open_Purchase_Order";
-      this.purchaseOrder.dateGeneration = this.formatDateTime(new Date());
-      this.purchaseOrder.dateDelivery = this.formatDateTime(new Date(value.dateDelivery));
-      this.purchaseOrder.responsibleId = this.storageService.id;
-      this.purchaseOrder.responsibleName = this.storageService.name;
-      this.purchaseOrder.paymentType = value.paymentType;
-      this.purchaseOrder.clientCompanyId = this.selectClientCompany().id;
-      this.purchaseOrder.clientCompanyName = this.selectClientCompany().name;
-      this.purchaseOrder.attendantName = value?.attendantName ?? "";
-      this.purchaseOrder.attendantEmail = value?.attendantEmail ?? "";
-      this.purchaseOrder.attendantDddCellphone = value.attendantDddCellphone == null ? "" : value.attendantDddCellphone.toString();
-      this.purchaseOrder.attendantCellphone = value.attendantCellphone == null ? "" : value.attendantCellphone.toString();
-      this.purchaseOrder.attendantDddPhone = value.attendantDddPhone == null ? "" : value.attendantDddPhone.toString();
-      this.purchaseOrder.attendantPhone = value.attendantPhone == null ? "" : value.attendantPhone.toString();
-      this.purchaseOrder.nfNum = 0;
-      this.purchaseOrder.nfSerie = "";
-      this.purchaseOrder.nfDate = ""
-      this.purchaseOrder.nfKey = "";
-      this.purchaseOrder.information = value?.information ?? "";
-
-      const resultPu = await this.savePurchaseOrder(this.purchaseOrder);
-      if (resultPu.status == 201) {
-        this.purchaseOrder.id = resultPu.body.id;
-        this.numPurchaseOrder.set(this.purchaseOrder.id);
-        this.messageService.add({ severity: 'success', summary: 'Pedido de Compra', detail: 'Gerado com sucesso', icon: 'pi pi-check' });
-        this.listPurchaseOrders();
-      }
-      this.busyService.idle();
+    if (!valid) {
+      return;
     }
+
+
+    this.purchaseOrder = new PurchaseOrder();
+    this.purchaseOrder.companyId = this.storageService.companyId;
+    this.purchaseOrder.resaleId = this.storageService.resaleId;
+    this.purchaseOrder.status = StatusPurchaseOrder.OPEN;
+    //this.purchaseOrder.dateGeneration = this.formatDateTime(new Date());
+    this.purchaseOrder.dateDelivery = this.formatDateTime(new Date(value.dateDelivery));
+    //this.purchaseOrder.responsibleId = this.storageService.id;
+    //this.purchaseOrder.responsibleName = this.storageService.name;
+    //this.purchaseOrder.paymentType = value.paymentType;
+    this.purchaseOrder.clientCompanyId = this.selectClientCompany().id;
+    this.purchaseOrder.clientCompanyName = this.selectClientCompany().name;
+    this.purchaseOrder.attendantName = value?.attendantName ?? "";
+    this.purchaseOrder.attendantEmail = value?.attendantEmail ?? "";
+    this.purchaseOrder.attendantDddCellphone = value.attendantDddCellphone == null ? "" : value.attendantDddCellphone.toString();
+    this.purchaseOrder.attendantCellphone = value.attendantCellphone == null ? "" : value.attendantCellphone.toString();
+    this.purchaseOrder.attendantDddPhone = value.attendantDddPhone == null ? "" : value.attendantDddPhone.toString();
+    this.purchaseOrder.attendantPhone = value.attendantPhone == null ? "" : value.attendantPhone.toString();
+
+    this.purchaseOrder.information = value.information;
+
+    this.busyService.busy();
+    const resultPu = await this.savePurchaseOrder(this.purchaseOrder);
+    this.busyService.idle();
+
+    if (resultPu.status == 201) {
+      this.purchaseOrder.id = resultPu.body.data.id;
+      this.numPurchaseOrder.set(this.purchaseOrder.id);
+      this.messageService.add({ severity: 'success', summary: 'Pedido de Compra', detail: 'Gerado com sucesso', icon: 'pi pi-check' });
+      this.listPurchaseOrders();
+    }
+
   }
   //Update
   async edit(id: number) {
@@ -257,14 +330,14 @@ export default class PurchaseOrderComponent implements OnInit, DoCheck {
     if (resultPu.status == 200) {
       this.cleanForm();
       this.showDialogPurchase();
-      this.purchaseOrder = resultPu.body;
+      this.purchaseOrder = resultPu.body.data;
       //Número do pedido
       this.numPurchaseOrder.set(this.purchaseOrder.id);
       //Número nota
       this.nfNum.set(this.purchaseOrder.nfNum);
       this.formPurchase.patchValue({
-        responsibleName: this.purchaseOrder.responsibleName,
-        paymentType: this.purchaseOrder.paymentType,
+        // responsibleName: this.purchaseOrder.responsibleName,
+        //paymentType: this.purchaseOrder.paymentType,
         dateDelivery: new Date(this.purchaseOrder.dateDelivery),
         clientCompanyId: this.purchaseOrder.clientCompanyId,
         clientCompanyName: this.purchaseOrder.clientCompanyName,
@@ -280,12 +353,12 @@ export default class PurchaseOrderComponent implements OnInit, DoCheck {
         nfKey: this.purchaseOrder.nfKey != "" ? this.purchaseOrder.nfKey : null,
         information: this.purchaseOrder?.information ?? ""
       });
-      this.formNF.patchValue({
+      /* this.formNF.patchValue({
         nfNum: this.purchaseOrder.nfNum != 0 ? this.purchaseOrder.nfNum : null,
         nfNumSerie: this.purchaseOrder.nfSerie,
         nfDate: this.purchaseOrder.nfDate != "" ? new Date(this.purchaseOrder.nfDate) : null,
         nfKey: this.purchaseOrder.nfKey != "" ? this.purchaseOrder.nfKey : null
-      });
+      }); */
       //List items
       this.purchaseOrderItems = await this.listPurchaseOrderItem(this.purchaseOrder.companyId, this.purchaseOrder.resaleId, this.purchaseOrder.id);
       this.somaItem();
@@ -295,34 +368,34 @@ export default class PurchaseOrderComponent implements OnInit, DoCheck {
   async saveUpdate() {
     this.clientEnable();
     const { value, valid } = this.formPurchase;
-    const nf = this.formNF.value;
-    if (valid) {
-      this.busyService.busy();
-      this.purchaseOrder.dateGeneration = this.formatDateTime(new Date(this.purchaseOrder.dateGeneration))
-      this.purchaseOrder.dateDelivery = this.formatDateTime(new Date(value.dateDelivery));
-      this.purchaseOrder.responsibleId =   this.purchaseOrder.responsibleId;
-      this.purchaseOrder.responsibleName =   this.purchaseOrder.responsibleName;
-      this.purchaseOrder.paymentType = value.paymentType;
-      this.purchaseOrder.clientCompanyId = value.clientCompanyId;
-      this.purchaseOrder.clientCompanyName = value.clientCompanyName;
-      this.purchaseOrder.attendantName = value?.attendantName ?? "";
-      this.purchaseOrder.attendantEmail = value?.attendantEmail ?? "";
-      this.purchaseOrder.attendantDddCellphone = value.attendantDddCellphone == null ? "" : value.attendantDddCellphone.toString();
-      this.purchaseOrder.attendantCellphone = value.attendantCellphone == null ? "" : value.attendantCellphone.toString();
-      this.purchaseOrder.attendantDddPhone = value.attendantDddPhone == null ? "" : value.attendantDddPhone.toString();
-      this.purchaseOrder.attendantPhone = value.attendantPhone == null ? "" : value.attendantPhone.toString();
-      this.purchaseOrder.nfNum = nf?.nfNum ?? 0;
-      this.purchaseOrder.nfSerie = nf?.nfNumSerie ?? "";
-      this.purchaseOrder.nfDate = nf.nfDate != null ? this.formatDateTime(new Date(nf.nfDate)) : "";
-      this.purchaseOrder.nfKey = nf?.nfKey ?? "";
-      this.purchaseOrder.information = value?.information ?? "";
-
-      const resultPu = await this.updatePurchaseOrder(this.purchaseOrder);
-      if (resultPu.status == 200) {
-        this.messageService.add({ severity: 'success', summary: 'Pedido de Compra', detail: 'Atualizado com sucesso', icon: 'pi pi-check' });
-      }
-      this.busyService.idle();
+    if (!valid) {
+      return;
     }
+    this.busyService.busy();
+    // this.purchaseOrder.dateGeneration = this.formatDateTime(new Date(this.purchaseOrder.dateGeneration))
+    this.purchaseOrder.dateDelivery = this.formatDateTime(new Date(value.dateDelivery));
+    //this.purchaseOrder.responsibleId =   this.purchaseOrder.responsibleId;
+    //this.purchaseOrder.responsibleName =   this.purchaseOrder.responsibleName;
+    //this.purchaseOrder.paymentType = value.paymentType;
+    this.purchaseOrder.clientCompanyId = value.clientCompanyId;
+    this.purchaseOrder.clientCompanyName = value.clientCompanyName;
+    this.purchaseOrder.attendantName = value?.attendantName ?? "";
+    this.purchaseOrder.attendantEmail = value?.attendantEmail ?? "";
+    this.purchaseOrder.attendantDddCellphone = value.attendantDddCellphone == null ? "" : value.attendantDddCellphone.toString();
+    this.purchaseOrder.attendantCellphone = value.attendantCellphone == null ? "" : value.attendantCellphone.toString();
+    this.purchaseOrder.attendantDddPhone = value.attendantDddPhone == null ? "" : value.attendantDddPhone.toString();
+    this.purchaseOrder.attendantPhone = value.attendantPhone == null ? "" : value.attendantPhone.toString();
+    this.purchaseOrder.nfNum = value?.nfNum ?? 0;
+    this.purchaseOrder.nfSerie = value?.nfNumSerie ?? "";
+    this.purchaseOrder.nfDate = value.nfDate != null ? this.formatDateTime(new Date(value.nfDate)) : "";
+    this.purchaseOrder.nfKey = value?.nfKey ?? "";
+    this.purchaseOrder.information = value?.information ?? "";
+
+    const resultPu = await this.updatePurchaseOrder(this.purchaseOrder);
+    if (resultPu.status == 200) {
+      this.messageService.add({ severity: 'success', summary: 'Pedido de Compra', detail: 'Atualizado com sucesso', icon: 'pi pi-check' });
+    }
+    this.busyService.idle();
     this.clientdisable();
   }
   //Close
@@ -342,19 +415,19 @@ export default class PurchaseOrderComponent implements OnInit, DoCheck {
         this.clientEnable();
         const { value, valid } = this.formPurchase;
 
-        const nf = this.formNF.value;
+
         const dateReceived = this.formDateClose.value;
 
         if (valid) {
           this.busyService.busy();
 
-          this.purchaseOrder.status = "Closed_Purchase_Order";
-          this.purchaseOrder.dateGeneration = this.formatDateTime(new Date(this.purchaseOrder.dateGeneration))
+          this.purchaseOrder.status = StatusPurchaseOrder.CLOSE;
+          //this.purchaseOrder.dateGeneration = this.formatDateTime(new Date(this.purchaseOrder.dateGeneration))
           this.purchaseOrder.dateDelivery = this.formatDateTime(new Date(value.dateDelivery));
           this.purchaseOrder.dateReceived = this.formatDateTime(new Date(dateReceived.dateClose));
-          this.purchaseOrder.responsibleId = this.storageService.id;
-          this.purchaseOrder.responsibleName = this.storageService.name;
-          this.purchaseOrder.paymentType = value.paymentType;
+          // this.purchaseOrder.responsibleId = this.storageService.id;
+          //this.purchaseOrder.responsibleName = this.storageService.name;
+          //this.purchaseOrder.paymentType = value.paymentType;
           this.purchaseOrder.clientCompanyId = value.clientCompanyId;
           this.purchaseOrder.clientCompanyName = value.clientCompanyName;
           this.purchaseOrder.attendantName = value?.attendantName ?? "";
@@ -363,10 +436,10 @@ export default class PurchaseOrderComponent implements OnInit, DoCheck {
           this.purchaseOrder.attendantCellphone = value.attendantCellphone == null ? "" : value.attendantCellphone.toString();
           this.purchaseOrder.attendantDddPhone = value.attendantDddPhone == null ? "" : value.attendantDddPhone.toString();
           this.purchaseOrder.attendantPhone = value.attendantPhone == null ? "" : value.attendantPhone.toString();
-          this.purchaseOrder.nfNum = nf?.nfNum ?? 0;
-          this.purchaseOrder.nfSerie = nf?.nfNumSerie ?? "";
-          this.purchaseOrder.nfDate = nf.nfDate != null ? this.formatDateTime(new Date(nf.nfDate)) : "";
-          this.purchaseOrder.nfKey = nf?.nfKey ?? "";
+          this.purchaseOrder.nfNum = value?.nfNum ?? 0;
+          this.purchaseOrder.nfSerie = value?.nfNumSerie ?? "";
+          this.purchaseOrder.nfDate = value.nfDate != null ? this.formatDateTime(new Date(value.nfDate)) : "";
+          this.purchaseOrder.nfKey = value?.nfKey ?? "";
 
           const resultPu = await this.updatePurchaseOrder(this.purchaseOrder);
           if (resultPu.status == 200) {
@@ -386,11 +459,11 @@ export default class PurchaseOrderComponent implements OnInit, DoCheck {
     });
   }
   confirmNF() {
-    const { valid, value } = this.formNF;
+    /* const { valid, value } = this.formNF;
     if (valid) {
       this.nfNum.set(value.nfNum);
       this.hideDialogNF();
-    }
+    } */
   }
   //Delete
   async deletePart(item: PurchaseOrderItem) {
@@ -418,14 +491,14 @@ export default class PurchaseOrderComponent implements OnInit, DoCheck {
     }
   }
   //Services
-  private async savePurchaseOrder(pu: PurchaseOrder): Promise<HttpResponse<PurchaseOrder>> {
+  private async savePurchaseOrder(pu: PurchaseOrder): Promise<HttpResponse<MessageResponse>> {
     try {
       return await lastValueFrom(this.purchaseOrderService.save(pu));
     } catch (error) {
       return error;
     }
   }
-  private async updatePurchaseOrder(pu: PurchaseOrder): Promise<HttpResponse<PurchaseOrder>> {
+  private async updatePurchaseOrder(pu: PurchaseOrder): Promise<HttpResponse<MessageResponse>> {
     try {
       return await lastValueFrom(this.purchaseOrderService.update(pu));
     } catch (error) {
@@ -439,10 +512,13 @@ export default class PurchaseOrderComponent implements OnInit, DoCheck {
     return 'Hoje';
   }
 
-  cleanForm() {
+  private cleanForm() {
     this.formPurchase.patchValue({
-      responsibleName:'',
+      type: TypePurchaseOrder.ESTOQUE,
+      responsible: null,
+      typePayment: null,
       dateDelivery: null,
+      dateReceived: null,
       clientCompanyId: null,
       clientCompanyName: "",
       attendantName: "",
@@ -451,7 +527,6 @@ export default class PurchaseOrderComponent implements OnInit, DoCheck {
       attendantCellphone: null,
       attendantDddPhone: null,
       attendantPhone: null,
-      paymentType: "",
       nfNum: null,
       nfNumSerie: "",
       nfDate: "",
@@ -478,7 +553,23 @@ export default class PurchaseOrderComponent implements OnInit, DoCheck {
     delete this.clonedPurchaseOrderItem[item.id as string];
   }
 
-  private async purchaseEdit(id: number): Promise<HttpResponse<PurchaseOrder>> {
+  private async filterUserRoleId(id: number): Promise<HttpResponse<MessageResponse>> {
+    try {
+      return await lastValueFrom(this.userService.filterRoleId(id));
+    } catch (error) {
+      this.messageService.add({ severity: 'error', summary: 'Erro', detail: error.error.message, icon: 'pi pi-times' });
+      return error;
+    }
+  }
+  private async listAllEnabledTypePayment(): Promise<TypePayment[]> {
+    try {
+      return await lastValueFrom(this.paymentService.listAllEnabled());
+    } catch (error) {
+      this.messageService.add({ severity: 'error', summary: 'Erro', detail: error.error.message, icon: 'pi pi-times' });
+      return error;
+    }
+  }
+  private async purchaseEdit(id: number): Promise<HttpResponse<MessageResponse>> {
     try {
       return await lastValueFrom(this.purchaseOrderService.filterId(this.storageService.companyId, this.storageService.resaleId, id));
     } catch (error) {
@@ -508,10 +599,10 @@ export default class PurchaseOrderComponent implements OnInit, DoCheck {
     puItem.partId = part.id;
     puItem.partCode = part.code;
     puItem.partDescription = part.description;
-/*     puItem.quantity = part.qtdAvailable;
-    puItem.price = part.price;
-    puItem.discount = part.discount;
- */
+    /*     puItem.quantity = part.qtdAvailable;
+        puItem.price = part.price;
+        puItem.discount = part.discount;
+     */
     const resultItem = await this.savePurchaseOrderItem(puItem);
     if (resultItem.status == 201) {
 

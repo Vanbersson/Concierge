@@ -19,12 +19,13 @@ import { UserService } from '../../../services/user/user.service';
 import { lastValueFrom } from 'rxjs';
 import { MessageResponse } from '../../../models/message/message-response';
 import { HttpResponse } from '@angular/common/http';
+import { LogoutComponent } from '../../../views/logout/logout.component';
 
 @Component({
   selector: 'app-topbar',
   standalone: true,
   imports: [CommonModule, UserProfileComponent, NotificationComponent, DialogModule,
-    RouterLink, SidebarModule, AvatarModule,
+    RouterLink, SidebarModule, AvatarModule, LogoutComponent,
     ImageModule],
   templateUrl: './topbar.component.html',
   styleUrl: './topbar.component.scss',
@@ -55,6 +56,8 @@ export class TopbarComponent implements OnInit, OnDestroy, DoCheck {
   dialogVisibleProfileUser: boolean = false;
   @ViewChild('profileUser') profileUser!: UserProfileComponent;
 
+  @ViewChild('appLogout') appLogout!: LogoutComponent;
+
   constructor(
     public layoutService: LayoutService,
     private userService: UserService,
@@ -81,7 +84,7 @@ export class TopbarComponent implements OnInit, OnDestroy, DoCheck {
       //Limpa o usuário
       this.updateUser.set(new User());
     }
- 
+
   }
 
   async openProfileUser() {
@@ -101,12 +104,7 @@ export class TopbarComponent implements OnInit, OnDestroy, DoCheck {
     }
   }
   closeSession() {
-    this.storageService.deleteStorage();
-    this.navigatorLogin();
-  }
-
-  private navigatorLogin() {
-    this.router.navigateByUrl("/login");
+    this.appLogout.exit();
   }
 
   showSideBarRight() {

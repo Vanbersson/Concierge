@@ -1,5 +1,6 @@
 package com.concierge.apiconcierge.validation.purchase;
 
+import com.concierge.apiconcierge.models.message.MessageResponse;
 import com.concierge.apiconcierge.models.purchase.PurchaseOrder;
 import com.concierge.apiconcierge.models.purchase.statusEnum.PurchaseOrderStatus;
 import com.concierge.apiconcierge.util.ConstantsMessage;
@@ -9,77 +10,123 @@ import org.springframework.stereotype.Service;
 @Service
 public class PurchaseOrderValidation implements IPurchaseOrderValidation {
     @Override
-    public String save(PurchaseOrder purchase) {
-        if (purchase.getCompanyId() == null || purchase.getCompanyId() == 0)
-            return ConstantsMessage.ERROR_COMPANY;
-        if (purchase.getResaleId() == null || purchase.getResaleId() == 0)
-            return ConstantsMessage.ERROR_RESALE;
-        if(purchase.getStatus() == null)
-            return "Status not informed.";
-        if(purchase.getResponsibleId() == null || purchase.getResponsibleId() == 0)
-            return ConstantsMessage.ERROR_ATTENDANT;
-        if(purchase.getResponsibleName().isBlank())
-            return ConstantsMessage.ERROR_ATTENDANT;
-        if (purchase.getDateGeneration() == null)
-            return "Date generation not informed.";
-        if(purchase.getDateDelivery() == null)
-            return "Date delivery not informed.";
-        if(purchase.getPaymentType().isBlank())
-            return "Payment not informed.";
-        if (purchase.getClientCompanyId() == null || purchase.getClientCompanyId() == 0)
-            return ConstantsMessage.ERROR_CLIENTCOMPANY;
-        if (purchase.getClientCompanyName().isBlank())
-            return ConstantsMessage.ERROR_CLIENTCOMPANY;
+    public MessageResponse save(PurchaseOrder pu) {
+        MessageResponse response = new MessageResponse();
+        if (pu.getCompanyId() == null || pu.getCompanyId() == 0) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Empresa");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (pu.getResaleId() == null || pu.getResaleId() == 0) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Revenda");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (pu.getStatus() == null) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Status");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (pu.getType() == null) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Tipo");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
 
-        return ConstantsMessage.SUCCESS;
+        response.setStatus(ConstantsMessage.SUCCESS);
+        response.setHeader("Pedido de Compra");
+        response.setMessage("Cadastrado com sucesso.");
+        return response;
     }
 
     @Override
-    public String update(PurchaseOrder purchase) {
-        if (purchase.getCompanyId() == null || purchase.getCompanyId() == 0)
-            return ConstantsMessage.ERROR_COMPANY;
-        if (purchase.getResaleId() == null || purchase.getResaleId() == 0)
-            return ConstantsMessage.ERROR_RESALE;
-        if (purchase.getId() == null || purchase.getId() == 0)
-            return ConstantsMessage.ERROR_ID;
-        if(purchase.getStatus() == null)
-            return "Status not informed.";
-        if(purchase.getResponsibleId() == null || purchase.getResponsibleId() == 0)
-            return ConstantsMessage.ERROR_ATTENDANT;
-        if(purchase.getResponsibleName().isBlank())
-            return ConstantsMessage.ERROR_ATTENDANT;
-        if (purchase.getDateGeneration() == null)
-            return "Date generation not informed.";
-        if(purchase.getDateDelivery() == null)
-            return "Date delivery not informed.";
-        if(purchase.getPaymentType().isBlank())
-            return "Payment not informed.";
-        if (purchase.getClientCompanyId() == null || purchase.getClientCompanyId() == 0)
-            return ConstantsMessage.ERROR_CLIENTCOMPANY;
-        if (purchase.getClientCompanyName().isBlank())
-            return ConstantsMessage.ERROR_CLIENTCOMPANY;
+    public MessageResponse update(PurchaseOrder pu) {
+        MessageResponse response = new MessageResponse();
+        if (pu.getCompanyId() == null || pu.getCompanyId() == 0) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Empresa");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (pu.getResaleId() == null || pu.getResaleId() == 0) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Revenda");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (pu.getId() == null || pu.getId() == 0) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Código");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (pu.getStatus() == null) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Status");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (pu.getType() == null) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Tipo");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
 
-        return ConstantsMessage.SUCCESS;
+        response.setStatus(ConstantsMessage.SUCCESS);
+        response.setHeader("Pedido de Compra");
+        response.setMessage("Atualizado com sucesso.");
+        return response;
     }
 
     @Override
-    public String filterOpen(Integer companyId, Integer resaleId) {
-        if (companyId == null || companyId == 0)
-            return ConstantsMessage.ERROR_COMPANY;
-        if (resaleId == null || resaleId == 0)
-            return ConstantsMessage.ERROR_RESALE;
-
-        return ConstantsMessage.SUCCESS;
+    public MessageResponse filterOpen(Integer companyId, Integer resaleId) {
+        MessageResponse response = new MessageResponse();
+        if (companyId == null || companyId == 0) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Empresa");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (resaleId == null || resaleId == 0) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Revenda");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        response.setStatus(ConstantsMessage.SUCCESS);
+        response.setHeader("Pedido de Compra");
+        response.setMessage("Encontrado com sucesso.");
+        return response;
     }
 
-    public String filterId(Integer companyId, Integer resaleId, Integer purchaseId) {
-        if (companyId == null || companyId == 0)
-            return ConstantsMessage.ERROR_COMPANY;
-        if (resaleId == null || resaleId == 0)
-            return ConstantsMessage.ERROR_RESALE;
-        if (purchaseId == null || purchaseId == 0)
-            return ConstantsMessage.ERROR_ID;
-
-        return ConstantsMessage.SUCCESS;
+    public MessageResponse filterId(Integer companyId, Integer resaleId, Integer purchaseId) {
+        MessageResponse response = new MessageResponse();
+        if (companyId == null || companyId == 0) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Empresa");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (resaleId == null || resaleId == 0) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Revenda");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (purchaseId == null || purchaseId == 0) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Pedido de Compra");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        response.setStatus(ConstantsMessage.SUCCESS);
+        response.setHeader("Pedido de Compra");
+        response.setMessage("Encontrado com sucesso.");
+        return response;
     }
 }

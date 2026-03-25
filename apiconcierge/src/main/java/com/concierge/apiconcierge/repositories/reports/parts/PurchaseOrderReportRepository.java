@@ -38,10 +38,10 @@ public class PurchaseOrderReportRepository {
         }
 
         if (!purchaseFilters.status().isBlank()) {
-            if (purchaseFilters.status().equals(PurchaseOrderStatus.Open_Purchase_Order.toString()))
-                predicates.add(cb.equal(purchaseOrder.get("status"), PurchaseOrderStatus.Open_Purchase_Order));
-            if (purchaseFilters.status().equals(PurchaseOrderStatus.Closed_Purchase_Order.toString()))
-                predicates.add(cb.equal(purchaseOrder.get("status"), PurchaseOrderStatus.Closed_Purchase_Order));
+//            if (purchaseFilters.status().equals(PurchaseOrderStatus.Open_Purchase_Order.toString()))
+//                predicates.add(cb.equal(purchaseOrder.get("status"), PurchaseOrderStatus.Open_Purchase_Order));
+//            if (purchaseFilters.status().equals(PurchaseOrderStatus.Closed_Purchase_Order.toString()))
+//                predicates.add(cb.equal(purchaseOrder.get("status"), PurchaseOrderStatus.Closed_Purchase_Order));
         }
 
         if (purchaseFilters.id() != null && purchaseFilters.id() != 0)

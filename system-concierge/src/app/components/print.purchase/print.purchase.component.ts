@@ -4,7 +4,7 @@ import { HttpResponse } from '@angular/common/http';
 import { lastValueFrom } from 'rxjs';
 
 //Class
-import { PurchaseOrder } from '../../models/purchase.order/puchase.order';
+import { PurchaseOrder } from '../../models/purchase.order/purchase.order';
 import { PurchaseOrderItem } from '../../models/purchase.order/purchase.order.item';
 
 //Print
@@ -14,6 +14,7 @@ import printJS from 'print-js';
 import { PurchaseOrderItemService } from '../../services/purchase/purchase-order-item.service';
 import { PurchaseOrderService } from '../../services/purchase/purchase-order.service';
 import { StorageService } from '../../services/storage/storage.service';
+import { MessageResponse } from '../../models/message/message-response';
 
 @Component({
   selector: 'app-printPurchase',
@@ -40,7 +41,7 @@ export class PrintPurchaseComponent {
     const resultPu = await this.PurchaseOrderFilterId(id);
     if (resultPu.status == 200) {
       //Dados 
-      this.printPurchaseOrder.set(resultPu.body);
+      this.printPurchaseOrder.set(resultPu.body.data);
 
       this.printPurchaseOrderItems = Array(30).fill(new PurchaseOrderItem());
 
@@ -69,7 +70,7 @@ export class PrintPurchaseComponent {
     }
 
   }
-  private async PurchaseOrderFilterId(id: number): Promise<HttpResponse<PurchaseOrder>> {
+  private async PurchaseOrderFilterId(id: number): Promise<HttpResponse<MessageResponse>> {
     try {
       return await lastValueFrom(this.purchaseOrderService.filterId(this.storageService.companyId, this.storageService.resaleId, id));
     } catch (error) {

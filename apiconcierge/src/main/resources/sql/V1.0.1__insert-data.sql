@@ -194,6 +194,7 @@ VALUE
 (1,1,0,'Cartão de crédito parcelado 11x'),
 (1,1,0,'Cartão de crédito parcelado 12x'),
 (1,1,0,'Faturamento especial'),
+(1,1,0,'Faturamento 28 dias'),
 (1,1,0,'Faturamento 30 dias'),
 (1,1,0,'Faturamento 30/60 dias'),
 (1,1,0,'Faturamento 30/60/90 dias'),

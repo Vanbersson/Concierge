@@ -1,4 +1,4 @@
-import { Component, DoCheck, OnInit, signal } from '@angular/core';
+import { Component, DoCheck, OnInit, signal, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterStateSnapshot } from '@angular/router';
@@ -6,29 +6,26 @@ import { lastValueFrom } from 'rxjs';
 import { HttpResponse } from '@angular/common/http';
 //PrimeNg
 import { ChartModule } from 'primeng/chart';
-import { ConfirmationService, MessageService, PrimeNGConfig } from 'primeng/api';
+import { PrimeNGConfig } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
-import { CalendarModule } from 'primeng/calendar';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { ToastModule } from 'primeng/toast';
 import { InputTextModule } from 'primeng/inputtext';
 //Service
 import { DashboardService } from '../../services/dashboard/dashboard.service';
-import { StorageService } from '../../services/storage/storage.service';
+import { BusyService } from '../../components/loading/busy.service';
 //Components
 import { FilterClientComponent } from '../../components/filter.client/filter.client.component';
 import { CanComponentDeactivate } from './can-deactivate.guard.ts';
+import { LogoutComponent } from '../logout/logout.component';
 //Class
 import { ClientCompany } from '../../models/clientcompany/client-company';
-import { BusyService } from '../../components/loading/busy.service';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, ChartModule, FormsModule, ButtonModule, CalendarModule, ConfirmDialogModule, ToastModule, InputTextModule, FilterClientComponent],
+  imports: [CommonModule, ChartModule, FormsModule, ButtonModule, InputTextModule, FilterClientComponent, LogoutComponent],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
-  providers: [ConfirmationService, MessageService]
+  providers: []
 })
 export default class DashboardComponent implements OnInit, CanComponentDeactivate, DoCheck {
   //Vehicle
@@ -47,10 +44,10 @@ export default class DashboardComponent implements OnInit, CanComponentDeactivat
   yearNow = signal<number>(Number.parseInt(new Date().getFullYear().toString()));
   isSearchClient: boolean = false;
 
-  constructor(private confirmationService: ConfirmationService,
-    private messageService: MessageService,
+  @ViewChild('appLogout') appLogout!: LogoutComponent;
+
+  constructor(
     private busyService: BusyService,
-    private storageService: StorageService,
     private primeNGConfig: PrimeNGConfig,
     private dashboardService: DashboardService
   ) {
@@ -196,24 +193,9 @@ export default class DashboardComponent implements OnInit, CanComponentDeactivat
   canDeactivate(nextState?: RouterStateSnapshot): Promise<boolean> | boolean {
     // Apenas confirmar se for sair para o login
     const nextUrl = nextState?.url || '';
-
     if (nextUrl.includes('/login')) {
-      return new Promise<boolean>((resolve) => {
-        this.confirmationService.confirm({
-          header: 'Sair?',
-          message: 'Deseja realmente sair e ir para a tela de login?',
-          accept: () => {
-            this.storageService.deleteStorage();
-            resolve(true);
-          },
-          reject: () => {
-            this.btnBack = false;
-            resolve(false);
-          }
-        });
-      });
+      this.appLogout.exit();
     }
-
     // Caso contrário, permite sair sem perguntar
     return true;
   }

@@ -1,7 +1,7 @@
 package com.concierge.apiconcierge.dtos.purchase;
 
 import com.concierge.apiconcierge.models.purchase.statusEnum.PurchaseOrderStatus;
-import jakarta.persistence.Column;
+import com.concierge.apiconcierge.models.purchase.statusEnum.TypePurchaseOrder;
 
 import java.util.Date;
 
@@ -10,11 +10,17 @@ public record PurchaseOrderDto(
         Integer resaleId,
         Integer id,
         PurchaseOrderStatus status,
-        Date dateGeneration,
+        TypePurchaseOrder type,
+        Integer generationUserId,
+        String generationUserName,
+        Date generationDate,
+        Integer responsibleUserId,
+        String responsibleUserName,
+        Integer paymentTypeId,
+        String paymentTypeDesc,
         Date dateDelivery,
         Date dateReceived,
-        Integer responsibleId,
-        String responsibleName,
+        String information,
         Integer clientCompanyId,
         String clientCompanyName,
         String attendantName,
@@ -27,7 +33,7 @@ public record PurchaseOrderDto(
         Integer nfNum,
         String nfSerie,
         Date nfDate,
-        String nfKey,
-        String information
+        String nfKey
+
 ) {
 }

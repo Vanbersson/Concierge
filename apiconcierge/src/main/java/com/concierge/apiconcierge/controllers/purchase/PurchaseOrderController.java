@@ -2,8 +2,9 @@ package com.concierge.apiconcierge.controllers.purchase;
 
 import com.concierge.apiconcierge.dtos.message.MessageResponseDto;
 import com.concierge.apiconcierge.dtos.purchase.PurchaseOrderDto;
+import com.concierge.apiconcierge.models.message.MessageResponse;
 import com.concierge.apiconcierge.models.purchase.PurchaseOrder;
-import com.concierge.apiconcierge.services.purchase.PurchaseOrderService;
+import com.concierge.apiconcierge.services.purchase.IPurchaseOrderService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,19 +20,15 @@ import java.util.Map;
 public class PurchaseOrderController {
 
     @Autowired
-    PurchaseOrderService service;
-
+    private IPurchaseOrderService service;
 
     @PostMapping("/save")
     public ResponseEntity<Object> save(@RequestBody PurchaseOrderDto data) {
         try {
             PurchaseOrder purchaseOrder = new PurchaseOrder();
             BeanUtils.copyProperties(data, purchaseOrder);
-
-            Integer id = this.service.save(purchaseOrder);
-            Map<String, Object> map = new HashMap<>();
-            map.put("id", id);
-            return ResponseEntity.status(HttpStatus.CREATED).body(map);
+            MessageResponse response = this.service.save(purchaseOrder);
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
         }
@@ -42,9 +39,8 @@ public class PurchaseOrderController {
         try {
             PurchaseOrder purchaseOrder = new PurchaseOrder();
             BeanUtils.copyProperties(data, purchaseOrder);
-
-            String message = this.service.update(purchaseOrder);
-            return ResponseEntity.status(HttpStatus.OK).body(new MessageResponseDto(message));
+            MessageResponse response = this.service.update(purchaseOrder);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
         }
@@ -54,7 +50,7 @@ public class PurchaseOrderController {
     public ResponseEntity<Object> filterOpen(@PathVariable(name = "companyId") Integer companyId,
                                              @PathVariable(name = "resaleId") Integer resaleId) {
         try {
-            List<Map<String, Object>> purchases = this.service.filterOpen(companyId, resaleId);
+            List<PurchaseOrder> purchases = this.service.filterOpen(companyId, resaleId);
             return ResponseEntity.status(HttpStatus.OK).body(purchases);
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
@@ -66,8 +62,8 @@ public class PurchaseOrderController {
                                            @PathVariable(name = "resaleId") Integer resaleId,
                                            @PathVariable(name = "purchaseId") Integer purchaseId) {
         try {
-            Map<String, Object> map = this.service.filterId(companyId, resaleId, purchaseId);
-            return ResponseEntity.status(HttpStatus.OK).body(map);
+            MessageResponse response = this.service.filterId(companyId, resaleId, purchaseId);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
         }

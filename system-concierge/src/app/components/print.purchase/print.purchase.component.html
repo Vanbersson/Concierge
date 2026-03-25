@@ -12,7 +12,7 @@
         </tr>
         <tr>
             <td>
-                <span>Data: {{printPurchaseOrder().dateGeneration | date: 'dd/MM/yyyy'}}</span>
+                <span>Data: {{printPurchaseOrder().generationDate | date: 'dd/MM/yyyy'}}</span>
             </td>
             <td>
                 @if(printPurchaseOrder().attendantDddCellphone == '' || printPurchaseOrder().attendantCellphone == ''){
@@ -36,7 +36,7 @@
                 @if(printPurchaseOrder().nfNum != 0){ <span>NF: {{printPurchaseOrder().nfNum}}</span> }@else{
                 <span>NF:</span> }
             </td>
-            <td><span>Pagamento: {{printPurchaseOrder().paymentType | uppercase }}</span></td>
+            <td><span>Pagamento: {{printPurchaseOrder().paymentTypeDesc | uppercase }}</span></td>
         </tr>
     </table>
     <table class="print-table">

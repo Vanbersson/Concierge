@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { StorageService } from '../../storage/storage.service';
 import { environment } from '../../../../environments/environment';
 import { Observable } from 'rxjs';
-import { PurchaseOrder } from '../../../models/purchase.order/puchase.order';
+import { PurchaseOrder } from '../../../models/purchase.order/purchase.order';
 
 @Injectable({
   providedIn: 'root'

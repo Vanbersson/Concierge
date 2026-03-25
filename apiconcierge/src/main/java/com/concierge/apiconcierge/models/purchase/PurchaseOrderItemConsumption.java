@@ -13,10 +13,9 @@ import java.util.UUID;
 @SecondaryTable(name = "tb_company", pkJoinColumns = @PrimaryKeyJoinColumn(name = "id"))
 @SecondaryTable(name = "tb_resale", pkJoinColumns = @PrimaryKeyJoinColumn(name = "id"))
 @SecondaryTable(name = "tb_purchase_order", pkJoinColumns = @PrimaryKeyJoinColumn(name = "id"))
-@SecondaryTable(name = "tb_part", pkJoinColumns = @PrimaryKeyJoinColumn(name = "id"))
 @Entity
 @Table(name = "tb_purchase_order_item")
-public class PurchaseOrderItem {
+public class PurchaseOrderItemConsumption {
 
     @JoinColumn(table = "tb_company", referencedColumnName = "id")
     @Column(name = "company_id")
@@ -34,15 +33,7 @@ public class PurchaseOrderItem {
     @Column(name = "purchase_id")
     private Integer purchaseId;
 
-    @JoinColumn(table = "tb_part",referencedColumnName = "id")
-    @Column(name = "part_id")
-    private Integer partId;
-
-    @Column(name = "part_code")
-    private String partCode;
-
-    @Column(name = "part_description")
-    private String partDescription;
+    private String description;
 
     private float quantity;
 

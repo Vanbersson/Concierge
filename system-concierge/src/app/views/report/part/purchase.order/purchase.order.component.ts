@@ -21,7 +21,7 @@ import { TagModule } from 'primeng/tag';
 import { MultiSelectModule } from 'primeng/multiselect';
 
 //Class
-import { PurchaseOrder } from '../../../../models/purchase.order/puchase.order';
+import { PurchaseOrder } from '../../../../models/purchase.order/purchase.order';
 
 //Service
 import { BusyService } from '../../../../components/loading/busy.service';
@@ -42,6 +42,7 @@ import { PurchaseOrderItem } from '../../../../models/purchase.order/purchase.or
 //Print
 import { PurchaseOrderItemService } from '../../../../services/purchase/purchase-order-item.service';
 import { PrintPurchaseComponent } from '../../../../components/print.purchase/print.purchase.component';
+import { StatusPurchaseOrder } from '../../../../models/purchase.order/enums/status.purchase.order';
 
 
 export interface IFilterPurchaseOrder {
@@ -133,7 +134,7 @@ export default class PurchaseOrderComponent implements OnInit, DoCheck {
   }
   getStatusDelivery(pu: PurchaseOrder): string {
 
-    if (pu.status == "Open_Purchase_Order") {
+    if (pu.status == StatusPurchaseOrder.OPEN) {
       const data1 = this.formatDateTime(new Date());
       const dateDelivery = new Date(pu.dateDelivery);
       return this.compararDatas(new Date(data1), dateDelivery);
@@ -145,7 +146,6 @@ export default class PurchaseOrderComponent implements OnInit, DoCheck {
       const diff = dateDelivery.getTime() - dateReceived.getTime();
 
       if (diff < 0) status = "Atrasado";
-
       return status;
     }
 
@@ -154,7 +154,7 @@ export default class PurchaseOrderComponent implements OnInit, DoCheck {
 
     var status = "";
 
-    if (pu.status == "Open_Purchase_Order") {
+    if (pu.status == StatusPurchaseOrder.OPEN) {
       const data1 = this.formatDateTime(new Date());
       const data2 = new Date(pu.dateDelivery);
       status = this.compararDatas(new Date(data1), data2);
