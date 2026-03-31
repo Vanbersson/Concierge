@@ -9,7 +9,7 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class PurchaseOrderItemService {
-
+  companyResale: string = this.storage.companyId + "/" + this.storage.resaleId;
   constructor(private http: HttpClient, private storage: StorageService) { }
 
   public save(item: PurchaseOrderItem): Observable<HttpResponse<PurchaseOrderItem>> {
@@ -21,8 +21,8 @@ export class PurchaseOrderItemService {
   public delete(item: PurchaseOrderItem): Observable<HttpResponse<PurchaseOrderItem>> {
     return this.http.post<PurchaseOrderItem>(environment.apiuUrl + "/purchase/order/item/delete", item, { headers: this.myHeaders(), observe: 'response' });
   }
-  public filterId(companyId: number, resaleId: number, purchaseId: number): Observable<PurchaseOrderItem[]> {
-    return this.http.get<PurchaseOrderItem[]>(environment.apiuUrl + "/purchase/order/item/" + companyId + "/" + resaleId + "/filter/purchase/" + purchaseId, { headers: this.myHeaders() });
+  public filterId(purchaseId: number): Observable<PurchaseOrderItem[]> {
+    return this.http.get<PurchaseOrderItem[]>(environment.apiuUrl + "/purchase/order/item/" + this.companyResale + "/filter/purchase/" + purchaseId, { headers: this.myHeaders() });
   }
 
   private myHeaders(): HttpHeaders {

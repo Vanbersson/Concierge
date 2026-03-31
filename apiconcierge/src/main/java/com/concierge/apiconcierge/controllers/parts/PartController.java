@@ -70,6 +70,30 @@ public class PartController {
         }
     }
 
+    @GetMapping("/{companyId}/{resaleId}/filter/code/{code}")
+    public ResponseEntity<Object> filterCode(@PathVariable(name = "companyId") Integer companyId,
+                                             @PathVariable(name = "resaleId") Integer resaleId,
+                                             @PathVariable(name = "code") String code) {
+        try {
+            MessageResponse response = this.service.filterCode(companyId, resaleId, code);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
+        }
+    }
+
+    @GetMapping("/{companyId}/{resaleId}/filter/desc/{desc}")
+    public ResponseEntity<Object> filterDesc(@PathVariable(name = "companyId") Integer companyId,
+                                             @PathVariable(name = "resaleId") Integer resaleId,
+                                             @PathVariable(name = "desc") String desc) {
+        try {
+            MessageResponse response = this.service.filterDesc(companyId, resaleId, desc);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
+        }
+    }
+
     @PostMapping("/save/image")
     public ResponseEntity<Object> saveImage(@RequestParam("file") MultipartFile file,
                                             @RequestParam("local") String local) {
@@ -80,6 +104,7 @@ public class PartController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
         }
     }
+
     @PostMapping("/delete/image")
     public ResponseEntity<Object> deleteImage(@RequestParam("local") String local) {
         try {

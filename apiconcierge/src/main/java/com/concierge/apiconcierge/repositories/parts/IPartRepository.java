@@ -23,9 +23,15 @@ public interface IPartRepository extends JpaRepository<Part, Integer> {
             "ORDER BY p.id ASC", nativeQuery = true)
     List<IPartListAll> listAll(Integer companyId, Integer resaleId);
 
-    @Query(value = "SELECT * FROM tb_part WHERE company_id=?1 AND resale_id=?2 AND id=?3",nativeQuery = true)
+    @Query(value = "SELECT * FROM tb_part WHERE company_id=?1 AND resale_id=?2 AND id=?3", nativeQuery = true)
     Part filterId(Integer companyId, Integer resaleId, Integer id);
 
-    @Query(value = "SELECT * FROM tb_part WHERE company_id=?1 AND resale_id=?2 AND code=?3",nativeQuery = true)
-    Part filterCode(Integer companyId, Integer resaleId, String code);
+    @Query(value = "SELECT * FROM tb_part WHERE company_id=?1 AND resale_id=?2 AND code=?3", nativeQuery = true)
+    Part filterCodeUnique(Integer companyId, Integer resaleId, String code);
+
+    @Query(value = "SELECT * FROM tb_part WHERE company_id=?1 AND resale_id=?2 AND code like %?3%", nativeQuery = true)
+    List<Part> filterCode(Integer companyId, Integer resaleId, String code);
+
+    @Query(value = "SELECT * FROM tb_part WHERE company_id=?1 AND resale_id=?2 AND description like %?3%", nativeQuery = true)
+    List<Part> filterDesc(Integer companyId, Integer resaleId, String desc);
 }

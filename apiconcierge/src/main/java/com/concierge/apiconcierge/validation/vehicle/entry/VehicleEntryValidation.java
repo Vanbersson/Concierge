@@ -289,13 +289,16 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
         MessageResponse response = new MessageResponse();
         //Verifica se o usuário tem permissão
         User user = this.userRepository.loginEmail(userEmail);
-        PermissionUser permission = this.permissionUser.findPermissionId(user.getCompanyId(), user.getResaleId(), user.getId(), AUTH_EXIT_VEHICLE);
-        if (permission == null) {
-            response.setStatus(ConstantsMessage.ERROR);
-            response.setHeader("Permissão - " + AUTH_EXIT_VEHICLE);
-            response.setMessage(ConstantsMessage.NOT_PERMISSION);
-            return response;
+        if (user.getRoleFunc() != UserRoleEnum.ADMIN) {
+            PermissionUser permission = this.permissionUser.findPermissionId(user.getCompanyId(), user.getResaleId(), user.getId(), AUTH_EXIT_VEHICLE);
+            if (permission == null) {
+                response.setStatus(ConstantsMessage.ERROR);
+                response.setHeader("Permissão - " + AUTH_EXIT_VEHICLE);
+                response.setMessage(ConstantsMessage.NOT_PERMISSION);
+                return response;
+            }
         }
+
 
         if (dataExit.companyId() == null || dataExit.companyId() == 0) {
             response.setStatus(ConstantsMessage.ERROR);
@@ -483,7 +486,6 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
                 return response;
             }
         }
-
         if (vehicle.getVehicleServiceOrder() == YesNot.not) {
             if (vehicle.getClientCompanyId() == null || vehicle.getClientCompanyId() == 0 || vehicle.getClientCompanyName().isBlank()) {
                 response.setStatus(ConstantsMessage.ERROR);
@@ -492,13 +494,13 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
                 return response;
             }
         }
-
+        //Verifica se o usuário tem permissão
+        User user = this.userRepository.loginEmail(userEmail);
         //Permission
         if (vehicle.getVehicleServiceOrder() == YesNot.yes) {
-
             if (vehicle.getAuth1ExitUserId() == null || vehicle.getAuth1ExitUserId() == 0) {
-                if (authExitDto.userId() != 1) {
-                    PermissionUser permission = this.permissionUser.findPermissionId(authExitDto.companyId(), authExitDto.resaleId(), authExitDto.userId(), ADD_AUTH_EXIT_VEHICLE_1);
+                if (user.getRoleFunc() != UserRoleEnum.ADMIN) {
+                    PermissionUser permission = this.permissionUser.findPermissionId(user.getCompanyId(), user.getResaleId(), user.getId(), ADD_AUTH_EXIT_VEHICLE_1);
                     if (permission == null) {
                         response.setStatus(ConstantsMessage.ERROR);
                         response.setHeader("Permissão - " + ADD_AUTH_EXIT_VEHICLE_1);
@@ -507,8 +509,8 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
                     }
                 }
             } else if (vehicle.getAuth2ExitUserId() == null || vehicle.getAuth2ExitUserId() == 0) {
-                if (authExitDto.userId() != 1) {
-                    PermissionUser permission = this.permissionUser.findPermissionId(authExitDto.companyId(), authExitDto.resaleId(), authExitDto.userId(), ADD_AUTH_EXIT_VEHICLE_2);
+                if (user.getRoleFunc() != UserRoleEnum.ADMIN) {
+                    PermissionUser permission = this.permissionUser.findPermissionId(user.getCompanyId(), user.getResaleId(), user.getId(), ADD_AUTH_EXIT_VEHICLE_2);
                     if (permission == null) {
                         response.setStatus(ConstantsMessage.ERROR);
                         response.setHeader("Permissão - " + ADD_AUTH_EXIT_VEHICLE_2);
@@ -521,8 +523,8 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
         }
         //Permission
         if (vehicle.getVehicleServiceOrder() == YesNot.not) {
-            if (authExitDto.userId() != 1) {
-                PermissionUser permission = this.permissionUser.findPermissionId(authExitDto.companyId(), authExitDto.resaleId(), authExitDto.userId(), ADD_AUTH_EXIT_VEHICLE_WITHOUT_O_S);
+            if (user.getRoleFunc() != UserRoleEnum.ADMIN) {
+                PermissionUser permission = this.permissionUser.findPermissionId(user.getCompanyId(), user.getResaleId(), user.getId(), ADD_AUTH_EXIT_VEHICLE_WITHOUT_O_S);
                 if (permission == null) {
                     response.setStatus(ConstantsMessage.ERROR);
                     response.setHeader("Permissão - " + ADD_AUTH_EXIT_VEHICLE_WITHOUT_O_S);
@@ -531,7 +533,6 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
                 }
             }
         }
-
         response.setStatus(ConstantsMessage.SUCCESS);
         response.setHeader("Autorização Saída");
         response.setMessage("Autorizado com sucesso.");
@@ -553,14 +554,12 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
             response.setMessage("Veículo não está autorizado.");
             return response;
         }
+        //Verifica se o usuário tem permissão
+        User user = this.userRepository.loginEmail(userEmail);
         //Permission
         if (vehicle.getVehicleServiceOrder().equals(YesNot.yes)) {
-            if (authExitDto.userId() != 1) {
-                //Permissão de outro usuário
-//                if (vehicle.getIdUserExitAuth1() != authExitDto.userId()){
-//                 return ConstantsMessage.ERROR_PERMISSION_ANOTHER_USER;
-//                }
-                PermissionUser permission = this.permissionUser.findPermissionId(authExitDto.companyId(), authExitDto.resaleId(), authExitDto.userId(), DEL_AUTH_EXIT_VEHICLE_1);
+            if (user.getRoleFunc() != UserRoleEnum.ADMIN) {
+                PermissionUser permission = this.permissionUser.findPermissionId(user.getCompanyId(), user.getResaleId(), user.getId(), DEL_AUTH_EXIT_VEHICLE_1);
                 if (permission == null) {
                     response.setStatus(ConstantsMessage.ERROR);
                     response.setHeader("Permissão - " + DEL_AUTH_EXIT_VEHICLE_1);
@@ -571,12 +570,8 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
         }
         //Permission
         if (vehicle.getVehicleServiceOrder().equals(YesNot.not)) {
-            if (authExitDto.userId() != 1) {
-                //Permissão de outro usuário
-//                if (vehicle.getIdUserExitAuth1() != authExitDto.userId()){
-//                    return ConstantsMessage.ERROR_PERMISSION_ANOTHER_USER;
-//                }
-                PermissionUser permission = this.permissionUser.findPermissionId(authExitDto.companyId(), authExitDto.resaleId(), authExitDto.userId(), DEL_AUTH_EXIT_VEHICLE_WITHOUT_O_S);
+            if (user.getRoleFunc() != UserRoleEnum.ADMIN) {
+                PermissionUser permission = this.permissionUser.findPermissionId(user.getCompanyId(), user.getResaleId(), user.getId(), DEL_AUTH_EXIT_VEHICLE_WITHOUT_O_S);
                 if (permission == null) {
                     response.setStatus(ConstantsMessage.ERROR);
                     response.setHeader("Permissão - " + DEL_AUTH_EXIT_VEHICLE_WITHOUT_O_S);

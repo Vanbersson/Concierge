@@ -18,6 +18,10 @@ public interface IPartService {
 
     public MessageResponse filterId(Integer companyId, Integer resaleId, Integer id);
 
+    public MessageResponse filterCode(Integer companyId, Integer resaleId, String code);
+
+    public MessageResponse filterDesc(Integer companyId, Integer resaleId, String desc);
+
     public MessageResponse saveImage(MultipartFile file, String local);
 
     public MessageResponse deleteImage(String local);

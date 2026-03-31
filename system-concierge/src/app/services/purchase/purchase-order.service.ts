@@ -10,6 +10,7 @@ import { MessageResponse } from '../../models/message/message-response';
   providedIn: 'root'
 })
 export class PurchaseOrderService {
+  companyResale: string = this.storage.companyId + "/" + this.storage.resaleId;
 
   constructor(private http: HttpClient, private storage: StorageService) { }
 
@@ -21,12 +22,12 @@ export class PurchaseOrderService {
     return this.http.post<MessageResponse>(environment.apiuUrl + "/purchase/order/update", purchase, { headers: this.myHeaders(), observe: 'response' });
   }
 
-  public filterOpen(companyId: number, resaleId: number): Observable<PurchaseOrder[]> {
-    return this.http.get<PurchaseOrder[]>(environment.apiuUrl + "/purchase/order/" + companyId + "/" + resaleId + "/filter/open", { headers: this.myHeaders() });
+  public filterOpen(): Observable<PurchaseOrder[]> {
+    return this.http.get<PurchaseOrder[]>(environment.apiuUrl + "/purchase/order/" + this.companyResale + "/filter/open", { headers: this.myHeaders() });
   }
 
-  public filterId(companyId: number, resaleId: number, purchaseId: number): Observable<HttpResponse<MessageResponse>> {
-    return this.http.get<MessageResponse>(environment.apiuUrl + "/purchase/order/" + companyId + "/" + resaleId + "/filter/id/" + purchaseId, { headers: this.myHeaders(), observe: 'response' });
+  public filterId(id: number): Observable<HttpResponse<MessageResponse>> {
+    return this.http.get<MessageResponse>(environment.apiuUrl + "/purchase/order/" + this.companyResale + "/filter/id/" + id, { headers: this.myHeaders(), observe: 'response' });
   }
 
   private myHeaders(): HttpHeaders {

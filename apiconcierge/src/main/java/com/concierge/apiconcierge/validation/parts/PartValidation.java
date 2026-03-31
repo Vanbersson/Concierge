@@ -88,11 +88,11 @@ public class PartValidation implements IPartValidation {
             response.setMessage(ConstantsMessage.NOT_INFORMED);
             return response;
         }
-        Part resultPart = this.repository.filterCode(part.getCompanyId(), part.getResaleId(), part.getCode());
-        if(resultPart != null){
+        Part resultPart = this.repository.filterCodeUnique(part.getCompanyId(), part.getResaleId(), part.getCode());
+        if (resultPart != null) {
             response.setStatus(ConstantsMessage.ERROR);
             response.setHeader("Código da Peça");
-            response.setMessage("Já Cadastrado - "+resultPart.getId());
+            response.setMessage("Já Cadastrado - " + resultPart.getId());
             return response;
         }
         response.setStatus(ConstantsMessage.SUCCESS);
@@ -215,6 +215,7 @@ public class PartValidation implements IPartValidation {
         return response;
     }
 
+    @Override
     public MessageResponse filterId(Integer companyId, Integer resaleId, Integer id) {
         MessageResponse response = new MessageResponse();
         if (companyId == null || companyId == 0) {
@@ -232,6 +233,60 @@ public class PartValidation implements IPartValidation {
         if (id == null || id == 0) {
             response.setStatus(ConstantsMessage.ERROR);
             response.setHeader("Código");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        response.setStatus(ConstantsMessage.SUCCESS);
+        response.setHeader("Peça");
+        response.setMessage("Encontrada com sucesso.");
+        return response;
+    }
+
+    @Override
+    public MessageResponse filterCode(Integer companyId, Integer resaleId, String code) {
+        MessageResponse response = new MessageResponse();
+        if (companyId == null || companyId == 0) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Empresa");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (resaleId == null || resaleId == 0) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Revenda");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (code.isBlank()) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Código");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        response.setStatus(ConstantsMessage.SUCCESS);
+        response.setHeader("Peça");
+        response.setMessage("Encontrada com sucesso.");
+        return response;
+    }
+
+    @Override
+    public MessageResponse filterDesc(Integer companyId, Integer resaleId, String desc) {
+        MessageResponse response = new MessageResponse();
+        if (companyId == null || companyId == 0) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Empresa");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (resaleId == null || resaleId == 0) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Revenda");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (desc.isBlank()) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Descrição");
             response.setMessage(ConstantsMessage.NOT_INFORMED);
             return response;
         }

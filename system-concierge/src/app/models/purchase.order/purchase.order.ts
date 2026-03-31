@@ -1,3 +1,4 @@
+import { StatusDelivery } from "./enums/status.delivery";
 import { StatusPurchaseOrder } from "./enums/status.purchase.order";
 import { TypePurchaseOrder } from "./enums/type.purchase.order";
 
@@ -6,6 +7,7 @@ export class PurchaseOrder {
     resaleId: number | null = null;
     id: number | null = null;
     status: StatusPurchaseOrder = StatusPurchaseOrder.OPEN;
+    statusDelivery: StatusDelivery;
     type: TypePurchaseOrder = TypePurchaseOrder.ESTOQUE;
 
     generationUserId: number | null = null;

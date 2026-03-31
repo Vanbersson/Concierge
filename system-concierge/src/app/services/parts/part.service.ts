@@ -27,9 +27,11 @@ export class PartService {
   filterId(id: number): Observable<HttpResponse<MessageResponse>> {
     return this.http.get<MessageResponse>(environment.apiuUrl + "/part/" + this.companyResale + "/filter/id/" + id, { headers: this.myHeaders(), observe: 'response' });
   }
-
-  filterCode(id: number): Observable<HttpResponse<MessageResponse>> {
-    return this.http.get<MessageResponse>(environment.apiuUrl + "/part/" + this.companyResale + "/filter/id/" + id, { headers: this.myHeaders(), observe: 'response' });
+  filterCode(code: string): Observable<HttpResponse<MessageResponse>> {
+    return this.http.get<MessageResponse>(environment.apiuUrl + "/part/" + this.companyResale + "/filter/code/" + code, { headers: this.myHeaders(), observe: 'response' });
+  }
+  filterDesc(desc: string): Observable<HttpResponse<MessageResponse>> {
+    return this.http.get<MessageResponse>(environment.apiuUrl + "/part/" + this.companyResale + "/filter/desc/" + desc, { headers: this.myHeaders(), observe: 'response' });
   }
 
   saveImage(data: FormData): Observable<HttpResponse<MessageResponse>> {

@@ -104,6 +104,36 @@ public class PartService implements IPartService {
 
     @SneakyThrows
     @Override
+    public MessageResponse filterCode(Integer companyId, Integer resaleId, String code) {
+        try {
+            MessageResponse response = this.validation.filterCode(companyId, resaleId, code);
+            if (ConstantsMessage.SUCCESS.equals(response.getStatus())) {
+                List<Part> result = this.repository.filterCode(companyId, resaleId, code);
+                response.setData(result);
+            }
+            return response;
+        } catch (Exception ex) {
+            throw new PartsException(ex.getMessage());
+        }
+    }
+
+    @SneakyThrows
+    @Override
+    public MessageResponse filterDesc(Integer companyId, Integer resaleId, String desc) {
+        try {
+            MessageResponse response = this.validation.filterDesc(companyId, resaleId, desc);
+            if (ConstantsMessage.SUCCESS.equals(response.getStatus())) {
+                List<Part> result = this.repository.filterDesc(companyId, resaleId, desc);
+                response.setData(result);
+            }
+            return response;
+        } catch (Exception ex) {
+            throw new PartsException(ex.getMessage());
+        }
+    }
+
+    @SneakyThrows
+    @Override
     public MessageResponse saveImage(MultipartFile file, String local) {
         try {
             MessageResponse response = new MessageResponse();
