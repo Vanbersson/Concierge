@@ -172,7 +172,6 @@ export default class PartsComponent implements OnInit {
       brand: null,
       group: null,
       category: null,
-
       locationPriArea: '',
       locationPriStreet: '',
       locationPriBookcase: '',
@@ -184,9 +183,10 @@ export default class PartsComponent implements OnInit {
       locationSecShelf: '',
       locationSecPosition: ''
     });
-
     this.siglaUnit = '';
     this.isLoadingGroup = false;
+    this.photoPartFront = "";
+    this.photoPartVerse = "";
   }
   onUnitSelected(event: any) {
     this.siglaUnit = event.value.unitMeasure;

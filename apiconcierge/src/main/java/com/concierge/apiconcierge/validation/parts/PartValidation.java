@@ -7,6 +7,8 @@ import com.concierge.apiconcierge.util.ConstantsMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+
 @Service
 public class PartValidation implements IPartValidation {
 
@@ -52,19 +54,19 @@ public class PartValidation implements IPartValidation {
             response.setMessage(ConstantsMessage.NOT_INFORMED);
             return response;
         }
-        if (part.getPriceNow() < 0) {
+        if (part.getPriceNow().compareTo(BigDecimal.ZERO) < 0) {
             response.setStatus(ConstantsMessage.ERROR);
             response.setHeader("Valor Atual");
             response.setMessage(ConstantsMessage.NOT_INFORMED);
             return response;
         }
-        if (part.getPriceOld() < 0) {
+        if (part.getPriceOld().compareTo(BigDecimal.ZERO) < 0) {
             response.setStatus(ConstantsMessage.ERROR);
             response.setHeader("Valor Anterior");
             response.setMessage(ConstantsMessage.NOT_INFORMED);
             return response;
         }
-        if (part.getPriceWarranty() < 0) {
+        if (part.getPriceWarranty().compareTo(BigDecimal.ZERO) < 0) {
             response.setStatus(ConstantsMessage.ERROR);
             response.setHeader("Valor Garantia");
             response.setMessage(ConstantsMessage.NOT_INFORMED);
@@ -152,19 +154,19 @@ public class PartValidation implements IPartValidation {
             response.setMessage(ConstantsMessage.NOT_INFORMED);
             return response;
         }
-        if (part.getPriceNow() < 0) {
+        if (part.getPriceNow().compareTo(BigDecimal.ZERO) < 0) {
             response.setStatus(ConstantsMessage.ERROR);
             response.setHeader("Valor Atual");
             response.setMessage(ConstantsMessage.NOT_INFORMED);
             return response;
         }
-        if (part.getPriceOld() < 0) {
+        if (part.getPriceOld().compareTo(BigDecimal.ZERO) < 0) {
             response.setStatus(ConstantsMessage.ERROR);
             response.setHeader("Valor Anterior");
             response.setMessage(ConstantsMessage.NOT_INFORMED);
             return response;
         }
-        if (part.getPriceWarranty() < 0) {
+        if (part.getPriceWarranty().compareTo(BigDecimal.ZERO) < 0) {
             response.setStatus(ConstantsMessage.ERROR);
             response.setHeader("Valor Garantia");
             response.setMessage(ConstantsMessage.NOT_INFORMED);

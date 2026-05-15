@@ -3,6 +3,7 @@ package com.concierge.apiconcierge.dtos.parts;
 import com.concierge.apiconcierge.models.enums.StatusEnableDisable;
 import com.concierge.apiconcierge.models.part.enums.AdditionDiscount;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 public record PartDto(Integer companyId,
@@ -13,9 +14,9 @@ public record PartDto(Integer companyId,
                       String code,
                       String description,
                       Integer unitMeasureId,
-                      float priceNow,
-                      float priceOld,
-                      float priceWarranty,
+                      BigDecimal priceNow,
+                      BigDecimal priceOld,
+                      BigDecimal priceWarranty,
                       AdditionDiscount additionDiscount,
                       Integer brandId,
                       Integer groupId,

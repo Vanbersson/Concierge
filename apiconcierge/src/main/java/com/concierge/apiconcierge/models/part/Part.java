@@ -5,6 +5,7 @@ import com.concierge.apiconcierge.models.part.enums.AdditionDiscount;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 @Getter
@@ -48,13 +49,13 @@ public class Part {
     private Integer unitMeasureId;
 
     @Column(name = "price_now")
-    private float priceNow;
+    private BigDecimal priceNow;
 
     @Column(name = "price_old")
-    private float priceOld;
+    private BigDecimal priceOld;
 
     @Column(name = "price_warranty")
-    private float priceWarranty;
+    private BigDecimal priceWarranty;
 
     @Column(name = "addition_discount")
     private AdditionDiscount additionDiscount;

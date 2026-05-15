@@ -1,55 +1,167 @@
 package com.concierge.apiconcierge.validation.purchase.item;
 
-import com.concierge.apiconcierge.models.purchase.PurchaseOrder;
-import com.concierge.apiconcierge.models.purchase.PurchaseOrderItem;
+import com.concierge.apiconcierge.models.message.MessageResponse;
+import com.concierge.apiconcierge.models.purchase.item.PurchaseOrderItem;
 import com.concierge.apiconcierge.util.ConstantsMessage;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+
 @Service
-public class PurchaseOrderItemValidation implements IPurchaseOrderItemValidation{
+public class PurchaseOrderItemValidation implements IPurchaseOrderItemValidation {
     @Override
-    public String save(PurchaseOrderItem item) {
-        if (item.getCompanyId() == null || item.getCompanyId() == 0)
-            return ConstantsMessage.ERROR_COMPANY;
-        if (item.getResaleId() == null || item.getResaleId() == 0)
-            return ConstantsMessage.ERROR_RESALE;
-
-        return ConstantsMessage.SUCCESS;
+    public MessageResponse save(PurchaseOrderItem item) {
+        MessageResponse response = new MessageResponse();
+        if (item.getId().getCompanyId() == null || item.getId().getCompanyId() == 0) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Empresa");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (item.getId().getResaleId() == null || item.getId().getResaleId() == 0) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Revenda");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (item.getId().getPurchaseId() == null || item.getId().getPurchaseId() == 0) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Pedido de Compra");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (item.getId().getItemOrder() == null || item.getId().getItemOrder() == 0) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Ordem");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (item.getId().getItemId() == null || item.getId().getItemId() == 0) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Peça");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (item.getItemCode().isBlank()) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Código da Peça");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (item.getItemDescription().isBlank()) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Descrição da Peça");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (item.getQuantity() == null || item.getQuantity().compareTo(BigDecimal.ZERO) <= 0) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Quantidade");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (item.getPrice() == null || item.getPrice().compareTo(BigDecimal.ZERO) <= 0) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Valor");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (item.getDiscount() == null || item.getDiscount().compareTo(BigDecimal.ZERO) < 0) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Disconto");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        response.setStatus(ConstantsMessage.SUCCESS);
+        response.setHeader("Item");
+        response.setMessage("Cadastrado com sucesso.");
+        return response;
     }
 
     @Override
-    public String update(PurchaseOrderItem item) {
-        if (item.getCompanyId() == null || item.getCompanyId() == 0)
-            return ConstantsMessage.ERROR_COMPANY;
-        if (item.getResaleId() == null || item.getResaleId() == 0)
-            return ConstantsMessage.ERROR_RESALE;
-        if(item.getId() == null)
-            return ConstantsMessage.ERROR_ID;
-
-        return ConstantsMessage.SUCCESS;
+    public MessageResponse update(PurchaseOrderItem item) {
+        MessageResponse response = new MessageResponse();
+        if (item.getId().getCompanyId() == null || item.getId().getCompanyId() == 0) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Empresa");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (item.getId().getResaleId() == null || item.getId().getResaleId() == 0) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Revenda");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (item.getId().getPurchaseId() == null || item.getId().getPurchaseId() == 0) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Pedido de Compra");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (item.getId().getItemOrder() == null || item.getId().getItemOrder() == 0) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Ordem");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (item.getId().getItemId() == null || item.getId().getItemId() == 0) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Peça");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (item.getItemCode().isBlank()) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Código da Peça");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (item.getItemDescription().isBlank()) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Descrição da Peça");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (item.getQuantity() == null || item.getQuantity().compareTo(BigDecimal.ZERO) <= 0) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Quantidade");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (item.getPrice() == null || item.getPrice().compareTo(BigDecimal.ZERO) <= 0) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Valor");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (item.getDiscount() == null || item.getDiscount().compareTo(BigDecimal.ZERO) < 0) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Disconto");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        response.setStatus(ConstantsMessage.SUCCESS);
+        response.setHeader("Item");
+        response.setMessage("Atualizado com sucesso.");
+        return response;
     }
 
     @Override
-    public String delete(PurchaseOrderItem item){
-        if (item.getCompanyId() == null || item.getCompanyId() == 0)
-            return ConstantsMessage.ERROR_COMPANY;
-        if (item.getResaleId() == null || item.getResaleId() == 0)
-            return ConstantsMessage.ERROR_RESALE;
-        if(item.getId() == null)
-            return ConstantsMessage.ERROR_ID;
-
-        return ConstantsMessage.SUCCESS;
+    public MessageResponse delete(PurchaseOrderItem item) {
+        MessageResponse response = new MessageResponse();
+        response.setStatus(ConstantsMessage.SUCCESS);
+        response.setHeader("Item");
+        response.setMessage("Excluído com sucesso.");
+        return response;
     }
 
     @Override
-    public String filterId(Integer companyId, Integer resaleId, Integer purchaseId) {
-        if (companyId == null || companyId == 0)
-            return ConstantsMessage.ERROR_COMPANY;
-        if (resaleId == null || resaleId == 0)
-            return ConstantsMessage.ERROR_RESALE;
-        if(purchaseId == null || purchaseId == 0)
-            return  ConstantsMessage.ERROR_ID;
-
-        return ConstantsMessage.SUCCESS;
+    public MessageResponse filterId(Integer companyId, Integer resaleId, Integer purchaseId) {
+        MessageResponse response = new MessageResponse();
+        response.setStatus(ConstantsMessage.SUCCESS);
+        response.setHeader("Item");
+        response.setMessage("Encontrado com sucesso.");
+        return response;
     }
 }

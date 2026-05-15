@@ -3,101 +3,138 @@
 
 <p-button label="Peças" text="true" (onClick)="showDialogParts()" severity="warning" icon="pi pi-filter"/>
 
-<p-dialog [(visible)]="visibleParts" header="Peças" 
-    [modal]="true" [maximizable]="true" [draggable]="false" [resizable]="false"
-    [style]="{ width: '70rem','height': '50rem'}" [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }">       
+<p-dialog [(visible)]="visiblePart" header="Peças" 
+    [modal]="true"
+    [closable]="false" [maximizable]="true" [draggable]="false" [resizable]="false"
+    [style]="{ width: '100rem','height': '60rem'}" [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }">       
     <form [formGroup]="formFilterParts" (submit)="filterPart()">
         <div class="grid p-fluid p-formgrid">
             <div class="col-12 md:col-3">
-                <span>Código</span>
+                <label for="">Código</label>
                 <input pInputText id="idCode" type="text" formControlName="filterCode" />
             </div>
-            <div class="col-12 md:col-9">
-                <span>Descrição</span>
-                <p-inputGroup>
-                    <input id="Iddescription" type="text" pInputText formControlName="filterDesc"/>
-                    <button  pButton type="submit" icon="pi pi-search" class="p-button-warning" label="Pesquisar"></button>
-                </p-inputGroup>
+            <div class="col-9 md:col-7">
+                <label for="">Descrição</label>
+                <input id="Iddescription" type="text" pInputText formControlName="filterDesc"/>    
+            </div>
+            <div class="col-3 md:col-2 flex align-items-end flex-wrap " >
+                <p-button type="submit" icon="pi pi-search" severity="warning" label="Pesquisar" size="small"/>
             </div>
         </div>
     </form>
-    <!-- <form [formGroup]="formSelectPart">
-        <div class="p-formgrid p-fluid grid">
-            <div class="col-12 md:col-6">
-                <span>Descrição</span>
-                <input id="Iddescription" type="text" pInputText formControlName="selecDesc" />
-            </div>
-            <div class="col-12 md:col-2">
-                <span>Quantidade</span>
-                <p-inputNumber mode="decimal" [minFractionDigits]="2" formControlName="selecQtdAvailable" />
-                <small class="p-error block" *ngIf="formSelectPart.get('selecQtdAvailable')?.invalid || requiredFiel">Campo obrigatório</small>
-            </div>
-            <div class="col-12 md:col-2">
-                <span>Preço</span>
-                <p-inputNumber mode="currency" currency="BRL" locale="pt-BR" formControlName="selecPrice" />
-            </div>
-            <div class="col-12 md:col-2">
-                <span>Desconto</span>
-                <p-inputNumber mode="currency" currency="BRL" locale="pt-BR" formControlName="selecDiscount" />
-            </div>
-        </div>
-    </form> -->
-    <p-table dataKey="id" [value]="listParts" (onRowSelect)="onSelectEventParts($event)"
-        (onRowUnselect)="onUnSelectEventParts($event)" selectionMode="single" [(selection)]="selectedPart" 
-        [tableStyle]="{ 'min-width': '50rem','min-height': '20rem' }" styleClass="p-datatable-sm">
+    <p-table dataKey="id" [value]="listParts" 
+        (onRowSelect)="onSelectEventParts($event)"
+        (onRowUnselect)="onUnSelectEventParts($event)" 
+        selectionMode="single" 
+        [(selection)]="selectedPart" 
+        [tableStyle]="{ 'width': '100rem','height': '20rem' }" 
+        [scrollable]="true"
+        scrollHeight="250px"
+        styleClass="p-datatable-sm">
         <ng-template pTemplate="header">
             <tr>
-                <th>Código</th>
-                <th>Descrição</th>
-                <th>Quantidade</th>
+                <th style="width: 10%;">Código</th>
+                <th style="width: 30%;">Descrição</th>
+                <th style="width: 10%;">Disponível</th>
+                <th style="width: 10%;">Valor</th>
                 <th>Unidade</th>
-                <th>Preço</th>
-                <th>Locação</th>
+                <th>Marca</th>
+                <th>Grupo</th>
+                <th>Categoria</th>
             </tr>
         </ng-template>
         <ng-template pTemplate="body" let-parts>
             <tr [pSelectableRow]="parts">
                 <td>{{parts.code}}</td>
                 <td>{{parts.description | uppercase}}</td>
-                <td>{{parts.qtdAvailable}}</td>
-                <td>{{parts.unitMeasure}}</td>
-                <td>{{parts.price | currency }}</td>
-                <td></td>
+                <td>{{parts.available | number:'1.2-2'}}</td>
+                <td>{{parts.price | number:'1.3-3'}}</td>
+                <td>{{parts.unit | uppercase}}</td>
+                <td>{{parts.brand | uppercase}}</td>
+                <td>{{parts.group | uppercase}}</td>
+                <td>{{parts.category | uppercase}}</td>
             </tr>
-
         </ng-template>
     </p-table>
     <div class="flex justify-content-center gap-2 mt-2 mb-2 w-full">
         <button pButton type="button" label="Selecionar" icon="pi pi-arrow-down" [raised]="true" size="small" [disabled]="disabledButtonSelected" (click)="selectPartsConfirme()"></button>
-        <button pButton type="button" label="Remover" icon="pi pi-arrow-up" [raised]="true" size="small" [disabled]="disabledButtonDelete"></button>
-        <!-- <button pButton type="button" label="Remover" icon="pi pi-arrow-top" size="small" severity="danger" (click)="clearAll()"></button> -->
+        <button pButton type="button" label="Remover" icon="pi pi-arrow-up" [raised]="true" size="small" [disabled]="disabledButtonDelete" (click)="removerSelectPart()"></button>
     </div> 
-    <p-table dataKey="id" [value]="listPartsSelected" (onRowSelect)="onSelectEventParts($event)"
-        (onRowUnselect)="onUnSelectEventParts($event)" selectionMode="single" [(selection)]="deleteSelectPart"
-        [tableStyle]="{ 'min-width': '50rem','min-height': '20rem' }" styleClass="p-datatable-sm">
+    <p-table dataKey="id" [value]="listPartsSelected" 
+        (onRowSelect)="onSelectDeleteEventParts($event)"
+        (onRowUnselect)="onUnSelectDeleteEventParts($event)" 
+        selectionMode="single" 
+        [(selection)]="deleteSelectPart"
+        [tableStyle]="{ 'width': '100rem','height': '20rem' }"
+        [scrollable]="true"
+        scrollHeight="250px"
+        styleClass="p-datatable-sm">
         <ng-template pTemplate="header">
             <tr>
-                <th>Código</th>
-                <th>Descrição</th>
-                <th>Quantidade</th>
+                <th style="width: 10%;">Código</th>
+                <th style="width: 30%;">Descrição</th>
+                <th style="width: 10%;">Valor</th>
+                <th style="width: 10%;">Quant.</th>
+                <th style="width: 10%;">Desconto</th>
+                <th>Total</th>
                 <th>Unidade</th>
-                <th>Preço</th>
-                <th>Locação</th>
+                <th>Marca</th>
+                <th>Grupo</th>
+                <th>Categoria</th>
             </tr>
         </ng-template>
         <ng-template pTemplate="body" let-parts>
-            <tr [pSelectableRow]="parts">
+             <tr [pSelectableRow]="parts">
                 <td>{{parts.code}}</td>
-                <td>{{parts.description}}</td>
-                <td>{{parts.qtdAvailable}}</td>
-                <td>{{parts.unitMeasure}}</td>
-                <td>{{parts.price | currency }}</td>
-                <td>{{parts.locationStreet +"-"+parts.locationBookcase+"-"+parts.locationShelf}}</td>
+                <td>{{parts.description | uppercase}}</td>
+                <td>{{parts.price | number:'1.3-3'}}</td>
+                <td>{{parts.selectQuantity | number:'1.2-2'}}</td>
+                <td>{{parts.selectDiscount | number: '1.3-3'}}</td>
+                <td>{{ (parts.selectPrice * parts.selectQuantity) - parts.selectDiscount | number: '1.3-3'}}</td>
+                <td>{{parts.unit | uppercase}}</td>
+                <td>{{parts.brand | uppercase}}</td>
+                <td>{{parts.group | uppercase}}</td>
+                <td>{{parts.category | uppercase}}</td>
             </tr>
-
+        </ng-template>
+        <ng-template pTemplate="footer">
+            <tr>
+                <td colspan="4" class="text-right">Totais</td>
+                <td>{{totalPartsDiscount() | number: '1.3-3'}}</td>
+                <td colspan="2">{{totalParts() | number:'1.3-3'}}</td>
+            </tr>
         </ng-template>
     </p-table>
     <div class="flex justify-content-end mt-2">
         <button pButton type="button" pRipple label="Fechar" icon="pi pi-times" class="p-button-text" (click)="hideDialogParts()"></button>
     </div>
+</p-dialog>
+
+<p-dialog [(visible)]="visibleSelected" [modal]="true"
+    [style]="{ width: '20rem'}" 
+    [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }">
+    <form [formGroup]="formSelectPart"  (submit)="confirmSelectPart()">
+        <div class="col-12 flex justify-content-center">
+            <span class="font-semibold">{{descriptionPart | uppercase}}</span>    
+        </div>
+        <div class="card p-2">
+            <div class="grid p-fluid p-formgrid">
+                <div class="col-12">
+                    <label for="">Valor Unitário</label>
+                    <p-inputNumber mode="decimal" inputId="currency-br" locale="pt-BR" [minFractionDigits]="3" formControlName="price" />
+                </div>
+                <div class="col-12">
+                    <label for="">Total de Desconto</label>
+                    <p-inputNumber mode="decimal" inputId="currency-br" locale="pt-BR" [minFractionDigits]="3" formControlName="discount" />
+                </div>
+                <div class="col-12">
+                    <label for="">Quantidade</label>
+                    <p-inputNumber model="decimal" currency="BRL" locale="pt-BR" [minFractionDigits]="2" [maxFractionDigits]="2"  formControlName="quantity" />
+                </div>
+                <div class="col-12 flex justify-content-center " >
+                    <p-button type="submit" label="Confirmar" size="small" />
+                </div>
+            </div>
+        </div>
+    </form>
 </p-dialog>

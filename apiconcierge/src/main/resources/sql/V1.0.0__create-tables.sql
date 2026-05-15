@@ -270,9 +270,9 @@ date_register datetime not null,
 code varchar(50) not null,
 description varchar(100),
 unit_measure_id int not null,
-price_now float not null,
-price_old float not null,
-price_warranty float not null,
+price_now numeric(11,3) not null,
+price_old numeric(11,3) not null,
+price_warranty numeric(11,3) not null,
 addition_discount tinyint not null,
 brand_id int not null,
 group_id int not null,
@@ -298,20 +298,21 @@ FOREIGN KEY(category_id) REFERENCES tb_part_category(id),
 primary key(id)
 );
 
-CREATE TABLE IF NOT EXISTS tb_part_history(
+CREATE TABLE IF NOT EXISTS tb_part_movimentation(
 company_id int not null,
 resale_id int not null,
-id int not null,
 part_id int not null,
 date_last_entry datetime,
 date_last_exit datetime,
-client_id int not null,
-qtd_available float,
-qtd_accounting float,
-price_now float not null,
-price_old float not null,
-price_warranty float not null,
-primary key(id)
+qtd_available numeric(11,3) not null,
+qtd_accounting numeric(11,3) not null,
+qtd_alocada numeric(11,3) not null,
+price_total_inventary numeric(15,3) not null,
+price_cost numeric(11,3) not null,
+FOREIGN KEY(company_id) REFERENCES tb_company(id),
+FOREIGN KEY(resale_id) REFERENCES tb_resale(id),
+FOREIGN KEY(part_id) REFERENCES tb_part(id),
+constraint pk_part_movimentation primary key(company_id,resale_id,part_id)
 );
 
 CREATE TABLE IF NOT EXISTS tb_driver(
@@ -600,7 +601,6 @@ PRIMARY KEY(id)
 );
 
 
-
 CREATE TABLE IF NOT EXISTS tb_purchase_order(
 company_id int not null,
 resale_id int not null,
@@ -641,270 +641,298 @@ PRIMARY KEY(id)
 CREATE TABLE IF NOT EXISTS tb_purchase_order_item(
 company_id int not null,
 resale_id int not null,
-id binary(16) unique not null,
 purchase_id int not null,
-part_id int not null,
-part_code varchar(20) not null,
-part_description varchar(100) not null,
-quantity float not null,
-discount float not null,
-price float not null,
+item_order int not null,
+item_id int not null,
+item_code varchar(20) not null,
+item_description varchar(100) not null,
+quantity numeric(11,3) not null,
+discount numeric(11,3) not null,
+price numeric(11,3) not null,
 FOREIGN KEY(company_id) REFERENCES tb_company(id),
 FOREIGN KEY(resale_id) REFERENCES tb_resale(id),
 FOREIGN KEY(purchase_id) REFERENCES tb_purchase_order(id),
-FOREIGN KEY(part_id) REFERENCES tb_part(id),
-PRIMARY KEY(id)
+FOREIGN KEY(item_id) REFERENCES tb_part(id),
+CONSTRAINT pk_purchase_order_item PRIMARY KEY(company_id,resale_id,purchase_id,item_order,item_id)
 );
 
 CREATE TABLE IF NOT EXISTS tb_purchase_order_item_consumption(
 company_id int not null,
 resale_id int not null,
-id binary(16) unique not null,
 purchase_id int not null,
+item_order int not null,
+item_description varchar(100) not null,
+quantity numeric(11,3) not null,
+discount numeric(11,3) not null,
+price numeric(11,3) not null,
+FOREIGN KEY(company_id) REFERENCES tb_company(id),
+FOREIGN KEY(resale_id) REFERENCES tb_resale(id),
+FOREIGN KEY(purchase_id) REFERENCES tb_purchase_order(id),
+CONSTRAINT pk_purchase_order_item_consumption PRIMARY KEY(company_id,resale_id,purchase_id,item_order)
+);
+
+
+#Falta verificar
+CREATE TABLE IF NOT EXISTS tb_nf_capa(
+company_id int not null,
+resale_id int not null,
+status tinyint not null,
+nf_number numeric(12,0) not null,
+nf_serie varchar(10) not null,
+type_transaction varchar(3) not null,
+nf_number_counter int not null,
+nf_key varchar(44),
+nf_date_emission datetime not null,
+nf_date_entry datetime not null,
+client_id int not null,
+constraint pk_nf_capa primary key(company_id,resale_id,nf_number,nf_serie,type_transaction,nf_number_counter)
+);
+
+CREATE TABLE IF NOT EXISTS tb_nf_item(
+company_id int not null,
+resale_id int not null,
+nf_number numeric(12,0) not null,
+nf_serie varchar(10) not null,
+type_transaction varchar(3) not null,
+nf_number_counter int not null,
+nf_number_order int not null,
+part_id int not null,
+quantity numeric(10,2) not null,
+constraint pk_nf_item primary key(company_id,resale_id,nf_number,nf_serie,type_transaction,nf_number_counter,nf_number_order)
+);
+
+CREATE TABLE IF NOT EXISTS tb_budget_requisition(
+company_id int not null,
+resale_id int not null,
+id binary(16) unique,
+budget_id int not null,
+ordem int not null,
+description varchar(100) not null,
+FOREIGN KEY(company_id) REFERENCES tb_company(id),
+FOREIGN KEY(resale_id) REFERENCES tb_resale(id),
+FOREIGN KEY(budget_id) REFERENCES tb_budget(id),
+primary key(id)
+);
+
+CREATE TABLE IF NOT EXISTS tb_budget_item(
+company_id int not null,
+resale_id int not null,
+id binary(16) unique,
+status tinyint not null,
+budget_id int not null,
+ordem int not null,
+part_id int not null,
+code varchar(20) not null,
 description varchar(100) not null,
 quantity float not null,
 discount float not null,
 price float not null,
 FOREIGN KEY(company_id) REFERENCES tb_company(id),
 FOREIGN KEY(resale_id) REFERENCES tb_resale(id),
-FOREIGN KEY(purchase_id) REFERENCES tb_purchase_order(id),
+FOREIGN KEY(part_id) REFERENCES tb_part(id),
+FOREIGN KEY(budget_id) REFERENCES tb_budget(id),
+primary key(id)
+);
+
+CREATE TABLE IF NOT EXISTS tb_budget_service(
+company_id int not null,
+resale_id int not null,
+id binary(16) unique,
+budget_id int not null,
+status tinyint not null,
+ordem int not null,
+description varchar(100) not null,
+hour_service float not null,
+price float not null,
+discount float not null,
+FOREIGN KEY(company_id) REFERENCES tb_company(id),
+FOREIGN KEY(resale_id) REFERENCES tb_resale(id),
+FOREIGN KEY(budget_id) REFERENCES tb_budget(id),
+primary key(id)
+);
+
+CREATE TABLE IF NOT EXISTS tb_budget_token(
+company_id int not null,
+resale_id int not null,
+id binary(16) unique,
+budget_id int not null,
+date_valid datetime not null,
+FOREIGN KEY(company_id) REFERENCES tb_company(id),
+FOREIGN KEY(resale_id) REFERENCES tb_resale(id),
 PRIMARY KEY(id)
 );
 
 
-#Falta verificar
- CREATE TABLE IF NOT EXISTS tb_budget_requisition(
-     company_id int not null,
-     resale_id int not null,
-     id binary(16) unique,
-     budget_id int not null,
-     ordem int not null,
-     description varchar(100) not null,
-     FOREIGN KEY(company_id) REFERENCES tb_company(id),
-     FOREIGN KEY(resale_id) REFERENCES tb_resale(id),
-     FOREIGN KEY(budget_id) REFERENCES tb_budget(id),
-     primary key(id)
-   );
 
- CREATE TABLE IF NOT EXISTS tb_budget_item(
-       company_id int not null,
-       resale_id int not null,
-       id binary(16) unique,
-       status tinyint not null,
-       budget_id int not null,
-       ordem int not null,
-       part_id int not null,
-       code varchar(20) not null,
-       description varchar(100) not null,
-       quantity float not null,
-       discount float not null,
-       price float not null,
-       FOREIGN KEY(company_id) REFERENCES tb_company(id),
-       FOREIGN KEY(resale_id) REFERENCES tb_resale(id),
-       FOREIGN KEY(part_id) REFERENCES tb_part(id),
-       FOREIGN KEY(budget_id) REFERENCES tb_budget(id),
-       primary key(id)
-   );
-
- CREATE TABLE IF NOT EXISTS tb_budget_service(
-         company_id int not null,
-         resale_id int not null,
-         id binary(16) unique,
-         budget_id int not null,
-         status tinyint not null,
-         ordem int not null,
-         description varchar(100) not null,
-         hour_service float not null,
-         price float not null,
-         discount float not null,
-         FOREIGN KEY(company_id) REFERENCES tb_company(id),
-         FOREIGN KEY(resale_id) REFERENCES tb_resale(id),
-         FOREIGN KEY(budget_id) REFERENCES tb_budget(id),
-         primary key(id)
-     );
-
- CREATE TABLE IF NOT EXISTS tb_budget_token(
-         company_id int not null,
-         resale_id int not null,
-         id binary(16) unique,
-         budget_id int not null,
-         date_valid datetime not null,
-         FOREIGN KEY(company_id) REFERENCES tb_company(id),
-         FOREIGN KEY(resale_id) REFERENCES tb_resale(id),
-         PRIMARY KEY(id)
-     );
-
-
-
- CREATE TABLE IF NOT EXISTS tb_mechanic_role(
-     company_id int not null,
-     resale_id int not null,
-     id int not null AUTO_INCREMENT,
-     status tinyint not null,
-     description varchar(100) not null,
-     PRIMARY KEY(id),
-     FOREIGN KEY(company_id) REFERENCES tb_company(id),
-     FOREIGN KEY(resale_id) REFERENCES tb_resale(id)
- );
-
- CREATE TABLE IF NOT EXISTS tb_mechanic(
-    company_id int not null,
-    resale_id int not null,
-    id int not null AUTO_INCREMENT,
-    status tinyint not null,
-    name varchar(100) not null,
-    code_password int not null,
-    role_id int not null,
-    photo_url varchar(255),
-    FOREIGN KEY(company_id) REFERENCES tb_company(id),
-    FOREIGN KEY(resale_id) REFERENCES tb_resale(id),
-    FOREIGN KEY(role_id) REFERENCES tb_mechanic_role(id),
-    PRIMARY KEY(id)
+CREATE TABLE IF NOT EXISTS tb_mechanic_role(
+company_id int not null,
+resale_id int not null,
+id int not null AUTO_INCREMENT,
+status tinyint not null,
+description varchar(100) not null,
+PRIMARY KEY(id),
+FOREIGN KEY(company_id) REFERENCES tb_company(id),
+FOREIGN KEY(resale_id) REFERENCES tb_resale(id)
 );
 
- CREATE TABLE IF NOT EXISTS tb_tool_control_category(
-    company_id int not null,
-    resale_id int not null,
-    id int not null AUTO_INCREMENT,
-    status tinyint not null,
-    type tinyint not null,
-    quantity_req int not null,
-    description varchar(100) not null,
-    FOREIGN KEY(company_id) REFERENCES tb_company(id),
-    FOREIGN KEY(resale_id) REFERENCES tb_resale(id),
-    PRIMARY KEY(id)
+CREATE TABLE IF NOT EXISTS tb_mechanic(
+company_id int not null,
+resale_id int not null,
+id int not null AUTO_INCREMENT,
+status tinyint not null,
+name varchar(100) not null,
+code_password int not null,
+role_id int not null,
+photo_url varchar(255),
+FOREIGN KEY(company_id) REFERENCES tb_company(id),
+FOREIGN KEY(resale_id) REFERENCES tb_resale(id),
+FOREIGN KEY(role_id) REFERENCES tb_mechanic_role(id),
+PRIMARY KEY(id)
 );
 
- CREATE TABLE IF NOT EXISTS tb_tool_control_material(
-    company_id int not null,
-    resale_id int not null,
-    id int not null AUTO_INCREMENT,
-    status tinyint not null,
-    type tinyint not null,
-    number_ca int,
-    description varchar(100) not null,
-    category_id int not null,
-    quantity_accounting_loan float not null,
-    quantity_available_loan float not null,
-    quantity_accounting_kit float not null,
-    quantity_available_kit float not null,
-    validity_day int,
-    photo_url varchar(255),
-    FOREIGN KEY(company_id) REFERENCES tb_company(id),
-    FOREIGN KEY(resale_id) REFERENCES tb_resale(id),
-    FOREIGN KEY(category_id) REFERENCES tb_tool_control_category(id),
-    PRIMARY KEY(id)
+CREATE TABLE IF NOT EXISTS tb_tool_control_category(
+company_id int not null,
+resale_id int not null,
+id int not null AUTO_INCREMENT,
+status tinyint not null,
+type tinyint not null,
+quantity_req int not null,
+description varchar(100) not null,
+FOREIGN KEY(company_id) REFERENCES tb_company(id),
+FOREIGN KEY(resale_id) REFERENCES tb_resale(id),
+PRIMARY KEY(id)
 );
 
- CREATE TABLE IF NOT EXISTS tb_tool_control_request(
-    company_id int not null,
-    resale_id int not null,
-    id int not null AUTO_INCREMENT,
-    status tinyint not null,
-    request_type tinyint not null,
-    request_date datetime not null,
-    request_information varchar(255),
-    request_user_id int not null,
-    request_user_name varchar(100) not null,
-    category_type tinyint not null,
-    mechanic_id int not null,
-    FOREIGN KEY(request_user_id) REFERENCES tb_user(id),
-    FOREIGN KEY(mechanic_id) REFERENCES tb_mechanic(id),
-    PRIMARY KEY(id)
+CREATE TABLE IF NOT EXISTS tb_tool_control_material(
+company_id int not null,
+resale_id int not null,
+id int not null AUTO_INCREMENT,
+status tinyint not null,
+type tinyint not null,
+number_ca int,
+description varchar(100) not null,
+category_id int not null,
+quantity_accounting_loan float not null,
+quantity_available_loan float not null,
+quantity_accounting_kit float not null,
+quantity_available_kit float not null,
+validity_day int,
+photo_url varchar(255),
+FOREIGN KEY(company_id) REFERENCES tb_company(id),
+FOREIGN KEY(resale_id) REFERENCES tb_resale(id),
+FOREIGN KEY(category_id) REFERENCES tb_tool_control_category(id),
+PRIMARY KEY(id)
 );
 
- CREATE TABLE IF NOT EXISTS tb_tool_control_mat_mec(
-    company_id int not null,
-    resale_id int not null,
-    id binary(16) unique not null,
-    request_id int not null,
-    delivery_user_id int,
-    delivery_user_name varchar(100),
-    delivery_date datetime not null,
-    delivery_quantity float not null,
-    delivery_information varchar(255),
-    return_user_id int,
-    return_user_name varchar(100),
-    return_date datetime,
-    return_quantity float,
-    return_information varchar(255),
-    material_id int not null,
-    material_description varchar(100),
-    material_number_ca int,
-    FOREIGN KEY(company_id) REFERENCES tb_company(id),
-    FOREIGN KEY(resale_id) REFERENCES tb_resale(id),
-    FOREIGN KEY(request_id) REFERENCES tb_tool_control_request(id),
-    FOREIGN KEY(delivery_user_id) REFERENCES tb_user(id),
-    FOREIGN KEY(return_user_id) REFERENCES tb_user(id),
-    FOREIGN KEY(material_id) REFERENCES tb_tool_control_material(id),
-    PRIMARY KEY(id)
+CREATE TABLE IF NOT EXISTS tb_tool_control_request(
+company_id int not null,
+resale_id int not null,
+id int not null AUTO_INCREMENT,
+status tinyint not null,
+request_type tinyint not null,
+request_date datetime not null,
+request_information varchar(255),
+request_user_id int not null,
+request_user_name varchar(100) not null,
+category_type tinyint not null,
+mechanic_id int not null,
+FOREIGN KEY(request_user_id) REFERENCES tb_user(id),
+FOREIGN KEY(mechanic_id) REFERENCES tb_mechanic(id),
+PRIMARY KEY(id)
 );
 
- CREATE TABLE IF NOT EXISTS tb_tool_control_kit_mec(
-    company_id int not null,
-    resale_id int not null,
-    id binary(16) unique,
-    request_id int not null,
-    quantity_req float not null,
-    quantity_ret float,
-    user_id_ret int,
-    date_ret datetime,
-    information_ret varchar(255),
-    material_id int not null,
-    FOREIGN KEY(company_id) REFERENCES tb_company(id),
-    FOREIGN KEY(resale_id) REFERENCES tb_resale(id),
-    FOREIGN KEY(user_id_ret) REFERENCES tb_user(id),
-    FOREIGN KEY(request_id) REFERENCES tb_tool_control_request(id),
-    FOREIGN KEY(material_id) REFERENCES tb_tool_control_material(id),
-    PRIMARY KEY(id)
+CREATE TABLE IF NOT EXISTS tb_tool_control_mat_mec(
+company_id int not null,
+resale_id int not null,
+id binary(16) unique not null,
+request_id int not null,
+delivery_user_id int,
+delivery_user_name varchar(100),
+delivery_date datetime not null,
+delivery_quantity float not null,
+delivery_information varchar(255),
+return_user_id int,
+return_user_name varchar(100),
+return_date datetime,
+return_quantity float,
+return_information varchar(255),
+material_id int not null,
+material_description varchar(100),
+material_number_ca int,
+FOREIGN KEY(company_id) REFERENCES tb_company(id),
+FOREIGN KEY(resale_id) REFERENCES tb_resale(id),
+FOREIGN KEY(request_id) REFERENCES tb_tool_control_request(id),
+FOREIGN KEY(delivery_user_id) REFERENCES tb_user(id),
+FOREIGN KEY(return_user_id) REFERENCES tb_user(id),
+FOREIGN KEY(material_id) REFERENCES tb_tool_control_material(id),
+PRIMARY KEY(id)
+);
+
+CREATE TABLE IF NOT EXISTS tb_tool_control_kit_mec(
+company_id int not null,
+resale_id int not null,
+id binary(16) unique,
+request_id int not null,
+quantity_req float not null,
+quantity_ret float,
+user_id_ret int,
+date_ret datetime,
+information_ret varchar(255),
+material_id int not null,
+FOREIGN KEY(company_id) REFERENCES tb_company(id),
+FOREIGN KEY(resale_id) REFERENCES tb_resale(id),
+FOREIGN KEY(user_id_ret) REFERENCES tb_user(id),
+FOREIGN KEY(request_id) REFERENCES tb_tool_control_request(id),
+FOREIGN KEY(material_id) REFERENCES tb_tool_control_material(id),
+PRIMARY KEY(id)
 );
 
 CREATE TABLE IF NOT EXISTS tb_notification(
-    company_id int not null,
-    resale_id int not null,
-    id binary(16) unique,
-    orig_user_id int not null,
-    orig_user_name varchar(100) not null,
-    orig_date datetime not null,
-    orig_role_id int not null,
-    orig_role_desc varchar(100) not null,
-    orig_notification_menu tinyint not null,
-    dest_user_id int,
-    dest_user_role_id int,
-    dest_user_all tinyint not null,
-    vehicle_id int,
-    budget_id int,
-    purchase_order_id int,
-    tool_control_request_id int,
-    header varchar(100) not null,
-    message1 varchar(100) not null,
-    message2 varchar(100),
-    message3 varchar(100),
-    share_message tinyint not null,
-    delete_message tinyint not null,
-    FOREIGN KEY(company_id) REFERENCES tb_company(id),
-    FOREIGN KEY(resale_id) REFERENCES tb_resale(id),
-    FOREIGN KEY(orig_user_id) REFERENCES tb_user(id),
-    FOREIGN KEY(orig_role_id) REFERENCES tb_user_role(id),
-    FOREIGN KEY(dest_user_id) REFERENCES tb_user(id),
-    FOREIGN KEY(dest_user_role_id) REFERENCES tb_user_role(id),
-    FOREIGN KEY(vehicle_id) REFERENCES tb_vehicle_entry(id),
-    FOREIGN KEY(budget_id) REFERENCES tb_budget(id),
-    FOREIGN KEY(purchase_order_id) REFERENCES tb_purchase_order(id),
-    FOREIGN KEY(tool_control_request_id) REFERENCES tb_tool_control_request(id),
-    PRIMARY KEY(id)
+company_id int not null,
+resale_id int not null,
+id binary(16) unique,
+orig_user_id int not null,
+orig_user_name varchar(100) not null,
+orig_date datetime not null,
+orig_role_id int not null,
+orig_role_desc varchar(100) not null,
+orig_notification_menu tinyint not null,
+dest_user_id int,
+dest_user_role_id int,
+dest_user_all tinyint not null,
+vehicle_id int,
+budget_id int,
+purchase_order_id int,
+tool_control_request_id int,
+header varchar(100) not null,
+message1 varchar(100) not null,
+message2 varchar(100),
+message3 varchar(100),
+share_message tinyint not null,
+delete_message tinyint not null,
+FOREIGN KEY(company_id) REFERENCES tb_company(id),
+FOREIGN KEY(resale_id) REFERENCES tb_resale(id),
+FOREIGN KEY(orig_user_id) REFERENCES tb_user(id),
+FOREIGN KEY(orig_role_id) REFERENCES tb_user_role(id),
+FOREIGN KEY(dest_user_id) REFERENCES tb_user(id),
+FOREIGN KEY(dest_user_role_id) REFERENCES tb_user_role(id),
+FOREIGN KEY(vehicle_id) REFERENCES tb_vehicle_entry(id),
+FOREIGN KEY(budget_id) REFERENCES tb_budget(id),
+FOREIGN KEY(purchase_order_id) REFERENCES tb_purchase_order(id),
+FOREIGN KEY(tool_control_request_id) REFERENCES tb_tool_control_request(id),
+PRIMARY KEY(id)
 );
 
- CREATE TABLE IF NOT EXISTS tb_notification_user(
-    company_id int not null,
-    resale_id int not null,
-    id binary(16) unique,
-    notification_id binary(16),
-    user_id int,
-    FOREIGN KEY(company_id) REFERENCES tb_company(id),
-    FOREIGN KEY(resale_id) REFERENCES tb_resale(id),
-    FOREIGN KEY(notification_id) REFERENCES tb_notification(id),
-    FOREIGN KEY(user_id) REFERENCES tb_user(id),
-    PRIMARY KEY(id)
+CREATE TABLE IF NOT EXISTS tb_notification_user(
+company_id int not null,
+resale_id int not null,
+id binary(16) unique,
+notification_id binary(16),
+user_id int,
+FOREIGN KEY(company_id) REFERENCES tb_company(id),
+FOREIGN KEY(resale_id) REFERENCES tb_resale(id),
+FOREIGN KEY(notification_id) REFERENCES tb_notification(id),
+FOREIGN KEY(user_id) REFERENCES tb_user(id),
+PRIMARY KEY(id)
 );
 

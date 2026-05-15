@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 //PrimeNG
@@ -15,12 +15,11 @@ import { lastValueFrom } from 'rxjs';
 //Service
 import { BusyService } from '../loading/busy.service';
 import { PartService } from '../../services/parts/part.service';
-import { StorageService } from '../../services/storage/storage.service';
-import { StatusEnum } from '../../models/enum/status-enum';
 import { MessageResponse } from '../../models/message/message-response';
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { SuccessError } from '../../models/enum/success-error';
+import { IPartFilter } from '../../interfaces/part/ipart.filter';
 
 @Component({
   selector: 'app-filterparts',
@@ -32,89 +31,160 @@ import { SuccessError } from '../../models/enum/success-error';
   providers: [MessageService]
 })
 export class FilterPartsComponent {
-  visibleParts: boolean = false;
-  @Output() public outputPart = new EventEmitter<Part>();
+  visiblePart: boolean = false;
+  @Output() public outputPart = new EventEmitter<IPartFilter[]>();
+  @Input() inputParts: IPartFilter[] = [];
   disabledButtonSelected = true;
   disabledButtonDelete = true;
 
-
-  listParts: Part[] = [];
-  listPartsSelected: Part[] = [];
-  selectedPart!: Part;
-  deleteSelectPart!: Part;
-
-
-
+  listParts: IPartFilter[] = [];
+  listPartsSelected: IPartFilter[] = [];
+  selectedPart!: IPartFilter;
+  deleteSelectPart!: IPartFilter;
+  totalParts = signal<number>(0.0);
+  totalPartsDiscount = signal<number>(0.0);
 
   formFilterParts = new FormGroup({
     filterCode: new FormControl<string>(''),
     filterDesc: new FormControl<string>(''),
   });
 
+  //Select parts
+  visibleSelected: boolean = false;
+  descriptionPart: string = "";
 
-
-
-  requiredFiel: boolean = false;
   formSelectPart = new FormGroup({
-    selecDesc: new FormControl(''),
-    selecPrice: new FormControl<number>(0),
-    selecDiscount: new FormControl<number>(0),
-    selecQtdAvailable: new FormControl<number>(0)
+    price: new FormControl<number>(0,Validators.required),
+    discount: new FormControl<number>(0,Validators.required),
+    quantity: new FormControl<number>(0,Validators.required)
   });
+
   constructor(private partsService: PartService,
     private busyService: BusyService,
-    private storageService: StorageService,
     private messageService: MessageService) { }
+
   showDialogParts() {
-    this.visibleParts = true;
+    this.listParts = [];
+    this.listPartsSelected = [];
+    this.selectedPart = null;
+    this.deleteSelectPart = null;
+    this.totalParts.set(0);
+    this.totalPartsDiscount.set(0);
     this.clearFormFilter();
-    this.clearFormSelected();
-    this.disableFormSelected();
+    this.cleanSelected();
+    this.visiblePart = true;
+
+    if (this.inputParts.length != 0) {
+      this.listPartsSelected = [...this.inputParts];
+      this.updateTotal();
+    }
+
   }
+
   hideDialogParts() {
-    this.visibleParts = false;
+    this.visiblePart = false;
+    this.outputPart.emit(this.listPartsSelected);
   }
-  private addRequireQtd() {
-    this.formSelectPart.controls['selecQtdAvailable'].addValidators(Validators.required);
-    this.formSelectPart.controls['selecQtdAvailable'].updateValueAndValidity();
+
+  private showDialogSelectPart() {
+    this.visibleSelected = true;
   }
-  async selectPartsConfirme() {
-    /*  if (this.selectedParts) {
-       const { value } = this.formSelectPart;
- 
-       if (value.selecQtdAvailable == 0 || value.selecQtdAvailable == null) {
-         this.requiredFiel = true;
-         this.addRequireQtd();
-         return;
-       }
- 
-       this.selectedParts.companyId = this.storageService.companyId;
-       this.selectedParts.resaleId = this.storageService.resaleId;
-       this.selectedParts.status = StatusEnum.ENABLED;
-       this.selectedParts.description = value.selecDesc;
-         this.selectedParts.qtdAvailable = value.selecQtdAvailable;
-        this.selectedParts.discount = value.selecDiscount;
-        this.selectedParts.price = value.selecPrice; 
- 
-        const resultPart = await this.savePart(this.selectedParts);
- 
-       this.outputPart.emit(this.selectedParts);
-       this.visibleParts = false; 
-     } */
+  private hideDialogSelectPart() {
+    this.visibleSelected = false;
   }
-  /*  private async savePart(part: Part): Promise<HttpResponse<Part>> {
-     try {
-       return await lastValueFrom(this.partsService.save(part))
-     } catch (error) {
-       return error;
-     }
-   } */
+
+  selectPartsConfirme() {
+    // Verifica se já existe antes de processar
+    const alreadyExists = this.listPartsSelected.some(
+      p => p.id === this.selectedPart.id
+    );
+
+    if (alreadyExists) {
+      this.messageService.add({
+        severity: 'info',
+        summary: 'Peça',
+        detail: 'Já adicionada',
+        icon: 'pi pi-info-circle'
+      });
+      return;
+    }
+
+    // Reset
+    this.formSelectPart.reset({
+      price: 0,
+      discount: 0,
+      quantity: 0
+    });
+    this.descriptionPart = this.selectedPart.description;
+    this.formSelectPart.get('price').setValue(this.selectedPart.price);
+    this.showDialogSelectPart();
+  }
+
+  confirmSelectPart() {
+    if (this.disabledButtonSelected || !this.selectedPart) return;
+
+    const { price, quantity, discount } = this.formSelectPart.value;
+
+    // Validação
+    if (price <= 0 || quantity <= 0 || discount < 0) return;
+    // Desconto maior que o total
+    if (discount > (price * quantity)) return;
+
+    if (price == null || quantity == null || discount == null) return;
+
+    // Monta objeto (evita mutar diretamente o selectedPart)
+    const part = {
+      ...this.selectedPart,
+      selectPrice: price,
+      selectQuantity: quantity,
+      selectDiscount: discount
+    };
+
+    // Adiciona na lista
+    this.listPartsSelected = [...this.listPartsSelected, part];
+
+    // Atualiza totais
+    this.updateTotal();
+
+    // Reset
+    this.formSelectPart.reset({
+      price: 0,
+      discount: 0,
+      quantity: 0
+    });
+
+    this.selectedPart = null;
+    this.disabledButtonSelected = true;
+    this.hideDialogSelectPart();
+  }
+
+  updateTotal() {
+    let tempDiscount = 0;
+    let tempPrice = 0;
+    for (const i of this.listPartsSelected) {
+      tempDiscount += i.selectDiscount;
+      tempPrice += (i.selectPrice * i.selectQuantity) - i.selectDiscount;
+    }
+    this.totalPartsDiscount.set(tempDiscount);
+    this.totalParts.set(tempPrice);
+  }
+
+  removerSelectPart() {
+    if (!this.disabledButtonDelete && this.deleteSelectPart) {
+      this.listPartsSelected = this.listPartsSelected.filter(
+        p => p.id !== this.deleteSelectPart.id
+      );
+      this.disabledButtonDelete = true;
+      //Atualiza totais
+      this.updateTotal();
+    }
+  }
+
   public async filterPart() {
     this.busyService.busy();
-    //clear selection
-    // this.clearFormSelected();
-    //  this.disableFormSelected();
-    //clear parts list
+    //clean selection
+    this.cleanSelected();
+    //clean parts list
     this.listParts = [];
     const { value } = this.formFilterParts;
 
@@ -149,70 +219,35 @@ export class FilterPartsComponent {
       return error;
     }
   }
-  private disableFormSelected() {
-    this.formSelectPart.get('selecDesc').disable();
-    this.formSelectPart.get('selecQtdAvailable').disable();
-    this.formSelectPart.get('selecPrice').disable();
-    this.formSelectPart.get('selecDiscount').disable();
-  }
-  private enableFormSelected() {
-    this.formSelectPart.get('selecDesc').enable();
-    this.formSelectPart.get('selecQtdAvailable').enable();
-    this.formSelectPart.get('selecPrice').enable();
-    this.formSelectPart.get('selecDiscount').enable();
-  }
-  onSelectEventParts(event: any) {
-    /*  this.formSelectPart.patchValue({
-       selecDesc: this.selectedParts.description,
-       selecQtdAvailable: 0,
-       selecDiscount: 0,
-       //selecPrice: this.selectedParts.price,
-     }); */
-    this.disabledButtonSelected = false;
-    //this.enableFormSelected();
-  }
-  onUnSelectEventParts(event: any) {
-   /*  this.formSelectPart.patchValue({
-      selecDesc: "",
-      selecQtdAvailable: 0,
-      selecPrice: 0,
-      selecDiscount: 0
-    }) */
-    this.disabledButtonSelected = true;
-   // this.disableFormSelected();
-  }
-  clearAll() {
-    this.formFilterParts.patchValue({
-      filterCode: "",
-      filterDesc: "",
 
-    });
-    this.formSelectPart.patchValue({
-      selecDesc: "",
-      selecQtdAvailable: 0,
-      selecPrice: 0,
-      selecDiscount: 0
-    });
-    this.requiredFiel = false;
-    // this.selectedParts = null;
-    //this.partsDisabledButton = true;
-    this.listParts = [];
+  onSelectEventParts(event: any) {
+    this.disabledButtonSelected = false;
+    this.deleteSelectPart = null;
+    this.disabledButtonDelete = true;
   }
+
+  onUnSelectEventParts(event: any) {
+    this.disabledButtonSelected = true;
+  }
+
+  onSelectDeleteEventParts(event: any) {
+    this.disabledButtonSelected = true;
+    this.selectedPart = null;
+    this.disabledButtonDelete = false;
+  }
+  onUnSelectDeleteEventParts(event: any) {
+    this.disabledButtonDelete = true;
+  }
+
   clearFormFilter() {
     this.formFilterParts.patchValue({
       filterCode: "",
       filterDesc: ""
     });
   }
-  clearFormSelected() {
-    this.formSelectPart.patchValue({
-      selecDesc: "",
-      selecQtdAvailable: 0,
-      selecPrice: 0,
-      selecDiscount: 0
-    });
-    this.requiredFiel = false;
-    // this.selectedParts = null;
-    //this.partsDisabledButton = true;
+  cleanSelected() {
+    this.disabledButtonSelected = true;
+    this.disabledButtonDelete = true;
+    this.selectedPart = null;
   }
 }

@@ -99,18 +99,18 @@
                 <div class="col-12 flex p-0">
                     <div class="col-6">
                         <label for="">Valor Atual</label>
-                        <p-inputNumber mode="decimal" inputId="currency-br" locale="pt-BR" [minFractionDigits]="2" formControlName="priceNow"/>
+                        <p-inputNumber mode="decimal" inputId="currency-br" locale="pt-BR" [minFractionDigits]="3" formControlName="priceNow"/>
                         <small class="p-error block" *ngIf="formPart.get('priceNow')?.invalid">Campo obrigatório</small>
                     </div>
                     <div class="col-6">
                         <label for="">Valor Anterior</label>
-                        <p-inputNumber mode="decimal" inputId="currency-br" locale="pt-BR" [minFractionDigits]="2" formControlName="priceOld"/>
+                        <p-inputNumber mode="decimal" inputId="currency-br" locale="pt-BR" [minFractionDigits]="3" formControlName="priceOld"/>
                         <small class="p-error block" *ngIf="formPart.get('priceOld')?.invalid">Campo obrigatório</small>
                     </div>
                 </div>
                 <div class="col-12">
                     <label for="">Valor Garantia</label>
-                    <p-inputNumber mode="decimal" inputId="currency-br" locale="pt-BR" [minFractionDigits]="2" formControlName="priceWarranty" />
+                    <p-inputNumber mode="decimal" inputId="currency-br" locale="pt-BR" [minFractionDigits]="3" formControlName="priceWarranty" />
                     <small class="p-error block" *ngIf="formPart.get('priceWarranty')?.invalid">Campo obrigatório</small>
                 </div>
                 <div class="col-12">

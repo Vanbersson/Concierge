@@ -1,7 +1,8 @@
 package com.concierge.apiconcierge.services.purchase.item;
 
 import com.concierge.apiconcierge.exceptions.purchase.PurchaseOrderException;
-import com.concierge.apiconcierge.models.purchase.PurchaseOrderItem;
+import com.concierge.apiconcierge.models.message.MessageResponse;
+import com.concierge.apiconcierge.models.purchase.item.PurchaseOrderItem;
 import com.concierge.apiconcierge.repositories.purchase.IPurchaseOrderItemRepository;
 import com.concierge.apiconcierge.util.ConstantsMessage;
 import com.concierge.apiconcierge.validation.purchase.item.IPurchaseOrderItemValidation;
@@ -22,16 +23,14 @@ public class PurchaseOrderItemService implements IPurchaseOrderItemService {
 
     @SneakyThrows
     @Override
-    public String save(PurchaseOrderItem item) {
+    public MessageResponse save(PurchaseOrderItem item) {
         try {
-            String message = this.validation.save(item);
-            if (ConstantsMessage.SUCCESS.equals(message)) {
-                item.setId(null);
-                this.repository.save(item);
-                return ConstantsMessage.SUCCESS;
-            } else {
-                throw new PurchaseOrderException(message);
+            MessageResponse response = this.validation.save(item);
+            if (ConstantsMessage.SUCCESS.equals(response.getStatus())) {
+                PurchaseOrderItem result = this.repository.save(item);
+                response.setData(result);
             }
+            return response;
         } catch (Exception ex) {
             throw new PurchaseOrderException(ex.getMessage());
         }
@@ -39,15 +38,14 @@ public class PurchaseOrderItemService implements IPurchaseOrderItemService {
 
     @SneakyThrows
     @Override
-    public String update(PurchaseOrderItem item) {
+    public MessageResponse update(PurchaseOrderItem item) {
         try {
-            String message = this.validation.update(item);
-            if (ConstantsMessage.SUCCESS.equals(message)) {
-                this.repository.save(item);
-                return ConstantsMessage.SUCCESS;
-            } else {
-                throw new PurchaseOrderException(message);
+            MessageResponse response = this.validation.update(item);
+            if (ConstantsMessage.SUCCESS.equals(response.getStatus())) {
+                PurchaseOrderItem result = this.repository.save(item);
+                response.setData(result);
             }
+            return response;
         } catch (Exception ex) {
             throw new PurchaseOrderException(ex.getMessage());
         }
@@ -55,15 +53,18 @@ public class PurchaseOrderItemService implements IPurchaseOrderItemService {
 
     @SneakyThrows
     @Override
-    public String delete(PurchaseOrderItem item){
+    public MessageResponse delete(PurchaseOrderItem item) {
         try {
-            String message = this.validation.delete(item);
-            if (ConstantsMessage.SUCCESS.equals(message)) {
-                this.repository.deleteItem(item.getId());
-                return ConstantsMessage.SUCCESS;
-            } else {
-                throw new PurchaseOrderException(message);
+            MessageResponse response = this.validation.delete(item);
+            if (ConstantsMessage.SUCCESS.equals(response.getStatus())) {
+                this.repository.deleteItem(
+                        item.getId().getCompanyId(),
+                        item.getId().getResaleId(),
+                        item.getId().getPurchaseId(),
+                        item.getId().getItemOrder(),
+                        item.getId().getItemId());
             }
+            return response;
         } catch (Exception ex) {
             throw new PurchaseOrderException(ex.getMessage());
         }
@@ -73,12 +74,11 @@ public class PurchaseOrderItemService implements IPurchaseOrderItemService {
     @Override
     public List<PurchaseOrderItem> filterId(Integer companyId, Integer resaleId, Integer purchaseId) {
         try {
-            String message = this.validation.filterId(companyId, resaleId, purchaseId);
-            if (ConstantsMessage.SUCCESS.equals(message)) {
+            MessageResponse response = this.validation.filterId(companyId, resaleId, purchaseId);
+            if (ConstantsMessage.SUCCESS.equals(response.getStatus())) {
                 return this.repository.filterPurchaseOrderId(companyId, resaleId, purchaseId);
-            } else {
-                throw new PurchaseOrderException(message);
             }
+            return List.of();
         } catch (Exception ex) {
             throw new PurchaseOrderException(ex.getMessage());
         }

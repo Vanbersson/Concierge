@@ -97,7 +97,12 @@ export const routes: Routes = [
                             {
                                 path: 'pedido/compra',
                                 title: 'Pedidos de compras',
-                                loadComponent: () => import('./views/parts/purchase.order/purchase.order.component')
+                                loadComponent: () => import('./views/parts/purchase/purchase.order/purchase.order.component')
+                            },
+                            {
+                                path: 'pedido/pedido/:id',
+                                title: 'Manutenção Pedido',
+                                loadComponent: () => import('./views/parts/purchase/register.order/register.order.component')
                             }
                         ]
                     },

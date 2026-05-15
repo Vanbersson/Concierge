@@ -1,14 +1,15 @@
 package com.concierge.apiconcierge.services.purchase.item;
 
-import com.concierge.apiconcierge.models.purchase.PurchaseOrderItem;
+import com.concierge.apiconcierge.models.message.MessageResponse;
+import com.concierge.apiconcierge.models.purchase.item.PurchaseOrderItem;
 
 import java.util.List;
 
 public interface IPurchaseOrderItemService {
-    public String save(PurchaseOrderItem item);
+    MessageResponse save(PurchaseOrderItem item);
 
-    public String update(PurchaseOrderItem item);
-    public String delete(PurchaseOrderItem item);
+    MessageResponse update(PurchaseOrderItem item);
+    MessageResponse delete(PurchaseOrderItem item);
 
-    public List<PurchaseOrderItem> filterId(Integer companyId, Integer resaleId, Integer purchaseId);
+     List<PurchaseOrderItem> filterId(Integer companyId, Integer resaleId, Integer purchaseId);
 }

@@ -2,7 +2,8 @@ package com.concierge.apiconcierge.controllers.purchase;
 
 import com.concierge.apiconcierge.dtos.message.MessageResponseDto;
 import com.concierge.apiconcierge.dtos.purchase.PurchaseOrderItemDto;
-import com.concierge.apiconcierge.models.purchase.PurchaseOrderItem;
+import com.concierge.apiconcierge.models.message.MessageResponse;
+import com.concierge.apiconcierge.models.purchase.item.PurchaseOrderItem;
 import com.concierge.apiconcierge.services.purchase.item.PurchaseOrderItemService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/purchase/order/item")
@@ -25,8 +25,8 @@ public class PurchaseOrderItemController {
         try {
             PurchaseOrderItem item = new PurchaseOrderItem();
             BeanUtils.copyProperties(data, item);
-            String message = this.service.save(item);
-            return ResponseEntity.status(HttpStatus.CREATED).body(new MessageResponseDto(message));
+            MessageResponse response = this.service.save(item);
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
         }
@@ -37,8 +37,8 @@ public class PurchaseOrderItemController {
         try {
             PurchaseOrderItem item = new PurchaseOrderItem();
             BeanUtils.copyProperties(data, item);
-            String message = this.service.update(item);
-            return ResponseEntity.status(HttpStatus.OK).body(new MessageResponseDto(message));
+            MessageResponse response = this.service.update(item);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
         }
@@ -49,8 +49,8 @@ public class PurchaseOrderItemController {
         try {
             PurchaseOrderItem item = new PurchaseOrderItem();
             BeanUtils.copyProperties(data, item);
-            String message = this.service.delete(item);
-            return ResponseEntity.status(HttpStatus.OK).body(new MessageResponseDto(message));
+            MessageResponse response = this.service.delete(item);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
         }

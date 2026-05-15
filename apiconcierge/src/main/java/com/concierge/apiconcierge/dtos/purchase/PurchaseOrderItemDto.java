@@ -1,19 +1,16 @@
 package com.concierge.apiconcierge.dtos.purchase;
 
-import jakarta.persistence.*;
 
-import java.util.UUID;
+import com.concierge.apiconcierge.models.purchase.item.PurchaseOrderItemId;
+
+import java.math.BigDecimal;
 
 public record PurchaseOrderItemDto(
-        Integer companyId,
-        Integer resaleId,
-        UUID id,
-        Integer purchaseId,
-        Integer partId,
-        String partCode,
-        String partDescription,
-        float quantity,
-        float discount,
-        float price
+        PurchaseOrderItemId id,
+        String itemCode,
+        String itemDescription,
+        BigDecimal quantity,
+        BigDecimal discount,
+        BigDecimal price
 ) {
 }

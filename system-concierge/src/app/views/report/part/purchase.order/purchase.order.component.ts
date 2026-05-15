@@ -37,7 +37,7 @@ import { UserService } from '../../../../services/user/user.service';
 import { User } from '../../../../models/user/user';
 import { lastValueFrom } from 'rxjs';
 import { HttpResponse } from '@angular/common/http';
-import { PurchaseOrderItem } from '../../../../models/purchase.order/purchase.order.item';
+import { PurchaseOrderItem } from '../../../../models/purchase.order/item/purchase.order.item';
 
 //Print
 import { PurchaseOrderItemService } from '../../../../services/purchase/purchase-order-item.service';

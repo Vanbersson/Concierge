@@ -5,6 +5,7 @@ import com.concierge.apiconcierge.models.enums.StatusEnableDisable;
 import com.concierge.apiconcierge.models.message.MessageResponse;
 import com.concierge.apiconcierge.models.part.Part;
 import com.concierge.apiconcierge.repositories.parts.IPartRepository;
+import com.concierge.apiconcierge.repositories.parts.interfaces.IFilterPart;
 import com.concierge.apiconcierge.services.parts.interfaces.IPartListAll;
 import com.concierge.apiconcierge.util.ConstantsMessage;
 import com.concierge.apiconcierge.validation.parts.IPartValidation;
@@ -123,8 +124,24 @@ public class PartService implements IPartService {
         try {
             MessageResponse response = this.validation.filterDesc(companyId, resaleId, desc);
             if (ConstantsMessage.SUCCESS.equals(response.getStatus())) {
-                List<Part> result = this.repository.filterDesc(companyId, resaleId, desc);
-                response.setData(result);
+                List<IFilterPart> result = this.repository.filterDesc(companyId, resaleId, desc);
+                List<Map<String, Object>> list = new ArrayList<>();
+                for(IFilterPart p : result){
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("companyId",companyId);
+                    map.put("resaleId",resaleId);
+                    map.put("id",p.getId());
+                    map.put("code",p.getCode());
+                    map.put("description",p.getDescription());
+                    map.put("available",p.getAvailable());
+                    map.put("price",p.getPrice());
+                    map.put("unit",p.getUnit());
+                    map.put("brand",p.getBrand());
+                    map.put("group",p.getGroup());
+                    map.put("category",p.getCategory());
+                    list.add(map);
+                }
+                response.setData(list);
             }
             return response;
         } catch (Exception ex) {

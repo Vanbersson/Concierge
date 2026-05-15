@@ -5,7 +5,7 @@ import { lastValueFrom } from 'rxjs';
 
 //Class
 import { PurchaseOrder } from '../../models/purchase.order/purchase.order';
-import { PurchaseOrderItem } from '../../models/purchase.order/purchase.order.item';
+import { PurchaseOrderItem } from '../../models/purchase.order/item/purchase.order.item';
 
 //Print
 import printJS from 'print-js';

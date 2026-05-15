@@ -2,7 +2,7 @@ import { HttpClient, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { StorageService } from '../storage/storage.service';
 import { environment } from '../../../environments/environment';
-import { PurchaseOrderItem } from '../../models/purchase.order/purchase.order.item';
+import { PurchaseOrderItem } from '../../models/purchase.order/item/purchase.order.item';
 import { Observable } from 'rxjs';
 
 @Injectable({
