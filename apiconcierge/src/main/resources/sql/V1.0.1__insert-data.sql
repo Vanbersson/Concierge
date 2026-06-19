@@ -105,6 +105,11 @@ VALUES
 ('4_99_0','Categoria de Clientes'),
 ('4_99_1','Condição de pagamento'),
 
+('5_0','CRM'),
+('5_1','Mapa'),
+('5_99','Cadastros'),
+('5_99_0','Vendedores'),
+
 ('100_0','Relatório'),
 ('100_1','Portaria'),
 ('100_1_0','Veículos'),

@@ -8,5 +8,4 @@ public class ApiconciergeApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(ApiconciergeApplication.class, args);
 	}
-
 }

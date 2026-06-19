@@ -109,8 +109,24 @@ public class PartService implements IPartService {
         try {
             MessageResponse response = this.validation.filterCode(companyId, resaleId, code);
             if (ConstantsMessage.SUCCESS.equals(response.getStatus())) {
-                List<Part> result = this.repository.filterCode(companyId, resaleId, code);
-                response.setData(result);
+                List<IFilterPart> result = this.repository.filterCode(companyId, resaleId, code);
+                List<Map<String, Object>> list = new ArrayList<>();
+                for(IFilterPart p : result){
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("companyId",companyId);
+                    map.put("resaleId",resaleId);
+                    map.put("id",p.getId());
+                    map.put("code",p.getCode());
+                    map.put("description",p.getDescription());
+                    map.put("available",p.getAvailable());
+                    map.put("price",p.getPrice());
+                    map.put("unit",p.getUnit());
+                    map.put("brand",p.getBrand());
+                    map.put("group",p.getGroup());
+                    map.put("category",p.getCategory());
+                    list.add(map);
+                }
+                response.setData(list);
             }
             return response;
         } catch (Exception ex) {

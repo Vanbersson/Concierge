@@ -16,6 +16,9 @@ public class PurchaseOrderItem {
     @EmbeddedId
     private PurchaseOrderItemId id;
 
+    @Column(name = "item_order")
+    private Integer itemOrder;
+
     @Column(name = "item_code")
     private String itemCode;
 

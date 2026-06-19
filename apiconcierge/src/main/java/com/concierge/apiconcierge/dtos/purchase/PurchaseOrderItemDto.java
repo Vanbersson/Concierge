@@ -7,6 +7,7 @@ import java.math.BigDecimal;
 
 public record PurchaseOrderItemDto(
         PurchaseOrderItemId id,
+        Integer itemOrder,
         String itemCode,
         String itemDescription,
         BigDecimal quantity,

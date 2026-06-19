@@ -54,16 +54,16 @@ export class FilterPartsComponent {
   descriptionPart: string = "";
 
   formSelectPart = new FormGroup({
-    price: new FormControl<number>(0,Validators.required),
-    discount: new FormControl<number>(0,Validators.required),
-    quantity: new FormControl<number>(0,Validators.required)
+    price: new FormControl<number>(0, Validators.required),
+    discount: new FormControl<number>(0, Validators.required),
+    quantity: new FormControl<number>(0, Validators.required)
   });
 
   constructor(private partsService: PartService,
     private busyService: BusyService,
     private messageService: MessageService) { }
 
-  showDialogParts() {
+  async showDialogParts() {
     this.listParts = [];
     this.listPartsSelected = [];
     this.selectedPart = null;
@@ -74,9 +74,22 @@ export class FilterPartsComponent {
     this.cleanSelected();
     this.visiblePart = true;
 
-    if (this.inputParts.length != 0) {
+    if (this.inputParts.length > 0) {
       this.listPartsSelected = [...this.inputParts];
+
+
       this.updateTotal();
+
+      for (let i of this.listPartsSelected) {
+        const partsResult = await this.filterCode(i.code);
+        if (partsResult.status == 200 && partsResult.body.status == SuccessError.succes) {
+          const part = partsResult.body.data;
+          i.unit = part.at(0).unit;
+          i.brand = part.at(0).brand;
+          i.group = part.at(0).group;
+          i.category = part.at(0).category;
+        }
+      }
     }
 
   }

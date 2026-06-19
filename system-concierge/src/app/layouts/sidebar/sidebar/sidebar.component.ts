@@ -143,19 +143,19 @@ export class SidebarComponent implements OnInit {
               {
                 key: '2_99_1',
                 label: 'Grupo de Peças',
-                routerLink:'pecas/cadastros/group',
+                routerLink: 'pecas/cadastros/group',
                 visible: false,
               },
               {
                 key: '2_99_2',
                 label: 'Categoria de Peças',
-                  routerLink:'pecas/cadastros/category',
+                routerLink: 'pecas/cadastros/category',
                 visible: false,
               },
               {
                 key: '2_99_3',
                 label: 'Unidades de Medida',
-                routerLink:'pecas/cadastros/unit',
+                routerLink: 'pecas/cadastros/unit',
                 visible: false,
               }
             ]
@@ -247,10 +247,36 @@ export class SidebarComponent implements OnInit {
                 routerLink: 'faturamento/cadastros/client-category'
               },
               {
-                key:'4_99_1',
-                label:'Condição de pagamento',
-                visible:false,
-                routerLink:'faturamento/cadastros/type-payment'
+                key: '4_99_1',
+                label: 'Condição de pagamento',
+                visible: false,
+                routerLink: 'faturamento/cadastros/type-payment'
+              }
+            ]
+          }
+        ]
+      },
+      {
+        key: '5_0',
+        label: 'CRM',
+        visible: false,
+        items: [
+          {
+            key: '5_1',
+            label: 'Mapa',
+            visible: false,
+            routerLink:'CRM/map'
+          },
+          {
+            key: '5_99',
+            label: 'Cadastros',
+            visible: false,
+            items: [
+              {
+                key: '5_99_0',
+                label: 'Vendedores',
+                visible: false,
+               
               }
             ]
           }
@@ -319,7 +345,7 @@ export class SidebarComponent implements OnInit {
                 key: '999_2_2',
                 label: 'Marcas',
                 visible: false,
-                routerLink:'configuracao/cadastros/marcas'
+                routerLink: 'configuracao/cadastros/marcas'
               }
             ]
           },

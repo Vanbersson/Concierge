@@ -192,6 +192,16 @@ export const routes: Routes = [
                 ]
             },
             {
+                path: 'CRM',
+                children: [
+                    {
+                        path: 'map',
+                        title: 'Mapa',
+                        loadComponent: () => import('./views/crm/map/map.component'),
+                    }
+                ]
+            },
+            {
                 path: 'configuracao',
                 children: [
                     {

@@ -24,9 +24,6 @@ public class PurchaseOrderItemId implements Serializable {
     @Column(name = "purchase_id")
     private Integer purchaseId;
 
-    @Column(name = "item_order")
-    private Integer itemOrder;
-
     @Column(name = "item_id")
     private Integer itemId;
 

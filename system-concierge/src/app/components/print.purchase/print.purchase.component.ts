@@ -15,6 +15,7 @@ import { PurchaseOrderItemService } from '../../services/purchase/purchase-order
 import { PurchaseOrderService } from '../../services/purchase/purchase-order.service';
 import { StorageService } from '../../services/storage/storage.service';
 import { MessageResponse } from '../../models/message/message-response';
+import { SuccessError } from '../../models/enum/success-error';
 
 @Component({
   selector: 'app-printPurchase',
@@ -39,19 +40,19 @@ export class PrintPurchaseComponent {
   public async print(id: number) {
 
     const resultPu = await this.PurchaseOrderFilterId(id);
-    if (resultPu.status == 200) {
+    if (resultPu.status == 200 && resultPu.body.status == SuccessError.succes) {
       //Dados 
       this.printPurchaseOrder.set(resultPu.body.data);
 
       this.printPurchaseOrderItems = Array(30).fill(new PurchaseOrderItem());
 
       //List items
-      this.purchaseOrderItems = await this.listPurchaseOrderItem(this.storageService.companyId, this.storageService.resaleId, id);
+      this.purchaseOrderItems = await this.listPurchaseOrderItem(id);
       this.somaItem();
 
-      for (let index = 0; index < this.purchaseOrderItems.length; index++) {
+       for (let index = 0; index < this.purchaseOrderItems.length; index++) {
         this.printPurchaseOrderItems[index] = this.purchaseOrderItems.at(index);
-      }
+      } 
 
       setTimeout(() => {
         const print = document.getElementById('print-sectionId');
@@ -77,7 +78,7 @@ export class PrintPurchaseComponent {
       return error;
     }
   }
-  private async listPurchaseOrderItem(companyId: number, resaleId: number, purchaseId: number): Promise<PurchaseOrderItem[]> {
+  private async listPurchaseOrderItem(purchaseId: number): Promise<PurchaseOrderItem[]> {
     try {
       return await lastValueFrom(this.purchaseOrderItemService.filterId(purchaseId));
     } catch (error) {

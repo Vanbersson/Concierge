@@ -653,7 +653,7 @@ FOREIGN KEY(company_id) REFERENCES tb_company(id),
 FOREIGN KEY(resale_id) REFERENCES tb_resale(id),
 FOREIGN KEY(purchase_id) REFERENCES tb_purchase_order(id),
 FOREIGN KEY(item_id) REFERENCES tb_part(id),
-CONSTRAINT pk_purchase_order_item PRIMARY KEY(company_id,resale_id,purchase_id,item_order,item_id)
+CONSTRAINT pk_purchase_order_item PRIMARY KEY(company_id,resale_id,purchase_id,item_id)
 );
 
 CREATE TABLE IF NOT EXISTS tb_purchase_order_item_consumption(

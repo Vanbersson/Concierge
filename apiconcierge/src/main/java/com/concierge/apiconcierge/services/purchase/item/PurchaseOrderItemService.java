@@ -61,7 +61,7 @@ public class PurchaseOrderItemService implements IPurchaseOrderItemService {
                         item.getId().getCompanyId(),
                         item.getId().getResaleId(),
                         item.getId().getPurchaseId(),
-                        item.getId().getItemOrder(),
+                        item.getItemOrder(),
                         item.getId().getItemId());
             }
             return response;

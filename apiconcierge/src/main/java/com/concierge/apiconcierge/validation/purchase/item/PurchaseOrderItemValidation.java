@@ -30,7 +30,7 @@ public class PurchaseOrderItemValidation implements IPurchaseOrderItemValidation
             response.setMessage(ConstantsMessage.NOT_INFORMED);
             return response;
         }
-        if (item.getId().getItemOrder() == null || item.getId().getItemOrder() == 0) {
+        if (item.getItemOrder() == null || item.getItemOrder() == 0) {
             response.setStatus(ConstantsMessage.ERROR);
             response.setHeader("Ordem");
             response.setMessage(ConstantsMessage.NOT_INFORMED);
@@ -99,7 +99,7 @@ public class PurchaseOrderItemValidation implements IPurchaseOrderItemValidation
             response.setMessage(ConstantsMessage.NOT_INFORMED);
             return response;
         }
-        if (item.getId().getItemOrder() == null || item.getId().getItemOrder() == 0) {
+        if (item.getItemOrder() == null || item.getItemOrder() == 0) {
             response.setStatus(ConstantsMessage.ERROR);
             response.setHeader("Ordem");
             response.setMessage(ConstantsMessage.NOT_INFORMED);

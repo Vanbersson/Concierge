@@ -3,6 +3,7 @@ import { CommonModule, DatePipe } from '@angular/common';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { lastValueFrom } from 'rxjs';
 import { HttpResponse } from '@angular/common/http';
+import { ActivatedRoute,  Router } from '@angular/router';
 
 //PrimeNG
 import { PrimeNGConfig } from 'primeng/api';
@@ -37,7 +38,6 @@ import { User } from '../../../../models/user/user';
 import { IPartFilter } from '../../../../interfaces/part/ipart.filter';
 import { ClientCompany } from '../../../../models/clientcompany/client-company';
 import { PurchaseOrder } from '../../../../models/purchase.order/purchase.order';
-import { StatusDelivery } from '../../../../models/purchase.order/enums/status.delivery';
 import { UserService } from '../../../../services/user/user.service';
 import { TypePaymentService } from '../../../../services/payment/type-payment.service';
 import { BusyService } from '../../../../components/loading/busy.service';
@@ -47,9 +47,6 @@ import { PurchaseOrderItemService } from '../../../../services/purchase/purchase
 import { SuccessError } from '../../../../models/enum/success-error';
 import { StatusPurchaseOrder } from '../../../../models/purchase.order/enums/status.purchase.order';
 import { MessageResponse } from '../../../../models/message/message-response';
-import { Part } from '../../../../models/parts/Part';
-import { ActivatedRoute, Route, Router } from '@angular/router';
-import { PurchaseOrderItemId } from '../../../../models/purchase.order/item/purchase.order.item.id';
 
 @Component({
   selector: 'app-register.order',
@@ -121,6 +118,10 @@ export default class RegisterOrderComponent implements OnInit, DoCheck {
   estoque = TypePurchaseOrder.ESTOQUE;
   consumo = TypePurchaseOrder.CONSUMO;
 
+  isSaveItem: boolean = false;
+  isUpdateItem: boolean = false;
+  isDeleteItem: boolean = false;
+
   //Print
   @ViewChild('printComponent') printComponent!: PrintPurchaseComponent;
 
@@ -164,33 +165,111 @@ export default class RegisterOrderComponent implements OnInit, DoCheck {
       this.selectClientCompany.set(new ClientCompany());
     }
 
-    if (this.selectPart().length != 0) {
-      this.inputiListPartsSelected = this.selectPart();
-      //limpa a lista de item
-      this.purchaseOrderItems = [];
-      for (let index = 0; index < this.selectPart().length; index++) {
-        const element = this.selectPart()[index];
-        const item: PurchaseOrderItem = new PurchaseOrderItem();
-        item.id.companyId = element.companyId;
-        item.id.resaleId = element.resaleId;
-        item.id.purchaseId = this.purchaseOrder.id;
-        item.id.itemOrder = index + 1;
-        item.id.itemId = element.id;
-        item.itemCode = element.code;
-        item.itemDescription = element.description;
-        item.price = element.selectPrice;
-        item.discount = element.selectDiscount;
-        item.quantity = element.selectQuantity;
-        this.purchaseOrderItems.push(item);
-      }
-      this.updateTotalItem();
-
-      //Salvar o item
-      //this.saveParts(this.selectPart());
-
+    if (this.selectPart().length > 0) {
+      this.seleItem(this.selectPart());
       //limpar selecção
       this.selectPart.set([]);
     }
+  }
+
+  private async seleItem(items: IPartFilter[]) {
+    this.busyService.busy();
+    for (let index = 0; index < items.length; index++) {
+      const element = items[index];
+      //VERIFICA SE O ITEM JÁ EXISTE NA LISTA
+      let itemExist = this.purchaseOrderItems.find(i => i.itemCode == element.code);
+      //SE O ITEM NÃO EXISTE NA LISTA SALVA NA BASE
+      if (itemExist == null) {
+        await this.saveNewItem(index, element);
+      } else if (itemExist.quantity != element.selectQuantity || itemExist.price != element.selectPrice || itemExist.discount != element.selectDiscount) {
+        //SE O ITEM JÁ EXISTE NA LISTA ATUALIZA NA BASE
+        itemExist.price = element.selectPrice;
+        itemExist.quantity = element.selectQuantity;
+        itemExist.discount = element.selectDiscount;
+        await this.saveUpdateItem(itemExist);
+
+        this.purchaseOrderItems.map(i => {
+          if (i.itemCode == itemExist.itemCode) {
+            i = itemExist;
+          }
+        });
+      }
+    }
+    //SE O ITEM FOI REMOVIDO DURANTE A PESQUISA TEM QUE SER REMOVIDO DA BASE
+    for (const element of this.purchaseOrderItems) {
+      const itemExist = items.find(s => s.code === element.itemCode);
+      if (!itemExist) {
+        await this.deleteItem(element);
+      }
+    }
+    if (this.isSaveItem || this.isUpdateItem || this.isDeleteItem) {
+      await this.listItems(this.purchaseOrder.id);
+    }
+    //PROCESSA ITENS
+    await this.processItem();
+
+    if (this.isSaveItem || this.isUpdateItem || this.isDeleteItem) {
+      setTimeout(() => {
+        this.listItems(this.purchaseOrder.id);
+      }, 700);
+    }
+    //Atualizar o total dos itens
+    this.updateTotalItem();
+
+    this.isDeleteItem = false;
+    this.isUpdateItem = false;
+    this.isSaveItem = false;
+
+    this.busyService.idle();
+  }
+
+  private async saveNewItem(index: number, item: IPartFilter): Promise<boolean> {
+    let itemNew = this.convertIPartFilterToPurchaseOrderItem(item);
+    itemNew.itemOrder = index + 1;
+    const resultItem = await this.savePurchaseOrderItem(itemNew);
+    if (resultItem.status == 201 && resultItem.body.status == SuccessError.succes) {
+      this.purchaseOrderItems.push(itemNew);
+      this.isSaveItem = true;
+    }
+    return true;
+  }
+  private async saveUpdateItem(item: PurchaseOrderItem): Promise<boolean> {
+    const resultItem = await this.updatePurchaseOrderItem(item);
+    if (resultItem.status == 200 && resultItem.body.status == SuccessError.succes) {
+      this.isUpdateItem = true;
+    }
+    return true;
+  }
+  private async deleteItem(item: PurchaseOrderItem): Promise<boolean> {
+    const resultItem = await this.deletePurchaseOrderItem(item);
+    if (resultItem.status == 200 && resultItem.body.status == SuccessError.succes) {
+      this.isDeleteItem = true;
+    }
+    return true;
+  }
+  private async processItem(): Promise<boolean> {
+    //SE REMOVEL ITEM ATUALIZAR A ORDEM DOS ITENS
+    if (this.isDeleteItem) {
+      this.purchaseOrderItems.map(async (element, index) => {
+        element.itemOrder = index + 1;
+        const result = await this.saveUpdateItem(element);
+        if (result) {
+          this.isUpdateItem = true;
+        }
+      });
+    }
+    return true;
+  }
+
+  private async listItems(purchaseId: number): Promise<boolean> {
+    this.purchaseOrderItems = [];
+    this.inputiListPartsSelected = [];
+    this.purchaseOrderItems = await this.listPurchaseOrderItem(purchaseId);
+    for (let index = 0; index < this.purchaseOrderItems.length; index++) {
+      const element = this.purchaseOrderItems[index];
+      this.inputiListPartsSelected.push(this.convertPurchaseOrderItemToIPartFilter(element));
+    }
+    return true;
   }
 
   private async init() {
@@ -201,12 +280,10 @@ export default class RegisterOrderComponent implements OnInit, DoCheck {
     }
     this.listPayments = await this.listAllEnabledTypePayment();
 
-
     if (this.activatedRoute.snapshot.params['id']) {
 
       this.activatedRoute.params.subscribe(params => {
         try {
-
           if (params['id'] > 0) {
             this.isNewPurchaseOrder = false;
             this.edit(params['id']);
@@ -218,11 +295,8 @@ export default class RegisterOrderComponent implements OnInit, DoCheck {
         } catch (error) {
           console.log("erro");
         }
-
       });
     }
-
-
     this.busyService.idle();
   }
 
@@ -286,15 +360,10 @@ export default class RegisterOrderComponent implements OnInit, DoCheck {
     return datePipe.transform(date, "yyyy-MM-dd") + "T00:00:00.000-03:00";
   }
 
-  /*   private showDialogPurchase() {
-      this.purcharOrderVisible = true;
-    }
-    hideDialogPurchase() {
-      this.purcharOrderVisible = false;
-    } */
   showDialogNF() {
     this.nfVisible = true;
   }
+
   hideDialogNF() {
     this.nfVisible = false;
   }
@@ -392,6 +461,7 @@ export default class RegisterOrderComponent implements OnInit, DoCheck {
     const resultPu = await this.saveUpdatePu(this.purchaseOrder);
     this.busyService.idle();
     if (resultPu.status == 200 && resultPu.body.status == SuccessError.succes) {
+
       this.messageService.add({ severity: 'success', summary: resultPu.body.header, detail: resultPu.body.message, icon: 'pi pi-check' });
       //Valid NF
       this.validNf();
@@ -404,7 +474,7 @@ export default class RegisterOrderComponent implements OnInit, DoCheck {
   }
   private async edit(id: number) {
     this.busyService.busy();
-    const resultPu = await this.purchaseEdit(id);
+    const resultPu = await this.PurchaseOrderFilterId(id);
     this.busyService.idle();
     if (resultPu.status == 200 && resultPu.body.status == SuccessError.succes) {
       this.isNewPurchaseOrder = false;
@@ -444,11 +514,11 @@ export default class RegisterOrderComponent implements OnInit, DoCheck {
         information: this.purchaseOrder.information
       });
       this.formPurchase.get('type').disable();
-      // this.showDialogPurchase();
 
-      //List items
-      //this.purchaseOrderItems = await this.listPurchaseOrderItem(this.purchaseOrder.companyId, this.purchaseOrder.resaleId, this.purchaseOrder.id);
-      // this.somaItem();
+      //LISTA TODOS OS ITENS
+      await this.listItems(this.purchaseOrder.id);
+
+      this.updateTotalItem();
     }
 
   }
@@ -466,43 +536,33 @@ export default class RegisterOrderComponent implements OnInit, DoCheck {
     });
   }
 
-
-  //Delete
-  async deletePart(item: PurchaseOrderItem) {
-
-    let listTemp: PurchaseOrderItem[] = [];
-
-    for (let index = 0; index < this.purchaseOrderItems.length; index++) {
-      const element = this.purchaseOrderItems[index];
-      if (item.id.itemId != element.id.itemId) {
-        listTemp.push(element);
-      }
-
-    }
-    this.purchaseOrderItems = [];
-    for (let index = 0; index < listTemp.length; index++) {
-      let element = listTemp[index];
-      element.id.itemOrder = index + 1;
-      this.purchaseOrderItems.push(element);
-    }
-
-    listTemp = [];
-
-
-    /*  const resultItem = await this.deleteItem(item);
-     if (resultItem.status == 200) {
-       //List items
-       this.purchaseOrderItems = await this.listPurchaseOrderItem(this.purchaseOrder.companyId, this.purchaseOrder.resaleId, this.purchaseOrder.id);
-       this.updateTotalItem();
-     } */
-
+  private convertPurchaseOrderItemToIPartFilter(item: PurchaseOrderItem): IPartFilter {
+    let p: IPartFilter = {
+      companyId: item.id.companyId,
+      resaleId: item.id.resaleId,
+      id: item.id.itemId,
+      code: item.itemCode,
+      description: item.itemDescription,
+      available: 0,
+      price: item.price,
+      selectPrice: item.price,
+      selectQuantity: item.quantity,
+      selectDiscount: item.discount,
+    };
+    return p;
   }
-  private async deleteItem(item: PurchaseOrderItem): Promise<HttpResponse<PurchaseOrderItem>> {
-    try {
-      return await lastValueFrom(this.purchaseOrderItemService.delete(item));
-    } catch (error) {
-      return error;
-    }
+  private convertIPartFilterToPurchaseOrderItem(item: IPartFilter): PurchaseOrderItem {
+    let p: PurchaseOrderItem = new PurchaseOrderItem();
+    p.id.companyId = item.companyId;
+    p.id.resaleId = item.resaleId;
+    p.id.itemId = item.id;
+    p.id.purchaseId = this.purchaseOrder.id;
+    p.itemCode = item.code;
+    p.itemDescription = item.description;
+    p.discount = item.selectDiscount;
+    p.price = item.selectPrice;
+    p.quantity = item.selectQuantity;
+    return p;
   }
   //Print
   print(id: number) {
@@ -513,24 +573,52 @@ export default class RegisterOrderComponent implements OnInit, DoCheck {
     }
   }
 
+  async deletePart(item: PurchaseOrderItem) {
+    this.busyService.busy();
+    const result = await this.deleteItem(item);
+    if (result) {
+      await this.listItems(this.purchaseOrder.id);
+      //PROCESSA ITENS
+      await this.processItem();
 
-  onRowEditInit(item: PurchaseOrderItem) {
-    this.clonedPurchaseOrderItem[item.id.itemOrder as number] = { ...item };
+      setTimeout(async () => {
+        await this.listItems(this.purchaseOrder.id);
+      }, 700);
+
+      //Atualizar o total dos itens
+      this.updateTotalItem();
+
+      this.isDeleteItem = false;
+      this.isUpdateItem = false;
+    }
+    this.busyService.idle();
   }
-  onRowEditSave(item: PurchaseOrderItem, index: number) {
+  onRowEditInit(item: PurchaseOrderItem) {
+    this.clonedPurchaseOrderItem[item.itemOrder as number] = { ...item };
+  }
+  async onRowEditSave(item: PurchaseOrderItem, index: number) {
     //desconto maior que o total do item
     if (item.discount > item.price * item.quantity) {
       this.messageService.add({ severity: 'error', summary: 'Desconto', detail: 'Maior que o total do item', icon: 'pi pi-times' });
       this.onRowEditCancel(item, index);
     } else {
-      delete this.clonedPurchaseOrderItem[item.id.itemOrder as number];
+      const result = await this.saveUpdateItem(item);
+      if (result) {
+        delete this.clonedPurchaseOrderItem[item.itemOrder as number];
+        //LISTA ITENS
+        await this.listItems(this.purchaseOrder.id);
+        //Atualizar o total dos itens
+        this.updateTotalItem();
+        this.isUpdateItem = false;
+      } else {
+        this.onRowEditCancel(item, index);
+      }
     }
   }
   onRowEditCancel(item: PurchaseOrderItem, index: number) {
-    this.purchaseOrderItems[index] = this.clonedPurchaseOrderItem[item.id.itemOrder as number];
-    delete this.clonedPurchaseOrderItem[item.id.itemOrder as number];
+    this.purchaseOrderItems[index] = this.clonedPurchaseOrderItem[item.itemOrder as number];
+    delete this.clonedPurchaseOrderItem[item.itemOrder as number];
   }
-
 
   private async saveNewPu(pu: PurchaseOrder): Promise<HttpResponse<MessageResponse>> {
     try {
@@ -549,12 +637,6 @@ export default class RegisterOrderComponent implements OnInit, DoCheck {
     }
   }
 
-
-
-
-
-
-
   private async listAllEnabledTypePayment(): Promise<TypePayment[]> {
     try {
       return await lastValueFrom(this.paymentService.listAllEnabled());
@@ -563,55 +645,36 @@ export default class RegisterOrderComponent implements OnInit, DoCheck {
       return error;
     }
   }
-  private async purchaseEdit(id: number): Promise<HttpResponse<MessageResponse>> {
+  private async PurchaseOrderFilterId(id: number): Promise<HttpResponse<MessageResponse>> {
     try {
       return await lastValueFrom(this.purchaseOrderService.filterId(id));
     } catch (error) {
       return error;
     }
   }
-  private async updateParts(item: PurchaseOrderItem) {
-    const resultItem = await this.updatePurchaseOrderItem(item);
-    if (resultItem.status == 200) {
-      this.updateTotalItem();
-    }
-
-  }
-  private async updatePurchaseOrderItem(item: PurchaseOrderItem): Promise<HttpResponse<PurchaseOrderItem>> {
-    try {
-      return await lastValueFrom(this.purchaseOrderItemService.update(item));
-    } catch (error) {
-      return error;
-    }
-  }
-  private async saveParts(part: Part) {
-
-    const puItem: PurchaseOrderItem = new PurchaseOrderItem();
-    /*  puItem.companyId = part.companyId;
-     puItem.resaleId = part.resaleId;
-     puItem.purchaseId = this.purchaseOrder.id;
-     puItem.partId = part.id;
-     puItem.partCode = part.code;
-     puItem.partDescription = part.description; */
-    /*     puItem.quantity = part.qtdAvailable;
-        puItem.price = part.price;
-        puItem.discount = part.discount;
-     */
-    const resultItem = await this.savePurchaseOrderItem(puItem);
-    if (resultItem.status == 201) {
-
-      this.purchaseOrderItems = await this.listPurchaseOrderItem(this.purchaseOrder.companyId, this.purchaseOrder.resaleId, this.purchaseOrder.id);
-      this.updateTotalItem();
-    }
-  }
-  private async savePurchaseOrderItem(item: PurchaseOrderItem): Promise<HttpResponse<PurchaseOrderItem>> {
+ 
+  private async savePurchaseOrderItem(item: PurchaseOrderItem): Promise<HttpResponse<MessageResponse>> {
     try {
       return await lastValueFrom(this.purchaseOrderItemService.save(item));
     } catch (error) {
       return error;
     }
   }
-  private async listPurchaseOrderItem(companyId: number, resaleId: number, purchaseId: number): Promise<PurchaseOrderItem[]> {
+  private async updatePurchaseOrderItem(item: PurchaseOrderItem): Promise<HttpResponse<MessageResponse>> {
+    try {
+      return await lastValueFrom(this.purchaseOrderItemService.update(item));
+    } catch (error) {
+      return error;
+    }
+  }
+  private async deletePurchaseOrderItem(item: PurchaseOrderItem): Promise<HttpResponse<MessageResponse>> {
+    try {
+      return await lastValueFrom(this.purchaseOrderItemService.delete(item));
+    } catch (error) {
+      return error;
+    }
+  }
+  private async listPurchaseOrderItem(purchaseId: number): Promise<PurchaseOrderItem[]> {
     try {
       return await lastValueFrom(this.purchaseOrderItemService.filterId(purchaseId));
     } catch (error) {
@@ -626,8 +689,5 @@ export default class RegisterOrderComponent implements OnInit, DoCheck {
       return error;
     }
   }
-
-
-
 
 }

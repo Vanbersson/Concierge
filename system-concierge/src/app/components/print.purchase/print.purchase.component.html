@@ -1,6 +1,6 @@
 <!-- Print -->
 <div id="print-sectionId" style="display: none;">
-    <img src="../../../../assets/image/barra-nativa.jpg" alt="" width="800">
+     <img src="../../../../assets/image/barra-nativa.jpg" alt="" width="800">
     <table style="border: 1px solid #ddd; padding: 4px; width: 100%;">
         <tr>
             <td>
@@ -48,16 +48,20 @@
             <th>Desconto</th>
             <th>Total</th>
         </tr>
-        <tr *ngFor="let item of printPurchaseOrderItems">
-            <td>{{item?.partCode }}</td>
-            <td>{{item?.partDescription | uppercase }}</td>
+        <tr *ngFor="let item of printPurchaseOrderItems" style="height: 20px;">
+            <td>{{item?.itemCode }}</td>
+            <td>{{item?.itemDescription | uppercase }}</td>
             <td>{{item?.quantity || ''}}</td>
-            <td>{{item?.price || 0 | currency }}</td>
-            <td>{{item?.discount || 0 | currency}}</td>
-            <td>{{(item?.price * item?.quantity) - item?.discount || 0 | currency}}</td>
+            <td>{{item?.price  | currency }}</td>
+            <td>{{item?.discount  | currency}}</td>
+            <td>
+                @if(item?.quantity > 0){
+{{(item?.price * item?.quantity) - item?.discount  | currency}}
+                }   
+            </td>
         </tr>
         <br>
-        <tr>
+        <tr style="height: 20px;">
             <td></td>
             <td></td>
             <td></td>
@@ -67,25 +71,26 @@
         </tr>
     </table>
     <br>
-    <div style="height: 60px; width: 100%; border: 1px solid #ddd;text-align: left;
+   <div style="height: 60px; width: 100%; border: 1px solid #ddd;text-align: left;
     padding: 4px; font-family: Arial, Helvetica, sans-serif; border-collapse: collapse;break-inside: avoid;">
         <label for="">Inf.: </label>{{printPurchaseOrder().information | uppercase}}
     </div>
+    <br>
     <table style="width: 100%; text-align: center;break-inside: avoid;">
         <tr>
             <td>AUTORIZADO POR</td>
             <td>AUTORIZADO POR</td>
-            <td>AUTORIZADO POR</td>
+           <!--  <td>AUTORIZADO POR</td> -->
         </tr>
         <tr>
-            <td class="text-xs"><strong>Alexsandro Paulino</strong></td>
+            <td class="text-xs"><strong>{{printPurchaseOrder().responsibleUserName}}</strong></td>
             <td class="text-xs"><strong>Luise Rossi</strong></td>
-            <td class="text-xs"><strong>Bruna Dones Gayer</strong></td>
+            <!-- <td class="text-xs"><strong>Daniela Batista</strong></td> -->
         </tr>
         <tr>
             <td class="text-xs">Comprador</td>
             <td class="text-xs">Diretora Financeira</td>
-            <td class="text-xs">Diretora comercial</td>
+           <!--  <td class="text-xs">Diretora comercial</td> -->
         </tr>
-    </table>
+    </table> 
 </div>

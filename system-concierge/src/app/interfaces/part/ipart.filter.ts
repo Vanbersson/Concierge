@@ -6,10 +6,10 @@ export interface IPartFilter {
     description: string;
     available: number;
     price: number;
-    unit: string;
-    brand: string;
-    group: string;
-    category: string;
+    unit?: string;
+    brand?: string;
+    group?: string;
+    category?: string;
 
     selectPrice: number;
     selectQuantity: number;

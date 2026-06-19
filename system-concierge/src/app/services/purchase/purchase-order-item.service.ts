@@ -4,6 +4,7 @@ import { StorageService } from '../storage/storage.service';
 import { environment } from '../../../environments/environment';
 import { PurchaseOrderItem } from '../../models/purchase.order/item/purchase.order.item';
 import { Observable } from 'rxjs';
+import { MessageResponse } from '../../models/message/message-response';
 
 @Injectable({
   providedIn: 'root'
@@ -12,14 +13,14 @@ export class PurchaseOrderItemService {
   companyResale: string = this.storage.companyId + "/" + this.storage.resaleId;
   constructor(private http: HttpClient, private storage: StorageService) { }
 
-  public save(item: PurchaseOrderItem): Observable<HttpResponse<PurchaseOrderItem>> {
-    return this.http.post<PurchaseOrderItem>(environment.apiuUrl + "/purchase/order/item/save", item, { headers: this.myHeaders(), observe: 'response' });
+  public save(item: PurchaseOrderItem): Observable<HttpResponse<MessageResponse>> {
+    return this.http.post<MessageResponse>(environment.apiuUrl + "/purchase/order/item/save", item, { headers: this.myHeaders(), observe: 'response' });
   }
-  public update(item: PurchaseOrderItem): Observable<HttpResponse<PurchaseOrderItem>> {
-    return this.http.post<PurchaseOrderItem>(environment.apiuUrl + "/purchase/order/item/update", item, { headers: this.myHeaders(), observe: 'response' });
+  public update(item: PurchaseOrderItem): Observable<HttpResponse<MessageResponse>> {
+    return this.http.post<MessageResponse>(environment.apiuUrl + "/purchase/order/item/update", item, { headers: this.myHeaders(), observe: 'response' });
   }
-  public delete(item: PurchaseOrderItem): Observable<HttpResponse<PurchaseOrderItem>> {
-    return this.http.post<PurchaseOrderItem>(environment.apiuUrl + "/purchase/order/item/delete", item, { headers: this.myHeaders(), observe: 'response' });
+  public delete(item: PurchaseOrderItem): Observable<HttpResponse<MessageResponse>> {
+    return this.http.post<MessageResponse>(environment.apiuUrl + "/purchase/order/item/delete", item, { headers: this.myHeaders(), observe: 'response' });
   }
   public filterId(purchaseId: number): Observable<PurchaseOrderItem[]> {
     return this.http.get<PurchaseOrderItem[]>(environment.apiuUrl + "/purchase/order/item/" + this.companyResale + "/filter/purchase/" + purchaseId, { headers: this.myHeaders() });
