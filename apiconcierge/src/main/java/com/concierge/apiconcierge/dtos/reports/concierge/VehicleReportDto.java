@@ -12,9 +12,11 @@ public record VehicleReportDto(
         Date dateFinal,
         Integer clientId,
         Integer userAttendantId,
+        Integer userConciergeId,
         Integer modelId,
         Integer vehicleId,
-        String placa,
-        String frota
+        String vehiclePlate,
+        String vehicleFleet,
+        String numServiceOrder
 ) {
 }

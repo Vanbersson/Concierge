@@ -117,12 +117,7 @@ public class UserValidation implements IUserValidation {
             response.setMessage(ConstantsMessage.NOT_INFORMED);
             return response;
         }
-//        if (user.getPassword().isBlank()) {
-//            response.setStatus(ConstantsMessage.ERROR);
-//            response.setHeader("Senha");
-//            response.setMessage(ConstantsMessage.NOT_INFORMED);
-//            return response;
-//        }
+
         if (user.getRoleId() == null || user.getRoleId() == 0) {
             response.setStatus(ConstantsMessage.ERROR);
             response.setHeader("Cargo");

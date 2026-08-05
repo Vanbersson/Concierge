@@ -20,8 +20,8 @@ public class VehicleReportController {
     @Autowired
     VehicleReportService service;
 
-    @PostMapping("/filter/vehicles")
-    public ResponseEntity<Object> filterVehicle(@RequestBody VehicleReportDto data) {
+    @PostMapping("/filter/vehicle/entry")
+    public ResponseEntity<Object> vehicleEntry(@RequestBody VehicleReportDto data) {
         try {
             List<Object> list = this.service.filterVehicles(data);
             return ResponseEntity.status(HttpStatus.OK).body(list);

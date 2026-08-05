@@ -45,31 +45,34 @@ public class VehicleReportRepository {
 
             switch (vehicleFilters.type()) {
                 case "E":
-                    predicates.add(cb.or(cb.between(vehicle.get("dateEntry"), initStartDate, initEndDate)));
-                    predicates.add(cb.isNull(vehicle.get("dateExit")));
+                    predicates.add(cb.or(cb.between(vehicle.get("entryDate"), initStartDate, initEndDate)));
+                    predicates.add(cb.isNull(vehicle.get("exitDate")));
                     break;
                 case "S":
-                    predicates.add(cb.or(cb.between(vehicle.get("dateExit"), initStartDate, initEndDate)));
+                    predicates.add(cb.or(cb.between(vehicle.get("exitDate"), initStartDate, initEndDate)));
                     break;
                 case "A":
-                    Predicate dateEntryPredicate = cb.between(vehicle.get("dateEntry"), initStartDate, initEndDate);
-                    Predicate dateExitPredicate = cb.between(vehicle.get("dateExit"), initStartDate, initEndDate);
+                    Predicate dateEntryPredicate = cb.between(vehicle.get("entryDate"), initStartDate, initEndDate);
+                    Predicate dateExitPredicate = cb.between(vehicle.get("exitDate"), initStartDate, initEndDate);
                     predicates.add(cb.or(dateEntryPredicate, cb.or(dateExitPredicate)));
                     break;
             }
         }
-        if(vehicleFilters.userAttendantId() != null && vehicleFilters.userAttendantId() !=0)
-            predicates.add(cb.equal(vehicle.get("idUserAttendant"), vehicleFilters.userAttendantId()));
+
+        if (vehicleFilters.userAttendantId() != null && vehicleFilters.userAttendantId() != 0)
+            predicates.add(cb.equal(vehicle.get("attendantUserId"), vehicleFilters.userAttendantId()));
         if (vehicleFilters.clientId() != null && vehicleFilters.clientId() != 0)
             predicates.add(cb.equal(vehicle.get("clientCompanyId"), vehicleFilters.clientId()));
         if (vehicleFilters.modelId() != null && vehicleFilters.modelId() != 0)
             predicates.add(cb.equal(vehicle.get("modelId"), vehicleFilters.modelId()));
         if (vehicleFilters.vehicleId() != null && vehicleFilters.vehicleId() != 0)
             predicates.add(cb.equal(vehicle.get("id"), vehicleFilters.vehicleId()));
-        if (vehicleFilters.placa() != "")
-            predicates.add(cb.equal(vehicle.get("placa"), vehicleFilters.placa()));
-        if (vehicleFilters.frota() != "")
-            predicates.add(cb.equal(vehicle.get("frota"), vehicleFilters.frota()));
+        if (!vehicleFilters.vehiclePlate().isBlank())
+            predicates.add(cb.equal(vehicle.get("vehiclePlate"), vehicleFilters.vehiclePlate()));
+        if (!vehicleFilters.vehicleFleet().isBlank())
+            predicates.add(cb.equal(vehicle.get("vehicleFleet"), vehicleFilters.vehicleFleet()));
+        if (!vehicleFilters.numServiceOrder().isBlank())
+            predicates.add(cb.equal(vehicle.get("numServiceOrder"), vehicleFilters.numServiceOrder()));
         if (vehicleFilters.vehicleNew() == YesNot.yes)
             predicates.add(cb.equal(vehicle.get("vehicleNew"), vehicleFilters.vehicleNew()));
 
