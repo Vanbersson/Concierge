@@ -50,7 +50,7 @@ public class PurchaseOrderController {
     public ResponseEntity<Object> filterOpen(@PathVariable(name = "companyId") Integer companyId,
                                              @PathVariable(name = "resaleId") Integer resaleId) {
         try {
-            List<PurchaseOrder> purchases = this.service.filterOpen(companyId, resaleId);
+            List<Map<String,Object>> purchases = this.service.filterOpen(companyId, resaleId);
             return ResponseEntity.status(HttpStatus.OK).body(purchases);
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));

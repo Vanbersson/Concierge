@@ -3,7 +3,6 @@ package com.concierge.apiconcierge.services.driver;
 import com.concierge.apiconcierge.exceptions.driver.DriverException;
 import com.concierge.apiconcierge.models.driver.Driver;
 import com.concierge.apiconcierge.models.message.MessageResponse;
-import com.concierge.apiconcierge.models.user.User;
 import com.concierge.apiconcierge.repositories.driver.IDriverRepository;
 import com.concierge.apiconcierge.util.ConstantsMessage;
 import com.concierge.apiconcierge.validation.driver.IDriverValidation;
@@ -26,10 +25,10 @@ public class DriverService implements IDriverService {
     private String UPLOAD_DIR;
 
     @Autowired
-    IDriverRepository repository;
+    private IDriverRepository repository;
 
     @Autowired
-    IDriverValidation validation;
+    private IDriverValidation validation;
 
     @SneakyThrows
     @Override

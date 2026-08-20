@@ -98,6 +98,7 @@ VALUES
 ('3_3','Orçamentos'),
 ('3_99','Cadastros'),
 ('3_99_0','Mecânico'),
+('3_99_1','Departamentos'),
 
 ('4_0','Faturamento'),
 ('4_1','Manutenção Clientes'),

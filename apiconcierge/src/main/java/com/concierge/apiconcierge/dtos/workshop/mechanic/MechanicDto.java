@@ -8,4 +8,5 @@ public record MechanicDto(Integer companyId,
                           StatusEnableDisable status,
                           String name,
                           Integer codePassword,
-                          byte[] photo) {}
+                          Integer departmentId,
+                          String photoUrl) {}

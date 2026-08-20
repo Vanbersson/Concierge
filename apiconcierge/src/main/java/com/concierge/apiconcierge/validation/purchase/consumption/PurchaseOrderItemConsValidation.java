@@ -1,168 +1,147 @@
-package com.concierge.apiconcierge.validation.workshop.mechanic;
+package com.concierge.apiconcierge.validation.purchase.consumption;
 
 import com.concierge.apiconcierge.models.message.MessageResponse;
-import com.concierge.apiconcierge.models.workshop.mechanic.Mechanic;
+import com.concierge.apiconcierge.models.purchase.PurchaseOrderItemConsumption;
 import com.concierge.apiconcierge.util.ConstantsMessage;
 import org.springframework.stereotype.Service;
 
 @Service
-public class MechanicValidation implements IMechanicValidation {
+public class PurchaseOrderItemConsValidation implements IPurchaseOrderItemConsValidation {
     @Override
-    public MessageResponse save(Mechanic mec) {
+    public MessageResponse save(PurchaseOrderItemConsumption item) {
         MessageResponse response = new MessageResponse();
-        if (mec.getCompanyId() == null || mec.getCompanyId() == 0) {
+        if (item.getCompanyId() == null || item.getCompanyId() == 0) {
             response.setStatus(ConstantsMessage.ERROR);
             response.setHeader("Empresa");
             response.setMessage(ConstantsMessage.NOT_INFORMED);
             return response;
         }
-        if (mec.getResaleId() == null || mec.getResaleId() == 0) {
+        if (item.getResaleId() == null || item.getResaleId() == 0) {
             response.setStatus(ConstantsMessage.ERROR);
             response.setHeader("Revenda");
             response.setMessage(ConstantsMessage.NOT_INFORMED);
             return response;
         }
-        if (mec.getStatus() == null) {
+        if (item.getPurchaseId() == null || item.getPurchaseId() == 0) {
             response.setStatus(ConstantsMessage.ERROR);
-            response.setHeader("Status");
+            response.setHeader("Número do pedido");
             response.setMessage(ConstantsMessage.NOT_INFORMED);
             return response;
         }
-        if (mec.getName().isBlank()) {
+        if (item.getItemOrder() == null || item.getItemOrder() == 0) {
             response.setStatus(ConstantsMessage.ERROR);
-            response.setHeader("Nome");
-            response.setMessage(ConstantsMessage.NOT_INFORMED);
-            return response;
-        }
-        if (mec.getCodePassword() == null || mec.getCodePassword() == 0) {
-            response.setStatus(ConstantsMessage.ERROR);
-            response.setHeader("Senha");
+            response.setHeader("Item Order");
             response.setMessage(ConstantsMessage.NOT_INFORMED);
             return response;
         }
         response.setStatus(ConstantsMessage.SUCCESS);
-        response.setHeader("Mecânico");
+        response.setHeader("Item");
         response.setMessage("Cadastrado com sucesso.");
         return response;
     }
 
     @Override
-    public MessageResponse update(Mechanic mec) {
+    public MessageResponse update(PurchaseOrderItemConsumption item) {
         MessageResponse response = new MessageResponse();
-        if (mec.getCompanyId() == null || mec.getCompanyId() == 0) {
+        if (item.getCompanyId() == null || item.getCompanyId() == 0) {
             response.setStatus(ConstantsMessage.ERROR);
             response.setHeader("Empresa");
             response.setMessage(ConstantsMessage.NOT_INFORMED);
             return response;
         }
-        if (mec.getResaleId() == null || mec.getResaleId() == 0) {
+        if (item.getResaleId() == null || item.getResaleId() == 0) {
             response.setStatus(ConstantsMessage.ERROR);
             response.setHeader("Revenda");
             response.setMessage(ConstantsMessage.NOT_INFORMED);
             return response;
         }
-        if (mec.getId() == null || mec.getId() == 0) {
+        if (item.getPurchaseId() == null || item.getPurchaseId() == 0) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Número do pedido");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (item.getItemOrder() == null || item.getItemOrder() == 0) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Item Order");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (item.getId() == null ) {
             response.setStatus(ConstantsMessage.ERROR);
             response.setHeader("Código");
             response.setMessage(ConstantsMessage.NOT_INFORMED);
             return response;
         }
-        if (mec.getStatus() == null) {
-            response.setStatus(ConstantsMessage.ERROR);
-            response.setHeader("Status");
-            response.setMessage(ConstantsMessage.NOT_INFORMED);
-            return response;
-        }
-        if (mec.getName().isBlank()) {
-            response.setStatus(ConstantsMessage.ERROR);
-            response.setHeader("Nome");
-            response.setMessage(ConstantsMessage.NOT_INFORMED);
-            return response;
-        }
-        if (mec.getCodePassword() == null || mec.getCodePassword() == 0) {
-            response.setStatus(ConstantsMessage.ERROR);
-            response.setHeader("Senha");
-            response.setMessage(ConstantsMessage.NOT_INFORMED);
-            return response;
-        }
         response.setStatus(ConstantsMessage.SUCCESS);
-        response.setHeader("Mecânico");
+        response.setHeader("Item");
         response.setMessage("Atualizado com sucesso.");
         return response;
     }
 
     @Override
-    public MessageResponse listAll(Integer companyId, Integer resaleId) {
+    public MessageResponse delete(PurchaseOrderItemConsumption item) {
         MessageResponse response = new MessageResponse();
-        if (companyId == null || companyId == 0) {
+        if (item.getCompanyId() == null || item.getCompanyId() == 0) {
             response.setStatus(ConstantsMessage.ERROR);
             response.setHeader("Empresa");
             response.setMessage(ConstantsMessage.NOT_INFORMED);
             return response;
         }
-        if (resaleId == null || resaleId == 0) {
+        if (item.getResaleId() == null || item.getResaleId() == 0) {
             response.setStatus(ConstantsMessage.ERROR);
             response.setHeader("Revenda");
             response.setMessage(ConstantsMessage.NOT_INFORMED);
             return response;
         }
-        response.setStatus(ConstantsMessage.SUCCESS);
-        response.setHeader("Mecânicos");
-        response.setMessage("Sucesso.");
-        return response;
-    }
-
-    @Override
-    public MessageResponse filterCodePass(Mechanic mec) {
-        MessageResponse response = new MessageResponse();
-        if (mec.getCompanyId() == null || mec.getCompanyId() == 0) {
+        if (item.getPurchaseId() == null || item.getPurchaseId() == 0) {
             response.setStatus(ConstantsMessage.ERROR);
-            response.setHeader("Empresa");
+            response.setHeader("Número do pedido");
             response.setMessage(ConstantsMessage.NOT_INFORMED);
             return response;
         }
-        if (mec.getResaleId() == null || mec.getResaleId() == 0) {
+        if (item.getItemOrder() == null || item.getItemOrder() == 0) {
             response.setStatus(ConstantsMessage.ERROR);
-            response.setHeader("Revenda");
+            response.setHeader("Item Order");
             response.setMessage(ConstantsMessage.NOT_INFORMED);
             return response;
         }
-        if (mec.getCodePassword() == null || mec.getCodePassword() == 0) {
-            response.setStatus(ConstantsMessage.ERROR);
-            response.setHeader("Senha");
-            response.setMessage(ConstantsMessage.NOT_INFORMED);
-            return response;
-        }
-        response.setStatus(ConstantsMessage.SUCCESS);
-        response.setHeader("Mecânicos");
-        response.setMessage("Sucesso.");
-        return response;
-    }
-
-    @Override
-    public MessageResponse filterId(Integer companyId, Integer resaleId, Integer id) {
-        MessageResponse response = new MessageResponse();
-        if (companyId == null || companyId == 0) {
-            response.setStatus(ConstantsMessage.ERROR);
-            response.setHeader("Empresa");
-            response.setMessage(ConstantsMessage.NOT_INFORMED);
-            return response;
-        }
-        if (resaleId == null || resaleId == 0) {
-            response.setStatus(ConstantsMessage.ERROR);
-            response.setHeader("Revenda");
-            response.setMessage(ConstantsMessage.NOT_INFORMED);
-            return response;
-        }
-        if (id == null || id == 0) {
+        if (item.getId() == null ) {
             response.setStatus(ConstantsMessage.ERROR);
             response.setHeader("Código");
             response.setMessage(ConstantsMessage.NOT_INFORMED);
             return response;
         }
         response.setStatus(ConstantsMessage.SUCCESS);
-        response.setHeader("Mecânico");
-        response.setMessage("Encontrado com sucesso.");
+        response.setHeader("Item");
+        response.setMessage("Excluído com sucesso.");
+        return response;
+    }
+
+    @Override
+    public MessageResponse filter(Integer companyId, Integer resaleId, Integer purchaseId) {
+        MessageResponse response = new MessageResponse();
+        if (companyId == null || companyId == 0) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Empresa");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (resaleId == null || resaleId == 0) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Revenda");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        if (purchaseId == null || purchaseId == 0) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Número do pedido");
+            response.setMessage(ConstantsMessage.NOT_INFORMED);
+            return response;
+        }
+        response.setStatus(ConstantsMessage.SUCCESS);
+        response.setHeader("Item");
+        response.setMessage("Cadastrado com sucesso.");
         return response;
     }
 }

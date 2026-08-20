@@ -12,7 +12,7 @@ public interface IPurchaseOrderService {
 
     public MessageResponse update(PurchaseOrder purchase);
 
-    public List<PurchaseOrder> filterOpen(Integer companyId, Integer resaleId);
+    public List<Map<String,Object>> filterOpen(Integer companyId, Integer resaleId);
 
     public MessageResponse filterId(Integer companyId, Integer resaleId, Integer purchaseId);
 }

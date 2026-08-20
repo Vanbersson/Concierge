@@ -3,6 +3,7 @@ package com.concierge.apiconcierge.models.purchase;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @Getter
@@ -10,34 +11,36 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(of = "id")
-@SecondaryTable(name = "tb_company", pkJoinColumns = @PrimaryKeyJoinColumn(name = "id"))
-@SecondaryTable(name = "tb_resale", pkJoinColumns = @PrimaryKeyJoinColumn(name = "id"))
-@SecondaryTable(name = "tb_purchase_order", pkJoinColumns = @PrimaryKeyJoinColumn(name = "id"))
 @Entity
-@Table(name = "tb_purchase_order_item")
+@Table(name = "tb_purchase_order_item_consumption")
 public class PurchaseOrderItemConsumption {
 
-    @JoinColumn(table = "tb_company", referencedColumnName = "id")
-    @Column(name = "company_id")
+    @Column(name = "company_id", nullable = false)
     private Integer companyId;
 
-    @JoinColumn(table = "tb_resale", referencedColumnName = "id")
-    @Column(name = "resale_id")
+    @Column(name = "resale_id", nullable = false)
     private Integer resaleId;
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id", columnDefinition = "binary(16)")
     private UUID id;
 
-    @JoinColumn(table = "tb_purchase_order", referencedColumnName = "id")
-    @Column(name = "purchase_id")
+    @Column(name = "purchase_id", nullable = false)
     private Integer purchaseId;
 
+    @Column(name = "item_order", nullable = false)
+    private Integer itemOrder;
+
+    @Column(name = "item_description", nullable = false, length = 100)
     private String description;
 
-    private float quantity;
+    @Column(name = "quantity", nullable = false, precision = 11, scale = 3)
+    private BigDecimal quantity;
 
-    private float discount;
+    @Column(name = "discount", nullable = false, precision = 11, scale = 3)
+    private BigDecimal discount;
 
-    private float price;
+    @Column(name = "price", nullable = false, precision = 11, scale = 3)
+    private BigDecimal price;
 }

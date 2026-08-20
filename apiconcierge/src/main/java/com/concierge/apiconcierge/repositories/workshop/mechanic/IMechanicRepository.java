@@ -18,4 +18,7 @@ public interface IMechanicRepository extends JpaRepository<Mechanic, Integer> {
 
     @Query(value = "SELECT * FROM `tb_mechanic` WHERE company_id=?1 AND resale_id=?2 AND status=0 ", nativeQuery = true)
     List<Mechanic> listAllEnabled(Integer companyId, Integer resaleId);
+
+    @Query(value = "SELECT * FROM `tb_mechanic` WHERE company_id=?1 AND resale_id=?2 AND id=?3 ", nativeQuery = true)
+    Mechanic filterId(Integer companyId, Integer resaleId, Integer id);
 }

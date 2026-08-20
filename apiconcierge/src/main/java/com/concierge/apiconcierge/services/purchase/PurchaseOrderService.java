@@ -53,11 +53,24 @@ public class PurchaseOrderService implements IPurchaseOrderService {
 
     @SneakyThrows
     @Override
-    public List<PurchaseOrder> filterOpen(Integer companyId, Integer resaleId) {
+    public List<Map<String,Object>> filterOpen(Integer companyId, Integer resaleId) {
         try {
             MessageResponse response = this.validation.filterOpen(companyId, resaleId);
             if (ConstantsMessage.SUCCESS.equals(response.getStatus())) {
-                return this.repository.filterOpen(companyId, resaleId);
+                List<PurchaseOrder> result = this.repository.filterOpen(companyId, resaleId);
+                List<Map<String,Object>> list = new ArrayList<>();
+                for (PurchaseOrder item : result){
+                    Map<String,Object> map = new HashMap<>();
+                    map.put("id",item.getId());
+                    map.put("status",item.getStatus());
+                    map.put("dateDelivery",item.getDateDelivery());
+                    map.put("nfNum",item.getNfNum());
+                    map.put("clientCompanyName",item.getClientCompanyName());
+                    map.put("responsibleUserName",item.getResponsibleUserName());
+                    map.put("type",item.getType());
+                    list.add(map);
+                }
+                return list;
             }
             return List.of();
         } catch (Exception ex) {

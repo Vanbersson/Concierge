@@ -61,14 +61,15 @@ public class ClientCompanyValidation implements IClientCompanyValidation {
                 response.setMessage("Inválido.");
                 return response;
             }
-            ClientCompany clientResult = this.repository.filterCNPJ(client.getCompanyId(), client.getResaleId(), client.getCpf());
+            ClientCompany clientResult = this.repository.filterCPF(client.getCompanyId(), client.getResaleId(), client.getCpf());
             if (clientResult != null) {
                 response.setStatus(ConstantsMessage.ERROR);
                 response.setHeader("Cliente");
                 response.setMessage("Já cadastrado.");
                 return response;
             }
-        } else if (client.getFisjur() == FisJur.Jurídica) {
+        }
+        if (client.getFisjur() == FisJur.Jurídica) {
             if (client.getCnpj().isBlank()) {
                 response.setStatus(ConstantsMessage.ERROR);
                 response.setHeader("CNPJ");

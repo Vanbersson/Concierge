@@ -1,15 +1,21 @@
 package com.concierge.apiconcierge.services.workshop.mechanic;
 
 import com.concierge.apiconcierge.exceptions.workshop.mechanic.MechanicException;
+import com.concierge.apiconcierge.models.message.MessageResponse;
 import com.concierge.apiconcierge.models.workshop.mechanic.Mechanic;
 import com.concierge.apiconcierge.repositories.workshop.mechanic.IMechanicRepository;
 import com.concierge.apiconcierge.util.ConstantsMessage;
-import com.concierge.apiconcierge.validation.workshop.mechanic.MechanicValidation;
+import com.concierge.apiconcierge.validation.workshop.mechanic.IMechanicValidation;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,26 +23,27 @@ import java.util.Map;
 @Service
 public class MechanicService implements IMechanicService {
 
-    @Autowired
-    IMechanicRepository repository;
+    @Value("${local.image.upload}")
+    private String UPLOAD_DIR;
 
     @Autowired
-    MechanicValidation validation;
+    private IMechanicRepository repository;
+
+    @Autowired
+    private IMechanicValidation validation;
 
     @SneakyThrows
     @Override
-    public Map<String, Object> save(Mechanic mec) {
+    public MessageResponse save(Mechanic mec) {
         try {
-            String message = this.validation.save(mec);
-            if (ConstantsMessage.SUCCESS.equals(message)) {
+            MessageResponse response = this.validation.save(mec);
+            if (response.getStatus().equals(ConstantsMessage.SUCCESS)) {
                 mec.setId(null);
                 Mechanic resultMec = this.repository.save(mec);
-                Map<String, Object> map = new HashMap<>();
-                map.put("id", resultMec.getId());
-                return map;
-            } else {
-                throw new MechanicException(message);
+                response.setData(resultMec);
+                return response;
             }
+            return response;
         } catch (Exception ex) {
             throw new MechanicException(ex.getMessage());
         }
@@ -44,15 +51,15 @@ public class MechanicService implements IMechanicService {
 
     @SneakyThrows
     @Override
-    public String update(Mechanic mec) {
+    public MessageResponse update(Mechanic mec) {
         try {
-            String message = this.validation.update(mec);
-            if (ConstantsMessage.SUCCESS.equals(message)) {
-                this.repository.save(mec);
-                return ConstantsMessage.SUCCESS;
-            } else {
-                throw new MechanicException(message);
+            MessageResponse response = this.validation.update(mec);
+            if (response.getStatus().equals(ConstantsMessage.SUCCESS)) {
+                Mechanic resultMec = this.repository.save(mec);
+                response.setData(resultMec);
+                return response;
             }
+            return response;
         } catch (Exception ex) {
             throw new MechanicException(ex.getMessage());
         }
@@ -60,19 +67,13 @@ public class MechanicService implements IMechanicService {
 
     @SneakyThrows
     @Override
-    public List<Map<String, Object>> listAll(Integer companyId, Integer resaleId) {
+    public List<Mechanic> listAll(Integer companyId, Integer resaleId) {
         try {
-            String message = this.validation.listAll(companyId, resaleId);
-            if (ConstantsMessage.SUCCESS.equals(message)) {
-                List<Mechanic> resultList = this.repository.listAll(companyId, resaleId);
-                List<Map<String, Object>> mechanics = new ArrayList<>();
-                for (Mechanic mec : resultList) {
-                    mechanics.add(this.loadMec(mec));
-                }
-                return mechanics;
-            } else {
-                throw new MechanicException(message);
+            MessageResponse response = this.validation.listAll(companyId, resaleId);
+            if (response.getStatus().equals(ConstantsMessage.SUCCESS)) {
+                return this.repository.listAll(companyId, resaleId);
             }
+            return List.of();
         } catch (Exception ex) {
             throw new MechanicException(ex.getMessage());
         }
@@ -80,43 +81,100 @@ public class MechanicService implements IMechanicService {
 
     @SneakyThrows
     @Override
-    public List<Map<String, Object>> listAllEnabled(Integer companyId, Integer resaleId) {
+    public List<Mechanic> listAllEnabled(Integer companyId, Integer resaleId) {
         try {
-            String message = this.validation.listAll(companyId, resaleId);
-            if (ConstantsMessage.SUCCESS.equals(message)) {
-                List<Mechanic> resultList = this.repository.listAllEnabled(companyId, resaleId);
-                List<Map<String, Object>> mechanics = new ArrayList<>();
-                for (Mechanic mec : resultList) {
-                    mechanics.add(this.loadMec(mec));
-                }
-                return mechanics;
-            } else {
-                throw new MechanicException(message);
+            MessageResponse response = this.validation.listAll(companyId, resaleId);
+            if (response.getStatus().equals(ConstantsMessage.SUCCESS)) {
+                return this.repository.listAllEnabled(companyId, resaleId);
             }
+            return List.of();
         } catch (Exception ex) {
             throw new MechanicException(ex.getMessage());
         }
     }
 
     @Override
-    public Map<String, Object> filterCodePass(Mechanic mec) {
+    public MessageResponse filterCodePass(Mechanic mec) {
         return null;
     }
 
-    private Map<String, Object> loadMec(Mechanic mec) {
-        Map<String, Object> map = new HashMap<>();
-        map.put("companyId", mec.getCompanyId());
-        map.put("resaleId", mec.getResaleId());
-        map.put("id", mec.getId());
-        map.put("status", mec.getStatus());
-        map.put("name", mec.getName());
-        map.put("codePassword", mec.getCodePassword());
-        if (mec.getPhoto() == null) {
-            map.put("photo", "");
-        } else {
-            map.put("photo", mec.getPhoto());
+    @SneakyThrows
+    @Override
+    public MessageResponse filterId(Integer companyId, Integer resaleId, Integer id) {
+        try {
+            MessageResponse response = this.validation.filterId(companyId, resaleId, id);
+            if (response.getStatus().equals(ConstantsMessage.SUCCESS)) {
+                Mechanic resultMec = this.repository.filterId(companyId, resaleId, id);
+                response.setData(resultMec);
+                return response;
+            }
+            return response;
+        } catch (Exception ex) {
+            throw new MechanicException(ex.getMessage());
         }
-        return map;
     }
+
+    @SneakyThrows
+    @Override
+    public MessageResponse savePhoto(MultipartFile file, String local) {
+        try {
+            MessageResponse response = new MessageResponse();
+            response.setStatus(ConstantsMessage.SUCCESS);
+            response.setHeader("Imagem");
+            response.setMessage("Salvo com sucesso.");
+            // Segurança básica
+            if (local.contains("..") || local.isBlank()) {
+                response.setStatus(ConstantsMessage.ERROR);
+                response.setMessage("Caminho inválido.");
+                return response;
+            }
+            // Nome do arquivo
+            Path filePath = Paths.get(UPLOAD_DIR + local);
+            // Cria diretórios se necessário
+            Files.createDirectories(filePath.getParent());
+            // Salva ou substitui se existir)
+            Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+            // URL pública
+            String url = "/images/" + local;
+            // Retornar o caminho do arquivo salvo
+            Map<String, String> map = new HashMap<>();
+            map.put("url", url);
+            response.setData(map);
+            return response;
+        } catch (Exception e) {
+            throw new Exception(e.getMessage());
+        }
+    }
+
+    @SneakyThrows
+    @Override
+    public MessageResponse deletePhoto(String local) {
+        try {
+            MessageResponse response = new MessageResponse();
+            response.setStatus(ConstantsMessage.SUCCESS);
+            response.setHeader("Imagem");
+            response.setMessage("Excluído com sucesso.");
+
+            Path basePath = Paths.get(UPLOAD_DIR).toAbsolutePath().normalize();
+            Path filePath = basePath.resolve(local).normalize();
+
+            // Proteção contra path traversal
+            if (!filePath.startsWith(basePath) || local.isBlank()) {
+                response.setStatus(ConstantsMessage.ERROR);
+                response.setMessage("Caminho inválido.");
+                return response;
+            }
+            if (!Files.exists(filePath) || !Files.isRegularFile(filePath)) {
+                response.setStatus(ConstantsMessage.ERROR);
+                response.setMessage("Imagem não encontrada.");
+                return response;
+            }
+            Files.delete(filePath);
+            return response;
+        } catch (Exception e) {
+            throw new Exception(e.getMessage());
+        }
+    }
+
 
 }

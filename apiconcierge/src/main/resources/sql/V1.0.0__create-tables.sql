@@ -659,6 +659,7 @@ CONSTRAINT pk_purchase_order_item PRIMARY KEY(company_id,resale_id,purchase_id,i
 CREATE TABLE IF NOT EXISTS tb_purchase_order_item_consumption(
 company_id int not null,
 resale_id int not null,
+id binary(16) unique not null,
 purchase_id int not null,
 item_order int not null,
 item_description varchar(100) not null,
@@ -668,9 +669,38 @@ price numeric(11,3) not null,
 FOREIGN KEY(company_id) REFERENCES tb_company(id),
 FOREIGN KEY(resale_id) REFERENCES tb_resale(id),
 FOREIGN KEY(purchase_id) REFERENCES tb_purchase_order(id),
-CONSTRAINT pk_purchase_order_item_consumption PRIMARY KEY(company_id,resale_id,purchase_id,item_order)
+PRIMARY KEY(id)
 );
 
+
+
+## workshop
+
+CREATE TABLE IF NOT EXISTS tb_mechanic_department(
+company_id int not null,
+resale_id int not null,
+id int not null AUTO_INCREMENT,
+status tinyint not null,
+description varchar(100) not null,
+PRIMARY KEY(id),
+FOREIGN KEY(company_id) REFERENCES tb_company(id),
+FOREIGN KEY(resale_id) REFERENCES tb_resale(id)
+);
+
+CREATE TABLE IF NOT EXISTS tb_mechanic(
+company_id int not null,
+resale_id int not null,
+id int not null AUTO_INCREMENT,
+status tinyint not null,
+name varchar(100) not null,
+code_password int not null,
+department_id int not null,
+photo_url varchar(255),
+FOREIGN KEY(company_id) REFERENCES tb_company(id),
+FOREIGN KEY(resale_id) REFERENCES tb_resale(id),
+FOREIGN KEY(department_id) REFERENCES tb_mechanic_department(id),
+PRIMARY KEY(id)
+);
 
 #Falta verificar
 CREATE TABLE IF NOT EXISTS tb_nf_capa(
@@ -764,31 +794,7 @@ PRIMARY KEY(id)
 
 
 
-CREATE TABLE IF NOT EXISTS tb_mechanic_role(
-company_id int not null,
-resale_id int not null,
-id int not null AUTO_INCREMENT,
-status tinyint not null,
-description varchar(100) not null,
-PRIMARY KEY(id),
-FOREIGN KEY(company_id) REFERENCES tb_company(id),
-FOREIGN KEY(resale_id) REFERENCES tb_resale(id)
-);
 
-CREATE TABLE IF NOT EXISTS tb_mechanic(
-company_id int not null,
-resale_id int not null,
-id int not null AUTO_INCREMENT,
-status tinyint not null,
-name varchar(100) not null,
-code_password int not null,
-role_id int not null,
-photo_url varchar(255),
-FOREIGN KEY(company_id) REFERENCES tb_company(id),
-FOREIGN KEY(resale_id) REFERENCES tb_resale(id),
-FOREIGN KEY(role_id) REFERENCES tb_mechanic_role(id),
-PRIMARY KEY(id)
-);
 
 CREATE TABLE IF NOT EXISTS tb_tool_control_category(
 company_id int not null,
