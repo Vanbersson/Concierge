@@ -12,19 +12,20 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/reports/parts/purchase/order")
 public class PurchaseOrderReportController {
 
     @Autowired
-    PurchaseOrderReportService service;
+   private PurchaseOrderReportService service;
 
 
     @PostMapping("/filter")
     public ResponseEntity<Object> filter(@RequestBody PurchaseOrderReportDto data) {
         try {
-            List<Object> list = this.service.filterPurchase(data);
+            List<Map<String,Object>> list = this.service.filterPurchase(data);
             return ResponseEntity.status(HttpStatus.OK).body(list);
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));

@@ -58,7 +58,7 @@ public class AutheticationController {
             response.setData(map);
             return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (Exception ex) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
     }

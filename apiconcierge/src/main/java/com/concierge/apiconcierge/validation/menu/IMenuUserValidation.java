@@ -1,16 +1,17 @@
 package com.concierge.apiconcierge.validation.menu;
 
 import com.concierge.apiconcierge.models.menu.MenuUser;
+import com.concierge.apiconcierge.models.message.MessageResponse;
 
 import java.util.List;
 import java.util.Map;
 
 public interface IMenuUserValidation {
-    public String save(MenuUser menu);
+    public MessageResponse save(MenuUser menu);
 
-    public String update(MenuUser menu);
+    public MessageResponse update(MenuUser menu);
 
-    public String filterMenus(MenuUser menu);
+    public MessageResponse filterMenus(MenuUser menu);
 
-    public String deleteMenus(MenuUser menu);
+    public MessageResponse deleteMenus(MenuUser menu);
 }

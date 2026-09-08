@@ -6,11 +6,13 @@ import com.concierge.apiconcierge.models.purchase.PurchaseOrder;
 
 public interface IPurchaseOrderValidation {
 
-    public MessageResponse save(PurchaseOrder purchase);
+    MessageResponse save(PurchaseOrder pu);
 
-    public MessageResponse update(PurchaseOrder purchase);
+    MessageResponse update(PurchaseOrder pu);
 
-    public MessageResponse filterOpen(Integer companyId, Integer resaleId);
+    MessageResponse close(PurchaseOrder pu);
 
-    public MessageResponse filterId(Integer companyId, Integer resaleId, Integer purchaseId);
+    MessageResponse filterOpen(Integer companyId, Integer resaleId);
+
+    MessageResponse filterId(Integer companyId, Integer resaleId, Integer purchaseId);
 }

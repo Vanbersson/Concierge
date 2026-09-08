@@ -3,7 +3,7 @@ package com.concierge.apiconcierge.controllers.notification;
 import com.concierge.apiconcierge.dtos.message.MessageResponseDto;
 import com.concierge.apiconcierge.dtos.notification.NotificationUserDto;
 import com.concierge.apiconcierge.models.message.MessageResponse;
-import com.concierge.apiconcierge.models.notification.NotificationUser;
+import com.concierge.apiconcierge.models.notification.Notification;
 import com.concierge.apiconcierge.services.auth.TokenService;
 import com.concierge.apiconcierge.services.notification.user.INotificationUserService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -13,13 +13,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/notification/user")
 public class NotificationUserController {
     @Autowired
-    INotificationUserService service;
+    private INotificationUserService service;
 
     @Autowired
     private TokenService tokenService;
@@ -29,7 +28,7 @@ public class NotificationUserController {
                                              @PathVariable(name = "resaleId") Integer resaleId,
                                              @PathVariable(name = "user") Integer userId) {
         try {
-            MessageResponse result = this.service.filterUser(companyId, resaleId, userId);
+            List<Notification> result = this.service.filterUser(companyId, resaleId, userId);
             return ResponseEntity.status(HttpStatus.OK).body(result);
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
@@ -41,17 +40,6 @@ public class NotificationUserController {
         try {
             String userEmail = this.getEmail(request);
             MessageResponse result = this.service.delete(data, userEmail);
-            return ResponseEntity.status(HttpStatus.OK).body(result);
-        } catch (Exception ex) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
-        }
-    }
-
-    @PostMapping("/delete/all")
-    public ResponseEntity<Object> deleteAll(@RequestBody NotificationUserDto data, HttpServletRequest request) {
-        try {
-            String userEmail = this.getEmail(request);
-            MessageResponse result = this.service.deleteAll(data, userEmail);
             return ResponseEntity.status(HttpStatus.OK).body(result);
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));

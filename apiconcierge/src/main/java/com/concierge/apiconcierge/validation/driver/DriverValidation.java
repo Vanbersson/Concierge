@@ -66,7 +66,6 @@ public class DriverValidation implements IDriverValidation {
             response.setMessage(ConstantsMessage.NOT_INFORMED);
             return response;
         }
-
         response.setStatus(ConstantsMessage.SUCCESS);
         response.setHeader("Motorista");
         response.setMessage("Cadastrado com sucesso.");

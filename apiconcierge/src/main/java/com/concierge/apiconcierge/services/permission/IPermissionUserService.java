@@ -9,10 +9,12 @@ public interface IPermissionUserService {
 
     MessageResponse save(PermissionUser permission);
 
-    MessageResponse filterUser(Integer companyId, Integer resaleId, Integer userId);
+    MessageResponse update(PermissionUser permission);
 
-    MessageResponse filterUserPermission(Integer companyId, Integer resaleId, Integer userId, Integer permissionId);
+    List<PermissionUser> filterUser(Integer companyId, Integer resaleId, Integer userId);
 
-    MessageResponse deletePermissionsUser(Integer companyId, Integer resaleId, Integer userId);
+    MessageResponse filterPermission(Integer companyId, Integer resaleId, Integer userId, Integer permissionId,String userEmail);
+
+    MessageResponse deleteAllUser(Integer companyId, Integer resaleId, Integer userId);
 
 }

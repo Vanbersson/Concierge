@@ -8,11 +8,13 @@ import java.util.Map;
 
 public interface IPurchaseOrderService {
 
-    public MessageResponse save(PurchaseOrder purchase);
+    MessageResponse save(PurchaseOrder purchase);
 
-    public MessageResponse update(PurchaseOrder purchase);
+    MessageResponse update(PurchaseOrder purchase);
 
-    public List<Map<String,Object>> filterOpen(Integer companyId, Integer resaleId);
+    MessageResponse close(PurchaseOrder purchase);
 
-    public MessageResponse filterId(Integer companyId, Integer resaleId, Integer purchaseId);
+    List<Map<String, Object>> filterOpen(Integer companyId, Integer resaleId);
+
+    MessageResponse filterId(Integer companyId, Integer resaleId, Integer purchaseId);
 }

@@ -146,6 +146,13 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
             response.setMessage(ConstantsMessage.NOT_INFORMED);
             return response;
         }
+        VehicleEntry internalVehicle = this.repository.filterId(vehicle.getCompanyId(), vehicle.getResaleId(), vehicle.getId());
+        if (internalVehicle.getStatus().equals(StatusVehicleEnum.Exited)) {
+            response.setStatus(ConstantsMessage.ERROR);
+            response.setHeader("Veículo");
+            response.setMessage("Informações não pode ser atualizadas.");
+            return response;
+        }
         if (vehicle.getStatus() == null) {
             response.setStatus(ConstantsMessage.ERROR);
             response.setHeader("Status");
@@ -178,16 +185,12 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
             response.setMessage(ConstantsMessage.NOT_INFORMED);
             return response;
         }
-        //Driver
         if (vehicle.getDriverEntryId() == null || vehicle.getDriverEntryId() == 0 || vehicle.getDriverEntryName().isBlank()) {
             response.setStatus(ConstantsMessage.ERROR);
             response.setHeader("Motorista Entrada");
             response.setMessage(ConstantsMessage.NOT_INFORMED);
             return response;
         }
-
-        VehicleEntry internalVehicle = this.repository.filterId(vehicle.getCompanyId(), vehicle.getResaleId(), vehicle.getId());
-
         if (vehicle.getVehicleServiceOrder() == YesNot.yes) {
             //Verifica autorização de saída
             if (vehicle.getAuthExitStatus() != StatusAuthExitEnum.NotAuth) {
@@ -223,7 +226,6 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
                 }
             }
         }
-
         if (vehicle.getVehicleServiceOrder() == YesNot.not) {
             if (vehicle.getAuthExitStatus() != StatusAuthExitEnum.NotAuth) {
                 if (vehicle.getClientCompanyId() == null || vehicle.getClientCompanyId() == 0 || vehicle.getClientCompanyName().isBlank()) {
@@ -247,37 +249,6 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
             }
         }
 
-
-        //Já existe orçamento
-//        if (vehicle.getBudgetStatus() != StatusBudgetEnum.NotBudget) {
-//            if (vehicle.getIdUserAttendant() == null || vehicle.getIdUserAttendant() == 0 || vehicle.getNameUserAttendant().isBlank()) {
-//                response.setStatus(ConstantsMessage.ERROR);
-//                response.setHeader("Consultor");
-//                response.setMessage(ConstantsMessage.NOT_INFORMED);
-//                return response;
-//            }
-//            if (vehicle.getNumServiceOrder().isBlank()) {
-//                response.setStatus(ConstantsMessage.ERROR);
-//                response.setHeader("Número O.S.");
-//                response.setMessage(ConstantsMessage.NOT_INFORMED);
-//                return response;
-//            }
-//            if (vehicle.getServiceOrder() == YesNot.not) {
-//                response.setStatus(ConstantsMessage.ERROR);
-//                response.setHeader("Ordem serviço");
-//                response.setMessage("Ordem de serviço iqual a não.");
-//                return response;
-//            }
-//            if (vehicle.getClientCompanyId() == null || vehicle.getClientCompanyId() == 0 || vehicle.getClientCompanyName().isBlank()) {
-//                response.setStatus(ConstantsMessage.ERROR);
-//                response.setHeader("Proprietário");
-//                response.setMessage(ConstantsMessage.NOT_INFORMED);
-//                return response;
-//            }
-//
-//        }
-
-
         response.setStatus(ConstantsMessage.SUCCESS);
         response.setHeader("Veículo");
         response.setMessage("Atualizado com sucesso.");
@@ -298,8 +269,6 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
                 return response;
             }
         }
-
-
         if (dataExit.companyId() == null || dataExit.companyId() == 0) {
             response.setStatus(ConstantsMessage.ERROR);
             response.setHeader("Empresa");
@@ -448,10 +417,10 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
             response.setMessage(ConstantsMessage.NOT_INFORMED);
             return response;
         }
-        if (vehicle.getStatus() == StatusVehicleEnum.Exited) {
+        if (vehicle.getStatus().equals(StatusVehicleEnum.Exited)) {
             response.setStatus(ConstantsMessage.ERROR);
             response.setHeader("Veículo");
-            response.setMessage("Veículo não está na empresa.");
+            response.setMessage("Informações não pode ser atualizadas.");
             return response;
         }
         if (vehicle.getDriverEntryId() == null || vehicle.getDriverEntryId() == 0) {
@@ -542,10 +511,10 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
     @Override
     public MessageResponse deleteAuthExit1(VehicleEntry vehicle, AuthExitDto authExitDto, String userEmail) {
         MessageResponse response = new MessageResponse();
-        if (vehicle.getStatus() == StatusVehicleEnum.Exited || vehicle.getStepEntry() == StepVehicleEnum.Exit) {
+        if (vehicle.getStatus().equals(StatusVehicleEnum.Exited)) {
             response.setStatus(ConstantsMessage.ERROR);
             response.setHeader("Veículo");
-            response.setMessage("Veículo não está na empresa.");
+            response.setMessage("Informações não pode ser atualizadas.");
             return response;
         }
         if (vehicle.getAuthExitStatus() == StatusAuthExitEnum.NotAuth) {
@@ -589,10 +558,10 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
     @Override
     public MessageResponse deleteAuthExit2(VehicleEntry vehicle, AuthExitDto authExitDto, String userEmail) {
         MessageResponse response = new MessageResponse();
-        if (vehicle.getStatus() == StatusVehicleEnum.Exited || vehicle.getStepEntry() == StepVehicleEnum.Exit) {
+        if (vehicle.getStatus().equals(StatusVehicleEnum.Exited)) {
             response.setStatus(ConstantsMessage.ERROR);
             response.setHeader("Veículo");
-            response.setMessage("Veículo não está na empresa.");
+            response.setMessage("Informações não pode ser atualizadas.");
             return response;
         }
         if (vehicle.getAuthExitStatus() == StatusAuthExitEnum.NotAuth) {
@@ -601,13 +570,12 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
             response.setMessage("Veículo não está autorizado.");
             return response;
         }
+        //Verifica se o usuário tem permissão
+        User user = this.userRepository.loginEmail(userEmail);
         //Permission
         if (vehicle.getVehicleServiceOrder().equals(YesNot.yes)) {
-            if (authExitDto.userId() != 1) {
-//                if (vehicle.getIdUserExitAuth2() != authExitDto.userId()){
-//                    return ConstantsMessage.ERROR_PERMISSION_ANOTHER_USER;
-//                }
-                PermissionUser permission = this.permissionUser.findPermissionId(authExitDto.companyId(), authExitDto.resaleId(), authExitDto.userId(), DEL_AUTH_EXIT_VEHICLE_2);
+            if (user.getRoleFunc() != UserRoleEnum.ADMIN) {
+                PermissionUser permission = this.permissionUser.findPermissionId(user.getCompanyId(), user.getResaleId(), user.getId(), DEL_AUTH_EXIT_VEHICLE_2);
                 if (permission == null) {
                     response.setStatus(ConstantsMessage.ERROR);
                     response.setHeader("Permissão - " + DEL_AUTH_EXIT_VEHICLE_2);
@@ -618,11 +586,8 @@ public class VehicleEntryValidation implements IVehicleEntryValidation {
         }
         //Permission
         if (vehicle.getVehicleServiceOrder().equals(YesNot.not)) {
-            if (authExitDto.userId() != 1) {
-//                if (vehicle.getIdUserExitAuth2() != authExitDto.userId()){
-//                    return ConstantsMessage.ERROR_PERMISSION_ANOTHER_USER;
-//                }
-                PermissionUser permission = this.permissionUser.findPermissionId(authExitDto.companyId(), authExitDto.resaleId(), authExitDto.userId(), DEL_AUTH_EXIT_VEHICLE_WITHOUT_O_S);
+            if (user.getRoleFunc() != UserRoleEnum.ADMIN) {
+                PermissionUser permission = this.permissionUser.findPermissionId(user.getCompanyId(), user.getResaleId(), user.getId(), DEL_AUTH_EXIT_VEHICLE_WITHOUT_O_S);
                 if (permission == null) {
                     response.setStatus(ConstantsMessage.ERROR);
                     response.setHeader("Permissão - " + DEL_AUTH_EXIT_VEHICLE_WITHOUT_O_S);

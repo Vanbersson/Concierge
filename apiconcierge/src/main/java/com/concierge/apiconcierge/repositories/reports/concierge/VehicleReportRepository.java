@@ -1,4 +1,4 @@
-package com.concierge.apiconcierge.repositories.vehicle.reports;
+package com.concierge.apiconcierge.repositories.reports.concierge;
 
 import com.concierge.apiconcierge.dtos.reports.concierge.VehicleReportDto;
 import com.concierge.apiconcierge.models.enums.YesNot;
@@ -30,7 +30,6 @@ public class VehicleReportRepository {
         predicates.add(cb.equal(vehicle.get("companyId"), vehicleFilters.companyId()));
         predicates.add(cb.equal(vehicle.get("resaleId"), vehicleFilters.resaleId()));
 
-        //periodo
         if (vehicleFilters.dateInit() != null && vehicleFilters.dateFinal() != null) {
             LocalDateTime dateInit = vehicleFilters.dateInit().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
             // Criar intervalo de 00:00:00 até 23:59:59
@@ -46,7 +45,6 @@ public class VehicleReportRepository {
             switch (vehicleFilters.type()) {
                 case "E":
                     predicates.add(cb.or(cb.between(vehicle.get("entryDate"), initStartDate, initEndDate)));
-                    predicates.add(cb.isNull(vehicle.get("exitDate")));
                     break;
                 case "S":
                     predicates.add(cb.or(cb.between(vehicle.get("exitDate"), initStartDate, initEndDate)));
@@ -57,8 +55,18 @@ public class VehicleReportRepository {
                     predicates.add(cb.or(dateEntryPredicate, cb.or(dateExitPredicate)));
                     break;
             }
+        }else{
+            switch (vehicleFilters.type()) {
+                case "E":
+                    predicates.add(cb.isNull(vehicle.get("exitDate")));
+                    break;
+                case "S":
+                    predicates.add(cb.isNotNull(vehicle.get("exitDate")));
+                    break;
+                case "A":
+                    break;
+            }
         }
-
         if (vehicleFilters.userAttendantId() != null && vehicleFilters.userAttendantId() != 0)
             predicates.add(cb.equal(vehicle.get("attendantUserId"), vehicleFilters.userAttendantId()));
         if (vehicleFilters.clientId() != null && vehicleFilters.clientId() != 0)
@@ -75,7 +83,6 @@ public class VehicleReportRepository {
             predicates.add(cb.equal(vehicle.get("numServiceOrder"), vehicleFilters.numServiceOrder()));
         if (vehicleFilters.vehicleNew() == YesNot.yes)
             predicates.add(cb.equal(vehicle.get("vehicleNew"), vehicleFilters.vehicleNew()));
-
         cq.where(predicates.toArray(new Predicate[0]));
         return em.createQuery(cq).getResultList();
     }

@@ -4,6 +4,7 @@ import com.concierge.apiconcierge.models.workshop.toolcontrol.ToolControlMatMec;
 import com.concierge.apiconcierge.util.ConstantsMessage;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @Service
@@ -18,7 +19,7 @@ public class ToolControlMatMecValidation implements IToolControlMatMecValidation
             return "Id Request not informed.";
         if (matMec.getDeliveryDate() == null)
             return "Date not informed.";
-        if (matMec.getDeliveryQuantity() < 0 || matMec.getDeliveryQuantity() == 0)
+        if (matMec.getDeliveryQuantity().compareTo(BigDecimal.ZERO) < 0 || matMec.getDeliveryQuantity().compareTo(BigDecimal.ZERO) == 0)
             return "Quantity not informed.";
         if (matMec.getMaterialId() == null || matMec.getMaterialId() == 0)
             return "Id Material not informed.";
@@ -38,7 +39,7 @@ public class ToolControlMatMecValidation implements IToolControlMatMecValidation
             return "Id Request not informed.";
         if (matMec.getDeliveryDate() == null)
             return "Date not informed.";
-        if (matMec.getDeliveryQuantity() < 0 || matMec.getDeliveryQuantity() == 0)
+        if (matMec.getDeliveryQuantity().compareTo(BigDecimal.ZERO) < 0 || matMec.getDeliveryQuantity().compareTo(BigDecimal.ZERO) == 0)
             return "Quantity not informed.";
         if (matMec.getMaterialId() == null || matMec.getMaterialId() == 0)
             return "Id Material not informed.";

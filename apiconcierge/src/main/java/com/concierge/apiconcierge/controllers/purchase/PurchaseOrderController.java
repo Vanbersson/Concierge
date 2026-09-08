@@ -46,6 +46,18 @@ public class PurchaseOrderController {
         }
     }
 
+    @PostMapping("/close")
+    public ResponseEntity<Object> close(@RequestBody PurchaseOrderDto data) {
+        try {
+            PurchaseOrder purchaseOrder = new PurchaseOrder();
+            BeanUtils.copyProperties(data, purchaseOrder);
+            MessageResponse response = this.service.close(purchaseOrder);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponseDto(ex.getMessage()));
+        }
+    }
+
     @GetMapping("/{companyId}/{resaleId}/filter/open")
     public ResponseEntity<Object> filterOpen(@PathVariable(name = "companyId") Integer companyId,
                                              @PathVariable(name = "resaleId") Integer resaleId) {

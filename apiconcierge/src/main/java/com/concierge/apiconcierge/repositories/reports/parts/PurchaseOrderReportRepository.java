@@ -22,34 +22,24 @@ public class PurchaseOrderReportRepository {
 
     public List<PurchaseOrder> filterPurchase(PurchaseOrderReportDto purchaseFilters) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
-
         CriteriaQuery<PurchaseOrder> cq = cb.createQuery(PurchaseOrder.class);
         Root<PurchaseOrder> purchaseOrder = cq.from(PurchaseOrder.class);
 
         List<Predicate> predicates = new ArrayList<>();
         predicates.add(cb.equal(purchaseOrder.get("companyId"), purchaseFilters.companyId()));
         predicates.add(cb.equal(purchaseOrder.get("resaleId"), purchaseFilters.resaleId()));
-
-        if (purchaseFilters.dateInit() != null && purchaseFilters.dateFinal() != null) {
-            Predicate preGeneration = cb.between(purchaseOrder.get("dateGeneration"), purchaseFilters.dateInit(), purchaseFilters.dateFinal());
-            Predicate preDelivery = cb.between(purchaseOrder.get("dateDelivery"), purchaseFilters.dateInit(), purchaseFilters.dateFinal());
-            Predicate preReceived = cb.between(purchaseOrder.get("dateReceived"), purchaseFilters.dateInit(), purchaseFilters.dateFinal());
-            predicates.add(cb.or(preGeneration, cb.or(preDelivery, cb.or(preReceived))));
-        }
-
-        if (!purchaseFilters.status().isBlank()) {
-//            if (purchaseFilters.status().equals(PurchaseOrderStatus.Open_Purchase_Order.toString()))
-//                predicates.add(cb.equal(purchaseOrder.get("status"), PurchaseOrderStatus.Open_Purchase_Order));
-//            if (purchaseFilters.status().equals(PurchaseOrderStatus.Closed_Purchase_Order.toString()))
-//                predicates.add(cb.equal(purchaseOrder.get("status"), PurchaseOrderStatus.Closed_Purchase_Order));
-        }
-
+        if (purchaseFilters.dateInit() != null && purchaseFilters.dateFinal() != null)
+            predicates.add(cb.or(cb.between(purchaseOrder.get("dateReceived"), purchaseFilters.dateInit(), purchaseFilters.dateFinal())));
+        if (purchaseFilters.status().equals(PurchaseOrderStatus.ABERTO))
+            predicates.add(cb.equal(purchaseOrder.get("status"), PurchaseOrderStatus.ABERTO));
+        if (purchaseFilters.status().equals(PurchaseOrderStatus.FECHADO))
+            predicates.add(cb.equal(purchaseOrder.get("status"), PurchaseOrderStatus.FECHADO));
         if (purchaseFilters.id() != null && purchaseFilters.id() != 0)
             predicates.add(cb.equal(purchaseOrder.get("id"), purchaseFilters.id()));
         if (purchaseFilters.clientCompanyId() != null && purchaseFilters.clientCompanyId() != 0)
             predicates.add(cb.equal(purchaseOrder.get("clientCompanyId"), purchaseFilters.clientCompanyId()));
         if (purchaseFilters.responsibleId() != null && purchaseFilters.responsibleId() != 0)
-            predicates.add(cb.equal(purchaseOrder.get("responsibleId"), purchaseFilters.responsibleId()));
+            predicates.add(cb.equal(purchaseOrder.get("responsibleUserId"), purchaseFilters.responsibleId()));
         if (purchaseFilters.nfNum() != null && purchaseFilters.nfNum() != 0)
             predicates.add(cb.equal(purchaseOrder.get("nfNum"), purchaseFilters.nfNum()));
 

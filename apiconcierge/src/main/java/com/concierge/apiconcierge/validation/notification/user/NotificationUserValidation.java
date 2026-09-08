@@ -56,7 +56,7 @@ public class NotificationUserValidation implements INotificationUserValidation {
             response.setMessage(ConstantsMessage.NOT_INFORMED);
             return response;
         }
-        if (notification.id() == null) {
+        if (notification.notificationId() == null) {
             response.setStatus(ConstantsMessage.ERROR);
             response.setHeader("Notificação");
             response.setMessage(ConstantsMessage.NOT_INFORMED);
@@ -86,12 +86,6 @@ public class NotificationUserValidation implements INotificationUserValidation {
         if (notification.resaleId() == null || notification.resaleId() == 0) {
             response.setStatus(ConstantsMessage.ERROR);
             response.setHeader("Revenda");
-            response.setMessage(ConstantsMessage.NOT_INFORMED);
-            return response;
-        }
-        if (notification.userId() == null || notification.userId() == 0 ) {
-            response.setStatus(ConstantsMessage.ERROR);
-            response.setHeader("Usuário");
             response.setMessage(ConstantsMessage.NOT_INFORMED);
             return response;
         }

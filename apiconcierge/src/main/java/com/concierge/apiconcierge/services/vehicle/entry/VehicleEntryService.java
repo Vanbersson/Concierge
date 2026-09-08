@@ -1,11 +1,8 @@
 package com.concierge.apiconcierge.services.vehicle.entry;
 
 import com.concierge.apiconcierge.dtos.vehicle.entry.AuthExitDto;
-import com.concierge.apiconcierge.dtos.vehicle.entry.ExistsVehiclePlateDto;
 import com.concierge.apiconcierge.dtos.vehicle.entry.VehicleExitDto;
 import com.concierge.apiconcierge.exceptions.vehicle.VehicleEntryException;
-import com.concierge.apiconcierge.models.budget.Budget;
-import com.concierge.apiconcierge.models.budget.enums.StatusBudgetEnum;
 import com.concierge.apiconcierge.models.enums.YesNot;
 import com.concierge.apiconcierge.models.message.MessageResponse;
 import com.concierge.apiconcierge.models.notification.Notification;
@@ -38,9 +35,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 import static com.concierge.apiconcierge.util.ConstantsPermission.*;
 
@@ -89,15 +84,14 @@ public class VehicleEntryService implements IVehicleEntryService {
                 vehicle.setAuth1ExitUserId(null);
                 vehicle.setAuth2ExitUserId(null);
                 vehicle.setAuthExitStatus(StatusAuthExitEnum.NotAuth);
-                VehicleEntry result = this.repository.save(vehicle);
+                VehicleEntry resultVehicle = this.repository.save(vehicle);
 
                 Map<String, Object> map = new HashMap<>();
-                map.put("id", result.getId());
+                map.put("id", resultVehicle.getId());
                 response.setData(map);
-
                 //Notification
-//                User userOrigem = this.userRepository.filterEmail(result.getCompanyId(), result.getResaleId(), userEmail);
-//                this.notification("Entry", result, RECEIVE_VEHICLE_ENTRY_NOTIFICATIONS, userOrigem);
+                User resultUser = this.userRepository.loginEmail(userEmail);
+                this.sendNotification("Entry", resultVehicle, CONCIERGE_VEHICLE_ENTRY_NOTIFICATIONS, resultUser);
             }
             return response;
         } catch (Exception ex) {
@@ -153,9 +147,9 @@ public class VehicleEntryService implements IVehicleEntryService {
                 vehicleEntry.setExitPhoto3Url(dataExit.exitPhoto3Url());
                 vehicleEntry.setExitPhoto4Url(dataExit.exitPhoto4Url());
                 VehicleEntry result = this.repository.save(vehicleEntry);
-//                Notification
-//                User userOrigem = this.userRepository.filterEmail(result.getCompanyId(), result.getResaleId(), userEmail);
-//                this.notification("Exit", result, RECEIVE_VEHICLE_EXIT_NOTIFICATIONS, userOrigem);
+                //Notification
+                User userOrigem = this.userRepository.loginEmail(userEmail);
+                this.sendNotification("Exit", result, CONCIERGE_VEHICLE_EXIT_NOTIFICATIONS, userOrigem);
             }
             return response;
         } catch (Exception ex) {
@@ -258,7 +252,7 @@ public class VehicleEntryService implements IVehicleEntryService {
             MessageResponse response = new MessageResponse();
             //Verifica se o usuário tem permissão
             User user = this.userRepository.loginEmail(userEmail);
-            if(user.getRoleFunc() != UserRoleEnum.ADMIN){
+            if (user.getRoleFunc() != UserRoleEnum.ADMIN) {
                 PermissionUser permission = this.permissionUser.findPermissionId(user.getCompanyId(), user.getResaleId(), user.getId(), AUTH_ENTRY_VEHICLE);
                 if (permission == null) {
                     response.setStatus(ConstantsMessage.ERROR);
@@ -404,9 +398,6 @@ public class VehicleEntryService implements IVehicleEntryService {
     public MessageResponse deleteAuthExit1(AuthExitDto authExitDto, String userEmail) {
         try {
             VehicleEntry vehicle = this.repository.filterId(authExitDto.companyId(), authExitDto.resaleId(), authExitDto.vehicleId());
-            if (vehicle == null || vehicle.getStatus() == StatusVehicleEnum.Exited) {
-                throw new VehicleEntryException("Veículo não encontrado.");
-            }
             MessageResponse response = this.validation.deleteAuthExit1(vehicle, authExitDto, userEmail);
             if (ConstantsMessage.SUCCESS.equals(response.getStatus())) {
                 vehicle.setAuth1ExitUserId(null);
@@ -426,9 +417,6 @@ public class VehicleEntryService implements IVehicleEntryService {
     public MessageResponse deleteAuthExit2(AuthExitDto authExitDto, String userEmail) {
         try {
             VehicleEntry vehicle = this.repository.filterId(authExitDto.companyId(), authExitDto.resaleId(), authExitDto.vehicleId());
-            if (vehicle == null || vehicle.getStatus() == StatusVehicleEnum.Exited) {
-                throw new VehicleEntryException("Veículo não encontrado.");
-            }
             MessageResponse response = this.validation.deleteAuthExit2(vehicle, authExitDto, userEmail);
             if (ConstantsMessage.SUCCESS.equals(response.getStatus())) {
                 vehicle.setAuth2ExitUserId(null);
@@ -476,7 +464,6 @@ public class VehicleEntryService implements IVehicleEntryService {
             map.put("url", url);
 
             response.setData(map);
-
             return response;
         } catch (Exception e) {
             throw new Exception(e.getMessage());
@@ -568,70 +555,55 @@ public class VehicleEntryService implements IVehicleEntryService {
         return status;
     }
 
-//    private String notification(String tipo, VehicleEntry vehicle, Integer permissionId, User userOrig) {
-//        List<PermissionUser> permissions = this.permissionUser.filterPermissionId(vehicle.getCompanyId(), vehicle.getResaleId(), permissionId);
-//        if (permissions.isEmpty()) {
-//            return ConstantsMessage.FAILED;
-//        }
-//        Notification n = new Notification();
-//        switch (tipo) {
-//            case "Entry":
-//                n.setCompanyId(userOrig.getCompanyId());
-//                n.setResaleId(userOrig.getResaleId());
-//                n.setOrigUserId(userOrig.getId());
-//                n.setOrigUserName(userOrig.getName());
-//                n.setOrigRoleId(userOrig.getRoleId());
-//                n.setOrigRoleDesc(userOrig.getRoleDesc());
-//                n.setOrigDate(new Date());
-//                n.setOrigNotificationMenu(NotificationMenu.Vehicle_Entry);
-//                n.setDestUserAll(YesNot.not);
-//                n.setVehicleId(vehicle.getId());
-//                n.setHeader("Entrada de Veículo");
-//                n.setMessage1("realizou a entrada do veículo.");
-//                if (vehicle.getVehicleNew() == YesNot.yes) {
-//                    n.setMessage2(vehicle.getId() + ", novo, " + vehicle.getModelDescription());
-//                } else {
-//                    n.setMessage2(vehicle.getId() + ", " + vehicle.getPlaca() + ", " + vehicle.getModelDescription());
-//                }
-//                n.setMessage3("");
-//                n.setShareMessage(YesNot.yes);
-//                n.setDeleteMessage(YesNot.yes);
-//                break;
-//            case "Exit":
-//                n.setCompanyId(userOrig.getCompanyId());
-//                n.setResaleId(userOrig.getResaleId());
-//                n.setOrigUserId(userOrig.getId());
-//                n.setOrigUserName(userOrig.getName());
-//                n.setOrigRoleId(userOrig.getRoleId());
-//                n.setOrigRoleDesc(userOrig.getRoleDesc());
-//                n.setOrigDate(new Date());
-//                n.setOrigNotificationMenu(NotificationMenu.Vehicle_Exit);
-//                n.setDestUserAll(YesNot.not);
-//                n.setVehicleId(vehicle.getId());
-//                n.setHeader("Saída de Veículo");
-//                n.setMessage1("realizou a saída do veículo.");
-//                if (vehicle.getVehicleNew() == YesNot.yes) {
-//                    n.setMessage2(vehicle.getId() + ", novo, " + vehicle.getModelDescription());
-//                } else {
-//                    n.setMessage2(vehicle.getId() + ", " + vehicle.getPlaca() + ", " + vehicle.getModelDescription());
-//                }
-//                n.setMessage3("");
-//                n.setShareMessage(YesNot.yes);
-//                n.setDeleteMessage(YesNot.yes);
-//                break;
-//        }
-//        //Save notification
-//        MessageResponse resultNotification = this.notificationService.save(n);
-//        Notification dataNotifi = (Notification) resultNotification.getData();
-//        for (PermissionUser p : permissions) {
-//            User u = this.userRepository.filterId(vehicle.getCompanyId(), vehicle.getResaleId(), p.getUserId());
-//            NotificationUser nuDest = new NotificationUser();
-//            nuDest.setCompanyId(userOrig.getCompanyId());
-//            nuDest.setResaleId(userOrig.getResaleId());
-//            nuDest.setNotificationId(dataNotifi.getId());
-//            nuDest.setUserId(u.getId());
-//            this.notificationUserService.save(nuDest);
-//        }
-//        return ConstantsMessage.SUCCESS;
-//    }
+    private String sendNotification(String type, VehicleEntry vehicle, Integer permissionId, User userOrig) {
+        List<PermissionUser> permissions = this.permissionUser.filterPermissionId(userOrig.getCompanyId(), userOrig.getResaleId(), permissionId);
+        if (permissions.isEmpty()) {
+            return ConstantsMessage.ERROR;
+        }
+        Notification n = new Notification();
+        n.setCompanyId(userOrig.getCompanyId());
+        n.setResaleId(userOrig.getResaleId());
+
+        n.setOrigUserId(userOrig.getId());
+        n.setOrigUserName(userOrig.getName());
+        n.setOrigRoleId(userOrig.getRoleId());
+        n.setOrigRoleDesc(userOrig.getRoleDesc());
+        n.setOrigDate(new Date());
+        n.setOrigId(vehicle.getId().toString());
+        n.setMessage3("");
+        switch (type) {
+            case "Entry":
+                n.setOrigNotificationMenu(NotificationMenu.Concierge_Vehicle_Entry);
+                n.setHeader("Entrada de Veículo");
+                n.setMessage1("realizou a entrada do veículo.");
+                if (vehicle.getVehicleNew() == YesNot.yes) {
+                    n.setMessage2(vehicle.getId() + ", novo, " + vehicle.getModelDescription());
+                } else {
+                    n.setMessage2(vehicle.getId() + ", " + vehicle.getVehiclePlate() + ", " + vehicle.getModelDescription());
+                }
+                break;
+            case "Exit":
+                n.setOrigNotificationMenu(NotificationMenu.Concierge_Vehicle_Exit);
+                n.setHeader("Saída de Veículo");
+                n.setMessage1("realizou a saída do veículo.");
+                if (vehicle.getVehicleNew() == YesNot.yes) {
+                    n.setMessage2(vehicle.getId() + ", novo, " + vehicle.getModelDescription());
+                } else {
+                    n.setMessage2(vehicle.getId() + ", " + vehicle.getVehiclePlate() + ", " + vehicle.getModelDescription());
+                }
+                break;
+        }
+        //Save notification
+        Notification resultNotification = this.notificationService.save(n);
+        for (PermissionUser p : permissions) {
+            User u = this.userRepository.filterId(vehicle.getCompanyId(), vehicle.getResaleId(), p.getUserId());
+            NotificationUser nuDest = new NotificationUser();
+            nuDest.setCompanyId(userOrig.getCompanyId());
+            nuDest.setResaleId(userOrig.getResaleId());
+            nuDest.setNotificationId(resultNotification.getId());
+            nuDest.setUserId(u.getId());
+            this.notificationUserService.save(nuDest);
+        }
+        return ConstantsMessage.SUCCESS;
+    }
 }

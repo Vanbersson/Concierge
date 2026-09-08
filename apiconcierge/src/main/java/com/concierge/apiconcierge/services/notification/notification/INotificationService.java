@@ -3,12 +3,16 @@ package com.concierge.apiconcierge.services.notification.notification;
 import com.concierge.apiconcierge.models.message.MessageResponse;
 import com.concierge.apiconcierge.models.notification.Notification;
 
-import java.util.UUID;
+import java.util.List;
 
 public interface INotificationService {
 
-    public MessageResponse save(Notification n);
+    Notification save(Notification n);
 
-    public MessageResponse delete(Integer companyId, Integer resaleId, UUID id);
+    MessageResponse delete(Integer companyId, Integer resaleId, Integer id);
+
+    Notification filterId(Integer companyId, Integer resaleId, Integer id);
+
+    List<Notification> filterUser(Integer companyId, Integer resaleId, Integer userId);
 
 }

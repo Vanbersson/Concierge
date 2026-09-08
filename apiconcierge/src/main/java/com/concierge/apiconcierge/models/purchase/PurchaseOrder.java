@@ -12,20 +12,13 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(of = "id")
-@SecondaryTable(name = "tb_company", pkJoinColumns = @PrimaryKeyJoinColumn(name = "id"))
-@SecondaryTable(name = "tb_resale", pkJoinColumns = @PrimaryKeyJoinColumn(name = "id"))
-@SecondaryTable(name = "tb_user", pkJoinColumns = @PrimaryKeyJoinColumn(name = "id"))
-@SecondaryTable(name = "tb_payment_type", pkJoinColumns = @PrimaryKeyJoinColumn(name = "id"))
-@SecondaryTable(name = "tb_client_company", pkJoinColumns = @PrimaryKeyJoinColumn(name = "id"))
 @Entity
 @Table(name = "tb_purchase_order")
 public class PurchaseOrder {
 
-    @JoinColumn(table = "tb_company", referencedColumnName = "id")
     @Column(name = "company_id")
     private Integer companyId;
 
-    @JoinColumn(table = "tb_resale", referencedColumnName = "id")
     @Column(name = "resale_id")
     private Integer resaleId;
 
@@ -37,7 +30,6 @@ public class PurchaseOrder {
 
     private TypePurchaseOrder type;
 
-    @JoinColumn(table = "tb_user", referencedColumnName = "id")
     @Column(name = "generation_user_id")
     private Integer generationUserId;
 
@@ -47,14 +39,12 @@ public class PurchaseOrder {
     @Column(name = "generation_date")
     private Date generationDate;
 
-    @JoinColumn(table = "tb_user", referencedColumnName = "id")
     @Column(name = "responsible_user_id")
     private Integer responsibleUserId;
 
     @Column(name = "responsible_user_name")
     private String responsibleUserName;
 
-    @JoinColumn(table = "tb_payment_type", referencedColumnName = "id")
     @Column(name = "payment_type_id")
     private Integer paymentTypeId;
 
@@ -69,7 +59,6 @@ public class PurchaseOrder {
 
     private String information;
 
-    @JoinColumn(table = "tb_client_company", referencedColumnName = "id")
     @Column(name = "client_company_id")
     private Integer clientCompanyId;
 

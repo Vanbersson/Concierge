@@ -15,6 +15,7 @@ import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 
@@ -38,35 +39,36 @@ public class ToolControlMatMecService implements IToolControlMatMecService {
     public String save(ToolControlMatMec matMec) {
         try {
             String message = this.validation.save(matMec);
-            if (ConstantsMessage.SUCCESS.equals(message)) {
-                float quant = matMec.getDeliveryQuantity();
-                for (int i = 0; i < quant; i++) {
-                    ToolControlMatMec newMatMec = new ToolControlMatMec();
-                    newMatMec.setCompanyId(matMec.getCompanyId());
-                    newMatMec.setResaleId(matMec.getResaleId());
-                    newMatMec.setRequestId(matMec.getRequestId());
-                    newMatMec.setDeliveryUserId(matMec.getDeliveryUserId());
-                    newMatMec.setDeliveryUserName(matMec.getDeliveryUserName());
-                    newMatMec.setDeliveryDate(matMec.getDeliveryDate());
-                    newMatMec.setDeliveryQuantity(1);
-                    newMatMec.setDeliveryInformation(matMec.getDeliveryInformation());
-                    newMatMec.setReturnUserId(null);
-                    newMatMec.setReturnUserName("");
-                    newMatMec.setReturnDate(null);
-                    newMatMec.setReturnQuantity(0);
-                    newMatMec.setReturnInformation("");
-                    newMatMec.setMaterialId(matMec.getMaterialId());
-                    newMatMec.setMaterialDescription(matMec.getMaterialDescription());
-                    newMatMec.setMaterialNumberCA(matMec.getMaterialNumberCA());
-
-                    this.repository.save(newMatMec);
-                    this.updateMatQuantityAccounting(matMec);
-                }
-                this.updateMatQuantityAvailable(matMec);
-                return ConstantsMessage.SUCCESS;
-            } else {
-                throw new ToolControlException(message);
-            }
+//            if (ConstantsMessage.SUCCESS.equals(message)) {
+//                Integer quant = matMec.getDeliveryQuantity();
+//                for (int i = 0; i < quant ; i++) {
+//                    ToolControlMatMec newMatMec = new ToolControlMatMec();
+//                    newMatMec.setCompanyId(matMec.getCompanyId());
+//                    newMatMec.setResaleId(matMec.getResaleId());
+//                    newMatMec.setRequestId(matMec.getRequestId());
+//                    newMatMec.setDeliveryUserId(matMec.getDeliveryUserId());
+//                    newMatMec.setDeliveryUserName(matMec.getDeliveryUserName());
+//                    newMatMec.setDeliveryDate(matMec.getDeliveryDate());
+//                    // newMatMec.setDeliveryQuantity(1);
+//                    newMatMec.setDeliveryInformation(matMec.getDeliveryInformation());
+//                    newMatMec.setReturnUserId(null);
+//                    newMatMec.setReturnUserName("");
+//                    newMatMec.setReturnDate(null);
+//                    newMatMec.setReturnQuantity(0);
+//                    newMatMec.setReturnInformation("");
+//                    newMatMec.setMaterialId(matMec.getMaterialId());
+//                    newMatMec.setMaterialDescription(matMec.getMaterialDescription());
+//                    newMatMec.setMaterialNumberCA(matMec.getMaterialNumberCA());
+//
+//                    this.repository.save(newMatMec);
+//                    this.updateMatQuantityAccounting(matMec);
+//                }
+//                this.updateMatQuantityAvailable(matMec);
+//                return ConstantsMessage.SUCCESS;
+//            } else {
+//                throw new ToolControlException(message);
+//            }
+            return message;
         } catch (Exception ex) {
             throw new ToolControlException(ex.getMessage());
         }
@@ -94,24 +96,39 @@ public class ToolControlMatMecService implements IToolControlMatMecService {
         ToolControlMaterial material = this.materialRepository.filterId(matMec.getCompanyId(), matMec.getResaleId(), matMec.getMaterialId());
         ToolControlCategory category = this.categoryRepository.filterId(matMec.getCompanyId(), matMec.getResaleId(), material.getCategoryId());
         if (category.getType() == TypeCategory.EPI || category.getType() == TypeCategory.Uniforme) {
-            material.setQuantityAccountingLoan(material.getQuantityAccountingLoan() - 1);
+            material.setQuantityAccountingLoan(material.getQuantityAccountingLoan().subtract(new BigDecimal(1)) );
             this.materialRepository.save(material);
         }
     }
 
     private void updateMatQuantityAvailable(ToolControlMatMec matMec) {
-        float quantityLoan = (float) this.repository.filterMatIdDevPend(matMec.getCompanyId(), matMec.getResaleId(), matMec.getMaterialId())
+        BigDecimal quantityLoan = this.repository
+                .filterMatIdDevPend(matMec.getCompanyId(), matMec.getResaleId(), matMec.getMaterialId())
                 .stream()
-                .mapToDouble(ToolControlMatMec::getDeliveryQuantity)
-                .sum();
+                .map(ToolControlMatMec:: getDeliveryQuantity)
+                .filter(Objects::nonNull)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
         ToolControlMaterial material = this.materialRepository.filterId(matMec.getCompanyId(), matMec.getResaleId(), matMec.getMaterialId());
         ToolControlCategory category = this.categoryRepository.filterId(material.getCompanyId(), material.getResaleId(), material.getCategoryId());
-        if(category.getType() == TypeCategory.EPI || category.getType() == TypeCategory.Uniforme){
+        if (category.getType() == TypeCategory.EPI || category.getType() == TypeCategory.Uniforme) {
             material.setQuantityAvailableLoan(material.getQuantityAccountingLoan());
-        }else{
-            material.setQuantityAvailableLoan(material.getQuantityAccountingLoan() - quantityLoan);
+        } else {
+            material.setQuantityAvailableLoan(material.getQuantityAccountingLoan().subtract(quantityLoan)            );
         }
         this.materialRepository.save(material);
+//        BigDecimal quantityLoan =  this.repository.filterMatIdDevPend(matMec.getCompanyId(), matMec.getResaleId(), matMec.getMaterialId())
+//                .stream()
+//                .mapToDouble(ToolControlMatMec::getDeliveryQuantity)
+//                .sum();
+//        ToolControlMaterial material = this.materialRepository.filterId(matMec.getCompanyId(), matMec.getResaleId(), matMec.getMaterialId());
+//        ToolControlCategory category = this.categoryRepository.filterId(material.getCompanyId(), material.getResaleId(), material.getCategoryId());
+//        if(category.getType() == TypeCategory.EPI || category.getType() == TypeCategory.Uniforme){
+//            material.setQuantityAvailableLoan(material.getQuantityAccountingLoan());
+//        }else{
+//            material.setQuantityAvailableLoan(material.getQuantityAccountingLoan() - quantityLoan);
+//        }
+//        this.materialRepository.save(material);
     }
 
     @SneakyThrows

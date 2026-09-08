@@ -1,17 +1,18 @@
 package com.concierge.apiconcierge.services.menu;
 
 import com.concierge.apiconcierge.models.menu.MenuUser;
+import com.concierge.apiconcierge.models.message.MessageResponse;
 
 import java.util.List;
 import java.util.Map;
 
 public interface IMenuUserService {
 
-    public String save(MenuUser menu);
+    MessageResponse save(MenuUser menu);
 
-    public String update(MenuUser menu);
+    MessageResponse update(MenuUser menu);
 
-    public List<Object> filterMenus(MenuUser menu);
+    List<Map<String, Object>> filterMenus(MenuUser menu);
 
-    public String deleteMenu(MenuUser menu);
+    MessageResponse deleteMenu(MenuUser menu);
 }

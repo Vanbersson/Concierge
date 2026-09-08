@@ -7,9 +7,11 @@ import com.concierge.apiconcierge.services.permission.PermissionUserService;
 public interface IPermissionUserValidation {
     MessageResponse save(PermissionUser permission);
 
+    MessageResponse update(PermissionUser permission);
+
     MessageResponse filterUser(Integer companyId, Integer resaleId,Integer userId);
 
-    MessageResponse filterUserPermission(Integer companyId, Integer resaleId, Integer userId, Integer permissionId);
+    MessageResponse filterPermission(Integer companyId, Integer resaleId, Integer userId, Integer permissionId);
 
-    MessageResponse deletePermissionsUser(Integer companyId, Integer resaleId,Integer userId);
+    MessageResponse deleteAllUser(Integer companyId, Integer resaleId,Integer userId);
 }

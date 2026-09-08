@@ -4,11 +4,13 @@ import com.concierge.apiconcierge.models.message.MessageResponse;
 import com.concierge.apiconcierge.models.workshop.toolcontrol.ToolControlMaterial;
 
 public interface IToolControlMaterialValidation {
-    String save(ToolControlMaterial mat);
+    MessageResponse save(ToolControlMaterial mat);
 
     MessageResponse update(ToolControlMaterial mat);
 
-    String listAll(Integer companyId, Integer resaleId);
+    MessageResponse filterId(Integer companyId, Integer resaleId, Integer id);
 
-    String listAllEnabled(Integer companyId, Integer resaleId);
+    MessageResponse listAll(Integer companyId, Integer resaleId);
+
+    MessageResponse listAllEnabled(Integer companyId, Integer resaleId);
 }

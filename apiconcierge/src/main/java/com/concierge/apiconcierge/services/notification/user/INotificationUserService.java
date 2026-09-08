@@ -2,15 +2,16 @@ package com.concierge.apiconcierge.services.notification.user;
 
 import com.concierge.apiconcierge.dtos.notification.NotificationUserDto;
 import com.concierge.apiconcierge.models.message.MessageResponse;
+import com.concierge.apiconcierge.models.notification.Notification;
 import com.concierge.apiconcierge.models.notification.NotificationUser;
 
+import java.util.List;
+
 public interface INotificationUserService {
-    public MessageResponse save(NotificationUser n);
+     MessageResponse save(NotificationUser n);
 
-    public MessageResponse delete(NotificationUserDto notification, String userEmail);
+     MessageResponse delete(NotificationUserDto notification, String userEmail);
 
-    public MessageResponse deleteAll(NotificationUserDto notification, String userEmail);
-
-    public MessageResponse filterUser(Integer companyId, Integer resaleId, Integer userId);
+     List<Notification> filterUser(Integer companyId, Integer resaleId, Integer userId);
 
 }

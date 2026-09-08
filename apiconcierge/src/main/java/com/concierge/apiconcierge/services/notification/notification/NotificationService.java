@@ -9,21 +9,31 @@ import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.UUID;
+import java.util.List;
 
 @Service
 public class NotificationService implements INotificationService {
     @Autowired
-    INotificationRepository repository;
+    private INotificationRepository repository;
 
     @SneakyThrows
     @Override
-    public MessageResponse save(Notification n) {
+    public Notification save(Notification n) {
         try {
-            Notification result = this.repository.save(n);
+            n.setId(null);
+            return this.repository.save(n);
+        } catch (Exception e) {
+            throw new NotificationException(e.getMessage());
+        }
+    }
+
+    @SneakyThrows
+    @Override
+    public MessageResponse delete(Integer companyId, Integer resaleId, Integer id) {
+        try {
+            this.repository.delete(companyId, resaleId, id);
             MessageResponse response = new MessageResponse();
             response.setStatus(ConstantsMessage.SUCCESS);
-            response.setData(result);
             return response;
         } catch (Exception e) {
             throw new NotificationException(e.getMessage());
@@ -32,12 +42,19 @@ public class NotificationService implements INotificationService {
 
     @SneakyThrows
     @Override
-    public MessageResponse delete(Integer companyId, Integer resaleId, UUID id) {
+    public Notification filterId(Integer companyId, Integer resaleId, Integer id){
         try {
-            this.repository.delete(companyId, resaleId, id);
-            MessageResponse response = new MessageResponse();
-            response.setStatus(ConstantsMessage.SUCCESS);
-            return response;
+           return this.repository.filterId(companyId, resaleId, id);
+        } catch (Exception e) {
+            throw new NotificationException(e.getMessage());
+        }
+    }
+
+    @SneakyThrows
+    @Override
+    public List<Notification> filterUser(Integer companyId, Integer resaleId, Integer userId) {
+        try {
+            return this.repository.filterUser(companyId, resaleId, userId);
         } catch (Exception e) {
             throw new NotificationException(e.getMessage());
         }

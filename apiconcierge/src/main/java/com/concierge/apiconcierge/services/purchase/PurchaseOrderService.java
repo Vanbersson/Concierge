@@ -53,6 +53,20 @@ public class PurchaseOrderService implements IPurchaseOrderService {
 
     @SneakyThrows
     @Override
+    public MessageResponse close(PurchaseOrder purchase){
+        try {
+            MessageResponse response = this.validation.close(purchase);
+            if (ConstantsMessage.SUCCESS.equals(response.getStatus())) {
+                 this.repository.save(purchase);
+            }
+            return response;
+        } catch (Exception ex) {
+            throw new PurchaseOrderException(ex.getMessage());
+        }
+    }
+
+    @SneakyThrows
+    @Override
     public List<Map<String,Object>> filterOpen(Integer companyId, Integer resaleId) {
         try {
             MessageResponse response = this.validation.filterOpen(companyId, resaleId);

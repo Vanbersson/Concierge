@@ -3,6 +3,8 @@ package com.concierge.apiconcierge.dtos.workshop.toolcontrol;
 import com.concierge.apiconcierge.models.enums.StatusEnableDisable;
 import com.concierge.apiconcierge.models.workshop.toolcontrol.enums.TypeRequest;
 
+import java.math.BigDecimal;
+
 public record ToolControlMaterialDto(Integer companyId,
                                      Integer resaleId,
                                      Integer id,
@@ -11,10 +13,10 @@ public record ToolControlMaterialDto(Integer companyId,
                                      Integer numberCA,
                                      String description,
                                      Integer categoryId,
-                                     float quantityAccountingLoan,
-                                     float quantityAvailableLoan,
-                                     float quantityAccountingKit,
-                                     float quantityAvailableKit,
+                                     BigDecimal quantityAccountingLoan,
+                                     BigDecimal quantityAvailableLoan,
+                                     BigDecimal quantityAccountingKit,
+                                     BigDecimal quantityAvailableKit,
                                      Integer validityDay,
-                                     byte[] photo) {
+                                     String photoUrl) {
 }

@@ -3,8 +3,10 @@ package com.concierge.apiconcierge.services.menu;
 import com.concierge.apiconcierge.exceptions.menu.MenuUserException;
 import com.concierge.apiconcierge.models.menu.IMenuUserReport;
 import com.concierge.apiconcierge.models.menu.MenuUser;
+import com.concierge.apiconcierge.models.message.MessageResponse;
 import com.concierge.apiconcierge.repositories.menu.IMenuUserRepository;
 import com.concierge.apiconcierge.util.ConstantsMessage;
+import com.concierge.apiconcierge.validation.menu.IMenuUserValidation;
 import com.concierge.apiconcierge.validation.menu.MenuUserValidation;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,43 +21,20 @@ import java.util.Map;
 public class MenuUserService implements IMenuUserService {
 
     @Autowired
-    IMenuUserRepository repository;
+    private IMenuUserRepository repository;
     @Autowired
-    MenuUserValidation validation;
+    private IMenuUserValidation validation;
 
     @SneakyThrows
     @Override
-    public String save(MenuUser menu) {
-
+    public MessageResponse save(MenuUser menu) {
         try {
-
-            String message = this.validation.save(menu);
-            if (ConstantsMessage.SUCCESS.equals(message)) {
+            MessageResponse response = this.validation.save(menu);
+            if (response.getStatus().equals(ConstantsMessage.SUCCESS)) {
                 menu.setId(null);
-
                 this.repository.save(menu);
-                return ConstantsMessage.SUCCESS;
-            } else {
-                throw new MenuUserException(message);
             }
-        } catch (Exception ex) {
-            throw new MenuUserException(ex.getMessage());
-        }
-
-    }
-
-    @SneakyThrows
-    @Override
-    public String update(MenuUser menu) {
-        try {
-            String message = this.validation.update(menu);
-            if (ConstantsMessage.SUCCESS.equals(message)) {
-
-                this.repository.save(menu);
-                return ConstantsMessage.SUCCESS;
-            } else {
-                throw new MenuUserException(message);
-            }
+            return response;
         } catch (Exception ex) {
             throw new MenuUserException(ex.getMessage());
         }
@@ -63,13 +42,27 @@ public class MenuUserService implements IMenuUserService {
 
     @SneakyThrows
     @Override
-    public List<Object> filterMenus(MenuUser menu) {
+    public MessageResponse update(MenuUser menu) {
         try {
-            String message = this.validation.filterMenus(menu);
-            if (ConstantsMessage.SUCCESS.equals(message)) {
+            MessageResponse response = this.validation.update(menu);
+            if (response.getStatus().equals(ConstantsMessage.SUCCESS)) {
+                this.repository.save(menu);
+            }
+            return response;
+        } catch (Exception ex) {
+            throw new MenuUserException(ex.getMessage());
+        }
+    }
+
+    @SneakyThrows
+    @Override
+    public List<Map<String, Object>> filterMenus(MenuUser menu) {
+        try {
+            MessageResponse response = this.validation.filterMenus(menu);
+            if (response.getStatus().equals(ConstantsMessage.SUCCESS)) {
                 List<IMenuUserReport> list = this.repository.filterUserId(menu.getCompanyId(), menu.getResaleId(), menu.getUserId());
-                List<Object> menus = new ArrayList<>();
-                for(var item : list){
+                List<Map<String, Object>> menus = new ArrayList<>();
+                for (var item : list) {
                     Map<String, Object> map = new HashMap<>();
                     map.put("companyId", item.getCompanyId());
                     map.put("resaleId", item.getResaleId());
@@ -78,27 +71,22 @@ public class MenuUserService implements IMenuUserService {
                     menus.add(map);
                 }
                 return menus;
-            } else {
-                throw new MenuUserException(message);
             }
+            return List.of();
         } catch (Exception ex) {
             throw new MenuUserException(ex.getMessage());
         }
-
     }
 
     @SneakyThrows
     @Override
-    public String deleteMenu(MenuUser menu) {
+    public MessageResponse deleteMenu(MenuUser menu) {
         try {
-
-            String message = this.validation.deleteMenus(menu);
-            if (ConstantsMessage.SUCCESS.equals(message)) {
+            MessageResponse response = this.validation.deleteMenus(menu);
+            if (response.getStatus().equals(ConstantsMessage.SUCCESS)) {
                 this.repository.deleteMenu(menu.getCompanyId(), menu.getResaleId(), menu.getUserId());
-                return ConstantsMessage.SUCCESS;
-            } else {
-                throw new MenuUserException(message);
             }
+            return response;
         } catch (Exception ex) {
             throw new MenuUserException(ex.getMessage());
 
